@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GAP Ethernet (ESP32-WROOM + LAN8720) – Wiring & GPIO Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Paths are from /docs/ back to site root -->
+  <link rel="icon" type="image/png" href="../icons/Westtech_Icon_Green_32.png">
+  <link rel="stylesheet" href="../css/site.css">
+</head>
+<body class="support-page doc-page">
+  <div class="page">
+
+    <!-- NAV (same as main site, but ../ for links) -->
+    <nav class="nav nav-stack">
+      <a href="../index.html" class="nav-brand nav-brand-stack">
+        <img src="../images/Westtech_Logo_Blue.png"
+             alt="WestTechAI – IoT &amp; Computing Solutions logo"
+             class="nav-logo nav-logo-full">
+
+        <div class="badge badge-nav">
+          <span></span>
+          VETERAN OWNED • IOT PANELS
+        </div>
+      </a>
+
+      <div class="nav-links">
+        <a href="../index.html" class="nav-link">Home</a>
+        <a href="../products.html" class="nav-link">Products</a>
+        <a href="../order.html" class="nav-link">Order</a>
+        <a href="../support.html" class="nav-link active">Support</a>
+        <a href="../about.html" class="nav-link">About</a>
+      
+        <a class="nav-link" href="../contact.html">Contact</a></div>
+    </nav>
+
+    <!-- PAGE HEADER -->
+    <header class="page-header">
+      <div class="badge">
+        <span></span>
+        GARAGE PANEL • ESP32-WROOM • ETHERNET
+      </div>
+
+      <h1>GAP Ethernet (ESP32-WROOM + LAN8720)<br>Wiring &amp; GPIO Map</h1>
+
+      <p class="tagline">
+        Reference wiring guide for the GAP Ethernet panel using ESP32-WROOM, LAN8720 Ethernet,
+        OLED (I²C), DHT11, PIR sensors, door reeds, garage door relay, and active buzzer.
+      </p>
+
+      <!-- hook this up once you export a PDF version -->
+      <p>
+        <a href="GAP-ESP32-Eth-Wiring.pdf" class="btn-download">
+          Download Wiring Guide (PDF)
+        </a>
+      </p>
+    </header>
+
+    <main>
+
+      <!-- SUMMARY GPIO MAP -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">GPIO Map &amp; Available Pins</div>
+          <span class="section-tag">Summary</span>
+        </div>
+
+        <p>
+          This map covers the main I/O used by the GAP Ethernet (ESP32-WROOM + LAN8720) panel.
+          All logic-level signals are 3.3&nbsp;V. The LAN8720 Ethernet pins are reserved and
+          must not be repurposed.
+        </p>
+
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>GPIO</th>
+                <th>Signal / Device</th>
+                <th>Direction</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>GPIO2</td>
+                <td>DHT11 Temperature / Humidity</td>
+                <td>INPUT (1-wire)</td>
+                <td>Strap pin; idles high via DHT11, OK if wiring is clean</td>
+              </tr>
+              <tr>
+                <td>GPIO4</td>
+                <td>Garage Door Relay</td>
+                <td>OUTPUT (momentary)</td>
+                <td>Drives relay IN to simulate wall button</td>
+              </tr>
+              <tr>
+                <td>GPIO5</td>
+                <td>Buzzer (Active)</td>
+                <td>OUTPUT</td>
+                <td>Active buzzer, 3.3&nbsp;V</td>
+              </tr>
+              <tr>
+                <td>GPIO13</td>
+                <td>Inside Garage Door Reed</td>
+                <td>INPUT (pullup)</td>
+                <td>Reed between GPIO13 and GND</td>
+              </tr>
+              <tr>
+                <td>GPIO14</td>
+                <td>Main Garage Door Reed</td>
+                <td>INPUT (pullup)</td>
+                <td>Primary door state (open/closed)</td>
+              </tr>
+              <tr>
+                <td>GPIO16</td>
+                <td>Outside Garage Door Reed</td>
+                <td>INPUT (pullup)</td>
+                <td>Reed between GPIO16 and GND</td>
+              </tr>
+              <tr>
+                <td>GPIO32</td>
+                <td>I²C SDA – OLED</td>
+                <td>Bidirectional</td>
+                <td>SDA for 0.96″ OLED (addr 0x3C)</td>
+              </tr>
+              <tr>
+                <td>GPIO33</td>
+                <td>I²C SCL – OLED</td>
+                <td>OUTPUT</td>
+                <td>SCL for 0.96″ OLED (addr 0x3C)</td>
+              </tr>
+              <tr>
+                <td>GPIO34</td>
+                <td>PIR Inside</td>
+                <td>INPUT-only</td>
+                <td>No internal pull-up; PIR module provides logic output</td>
+              </tr>
+              <tr>
+                <td>GPIO35</td>
+                <td>PIR Outside</td>
+                <td>INPUT-only</td>
+                <td>No internal pull-up; PIR module provides logic output</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="support-note">
+          <strong>Wiring assumptions for this version:</strong> reeds on 13 (inside),
+          16 (outside), 14 (main); PIRs on 34 (inside) and 35 (outside); OLED on SDA=32,
+          SCL=33; DHT11 on GPIO2; garage relay on GPIO4; buzzer on GPIO5.
+        </p>
+      </section>
+
+      <!-- ETHERNET / LAN8720 -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">Ethernet (LAN8720) – Reserved Pins</div>
+          <span class="section-tag">LAN8720</span>
+        </div>
+
+        <p>
+          These GPIOs are dedicated to the LAN8720 RMII interface and must not be reused.
+          They follow the <strong>WestTech – LAN8720 to ESP32 (Stable-Tested)</strong> mapping.
+        </p>
+
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>GPIO</th>
+                <th>LAN8720 Signal</th>
+                <th>Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>GPIO17</td>
+                <td>RMII CLK_OUT</td>
+                <td>50&nbsp;MHz clock (internal clkout mode)</td>
+              </tr>
+              <tr>
+                <td>GPIO18</td>
+                <td>MDIO</td>
+                <td>MDIO data line</td>
+              </tr>
+              <tr>
+                <td>GPIO23</td>
+                <td>MDC</td>
+                <td>MDIO clock line</td>
+              </tr>
+              <tr>
+                <td>GPIO19</td>
+                <td>TX0</td>
+                <td>RMII transmit data 0</td>
+              </tr>
+              <tr>
+                <td>GPIO22</td>
+                <td>TX1</td>
+                <td>RMII transmit data 1</td>
+              </tr>
+              <tr>
+                <td>GPIO21</td>
+                <td>TX_EN</td>
+                <td>RMII transmit enable</td>
+              </tr>
+              <tr>
+                <td>GPIO25</td>
+                <td>RX0</td>
+                <td>RMII receive data 0</td>
+              </tr>
+              <tr>
+                <td>GPIO26</td>
+                <td>RX1</td>
+                <td>RMII receive data 1</td>
+              </tr>
+              <tr>
+                <td>GPIO27</td>
+                <td>CRS</td>
+                <td>RMII carrier sense</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="support-note">
+          If Ethernet doesn’t come up, verify all LAN8720 power (3.3&nbsp;V), grounds, and
+          each RMII signal above. Then reboot the ESP32 and your switch.
+        </p>
+      </section>
+
+      <!-- BOOT / FLASH / EXTRA PINS -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">Boot / Flash Pins &amp; Extra Inputs</div>
+          <span class="section-tag">Reference</span>
+        </div>
+
+        <h3>Boot/flash pins to avoid</h3>
+        <ul>
+          <li><strong>GPIO6..11</strong> – Flash pins (SDIO). <strong>Do not use.</strong></li>
+          <li><strong>GPIO0, GPIO2, GPIO12, GPIO15</strong> – Boot strap pins; use with care.</li>
+          <li>
+            <strong>GPIO1 (TX0), GPIO3 (RX0)</strong> – Serial console; avoid unless you know
+            the trade-offs.
+          </li>
+        </ul>
+
+        <h3>Input-only pins</h3>
+        <p>
+          These are input-only and have no internal pull-ups; they’re great for dry-contact
+          sensors when paired with an external 10&nbsp;kΩ pull-up to 3.3&nbsp;V:
+        </p>
+
+        <ul>
+          <li><strong>GPIO34, GPIO35, GPIO36 (VP), GPIO39 (VN)</strong></li>
+          <li>
+            Typical uses: safety beam, extra door/window reeds, additional PIRs, dry-contact
+            inputs.
+          </li>
+        </ul>
+
+        <h3>Usable with care (strap/LED caveats)</h3>
+        <ul>
+          <li>
+            <strong>GPIO2</strong> – Strap + sometimes onboard LED.
+            Must <strong>not</strong> be pulled low at boot.
+            Here used for DHT11 (idles high, OK if wiring is clean).
+          </li>
+          <li>
+            <strong>GPIO15</strong> – Strap (usually pulled-down). Safer as OUTPUT; avoid external
+            pull-up at boot.
+          </li>
+          <li>
+            <strong>GPIO0</strong> – Strap; must be HIGH at boot (LOW enters flash mode).
+            Generally avoid connecting external buttons directly.
+          </li>
+          <li>
+            <strong>GPIO12</strong> – Strap; affects flash voltage. Avoid connecting anything that
+            might pull it up at boot.
+          </li>
+        </ul>
+      </section>
+
+      <!-- OLED / I2C -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">OLED – I²C Wiring</div>
+          <span class="section-tag">Display</span>
+        </div>
+
+        <p>
+          The 0.96″ OLED uses I²C at address <code>0x3C</code>, powered from 3.3&nbsp;V, and
+          connected to GPIO32/33.
+        </p>
+
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ESP32-WROOM</th>
+                <th>OLED Module</th>
+                <th>Typical Wire Color</th>
+                <th>Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>3V3</td>
+                <td>VCC</td>
+                <td>Red</td>
+                <td>Display power (3.3&nbsp;V)</td>
+              </tr>
+              <tr>
+                <td>GND</td>
+                <td>GND</td>
+                <td>Black</td>
+                <td>Common ground</td>
+              </tr>
+              <tr>
+                <td>GPIO32</td>
+                <td>SDA</td>
+                <td>Blue</td>
+                <td>I²C data</td>
+              </tr>
+              <tr>
+                <td>GPIO33</td>
+                <td>SCL</td>
+                <td>Green</td>
+                <td>I²C clock</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- DHT11 -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">DHT11 – Temperature &amp; Humidity</div>
+          <span class="section-tag">Sensor</span>
+        </div>
+
+        <p>
+          The DHT11 sensor is powered from 3.3&nbsp;V and uses GPIO2 as its single data line.
+        </p>
+
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ESP32-WROOM</th>
+                <th>DHT11</th>
+                <th>Typical Wire Color</th>
+                <th>Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>3V3</td>
+                <td>VCC</td>
+                <td>Red</td>
+                <td>Sensor power (3.3&nbsp;V)</td>
+              </tr>
+              <tr>
+                <td>GND</td>
+                <td>GND</td>
+                <td>Black</td>
+                <td>Common ground</td>
+              </tr>
+              <tr>
+                <td>GPIO2</td>
+                <td>DATA / OUT</td>
+                <td>Yellow</td>
+                <td>DHT11 data (1-wire)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- REEDS -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">Garage Door Reeds – Inside / Outside / Main</div>
+          <span class="section-tag">Inputs</span>
+        </div>
+
+        <p>
+          Three reed switches monitor the garage door: inside track, outside track, and main
+          door state. Each is wired between the GPIO and ground with the internal pull-up
+          enabled.
+        </p>
+
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>GPIO</th>
+                <th>Reed Location</th>
+                <th>Wiring</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>GPIO13</td>
+                <td>Inside Garage Door Reed</td>
+                <td>Reed between GPIO13 and GND</td>
+                <td>INPUT, pullup enabled</td>
+              </tr>
+              <tr>
+                <td>GPIO16</td>
+                <td>Outside Garage Door Reed</td>
+                <td>Reed between GPIO16 and GND</td>
+                <td>INPUT, pullup enabled</td>
+              </tr>
+              <tr>
+                <td>GPIO14</td>
+                <td>Main Garage Door Reed</td>
+                <td>Reed between GPIO14 and GND</td>
+                <td>Primary open/closed state</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="support-note">
+          With pull-ups enabled, the GPIO reads HIGH when the reed is open and LOW when the reed
+          closes and connects the pin to ground.
+        </p>
+      </section>
+
+      <!-- PIR SENSORS -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">PIR Motion Sensors – Inside &amp; Outside</div>
+          <span class="section-tag">Motion</span>
+        </div>
+
+        <p>
+          Two PIR sensors monitor inside and outside motion for auto-close logic and safety.
+          GPIO34 and GPIO35 are input-only pins; the PIR modules provide the logic-level output.
+        </p>
+
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>GPIO</th>
+                <th>PIR</th>
+                <th>Wiring</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>GPIO34</td>
+                <td>PIR Inside</td>
+                <td>VCC to 5&nbsp;V or 3.3&nbsp;V (per module), GND to GND, OUT to GPIO34</td>
+                <td>Input-only; no internal pull-up</td>
+              </tr>
+              <tr>
+                <td>GPIO35</td>
+                <td>PIR Outside</td>
+                <td>VCC to 5&nbsp;V or 3.3&nbsp;V (per module), GND to GND, OUT to GPIO35</td>
+                <td>Input-only; no internal pull-up</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- RELAY & BUZZER -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">Garage Relay &amp; Buzzer</div>
+          <span class="section-tag">Outputs</span>
+        </div>
+
+        <h3>Garage Door Relay (GPIO4)</h3>
+        <p>
+          The relay module simulates the garage wall-button press. The coil side is powered
+          from 5&nbsp;V (separate buck), while the IN pin is driven by GPIO4.
+        </p>
+
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ESP32 / Rail</th>
+                <th>Relay Module</th>
+                <th>Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>5&nbsp;V Supply</td>
+                <td>DC+</td>
+                <td>Relay power (5&nbsp;V)</td>
+              </tr>
+              <tr>
+                <td>GND (common)</td>
+                <td>DC-</td>
+                <td>Common ground with ESP32 and panel</td>
+              </tr>
+              <tr>
+                <td>GPIO4</td>
+                <td>IN</td>
+                <td>Relay control (momentary pulse)</td>
+              </tr>
+              <tr>
+                <td>Garage opener button contacts</td>
+                <td>NO / COM</td>
+                <td>Connect in parallel with wall button</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Buzzer (GPIO5)</h3>
+        <p>
+          The active buzzer is powered from 3.3&nbsp;V and driven from GPIO5. It is used for
+          pre-warn tones and continuous beep until close.
+        </p>
+
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ESP32-WROOM</th>
+                <th>Buzzer</th>
+                <th>Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>3V3</td>
+                <td>VCC / +</td>
+                <td>Power (3.3&nbsp;V)</td>
+              </tr>
+              <tr>
+                <td>GND</td>
+                <td>GND / −</td>
+                <td>Common ground</td>
+              </tr>
+              <tr>
+                <td>GPIO5</td>
+                <td>IN (if 3-pin type)</td>
+                <td>Drives buzzer (active type)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="footer">
+      <p>© 2025 WestTechAI · Veteran Owned · Built for DIYers</p>
+    </footer>
+  </div>
+</body>
+</html>

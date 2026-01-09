@@ -1,0 +1,780 @@
+:root {
+  --bg: #05060a;
+  --bg-alt: #0c0f16;
+  --card: #111522;
+  --accent: #38bdf8;
+  --accent-soft: rgba(56, 189, 248, 0.12);
+  --text-main: #e5e7eb;
+  --text-muted: #9ca3af;
+  --border-subtle: #1f2933;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.5);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, #020617 0, #020617 35%, #02040a 100%);
+  color: var(--text-main);
+  line-height: 1.6;
+}
+
+a { color: inherit; text-decoration: none; }
+
+.page {
+  max-width: clamp(1080px, 94vw, 2800px);
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+@media (max-width: 480px){
+  .page{
+    padding: 18px 14px 56px;
+  }
+}
+
+@media (min-width: 1400px){
+  .page{
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+}
+
+
+
+/* ============================================================
+   Page header (site-wide, Products-style)
+   ============================================================ */
+.page-header {
+  margin: 14px 0 24px;
+}
+
+.page-header .badge {
+  margin-bottom: 10px;
+}
+
+.page-header h1 {
+  font-size: clamp(2.0rem, 3vw, 2.4rem);
+  margin: 0 0 6px;
+}
+
+.page-header p,
+.page-header .tagline {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.98rem;
+  max-width: 640px;
+}
+/* Nav */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 16px;
+}
+
+.nav-brand {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+/* (kept) original logo rule — used by other pages/icons if needed */
+.nav-logo {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
+/* === NAV (global) === */
+.nav-stack{
+  display: grid;
+  grid-template-columns: 1fr;       /* mobile: stacked */
+  justify-items: center;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 0 6px;
+}
+
+/* Brand wrap: logo + badge locked together */
+.nav-brand-wrap{
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.nav-brand{
+  display: block;
+}
+
+.nav-logo-full{
+  display: block;
+  width: min(670px, 80vw);
+  height: auto;
+}
+
+/* "Veteran Owned" pill under logo */
+.badge-nav{
+  margin-top: 10px;
+  align-self: center;
+  text-align: center;
+}
+
+/* Menu block (mobile) */
+.nav-links{
+  display: flex;
+  gap: 14px;
+  margin-top: 0;
+  font-size: 0.9rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Tablet / desktop: brand + menu side-by-side, centered as a group */
+@media (min-width: 860px){
+  .nav-stack{
+    /* Center the whole header group */
+    grid-template-columns: max-content max-content;
+    justify-content: center;
+
+    /* knobs */
+    --brand-x: 0px;
+    --nav-x: 0px;
+    --nav-y: -18px;
+    --brand-nav-gap: 64px; /* gap between logo and nav */
+
+    column-gap: var(--brand-nav-gap);
+    row-gap: 0;
+    align-items: center;
+    justify-items: start;
+    padding: 14px 0 6px;
+  }
+
+  .nav-brand-wrap{
+    grid-column: 1;
+    justify-self: start;
+    transform: translateX(var(--brand-x));
+  }
+
+  /* keep the logo from being too huge when nav is beside it */
+  .nav-logo-full{
+    width: clamp(420px, 44vw, 620px);
+    height: auto;
+  }
+
+  .nav-links{
+    grid-column: 2;
+    justify-self: start;
+    align-self: center;
+
+    /* 2-row menu */
+    display: grid;
+    grid-template-columns: repeat(4, max-content); /* 4 on top row, 3 on bottom */
+    gap: 10px 20px;
+
+    /* lift it up next to the logo */
+    transform: translate(var(--nav-x), var(--nav-y));
+
+    margin-top: 0;
+    text-align: left;
+    justify-content: start;
+    justify-items: start;
+  }
+}
+
+/* Nav link pill styling (original behavior) */
+.nav-links a,
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: var(--text-muted);
+  border: 1px solid transparent;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  white-space: nowrap;
+}
+
+.nav-links a:hover,
+.nav-link:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: rgba(148, 163, 184, 0.5);
+}
+
+.nav-links a.active,
+.nav-links a[aria-current="page"],
+.nav-link.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Badge (reused) */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.8rem;
+  text-transform: capitalize;
+  letter-spacing: 0.12em;
+  margin-bottom: 10px;
+}
+
+.badge span {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.badge-nav {
+  margin-top: 10px;   /* spacing under logo */
+  align-self: center;
+  text-align: center;
+}
+
+/* Hero */
+header { margin-bottom: 28px; }
+
+.hero-logo-wrapper {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.hero-logo {
+  max-width: 460px;
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 18px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.7);
+}
+
+.hero-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr);
+  gap: 22px;
+  align-items: center;
+}
+
+.hero-main h1 {
+  font-size: clamp(2.2rem, 3.3vw, 2.9rem);
+  margin: 0 0 8px;
+  letter-spacing: 0.03em;
+}
+
+.hero-subtitle {
+  font-size: 1.02rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  max-width: 640px;
+}
+
+.hero-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 16px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.08s ease;
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #020617;
+  box-shadow: 0 12px 30px rgba(56, 189, 248, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 40px rgba(56, 189, 248, 0.55);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: rgba(148, 163, 184, 0.4);
+  color: var(--text-muted);
+}
+
+.btn-ghost:hover {
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text-main);
+}
+
+.hero-note {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Sections */
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 6px;
+}
+
+.section {
+  background: linear-gradient(135deg, var(--card), #070b12);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  padding: 18px 18px 16px;
+  box-shadow: var(--shadow-soft);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.section-tag {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.section p {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+}
+
+.two-col { display: grid; gap: 18px; }
+
+@media (min-width: 900px) {
+  .two-col { grid-template-columns: 1.4fr 1.2fr; }
+}
+
+.list-tight {
+  margin: 0 0 6px 18px;
+  padding: 0;
+  font-size: 0.9rem;
+}
+
+.list-tight li { margin-bottom: 4px; }
+
+.footer {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(15, 23, 42, 0.8);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+/* ============================================================
+   SUPPORT PAGE – scoped styles (keeps other pages unchanged)
+   ============================================================ */
+.support-page main {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.support-page ul {
+  margin: 0 0 10px 18px;
+  padding: 0;
+  font-size: 0.92rem;
+}
+
+.support-page li {
+  margin-bottom: 4px;
+}
+
+.support-page .doc-list-title {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+
+.support-page .doc-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.support-page .doc-link:hover {
+  text-decoration: underline;
+}
+
+.support-page .issue-title {
+  font-weight: 600;
+}
+
+.support-page .mailto-link {
+  color: var(--accent);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.support-page .mailto-link:hover {
+  text-decoration: underline;
+}
+
+.support-page .support-note {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   ORDER PAGE – carried over from previous inline CSS
+   (keeps order.html clean; uses site-wide variables)
+   ============================================================ */
+
+header .tagline {
+  font-size: 0.96rem;
+  color: var(--text-muted);
+  max-width: 640px;
+}
+
+.product-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+  margin-bottom: 4px;
+}
+
+.chip {
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+}
+
+.mailto-link {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.form-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.btn-submit {
+  margin-top: 6px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #020617;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 10px 26px rgba(56, 189, 248, 0.45);
+  transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.08s ease;
+}
+
+.btn-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 34px rgba(56, 189, 248, 0.6);
+}
+
+
+/* ============================================================
+   ORDER PAGE – Form styling (scoped to forms inside .section)
+   ============================================================ */
+
+.section form {
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.section form > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.section form label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.section form input,
+.section form select,
+.section form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(2, 6, 23, 0.35);
+  color: var(--text-main);
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.section form textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.section form input::placeholder,
+.section form textarea::placeholder {
+  color: rgba(156, 163, 175, 0.75);
+}
+
+.section form input:focus,
+.section form select:focus,
+.section form textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+}
+
+.section form select {
+  appearance: none;
+}
+/* ============================================================
+   ABOUT PAGE – scoped styles (keeps Order form + other pages safe)
+   ============================================================ */
+.about-page main {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Numbered section headers */
+.about-page .section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.about-page .section-number {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: var(--accent-soft);
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.about-page .section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.about-page .section p {
+  margin: 0 0 10px;
+  font-size: 0.97rem;
+}
+
+.about-page .section p:last-child { margin-bottom: 0; }
+
+.about-page .muted {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.about-page ul {
+  margin: 0 0 10px 18px;
+  padding: 0;
+}
+
+.about-page li {
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+}
+
+.about-page li strong { font-weight: 600; }
+
+.about-page .pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.about-page .pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+}
+
+.about-page .subheading {
+  margin-top: 12px;
+  margin-bottom: 4px;
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+
+.about-page .story-quote {
+  border-left: 3px solid var(--accent);
+  padding-left: 12px;
+  margin-top: 4px;
+  font-style: italic;
+  color: var(--text-main);
+}
+
+/* Two-column layout on desktop, full-width sections */
+@media (min-width: 900px) {
+  .about-page main {
+    display: grid;
+    grid-template-columns: 1.1fr 1.1fr;
+    gap: 22px;
+  }
+
+  .about-page .section--full {
+    grid-column: 1 / -1;
+  }
+}
+/* ============================================================
+   PRODUCTS PAGE – scoped styles (keeps Order form safe)
+   ============================================================ */
+/* Product grid */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+  max-width: 100% /* clamp(980px, 92vw, 1680px);*/
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+.product-card {
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(15, 23, 42, 0.9);
+  background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), #020617 55%);
+  padding: 12px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.product-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.product-name {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.product-status {
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+
+.product-body {
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+
+.product-list {
+  margin: 4px 0 6px 18px;
+  padding: 0;
+  font-size: 0.88rem;
+}
+
+.product-list li {
+  margin-bottom: 4px;
+}
+
+.product-footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.link-inline {
+  font-size: 0.8rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.link-inline:hover {
+  text-decoration: underline;
+}
+/* Fix: Products page horizontal overflow causing layout nudge */
+body.products-page {
+  overflow-x: hidden;   /* or: overflow-x: clip; */
+}
+
+.products-page .page {
+  overflow-x: hidden;   /* belt + suspenders */
+}
+
+.products-page main img {
+  max-width: 100%;
+  height: auto;
+}

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Contact – WestTechHA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="icons/Westtech_Icon_BrainW_Blue_128.png" />
+  <link rel="stylesheet" href="css/site.css" />
+</head>
+
+<body class="contact-page">
+  <div class="page">
+    <nav class="nav nav-stack">
+      <div class="nav-brand-wrap">
+        <a class="nav-brand" href="index.html">
+          <img
+            class="nav-logo nav-logo-full"
+            src="images/Westtech_Logo_Blue.png"
+            alt="WestTechHA – IoT &amp; Computing Solutions logo"
+          />
+        </a>
+        <div class="badge badge-nav">
+          <span></span>
+          VETERAN OWNED • IoT PANELS
+        </div>
+      </div>
+
+      <div class="nav-links">
+        <a class="nav-link" href="index.html">Home</a>
+        <a class="nav-link" href="products.html">Products</a>
+        <a class="nav-link" href="services.html">Services</a>
+        <a class="nav-link" href="order.html">Order</a>
+        <a class="nav-link" href="support.html">Support</a>
+        <a class="nav-link" href="about.html">About</a>
+      
+        <a class="nav-link active" href="contact.html">Contact</a></div>
+    </nav>
+
+    <header class="page-header">
+      <div class="badge">
+        <span></span>
+        CONTACT
+      </div>
+      <h1>Contact WestTechHA</h1>
+      <p class="tagline">
+        Send a message and we’ll get back to you. If this is a support request, include your panel
+        type, firmware version, and a quick description of what you’re seeing.
+      </p>
+    </header>
+
+    <main>
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">Contact Options</div>
+          <span class="section-tag">Support</span>
+        </div>
+
+        <div class="product-grid">
+          <article class="product-card">
+            <div class="product-label">Email</div>
+            <div class="product-name">support@WestTechHA.com</div>
+            <div class="product-status">Fastest response</div>
+            <p class="product-body">
+              You can always email us directly. If possible, attach photos/screenshots and include
+              your panel type and firmware version.
+            </p>
+            <div class="product-footer">
+              <span class="chip">EMAIL</span>
+              <a class="link-inline" href="mailto:support@WestTechHA.com">Compose email</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">Send a Message</div>
+          <span class="section-tag">Form</span>
+        </div>
+
+        <p>
+          This form is ready for a static website. It uses FormSubmit to deliver messages to your
+          inbox (no server required). If you’d rather use a different provider (Formspree, Cloudflare
+          Worker, etc.), we can swap the form action.
+        </p>
+
+        <form action="https://formsubmit.co/support@WestTechHA.com" method="POST">
+          <!-- Optional FormSubmit options (safe defaults). You can remove or tweak later. -->
+          <input type="hidden" name="_subject" value="WestTechHA Contact Form" />
+          <input type="hidden" name="_captcha" value="true" />
+          <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" />
+
+          <div>
+            <label for="name">Your name</label>
+            <input id="name" name="name" type="text" autocomplete="name" required />
+          </div>
+
+          <div>
+            <label for="email">Your email</label>
+            <input id="email" name="email" type="email" autocomplete="email" required />
+          </div>
+
+          <div>
+            <label for="topic">Topic</label>
+            <select id="topic" name="topic" required>
+              <option value="Support">Support / Troubleshooting</option>
+              <option value="Order">Order / Quote</option>
+              <option value="Partnership">Partnership / Installer</option>
+              <option value="General">General Question</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="panel">Panel / Product (optional)</label>
+            <input id="panel" name="panel" type="text" placeholder="GAP / SAP / MAP / BAP" />
+          </div>
+
+          <div>
+            <label for="message">Message</label>
+            <textarea id="message" name="message" rows="6" required
+              placeholder="What can we help with? Include steps you’ve tried, and anything that changed recently."></textarea>
+          </div>
+
+          <button class="btn btn-primary" type="submit">Send message</button>
+
+          <p class="form-note">
+            Prefer email? Send details to
+            <a class="mailto-link" href="mailto:support@WestTechHA.com">support@WestTechHA.com</a>.
+          </p>
+        </form>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>© 2025 WestTechHA · Veteran Owned · Built for DIYers</p>
+    </footer>
+  </div>
+</body>
+</html>

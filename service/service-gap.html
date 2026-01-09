@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GAP Service – WestTechAI Panels</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="/css/site.css">
+  <!-- Optional shared service styling -->
+  <!-- <link rel="stylesheet" href="/css/service.css"> -->
+
+  <link rel="icon" type="image/png" href="/assets/favicon.png">
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- Replace this with your normal site header/nav -->
+    <div class="mini-header">
+      <div class="muted" style="font-size:13px;">WestTechAI Panels</div>
+      <div class="links">
+        <a href="/index.html">Home</a>
+        <a href="/products.html">Products</a>
+        <a href="/orders.html">Orders</a>
+        <a href="/support.html">Support</a>
+        <a class="active" href="/service.html">Service</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/about.html">About</a>
+      </div>
+    </div>
+
+    <h1 class="page-title">GAP Service (Garage Automation Panel)</h1>
+    <p class="page-subtitle">
+      GAP is designed with over-the-counter parts so repairs are fast and affordable. This page covers GAP-specific
+      troubleshooting, parts, and swap steps.
+    </p>
+
+    <div class="card">
+      <h2>What to send Support (fastest resolution)</h2>
+      <ul class="muted" style="margin:0; padding-left:18px; line-height:1.7;">
+        <li><strong>Unit Label:</strong> YYWW + last 4 of MAC (example: <code>2549-7E6D</code>)</li>
+        <li><strong>Inside-floor enclosure version mark:</strong> example <code>GAP_BOX_v7.3</code></li>
+        <li><strong>Photo of wiring</strong> (wide shot + close of power + relay)</li>
+        <li><strong>Symptom summary:</strong> “reboots on relay”, “door state inverted”, “eth flaps”, etc.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Quick Triage (GAP)</h2>
+      <ol class="muted" style="margin:0; padding-left:18px; line-height:1.7;">
+        <li><strong>Power first:</strong> most “random” issues are brownouts or loose DC wiring.</li>
+        <li><strong>Check grounds:</strong> all grounds must be common (buck(s), relay, ESP32, sensors).</li>
+        <li><strong>Relay click test:</strong> does the relay LED/click occur when commanded?</li>
+        <li><strong>Swap test:</strong> swap a suspect reed/PIR with a known-good part if available.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2>Common Symptoms → Likely Cause</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:240px;">Symptom</th>
+              <th style="width:280px;">Most likely causes</th>
+              <th>Fix</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Reboots when relay toggles</strong></td>
+              <td>Undersized buck, loose DC input, ground issue</td>
+              <td>Verify buck headroom, tighten DC wiring, keep grounds common, shorten power leads.</td>
+            </tr>
+            <tr>
+              <td><strong>Door shows open when closed</strong></td>
+              <td>Reed type mismatch (NO/NC), magnet alignment</td>
+              <td>Confirm reed type and wiring, align magnet, invert input in firmware only if needed.</td>
+            </tr>
+            <tr>
+              <td><strong>Ethernet flaps</strong></td>
+              <td>3.3V sag, cable/switch port, LAN8720 wiring</td>
+              <td>Confirm stable 3.3V, try different cable/port, verify LAN8720 pin map used by your baseline.</td>
+            </tr>
+            <tr>
+              <td><strong>PIR false triggers</strong></td>
+              <td>Noise, vibration, sensitivity too high</td>
+              <td>Reduce sensitivity, improve mounting stability, verify power stability and routing.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Replacement Parts (GAP-Specific)</h2>
+      <p class="muted">
+        Use equivalent parts as long as the key specs match. Search terms are shown so you aren’t tied to one seller.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:180px;">Part</th>
+              <th style="width:260px;">Specs that matter</th>
+              <th style="width:280px;">Search terms</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Relay module</strong></td>
+              <td>Coil voltage matches rail, opto preferred, 3.3V trigger compatible</td>
+              <td><code>1 channel relay module 5V optocoupler</code></td>
+              <td>Match coil voltage to your power rail.</td>
+            </tr>
+            <tr>
+              <td><strong>Reed switch</strong></td>
+              <td>NO vs NC, mounting style</td>
+              <td><code>magnetic reed switch door sensor NO</code></td>
+              <td>Most setups expect NO + pullup.</td>
+            </tr>
+            <tr>
+              <td><strong>PIR</strong></td>
+              <td>3.3V/5V compatible model</td>
+              <td><code>HC-SR501 PIR</code> / <code>mini PIR 3.3V</code></td>
+              <td>False triggers are often sensitivity/time + mounting + power noise.</td>
+            </tr>
+            <tr>
+              <td><strong>Buck (5V)</strong></td>
+              <td>Enough current headroom under relay load</td>
+              <td><code>DC buck 12V to 5V 3A</code></td>
+              <td>Don’t run at max rated current.</td>
+            </tr>
+            <tr>
+              <td><strong>Buck (3.3V)</strong></td>
+              <td>Stable 3.3V for ESP32 + display (+LAN8720 if used)</td>
+              <td><code>DC buck 5V to 3.3V</code></td>
+              <td>3.3V stability matters for network/display reliability.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Swap Steps (FRU style)</h2>
+
+      <details open>
+        <summary>Swap a buck converter (fastest “random reboot” fix)</summary>
+        <div class="muted" style="line-height:1.7;">
+          <ol style="margin:0; padding-left:18px;">
+            <li>Power off and disconnect DC supply.</li>
+            <li>Label input/output wires before removing.</li>
+            <li>Install replacement buck, verify polarity, then power on.</li>
+            <li>Verify stable output voltage before reconnecting loads.</li>
+          </ol>
+        </div>
+      </details>
+
+      <details>
+        <summary>Swap relay module</summary>
+        <div class="muted" style="line-height:1.7;">
+          <ol style="margin:0; padding-left:18px;">
+            <li>Power off.</li>
+            <li>Move one wire at a time to the new relay module.</li>
+            <li>Power on and test relay toggle.</li>
+          </ol>
+        </div>
+      </details>
+
+      <details>
+        <summary>Swap ESP32 board</summary>
+        <div class="muted" style="line-height:1.7;">
+          <ol style="margin:0; padding-left:18px;">
+            <li>Power off.</li>
+            <li>Replace the board (same model family).</li>
+            <li>Flash the correct baseline firmware / restore backup.</li>
+            <li>Confirm network + sensor readings.</li>
+          </ol>
+        </div>
+      </details>
+    </div>
+
+    <div class="card">
+      <h2>Back to Service Overview</h2>
+      <p style="margin:0;">
+        <a href="/service.html" style="color: var(--accent, #2ea8ff); text-decoration:none; font-weight:600;">
+          ← Service & Replacement Parts
+        </a>
+      </p>
+    </div>
+
+    <p class="note" style="margin-top:16px;">
+      © WestTechAI – GAP service documentation
+    </p>
+
+  </div>
+</body>
+</html>

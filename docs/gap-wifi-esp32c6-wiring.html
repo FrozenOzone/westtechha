@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GAP Wi-Fi (ESP32-C6) – Wiring & GPIO Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Paths are from /docs/ back to root -->
+  <link rel="icon" type="image/png" href="../icons/Westtech_Icon_Green_32.png">
+  <link rel="stylesheet" href="../css/site.css">
+</head>
+<body class="support-page doc-page">
+  <div class="page">
+
+    <!-- NAV: go up one level for all main pages -->
+    <nav class="nav nav-stack">
+      <a href="../index.html" class="nav-brand nav-brand-stack">
+        <img src="../images/Westtech_Logo_Blue.png"
+             alt="WestTechAI – IoT &amp; Computing Solutions logo"
+             class="nav-logo nav-logo-full">
+
+        <div class="badge badge-nav">
+          <span></span>
+          VETERAN OWNED • IOT PANELS
+        </div>
+      </a>
+
+      <div class="nav-links">
+        <a href="../index.html" class="nav-link">Home</a>
+        <a href="../products.html" class="nav-link">Products</a>
+        <a href="../order.html" class="nav-link">Order</a>
+        <a href="../support.html" class="nav-link active">Support</a>
+        <a href="../about.html" class="nav-link">About</a>
+      
+        <a class="nav-link" href="../contact.html">Contact</a></div>
+    </nav>
+
+    <!-- PAGE HEADER -->
+    <header class="page-header">
+      <div class="badge">
+        <span></span>
+        GARAGE PANEL • ESP32-C6 • WI-FI
+      </div>
+
+      <h1>GAP Wi-Fi (ESP32-C6) – Wiring &amp; GPIO Map</h1>
+
+      <p class="tagline">
+        Reference wiring guide for the GAP Wi-Fi panel using ESP32-C6 DevKit, LCD2004 (I²C),
+        DHT11, door reeds, PIR sensors, garage door relay, and active buzzer.
+      </p>
+
+      <!-- If/when you export a PDF, just rename this file and it will work -->
+      <p>
+        <a href="GAP-WiFi-ESP32C6-Wiring.pdf" class="btn-download">
+          Download Wiring Guide (PDF)
+        </a>
+      </p>
+    </header>
+
+    <main>
+
+      <!-- SUMMARY GPIO MAP -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">GPIO Map – ESP32-C6 Wi-Fi Panel</div>
+          <span class="section-tag">Summary</span>
+        </div>
+
+        <p>
+          This table is the top-level GPIO map used by the GAP Wi-Fi (ESP32-C6) configuration.
+          Use this as your master reference when wiring or troubleshooting.
+        </p>
+
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>GPIO</th>
+                <th>Signal / Device</th>
+                <th>Direction</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>GPIO1</td>
+                <td>(Free / Future)</td>
+                <td>—</td>
+                <td>Reserved for future features</td>
+              </tr>
+              <tr>
+                <td>GPIO3</td>
+                <td>(Free / Future)</td>
+                <td>—</td>
+                <td>Reserved for future features</td>
+              </tr>
+              <tr>
+                <td>GPIO4</td>
+                <td>DHT11 Temperature / Humidity</td>
+                <td>INPUT (1-wire)</td>
+                <td>Single-wire DHT11 data pin</td>
+              </tr>
+              <tr>
+                <td>GPIO6</td>
+                <td>I²C SDA – LCD2004 / Bus A</td>
+                <td>Bidirectional</td>
+                <td>SDA for LCD2004 I²C backpack</td>
+              </tr>
+              <tr>
+                <td>GPIO7</td>
+                <td>I²C SCL – LCD2004 / Bus A</td>
+                <td>Output</td>
+                <td>SCL for LCD2004 I²C backpack</td>
+              </tr>
+              <tr>
+                <td>GPIO10</td>
+                <td>Inside Garage Door Reed</td>
+                <td>INPUT (pullup)</td>
+                <td>Detects inside track/position</td>
+              </tr>
+              <tr>
+                <td>GPIO11</td>
+                <td>Outside Garage Door Reed</td>
+                <td>INPUT (pullup)</td>
+                <td>Detects outside track/position</td>
+              </tr>
+              <tr>
+                <td>GPIO16</td>
+                <td>Buzzer</td>
+                <td>OUTPUT</td>
+                <td>Active buzzer (3.3&nbsp;V)</td>
+              </tr>
+              <tr>
+                <td>GPIO20</td>
+                <td>Main Garage Door Reed</td>
+                <td>INPUT (pullup)</td>
+                <td>Primary door state (open/closed)</td>
+              </tr>
+              <tr>
+                <td>GPIO21</td>
+                <td>PIR Outside</td>
+                <td>INPUT</td>
+                <td>Outside motion sensor</td>
+              </tr>
+              <tr>
+                <td>GPIO22</td>
+                <td>PIR Inside</td>
+                <td>INPUT</td>
+                <td>Inside motion sensor</td>
+              </tr>
+              <tr>
+                <td>GPIO23</td>
+                <td>Garage Door Relay</td>
+                <td>OUTPUT (momentary)</td>
+                <td>Simulates wall-button press</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="support-note">
+          All logic-level IO is 3.3&nbsp;V. Relay boards typically use 5&nbsp;V on their
+          power side, with the input signal still driven from a 3.3&nbsp;V GPIO.
+        </p>
+      </section>
+
+      <!-- I2C / LCD2004 -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">LCD2004 – I²C Bus A Wiring</div>
+          <span class="section-tag">Display</span>
+        </div>
+
+        <p>
+          The 20×4 LCD2004 uses an I²C backpack connected to Bus A on the ESP32-C6. Power and
+          signals are all on the 3.3&nbsp;V rail.
+        </p>
+
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ESP32-C6</th>
+                <th>LCD2004 I²C Backpack</th>
+                <th>Typical Wire Color</th>
+                <th>Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>3V3</td>
+                <td>VCC</td>
+                <td>Red</td>
+                <td>Display power (3.3&nbsp;V)</td>
+              </tr>
+              <tr>
+                <td>GND</td>
+                <td>GND</td>
+                <td>Black</td>
+                <td>Common ground</td>
+              </tr>
+              <tr>
+                <td>GPIO6</td>
+                <td>SDA</td>
+                <td>Blue</td>
+                <td>I²C data line</td>
+              </tr>
+              <tr>
+                <td>GPIO7</td>
+                <td>SCL</td>
+                <td>Green</td>
+                <td>I²C clock line</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="support-note">
+          If the LCD stays blank, verify 3.3&nbsp;V, GND, and SDA/SCL are not swapped. Also
+          double-check the I²C address in your ESPHome YAML.
+        </p>
+      </section>
+
+      <!-- DHT11 -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">DHT11 – Temperature &amp; Humidity Wiring</div>
+          <span class="section-tag">Sensor</span>
+        </div>
+
+        <p>
+          The DHT11 uses a single data line on GPIO4 and is powered from the 3.3&nbsp;V rail.
+        </p>
+
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ESP32-C6</th>
+                <th>DHT11</th>
+                <th>Typical Wire Color</th>
+                <th>Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>3V3</td>
+                <td>VCC</td>
+                <td>Red</td>
+                <td>Sensor power (3.3&nbsp;V)</td>
+              </tr>
+              <tr>
+                <td>GND</td>
+                <td>GND</td>
+                <td>Black</td>
+                <td>Common ground</td>
+              </tr>
+              <tr>
+                <td>GPIO4</td>
+                <td>DATA / OUT</td>
+                <td>Yellow</td>
+                <td>DHT11 data (1-wire)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- REED SWITCHES -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">Garage Door Reeds – Inside, Outside, Main</div>
+          <span class="section-tag">Inputs</span>
+        </div>
+
+        <p>
+          Three reed switches are used to monitor the door and track position:
+          inside rail, outside rail, and the primary “door closed / open” state.
+          All are configured as inputs with internal pull-ups.
+        </p>
+
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ESP32-C6 GPIO</th>
+                <th>Reed Location</th>
+                <th>Wiring</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>GPIO10</td>
+                <td>Inside Garage Door Reed</td>
+                <td>One side to GPIO10, other side to GND</td>
+                <td>INPUT, pullup enabled</td>
+              </tr>
+              <tr>
+                <td>GPIO11</td>
+                <td>Outside Garage Door Reed</td>
+                <td>One side to GPIO11, other side to GND</td>
+                <td>INPUT, pullup enabled</td>
+              </tr>
+              <tr>
+                <td>GPIO20</td>
+                <td>Main Garage Door Reed</td>
+                <td>One side to GPIO20, other side to GND</td>
+                <td>Primary door state sensor</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="support-note">
+          With pull-ups enabled, the GPIO reads HIGH when the reed is open, and LOW when the
+          reed closes and connects the pin to ground.
+        </p>
+      </section>
+
+      <!-- PIR SENSORS -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">PIR Sensors – Inside &amp; Outside</div>
+          <span class="section-tag">Motion</span>
+        </div>
+
+        <p>
+          Two PIR sensors monitor inside and outside motion for auto-close logic and safety.
+        </p>
+
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ESP32-C6 GPIO</th>
+                <th>PIR</th>
+                <th>Wiring</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>GPIO21</td>
+                <td>PIR Outside</td>
+                <td>VCC to 3V3, GND to GND, OUT to GPIO21</td>
+                <td>Logic HIGH on motion</td>
+              </tr>
+              <tr>
+                <td>GPIO22</td>
+                <td>PIR Inside</td>
+                <td>VCC to 3V3, GND to GND, OUT to GPIO22</td>
+                <td>Logic HIGH on motion</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- RELAY + BUZZER -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">Garage Relay &amp; Buzzer Wiring</div>
+          <span class="section-tag">Outputs</span>
+        </div>
+
+        <h3>Garage Door Relay (GPIO23)</h3>
+        <p>
+          The relay module simulates the wall-button press to open/close the garage door. The
+          coil side is powered from 5&nbsp;V, with the input signal driven by GPIO23.
+        </p>
+
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ESP32-C6 / Rail</th>
+                <th>Relay Module</th>
+                <th>Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>5V Supply</td>
+                <td>DC+</td>
+                <td>Relay power (5&nbsp;V from dedicated buck)</td>
+              </tr>
+              <tr>
+                <td>GND (common)</td>
+                <td>DC-</td>
+                <td>Common ground (shared with ESP32-C6)</td>
+              </tr>
+              <tr>
+                <td>GPIO23</td>
+                <td>IN</td>
+                <td>Relay input (momentary pulse controls NO/COM)</td>
+              </tr>
+              <tr>
+                <td>Garage opener button contacts</td>
+                <td>NO / COM</td>
+                <td>In parallel with the wall button terminals</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Buzzer (GPIO16)</h3>
+        <p>
+          The active buzzer is powered from 3.3&nbsp;V and driven by GPIO16 for pre-warn and
+          continuous-beep behavior.
+        </p>
+
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ESP32-C6</th>
+                <th>Buzzer</th>
+                <th>Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>3V3</td>
+                <td>VCC / +</td>
+                <td>Power (3.3&nbsp;V only)</td>
+              </tr>
+              <tr>
+                <td>GND</td>
+                <td>GND / −</td>
+                <td>Common ground</td>
+              </tr>
+              <tr>
+                <td>GPIO16</td>
+                <td>IN (if 3-pin)</td>
+                <td>Drives active buzzer for warning tones</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="support-note">
+          Make sure the buzzer is an active type rated for 3.3&nbsp;V. A passive buzzer will
+          sound weak or not at all unless driven with PWM audio.
+        </p>
+      </section>
+
+    </main>
+
+    <footer class="footer">
+      <p>© 2025 WestTechAI · Veteran Owned · Built for DIYers</p>
+    </footer>
+  </div>
+</body>
+</html>

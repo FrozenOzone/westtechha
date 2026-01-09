@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Order – WestTechHA Panels</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+<link href="css/site.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="page">
+<nav class="nav nav-stack">
+<div class="nav-brand-wrap">
+  <a class="nav-brand" href="index.html">
+    <img alt="WestTechHA – IoT &amp; Computing Solutions logo" class="nav-logo nav-logo-full" src="images/Westtech_Logo_Blue.png"/>
+  </a>
+  <div class="badge badge-nav">
+<span></span>
+          VETERAN OWNED • IoT PANELS
+        </div>
+</div>
+<div class="nav-links">
+<a class="nav-link" href="index.html">Home</a>
+<a class="nav-link" href="products.html">Products</a>
+<a class="nav-link" href="services.html">Services</a>
+<a class="nav-link active" href="order.html">Order</a>
+<a class="nav-link" href="support.html">Support</a>
+<a class="nav-link" href="about.html">About</a>
+
+<a class="nav-link" href="contact.html">Contact</a>
+</div>
+</nav>
+<header class="page-header">
+<div class="badge">
+<span></span>
+        ORDER • PANELS &amp; PROJECTS
+      </div>
+<h1>Order a WestTechHA Panel</h1>
+<p class="tagline">
+        WestTechHA panels are built in small batches and tuned for real homes. Use this page to
+        start an order, request a quote, or ask about a custom build.
+      </p>
+</header>
+<main>
+<section class="section">
+  <div class="section-header">
+    <div class="section-title">Panels You Can Request</div>
+    <span class="section-tag">Lineup</span>
+  </div>
+  <p>
+    These are the initial WestTechHA panels and projects you can ask about when you place an order.
+    Availability and exact options may change as the product line evolves.
+  </p>
+
+  <div class="product-grid">
+    <article class="product-card">
+      <div class="product-label">Flagship Panel</div>
+      <div class="product-name">Garage Automation Panel (GAP)</div>
+      <div class="product-status">Available • Ethernet-first smart garage controller</div>
+      <p class="product-body">
+        Veteran-built garage controller with ESP32, Ethernet-first networking, door reeds, safety beam,
+        inside/outside motion inputs, buzzer pre-warn, and an LCD/OLED display (per model).
+      </p>
+      <ul class="product-list">
+        <li>Designed for Home Assistant users who want reliable, local control</li>
+        <li>Documented wiring + stable-tested firmware patterns</li>
+        <li>Installer-friendly labeling and support mindset</li>
+      </ul>
+      <div class="product-footer">
+        <span class="chip">GAP</span>
+        <a class="link-inline" href="products.html">See details</a>
+      </div>
+    </article>
+
+    <article class="product-card">
+      <div class="product-label">Coming Soon</div>
+      <div class="product-name">Sprinkler Automation Panel (SAP)</div>
+      <div class="product-status">In development • Smart irrigation controller</div>
+      <p class="product-body">
+        Smart irrigation controller with a 20×4 LCD for at-a-glance zone status, built on ESP32 with the
+        same stable firmware philosophy as GAP.
+      </p>
+      <ul class="product-list">
+        <li>Zone visibility at the panel (planned)</li>
+        <li>Home Assistant integration focus</li>
+        <li>Clean wiring + serviceability</li>
+      </ul>
+      <div class="product-footer">
+        <span class="chip">SAP</span>
+        <span class="product-status">In progress</span>
+      </div>
+    </article>
+
+    <article class="product-card">
+      <div class="product-label">Planned</div>
+      <div class="product-name">Main Automation Panel (MAP)</div>
+      <div class="product-status">Roadmap • Structured-media hub</div>
+      <p class="product-body">
+        A structured-media–friendly hub that aggregates sensors and relays with Ethernet-first options
+        and clear wiring docs.
+      </p>
+      <ul class="product-list">
+        <li>Sensor aggregation + relay expansion (planned)</li>
+        <li>Built for neat installs and maintainability</li>
+        <li>Fits the broader WestTechHA ecosystem</li>
+      </ul>
+      <div class="product-footer">
+        <span class="chip">MAP</span>
+        <a class="link-inline" href="products.html">See roadmap</a>
+      </div>
+    </article>
+
+    <article class="product-card">
+      <div class="product-label">Focused Builds</div>
+      <div class="product-name">Basement / Utility Panels (BAP) &amp; Pods</div>
+      <div class="product-status">Available/Planned • Targeted enclosures</div>
+      <p class="product-body">
+        Smaller panels and pods for motion, presence, and utility sensing—built to be repeatable and easy to support.
+      </p>
+      <ul class="product-list">
+        <li>Utility sensing, motion/presence pods (varies)</li>
+        <li>Installer-friendly labeling and documentation</li>
+        <li>Same stable-tested philosophy</li>
+      </ul>
+      <div class="product-footer">
+        <span class="chip">BAP</span>
+        <a class="link-inline" href="products.html">Explore lineup</a>
+      </div>
+    </article>
+  </div>
+</section>
+<section class="section">
+<div class="section-header">
+<div class="section-title">Request a Quote or Panel</div>
+<span class="section-tag">Form</span>
+</div>
+<p>
+          You can use this form as a starting point for an embedded contact/quote form. Today it is a
+          static HTML example; you can connect it later to email, a form service, or a Shopify contact
+          page. For now, copying the details into an email works great.
+        </p>
+<!-- Updated form: use JS to prepare a mailto: request -->
+<form id="order-form" onsubmit="return prepareOrderEmail();">
+<div>
+<label for="name">Name</label>
+<input id="name" name="name" placeholder="Your name" type="text"/>
+</div>
+<div>
+<label for="email">Email</label>
+<input id="email" name="email" placeholder="you@example.com" type="email"/>
+</div>
+<div>
+<label for="panel">Panel or Project</label>
+<select id="panel" name="panel">
+<option value="">Select a panel…</option>
+<option value="gap">Garage Automation Panel (GAP)</option>
+<option value="sap">Sprinkler Automation Panel (SAP)</option>
+<option value="map">Main Automation Panel (MAP)</option>
+<option value="bap">Basement / Utility Panel</option>
+<option value="custom">Custom / Other</option>
+</select>
+</div>
+<div>
+<label for="env">Environment</label>
+<input id="env" name="environment" placeholder="e.g., Single garage bay, Ethernet at opener, Home Assistant on mini PC…" type="text"/>
+</div>
+<div>
+<label for="message">Project Details</label>
+<textarea id="message" name="message" placeholder="Tell us how you’d like to use the panel, what you already have (Home Assistant, sensors, etc.), and any timing needs."></textarea>
+</div>
+<button class="btn-submit" type="submit">Prepare Request</button>
+<p class="form-note">
+            Tip: until this form is wired up, you can copy/paste your answers into an email to
+            <strong>orders@WestTechHA.com</strong>.
+          </p>
+</form>
+</section>
+</main>
+<footer class="footer">
+<p>© 2025 WestTechHA · Veteran Owned · Built for DIYers</p>
+</footer>
+</div>
+<!-- Simple mailto-based handler for the form -->
+<script>
+    function prepareOrderEmail() {
+      const name     = document.getElementById('name').value.trim();
+      const email    = document.getElementById('email').value.trim();
+      const panelSel = document.getElementById('panel');
+      const panelVal = panelSel.value;
+      const panelTxt = panelSel.options[panelSel.selectedIndex].text;
+      const env      = document.getElementById('env').value.trim();
+      const message  = document.getElementById('message').value.trim();
+
+      const subject = encodeURIComponent(
+        panelVal
+          ? `Panel request: ${panelTxt}`
+          : 'Panel request from website'
+      );
+
+      const lines = [
+        'New panel / quote request from the website:',
+        '',
+        `Name: ${name || '(not provided)'}`,
+        `Email: ${email || '(not provided)'}`,
+        `Panel / Project: ${panelVal ? panelTxt : '(not selected)'}`,
+        '',
+        'Environment:',
+        env || '(not provided)',
+        '',
+        'Project details:',
+        message || '(not provided)'
+      ];
+
+      const body = encodeURIComponent(lines.join('\n'));
+
+      const mailto = `mailto:orders@WestTechHA.com?subject=${subject}&body=${body}`;
+      window.location.href = mailto;
+
+      // Prevent the browser from trying to actually post the form
+      return false;
+    }
+  </script>
+</body>
+</html>
