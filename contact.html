@@ -32,7 +32,8 @@
         <a class="nav-link" href="services.html">Services</a>
         <a class="nav-link" href="order.html">Order</a>
         <a class="nav-link" href="support.html">Support</a>
-        <a class="nav-link" href="about.html">About</a>
+        <a class="nav-link" href="returns.html">Returns</a>
+<a class="nav-link" href="about.html">About</a>
       
         <a class="nav-link active" href="contact.html">Contact</a></div>
     </nav>
@@ -67,7 +68,7 @@
             </p>
             <div class="product-footer">
               <span class="chip">EMAIL</span>
-              <a class="link-inline" href="mailto:support@WestTechHA.com">Compose email</a>
+              <a class="link-inline" href="#" data-wt-email-trigger data-email="support@WestTechHA.com" data-subject="WestTechHA Support Request">Compose email</a>
             </div>
           </article>
         </div>
@@ -126,7 +127,7 @@
 
           <p class="form-note">
             Prefer email? Send details to
-            <a class="mailto-link" href="mailto:support@WestTechHA.com">support@WestTechHA.com</a>.
+            <a class="mailto-link" href="#" data-wt-email-trigger data-email="support@WestTechHA.com" data-subject="WestTechHA Support Request">support@WestTechHA.com</a>.
           </p>
         </form>
       </section>
@@ -136,5 +137,26 @@
       <p>© 2025 WestTechHA · Veteran Owned · Built for DIYers</p>
     </footer>
   </div>
+
+  <!-- Email chooser modal -->
+  <div class="wt-email-modal" id="wtEmailModal" aria-hidden="true">
+    <div class="wt-email-backdrop" data-wt-email-close></div>
+    <div class="wt-email-card" role="dialog" aria-modal="true" aria-label="Email options">
+      <div class="wt-email-head">
+        <div class="wt-email-title">Email WestTechHA</div>
+        <button class="wt-email-close" id="wtEmailClose" type="button" aria-label="Close">×</button>
+      </div>
+      <p class="wt-email-text">Choose how you’d like to compose this message:</p>
+      <div class="wt-email-actions">
+        <a class="btn btn-primary" id="wtEmailGmail" target="_blank" rel="noopener">Open Gmail</a>
+        <a class="btn btn-primary" id="wtEmailOutlook" target="_blank" rel="noopener">Open Outlook Web</a>
+        <a class="btn btn-ghost" id="wtEmailMailto">Use Default Mail App</a>
+        <button class="btn btn-ghost" id="wtEmailCopy" type="button">Copy Address</button>
+      </div>
+      <p class="wt-email-small">To: <span class="mono" id="wtEmailToText">support@WestTechHA.com</span></p>
+    </div>
+  </div>
+  <div class="wt-email-toast" id="wtEmailToast" aria-hidden="true"></div>
+  <script src="js/email-chooser.js"></script>
 </body>
 </html>
