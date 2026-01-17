@@ -778,3 +778,101 @@ body.products-page {
   max-width: 100%;
   height: auto;
 }
+
+/* ============================================================
+   Email chooser modal (Gmail / Outlook / Default / Copy)
+   ============================================================ */
+
+.wt-email-modal{ display:none; }
+.wt-email-modal.is-open{ display:block; }
+
+.wt-email-backdrop{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 9998;
+}
+
+.wt-email-card{
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(560px, calc(100% - 24px));
+  background: linear-gradient(135deg, var(--card), #070b12);
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 18px;
+  z-index: 9999;
+  box-shadow: var(--shadow-soft);
+}
+
+.wt-email-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.wt-email-title{
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.wt-email-close{
+  appearance:none;
+  background: transparent;
+  border: 0;
+  color: var(--text-main);
+  font-size: 1.5rem;
+  cursor: pointer;
+  opacity: 0.9;
+  padding: 0 6px;
+  line-height: 1;
+}
+
+.wt-email-text{
+  margin: 8px 0 12px;
+  color: var(--text-muted);
+}
+
+.wt-email-actions{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 520px){
+  .wt-email-actions{ grid-template-columns: 1fr; }
+}
+
+.wt-email-small{
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.mono{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.wt-email-toast{
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  color: var(--text-main);
+  font-size: 0.9rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+  z-index: 10000;
+}
+
+.wt-email-toast.show{ opacity: 1; }
