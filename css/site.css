@@ -40,27 +40,27 @@
 @media (prefers-color-scheme: light) {
   :root {
     /* Core palette (Light) */
-    --bg: #f6f7fb;
-    --bg-alt: #ffffff;
+    --bg: #f2f4f7;
+    --bg-alt: #f8fafc;
     --card: #ffffff;
 
     --accent: #0284c7;
-    --accent-soft: rgba(2, 132, 199, 0.12);
+    --accent-soft: rgba(2, 132, 199, 0.10);
 
     --text-main: #0b1220;
-    --text-muted: #4b5563;
+    --text-muted: #475569;
 
-    --border-subtle: #d1d5db;
+    --border-subtle: #cbd5e1;
 
-    --shadow-soft: 0 18px 45px rgba(2, 6, 23, 0.12);
+    --shadow-soft: 0 22px 60px rgba(2, 6, 23, 0.16);
 
-    --bg-grad-1: #ffffff;
-    --bg-grad-2: #f6f7fb;
-    --bg-grad-3: #e9eef8;
-    --card-grad-end: #eef2ff;
+    --bg-grad-1: #fbfcfe;
+    --bg-grad-2: #f2f4f7;
+    --bg-grad-3: #dbe6f7;
+    --card-grad-end: #e6efff;
 
-    --surface: rgba(2, 6, 23, 0.06);
-    --surface-strong: rgba(255, 255, 255, 0.92);
+    --surface: rgba(2, 6, 23, 0.07);
+    --surface-strong: rgba(255, 255, 255, 0.94);
 
     --btn-primary-text: #ffffff;
 
@@ -98,27 +98,27 @@
 }
 
 :root[data-theme="light"] {
-  --bg: #f6f7fb;
-  --bg-alt: #ffffff;
+  --bg: #f2f4f7;
+  --bg-alt: #f8fafc;
   --card: #ffffff;
 
   --accent: #0284c7;
-  --accent-soft: rgba(2, 132, 199, 0.12);
+  --accent-soft: rgba(2, 132, 199, 0.10);
 
   --text-main: #0b1220;
-  --text-muted: #4b5563;
+  --text-muted: #475569;
 
-  --border-subtle: #d1d5db;
+  --border-subtle: #cbd5e1;
 
-  --shadow-soft: 0 18px 45px rgba(2, 6, 23, 0.12);
+  --shadow-soft: 0 22px 60px rgba(2, 6, 23, 0.16);
 
-  --bg-grad-1: #ffffff;
-  --bg-grad-2: #f6f7fb;
-  --bg-grad-3: #e9eef8;
-  --card-grad-end: #eef2ff;
+  --bg-grad-1: #fbfcfe;
+  --bg-grad-2: #f2f4f7;
+  --bg-grad-3: #dbe6f7;
+  --card-grad-end: #e6efff;
 
-  --surface: rgba(2, 6, 23, 0.06);
-  --surface-strong: rgba(255, 255, 255, 0.92);
+  --surface: rgba(2, 6, 23, 0.07);
+  --surface-strong: rgba(255, 255, 255, 0.94);
 
   --btn-primary-text: #ffffff;
 
