@@ -41,8 +41,8 @@
   :root {
     /* Core palette (Light) */
     --bg: #f2f4f7;
-    --bg-alt: #f8fafc;
-    --card: #ffffff;
+    --bg-alt: #f6f7fb;
+    --card: #f3f6ff;
 
     --accent: #0284c7;
     --accent-soft: rgba(2, 132, 199, 0.10);
@@ -50,14 +50,14 @@
     --text-main: #0b1220;
     --text-muted: #475569;
 
-    --border-subtle: #cbd5e1;
+    --border-subtle: #b7c3d6;
 
-    --shadow-soft: 0 22px 60px rgba(2, 6, 23, 0.16);
+    --shadow-soft: 0 26px 70px rgba(2, 6, 23, 0.18);
 
     --bg-grad-1: #fbfcfe;
     --bg-grad-2: #f2f4f7;
     --bg-grad-3: #dbe6f7;
-    --card-grad-end: #e6efff;
+    --card-grad-end: #d9e6ff;
 
     --surface: rgba(2, 6, 23, 0.07);
     --surface-strong: rgba(255, 255, 255, 0.94);
@@ -99,8 +99,8 @@
 
 :root[data-theme="light"] {
   --bg: #f2f4f7;
-  --bg-alt: #f8fafc;
-  --card: #ffffff;
+  --bg-alt: #f6f7fb;
+  --card: #f3f6ff;
 
   --accent: #0284c7;
   --accent-soft: rgba(2, 132, 199, 0.10);
@@ -108,14 +108,14 @@
   --text-main: #0b1220;
   --text-muted: #475569;
 
-  --border-subtle: #cbd5e1;
+  --border-subtle: #b7c3d6;
 
-  --shadow-soft: 0 22px 60px rgba(2, 6, 23, 0.16);
+  --shadow-soft: 0 26px 70px rgba(2, 6, 23, 0.18);
 
   --bg-grad-1: #fbfcfe;
   --bg-grad-2: #f2f4f7;
   --bg-grad-3: #dbe6f7;
-  --card-grad-end: #e6efff;
+  --card-grad-end: #d9e6ff;
 
   --surface: rgba(2, 6, 23, 0.07);
   --surface-strong: rgba(255, 255, 255, 0.94);
