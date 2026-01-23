@@ -28,6 +28,7 @@
   --bg-grad-2: #020617;
   --bg-grad-3: #02040a;
   --card-grad-end: #070b12;
+  --section-bg: radial-gradient(circle at top left, rgba(56, 189, 248, 0.14), var(--card) 62%);
 
   --surface: rgba(2, 6, 23, 0.35);      /* inputs / subtle surfaces */
   --surface-strong: rgba(15, 23, 42, 0.92); /* toasts */
@@ -58,6 +59,7 @@
     --bg-grad-2: #f2f4f7;
     --bg-grad-3: #dbe6f7;
     --card-grad-end: #d9e6ff;
+    --section-bg: radial-gradient(circle at top left, rgba(2, 132, 199, 0.10), var(--card) 62%);
 
     --surface: rgba(2, 6, 23, 0.07);
     --surface-strong: rgba(255, 255, 255, 0.94);
@@ -88,6 +90,7 @@
   --bg-grad-2: #020617;
   --bg-grad-3: #02040a;
   --card-grad-end: #070b12;
+  --section-bg: radial-gradient(circle at top left, rgba(56, 189, 248, 0.14), var(--card) 62%);
 
   --surface: rgba(2, 6, 23, 0.35);
   --surface-strong: rgba(15, 23, 42, 0.92);
@@ -116,6 +119,7 @@
   --bg-grad-2: #f2f4f7;
   --bg-grad-3: #dbe6f7;
   --card-grad-end: #d9e6ff;
+  --section-bg: radial-gradient(circle at top left, rgba(2, 132, 199, 0.10), var(--card) 62%);
 
   --surface: rgba(2, 6, 23, 0.07);
   --surface-strong: rgba(255, 255, 255, 0.94);
@@ -469,7 +473,7 @@ main {
 }
 
 .section {
-  background: linear-gradient(135deg, var(--card), var(--card-grad-end));
+  background: var(--section-bg);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-subtle);
   padding: 18px 18px 16px;
