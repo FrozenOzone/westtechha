@@ -699,6 +699,102 @@ header .tagline {
 .section form select {
   appearance: none;
 }
+
+/* ============================================================
+   ORDER PAGE – GAP spec blocks / waitlist helpers
+   ============================================================ */
+
+/* Hide any toggle block when aria-hidden is true */
+.wt-toggle[aria-hidden="true"] {
+  display: none !important;
+}
+
+.wt-order {
+  margin-top: 14px;
+}
+
+.wt-fieldset {
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 16px;
+  padding: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.01));
+}
+
+.wt-fieldset + .wt-fieldset {
+  margin-top: 10px;
+}
+
+.wt-fieldset legend {
+  padding: 0 10px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.wt-help {
+  margin: 6px 0 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.wt-subhead {
+  margin: 10px 0 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-main);
+}
+
+.wt-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.wt-grid.wt-grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.wt-full {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 820px) {
+  .wt-grid,
+  .wt-grid.wt-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Checkbox rows */
+.wt-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 12px;
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.wt-check input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.wt-check label {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 0.92rem;
+}
+
+/* Make the shipping address less tall than the main notes box */
+.wt-order #shipAddr {
+  min-height: 86px;
+}
 /* ============================================================
    ABOUT PAGE – scoped styles (keeps Order form + other pages safe)
    ============================================================ */
