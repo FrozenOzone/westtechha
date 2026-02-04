@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Order – WestTechHA Panels</title>
+<title>Order – WestTech Home Automation Panels</title>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
 <link href="css/site.css" rel="stylesheet"/>
@@ -13,7 +13,7 @@
 <nav class="nav nav-stack">
 <div class="nav-brand-wrap">
   <a class="nav-brand" href="index.html">
-    <img alt="WestTechHA – IoT &amp; Computing Solutions logo" class="nav-logo nav-logo-full" src="images/WestTech_Logo_Blue.png"/>
+    <img alt="WestTech Home Automation – IoT &amp; Computing Solutions logo" class="nav-logo nav-logo-full" src="images/WestTech_Logo_Blue.png"/>
   </a>
   <div class="badge badge-nav">
 <span></span>
@@ -37,9 +37,9 @@
 <span></span>
         ORDER • PANELS &amp; PROJECTS
       </div>
-<h1>Order a WestTechHA Panel</h1>
+<h1>Order a WestTech Home Automation Panel</h1>
 <p class="tagline">
-        WestTechHA panels are built in small batches and tuned for real homes. Use this page to
+        WestTech Home Automation panels are built in small batches and tuned for real homes. Use this page to
         start an order, request a quote, or ask about a custom build.
       </p>
 </header>
@@ -50,7 +50,7 @@
     <span class="section-tag">Lineup</span>
   </div>
   <p>
-    These are the initial WestTechHA panels and projects you can ask about when you place an order.
+    These are the initial WestTech Home Automation panels and projects you can ask about when you place an order.
     Availability and exact options may change as the product line evolves.
   </p>
 
@@ -104,7 +104,7 @@
       <ul class="product-list">
         <li>Sensor aggregation + relay expansion (planned)</li>
         <li>Built for neat installs and maintainability</li>
-        <li>Fits the broader WestTechHA ecosystem</li>
+        <li>Fits the broader WestTech Home Automation ecosystem</li>
       </ul>
       <div class="product-footer">
         <span class="chip">MAP</span>
@@ -139,7 +139,7 @@
 <p>
           Fill out the details below and click <strong>Prepare Request</strong>.
           Your browser will open an email composer (Gmail/Outlook/Mail app) with your answers pre‑filled
-          to <strong>orders@WestTechHA.com</strong>.
+          to <strong>orders@WestTech Home Automation.com</strong>.
         </p>
 <!-- GAP order form + MAP/SAP waitlist (local only, email-prep via chooser) -->
 <form class="wt-order" id="order-form" onsubmit="return prepareOrderEmail();">
@@ -476,13 +476,13 @@
 
   <button class="btn-submit" type="submit">Prepare Request</button>
   <p class="form-note">
-    Tip: this prepares an email to <strong>orders@WestTechHA.com</strong>. You’ll be able to choose Gmail/Outlook/Mail app.
+    Tip: this prepares an email to <strong>orders@WestTech Home Automation.com</strong>. You’ll be able to choose Gmail/Outlook/Mail app.
   </p>
 </form>
 </section>
 </main>
 <footer class="footer">
-<p>© 2026 WestTechHA, LLC · Veteran Owned · Built for DIYers</p>
+<p>© 2026 WestTech Home Automation, LLC · Veteran Owned · Built for DIYers</p>
 </footer>
 </div>
 
@@ -491,7 +491,7 @@
     <div class="wt-email-backdrop" data-wt-email-close></div>
     <div class="wt-email-card" role="dialog" aria-modal="true" aria-label="Email options">
       <div class="wt-email-head">
-        <div class="wt-email-title">Email WestTechHA</div>
+        <div class="wt-email-title">Email WestTech Home Automation</div>
         <button class="wt-email-close" id="wtEmailClose" type="button" aria-label="Close">×</button>
       </div>
       <p class="wt-email-text">Choose how you’d like to compose this message:</p>
@@ -501,7 +501,7 @@
         <a class="btn btn-ghost" id="wtEmailMailto">Use Default Mail App</a>
         <button class="btn btn-ghost" id="wtEmailCopy" type="button">Copy Address</button>
       </div>
-      <p class="wt-email-small">To: <span class="mono" id="wtEmailToText">support@WestTechHA.com</span></p>
+      <p class="wt-email-small">To: <span class="mono" id="wtEmailToText">support@WestTech Home Automation.com</span></p>
     </div>
   </div>
   <div class="wt-email-toast" id="wtEmailToast" aria-hidden="true"></div>
@@ -558,10 +558,10 @@
       const panelVal = val('panel');
       const panelTxt = selText('panel') || '(not selected)';
 
-      const subject = panelVal ? `WestTechHA request: ${panelTxt}` : 'WestTechHA request from website';
+      const subject = panelVal ? `WestTech Home Automation request: ${panelTxt}` : 'WestTech Home Automation request from website';
 
       const lines = [];
-      lines.push('New request from westtechha.com (Order page)');
+      lines.push('New request from WestTech Home Automation.com (Order page)');
       lines.push('');
 
       // A) Customer + install context
@@ -661,12 +661,12 @@
 
       if (window.WTEmail && typeof window.WTEmail.open === 'function') {
         window.WTEmail.open({
-          to: 'orders@WestTechHA.com',
+          to: 'orders@WestTech Home Automation.com',
           subject: subject,
           body: body
         });
       } else {
-        const mailto = `mailto:orders@WestTechHA.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        const mailto = `mailto:orders@WestTech Home Automation.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         window.location.href = mailto;
       }
 

@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Services – WestTechHA Panels</title>
+<title>Services – WestTech Home Automation Panels</title>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
 <link href="css/site.css" rel="stylesheet"/>
@@ -13,7 +13,7 @@
 <nav class="nav nav-stack">
 <div class="nav-brand-wrap">
   <a class="nav-brand" href="index.html">
-    <img alt="WestTechHA – IoT &amp; Computing Solutions logo" class="nav-logo nav-logo-full" src="images/WestTech_Logo_Blue.png"/>
+    <img alt="WestTech Home Automation – IoT &amp; Computing Solutions logo" class="nav-logo nav-logo-full" src="images/WestTech_Logo_Blue.png"/>
   </a>
   <div class="badge badge-nav">
 <span></span>
@@ -37,9 +37,9 @@
 <span></span>
         SERVICES • DESIGN • BUILD • SUPPORT
       </div>
-<h1>WestTechHA Services</h1>
+<h1>WestTech Home Automation Services</h1>
 <p class="tagline">
-        From panel design and wiring to firmware tuning and Home Assistant integration, WestTechHA
+        From panel design and wiring to firmware tuning and Home Assistant integration, WestTech Home Automation
         is built for DIYers and small shops that still want <strong>clean, documented, reliable</strong> installs.
       </p>
 </header>
@@ -52,7 +52,7 @@
   </div>
 
   <p>
-    WestTechHA is building a small ecosystem of ESP32-based panels with an emphasis on reliability,
+    WestTech Home Automation is building a small ecosystem of ESP32-based panels with an emphasis on reliability,
     local control, clean wiring, and documentation that installers and DIYers can actually use.
   </p>
 
@@ -80,7 +80,7 @@
       <div class="product-name">Sprinkler Automation Panel (SAP)</div>
       <div class="product-status">In development • Smart irrigation</div>
       <p class="product-body">
-        Built for zone visibility at the panel and deep Home Assistant integration with a familiar WestTechHA workflow.
+        Built for zone visibility at the panel and deep Home Assistant integration with a familiar WestTech Home Automation workflow.
       </p>
       <ul class="product-list">
         <li>Front-facing 20×4 LCD zone/status display (planned)</li>
@@ -140,7 +140,7 @@
 <div>
 <div class="doc-list-title">DIY with Documentation</div>
 <p>
-              You build it, wire it, and flash it – using WestTechHA documentation and baseline
+              You build it, wire it, and flash it – using WestTech Home Automation documentation and baseline
               configs. This is ideal if you’re comfortable with tools but want a <strong>known-good map</strong>.
             </p>
 <ul>
@@ -210,8 +210,8 @@
 <ul>
 <li>
             Email:
-            <a class="mailto-link" href="#" data-wt-email-trigger data-email="support@WestTechHA.com" data-subject="WestTechHA Support Request">
-              support@WestTechHA.com
+            <a class="mailto-link" href="#" data-wt-email-trigger data-email="support@WestTech Home Automation.com" data-subject="WestTech Home Automation Support Request">
+              support@WestTech Home Automation.com
             </a>
 </li>
 <li>Mention which panel family (GAP, SAP, MAP, BAP) you’re thinking about.</li>
@@ -224,7 +224,7 @@
 <!-- Same form as order.html, reused here -->
 <p class="support-note">
           You can also use this form to prepare a request. It will open your mail client with
-          the details filled in so you can send it to <strong>orders@WestTechHA.com</strong>.
+          the details filled in so you can send it to <strong>orders@WestTech Home Automation.com</strong>.
         </p>
 <form id="order-form" onsubmit="return prepareOrderEmail();">
 <div>
@@ -257,13 +257,13 @@
 <button class="btn-submit" type="submit">Prepare Request</button>
 <p class="form-note">
             Tip: until this form is wired up to a backend, you can copy/paste your answers into an email to
-            <strong>orders@WestTechHA.com</strong>.
+            <strong>orders@WestTech Home Automation.com</strong>.
           </p>
 </form>
 </section>
 </main>
 <footer class="footer">
-<p>© 2026 WestTechHA, LLC · Veteran Owned · Built for DIYers</p>
+<p>© 2026 WestTech Home Automation, LLC · Veteran Owned · Built for DIYers</p>
 </footer>
 </div>
 
@@ -272,7 +272,7 @@
     <div class="wt-email-backdrop" data-wt-email-close></div>
     <div class="wt-email-card" role="dialog" aria-modal="true" aria-label="Email options">
       <div class="wt-email-head">
-        <div class="wt-email-title">Email WestTechHA</div>
+        <div class="wt-email-title">Email WestTech Home Automation</div>
         <button class="wt-email-close" id="wtEmailClose" type="button" aria-label="Close">×</button>
       </div>
       <p class="wt-email-text">Choose how you’d like to compose this message:</p>
@@ -282,7 +282,7 @@
         <a class="btn btn-ghost" id="wtEmailMailto">Use Default Mail App</a>
         <button class="btn btn-ghost" id="wtEmailCopy" type="button">Copy Address</button>
       </div>
-      <p class="wt-email-small">To: <span class="mono" id="wtEmailToText">support@WestTechHA.com</span></p>
+      <p class="wt-email-small">To: <span class="mono" id="wtEmailToText">support@WestTech Home Automation.com</span></p>
     </div>
   </div>
   <div class="wt-email-toast" id="wtEmailToast" aria-hidden="true"></div>
@@ -323,13 +323,13 @@
 
       if (window.WTEmail && typeof window.WTEmail.open === 'function') {
         window.WTEmail.open({
-          to: 'orders@WestTechHA.com',
+          to: 'orders@WestTech Home Automation.com',
           subject: subject,
           body: body
         });
       } else {
         // Fallback: default mail app
-        const mailto = 'mailto:orders@WestTechHA.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+        const mailto = 'mailto:orders@WestTech Home Automation.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
         window.location.href = mailto;
       }
 
