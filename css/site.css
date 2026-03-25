@@ -253,58 +253,10 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* Tablet / desktop: brand + menu side-by-side, centered as a group */
-@media (min-width: 860px){
-  .nav-stack{
-    /* Center the whole header group */
-    grid-template-columns: max-content max-content;
-    justify-content: center;
-
-    /* knobs */
-    --brand-x: 0px;
-    --nav-x: 0px;
-    --nav-y: -18px;
-    --brand-nav-gap: 64px; /* gap between logo and nav */
-
-    column-gap: var(--brand-nav-gap);
-    row-gap: 0;
-    align-items: center;
-    justify-items: start;
-    padding: 14px 0 6px;
-  }
-
-  .nav-brand-wrap{
-    grid-column: 1;
-    justify-self: start;
-    transform: translateX(var(--brand-x));
-  }
-
-  /* keep the logo from being too huge when nav is beside it */
-  .nav-logo-full{
-    width: clamp(420px, 44vw, 620px);
-    height: auto;
-  }
-
-  .nav-links{
-    grid-column: 2;
-    justify-self: start;
-    align-self: center;
-
-    /* 2-row menu */
-    display: grid;
-    grid-template-columns: repeat(4, max-content); /* 4 on top row, 3 on bottom */
-    gap: 10px 20px;
-
-    /* lift it up next to the logo */
-    transform: translate(var(--nav-x), var(--nav-y));
-
-    margin-top: 0;
-    text-align: left;
-    justify-content: start;
-    justify-items: start;
-  }
-}
+/* shell-specific layout lives later in the file */
 
 /* Nav link pill styling (original behavior) */
+
 .nav-links a,
 .nav-link {
   display: inline-flex;
@@ -1159,3 +1111,82 @@ body.products-page {
     padding: 8px 10px;
   }
 }
+
+
+
+/* ===================== Shared Header / Footer Shell ===================== */
+.nav-menu{
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  width: 100%;
+}
+
+.nav-primary{
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.nav-utility{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-size: 0.82rem;
+}
+
+.nav-utility .nav-link{
+  padding: 4px 9px;
+  opacity: 0.92;
+}
+
+@media (min-width: 860px){
+  .nav-stack{
+    grid-template-columns: max-content max-content;
+    justify-content: center;
+    --brand-x: 0px;
+    --nav-x: 0px;
+    --nav-y: -8px;
+    --brand-nav-gap: 56px;
+    column-gap: var(--brand-nav-gap);
+    row-gap: 0;
+    align-items: center;
+    justify-items: start;
+    padding: 14px 0 6px;
+  }
+
+  .nav-brand-wrap{
+    grid-column: 1;
+    justify-self: start;
+    transform: translateX(var(--brand-x));
+  }
+
+  .nav-logo-full{
+    width: clamp(420px, 44vw, 620px);
+    height: auto;
+  }
+
+  .nav-menu{
+    grid-column: 2;
+    justify-self: start;
+    align-self: center;
+    justify-items: start;
+    transform: translate(var(--nav-x), var(--nav-y));
+    width: auto;
+  }
+
+  .nav-primary{
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
+    gap: 10px 16px;
+    justify-content: start;
+  }
+
+  .nav-utility{
+    justify-content: start;
+    gap: 8px 10px;
+  }
+}
+

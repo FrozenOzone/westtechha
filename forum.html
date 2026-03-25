@@ -5,35 +5,14 @@
   <meta charset="utf-8"/>
   <title>Forum – WestTech Home Automation</title>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <link href="icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+      <meta name="description" content="Visit the WestTech Home Automation community forum, powered by GitHub Discussions, for questions, troubleshooting, ideas, and product discussion."/>
+<link href="icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
   <link href="css/site.css" rel="stylesheet"/>
 </head>
 
 <body class="forum-page">
   <div class="page">
-    <nav class="nav nav-stack">
-      <div class="nav-brand-wrap">
-        <a class="nav-brand" href="index.html">
-          <img alt="WestTech Home Automation – IoT &amp; Computing Solutions logo" class="nav-logo nav-logo-full" src="images/WestTech_Logo_Blue.png"/>
-        </a>
-        <div class="badge badge-nav">
-          <span></span>
-          VETERAN OWNED • IoT PANELS
-        </div>
-      </div>
-
-      <div class="nav-links">
-        <a href="index.html" class="nav-link">Home</a>
-        <a href="products.html" class="nav-link">Products</a>
-        <a href="services.html" class="nav-link">Services</a>
-        <a href="order.html" class="nav-link">Order</a>
-        <a href="support.html" class="nav-link">Support</a>
-        <a href="forum.html" class="nav-link active">Forum</a>
-        <a href="returns.html" class="nav-link">Returns</a>
-        <a href="about.html" class="nav-link">About</a>
-        <a href="contact.html" class="nav-link">Contact</a>
-      </div>
-    </nav>
+    <div id="site-header"></div>
 
     <header class="page-header">
       <div class="badge">
@@ -48,128 +27,155 @@
     </header>
 
     <main>
-      <section class="section">
-        <div class="section-header">
-          <div class="section-title">How it works</div>
-          <span class="section-tag">Start Here</span>
-        </div>
+  <section class="section">
+    <div class="section-header">
+      <div class="section-title">Start Here</div>
+      <span class="section-tag">Community</span>
+    </div>
 
+    <p class="tagline" style="margin: 0 0 14px;">
+      Our community forum is powered by <strong>GitHub Discussions</strong>. That is the full forum home for
+      questions, troubleshooting, ideas, release notes, and searchable answers.
+    </p>
+
+    <div class="product-grid">
+      <article class="product-card">
+        <div class="product-label">Forum Home</div>
+        <div class="product-name">GitHub Discussions</div>
+        <div class="product-status">Browse &amp; post</div>
+        <p class="product-body">
+          Use GitHub Discussions for the full forum experience: categories, new topics, replies,
+          pinned threads, and searchable community answers.
+        </p>
+        <div class="product-footer" style="margin-top: 14px;">
+          <a class="btn" href="https://github.com/FrozenOzone/westtechha/discussions" target="_blank" rel="noopener">Open Discussions</a>
+          <span class="chip">COMMUNITY</span>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <div class="product-label">Best For</div>
+        <div class="product-name">What belongs here</div>
+        <div class="product-status">Good forum topics</div>
         <ul class="product-list">
-          <li><strong>Best for:</strong> install questions, troubleshooting, feature requests, and firmware notes.</li>
-          <li><strong>What to include:</strong> panel type (GAP/SAP/MAP), network type (Ethernet/Wi‑Fi), photos (if helpful), and what you’ve tried.</li>
-          <li><strong>Response style:</strong> clear, documented, and searchable — so the next person finds the answer fast.</li>
+          <li>Install questions and setup problems</li>
+          <li>Troubleshooting and firmware notes</li>
+          <li>Feature requests and product feedback</li>
+          <li>Show-and-tell installs and customer tips</li>
         </ul>
-
-        <div class="product-grid">
-          <article class="product-card">
-            <div class="product-label">Quick links</div>
-            <div class="product-name">Open the forum</div>
-            <div class="product-status">Browse &amp; post</div>
-            <p class="tagline" style="margin: 10px 0 0;">
-              The embedded forum below is designed to be powered by GitHub Discussions.
-              If it’s not configured yet, use the button below.
-            </p>
-            <div class="product-footer" style="margin-top: 14px;">
-              <a class="btn" href="https://github.com/FrozenOzone/westtechha/discussions" target="_blank" rel="noopener">Open Discussions</a>
-              <span class="chip">COMMUNITY</span>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <div class="product-label">Before posting</div>
-            <div class="product-name">Recommended details</div>
-            <div class="product-status">Helps us help you</div>
-            <ul class="product-list">
-              <li>Panel: GAP / SAP / MAP</li>
-              <li>ESP board: ESP32‑WROOM / ESP32‑C6</li>
-              <li>Network: LAN8720 Ethernet / Wi‑Fi</li>
-              <li>Symptoms + recent changes</li>
-            </ul>
-            <div class="product-footer">
-              <span class="chip">TIP</span>
-              <a class="link-inline" href="support.html">Docs &amp; known issues</a>
-            </div>
-          </article>
+        <div class="product-footer">
+          <span class="chip">GUIDE</span>
+          <a class="link-inline" href="support.html">Support Center</a>
         </div>
-      </section>
+      </article>
+    </div>
+  </section>
 
-      <section class="section" id="forum">
-        <div class="section-header">
-          <div class="section-title">Forum</div>
-          <span class="section-tag">Community</span>
-        </div>
+  <section class="section">
+    <div class="section-header">
+      <div class="section-title">Before You Post</div>
+      <span class="section-tag">Helpful Details</span>
+    </div>
 
-        <div class="tagline" style="margin-bottom: 12px;">
-          <strong>Note:</strong> this site is static (Cloudflare Pages). To support real discussions without email,
-          this page is intended to embed a lightweight forum backed by GitHub Discussions.
-        </div>
-
-        <!--
-          Forum backend (recommended): Giscus + GitHub Discussions
-
-          Setup (one-time):
-          1) In GitHub: enable Discussions on the repo you want to use (ex: FrozenOzone/WestTech Home Automation)
-          2) Go to https://giscus.app and select your repo + a Discussion category (ex: "Support")
-          3) Copy the generated <script> block and replace the placeholder block below.
-
-          Why: it keeps everything searchable and avoids email threads.
-        -->
-
-        <div id="forum-not-configured" class="product-card" style="padding: 18px; margin-bottom: 14px;">
-          <div class="product-label">Forum setup</div>
-          <div class="product-name">Embed not configured yet</div>
-          <div class="product-status">Takes ~2 minutes</div>
-          <p class="tagline" style="margin: 10px 0 0;">
-            To turn this page into a real forum, enable GitHub Discussions for your repo and paste the
-            Giscus embed snippet here. Until then, use <a class="link-inline" href="https://github.com/FrozenOzone/WestTech Home Automation/discussions" target="_blank" rel="noopener">GitHub Discussions</a>.
-          </p>
-        </div>
-
-        <div id="forum-embed" style="min-height: 240px;"></div>
-
-        <!--
-        <script
-          src="https://giscus.app/client.js"
-          data-repo="FrozenOzone/WestTech Home Automation"
-          data-repo-id="REPO_ID_HERE"
-          data-category="Support"
-          data-category-id="CATEGORY_ID_HERE"
-          data-mapping="pathname"
-          data-strict="0"
-          data-reactions-enabled="1"
-          data-emit-metadata="0"
-          data-input-position="bottom"
-          data-theme="preferred_color_scheme"
-          data-lang="en"
-          crossorigin="anonymous"
-          async>
-        </script>
-        -->
-
-        <noscript>
-          <p class="tagline">JavaScript is required to load the embedded forum.</p>
-        </noscript>
-      </section>
-
-      <section class="section">
-        <div class="section-header">
-          <div class="section-title">Posting guidelines</div>
-          <span class="section-tag">Rules</span>
-        </div>
-
+    <div class="product-grid">
+      <article class="product-card">
+        <div class="product-label">Include</div>
+        <div class="product-name">The basics</div>
+        <div class="product-status">Helps us help you</div>
         <ul class="product-list">
-          <li>Be respectful — we’re all here to make installs safer and more reliable.</li>
-          <li>No sensitive info: remove Wi‑Fi passwords, full addresses, and personal data.</li>
-          <li>If something is safety‑critical (garage door behavior), include exact details.</li>
+          <li>Panel type: GAP / SAP / MAP / other</li>
+          <li>Board type: ESP32-WROOM / ESP32-C6 / other</li>
+          <li>Network type: Wi-Fi / LAN8720 Ethernet</li>
+          <li>What changed and what you already tried</li>
         </ul>
-      </section>
-    </main>
+      </article>
 
-    <footer class="footer">
-      <div class="watermark">© 2025 WestTech Home Automation · Veteran Owned · Built for DIYers</div>
-    </footer>
+      <article class="product-card">
+        <div class="product-label">Helpful Extras</div>
+        <div class="product-name">Makes answers faster</div>
+        <div class="product-status">Optional but useful</div>
+        <ul class="product-list">
+          <li>Photos or screenshots</li>
+          <li>Logs, error text, or status messages</li>
+          <li>Wiring notes or relay/sensor details</li>
+          <li>Firmware or config version, if known</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="forum">
+    <div class="section-header">
+      <div class="section-title">Site Integration</div>
+      <span class="section-tag">Optional</span>
+    </div>
+
+    <p class="tagline" style="margin-bottom: 12px;">
+      Use the discussion below to ask questions, share feedback, and join the conversation. You can also open the full forum in GitHub Discussions.
+    </p>
+
+    <div id="forum-not-configured" class="product-card" style="padding: 18px; margin-bottom: 14px;">
+      <div class="product-label">Embed Status</div>
+      <div class="product-name">Embedded discussion is live</div>
+      <div class="product-status">Forum page embed enabled</div>
+      <p class="tagline" style="margin: 10px 0 0;">
+        The main forum still lives in
+        <a class="link-inline" href="https://github.com/FrozenOzone/westtechha/discussions" target="_blank" rel="noopener">GitHub Discussions</a>,
+        and this page now loads an embedded discussion thread using Giscus.
+      </p>
+    </div>
+
+    <div id="forum-embed" style="min-height: 180px;"></div>
+
+    <!--
+      Optional future embed:
+      1) Go to https://giscus.app
+      2) Select your GitHub repo and discussion category
+      3) Paste the generated <script> block into #forum-embed or directly below this comment
+
+      Example placeholder only — replace with real values when ready.
+    -->
+    <script
+  src="https://giscus.app/client.js"
+  data-repo="FrozenOzone/westtechha"
+  data-repo-id="R_kgDOQ2df1g"
+  data-category="General"
+  data-category-id="DIC_kwDOQ2df1s4C17E0"
+  data-mapping="pathname"
+  data-strict="0"
+  data-reactions-enabled="1"
+  data-emit-metadata="0"
+  data-input-position="bottom"
+  data-theme="preferred_color_scheme"
+  data-lang="en"
+  crossorigin="anonymous"
+  async>
+</script>
+
+    <noscript>
+      <p class="tagline">JavaScript is required to load an embedded discussion if you add one later.</p>
+    </noscript>
+  </section>
+
+  <section class="section">
+    <div class="section-header">
+      <div class="section-title">Community Guidelines</div>
+      <span class="section-tag">Rules</span>
+    </div>
+
+    <ul class="product-list">
+      <li>Be respectful and keep replies useful.</li>
+      <li>Do not post Wi-Fi passwords, full addresses, or personal/private account details.</li>
+      <li>If something is safety-critical, include exact behavior and exact hardware details.</li>
+      <li>When a solution works, post the fix so the next person can find it.</li>
+    </ul>
+  </section>
+</main>
+
+    <div id="site-footer"></div>
   </div>
 
+  <script src="js/site-shell.js"></script>
   <script src="js/theme.js" defer></script>
 
   <!-- Optional: if you enable Giscus, this keeps its theme aligned with your Light/Dark/Auto toggle -->

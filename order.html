@@ -3,36 +3,15 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Order – WestTech Home Automation Panels</title>
+<title>Order Request – WestTech Home Automation</title>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="description" content="Start a WestTech Home Automation order request for panels, custom builds, or product questions using the order form."/>
 <link href="icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
 <link href="css/site.css" rel="stylesheet"/>
 </head>
 <body>
 <div class="page">
-<nav class="nav nav-stack">
-<div class="nav-brand-wrap">
-  <a class="nav-brand" href="index.html">
-    <img alt="WestTech Home Automation – IoT &amp; Computing Solutions logo" class="nav-logo nav-logo-full" src="images/WestTech_Logo_Blue.png"/>
-  </a>
-  <div class="badge badge-nav">
-<span></span>
-          VETERAN OWNED • IoT PANELS
-        </div>
-</div>
-<div class="nav-links">
-<a class="nav-link" href="index.html">Home</a>
-<a class="nav-link" href="products.html">Products</a>
-<a class="nav-link" href="services.html">Services</a>
-<a class="nav-link active" href="order.html">Order</a>
-<a class="nav-link" href="support.html">Support</a>
-<a class="nav-link" href="forum.html">Forum</a>
-<a class="nav-link" href="returns.html">Returns</a>
-<a class="nav-link" href="about.html">About</a>
-
-<a class="nav-link" href="contact.html">Contact</a>
-</div>
-</nav>
+<div id="site-header"></div>
 <header class="page-header">
 <div class="badge">
 <span></span>
@@ -140,7 +119,7 @@
 <p>
           Fill out the details below and click <strong>Prepare Request</strong>.
           Your browser will open an email composer (Gmail/Outlook/Mail app) with your answers pre‑filled
-          to <strong>orders@WestTech Home Automation.com</strong>.
+          to <strong>orders@westtechha.com</strong>.
         </p>
 <!-- GAP order form + MAP/SAP waitlist (local only, email-prep via chooser) -->
 <form class="wt-order" id="order-form" onsubmit="return prepareOrderEmail();">
@@ -477,14 +456,12 @@
 
   <button class="btn-submit" type="submit">Prepare Request</button>
   <p class="form-note">
-    Tip: this prepares an email to <strong>orders@WestTech Home Automation.com</strong>. You’ll be able to choose Gmail/Outlook/Mail app.
+    Tip: this prepares an email to <strong>orders@westtechha.com</strong>. You’ll be able to choose Gmail/Outlook/Mail app.
   </p>
 </form>
 </section>
 </main>
-<footer class="footer">
-<p>© 2026 WestTech Home Automation, LLC · Veteran Owned · Built for DIYers</p>
-</footer>
+<div id="site-footer"></div>
 </div>
 
   <!-- Email chooser modal -->
@@ -502,10 +479,11 @@
         <a class="btn btn-ghost" id="wtEmailMailto">Use Default Mail App</a>
         <button class="btn btn-ghost" id="wtEmailCopy" type="button">Copy Address</button>
       </div>
-      <p class="wt-email-small">To: <span class="mono" id="wtEmailToText">support@WestTech Home Automation.com</span></p>
+      <p class="wt-email-small">To: <span class="mono" id="wtEmailToText">support@westtechha.com</span></p>
     </div>
   </div>
   <div class="wt-email-toast" id="wtEmailToast" aria-hidden="true"></div>
+  <script src="js/site-shell.js"></script>
   <script src="js/theme.js" defer></script>
 <script src="js/email-chooser.js"></script>
 
@@ -662,12 +640,12 @@
 
       if (window.WTEmail && typeof window.WTEmail.open === 'function') {
         window.WTEmail.open({
-          to: 'orders@WestTech Home Automation.com',
+          to: 'orders@westtechha.com',
           subject: subject,
           body: body
         });
       } else {
-        const mailto = `mailto:orders@WestTech Home Automation.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        const mailto = `mailto:orders@westtechha.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         window.location.href = mailto;
       }
 

@@ -3,36 +3,15 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Services – WestTech Home Automation Panels</title>
+<title>Services – WestTech Home Automation</title>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="description" content="View WestTech Home Automation services, request details, and contact options for custom work and support."/>
 <link href="icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
 <link href="css/site.css" rel="stylesheet"/>
 </head>
 <body class="support-page">
 <div class="page">
-<nav class="nav nav-stack">
-<div class="nav-brand-wrap">
-  <a class="nav-brand" href="index.html">
-    <img alt="WestTech Home Automation – IoT &amp; Computing Solutions logo" class="nav-logo nav-logo-full" src="images/WestTech_Logo_Blue.png"/>
-  </a>
-  <div class="badge badge-nav">
-<span></span>
-          VETERAN OWNED • IoT PANELS
-        </div>
-</div>
-<div class="nav-links">
-<a class="nav-link" href="index.html">Home</a>
-<a class="nav-link" href="products.html">Products</a>
-<a class="nav-link active" href="services.html">Services</a>
-<a class="nav-link" href="order.html">Order</a>
-<a class="nav-link" href="support.html">Support</a>
-<a class="nav-link" href="forum.html">Forum</a>
-<a class="nav-link" href="returns.html">Returns</a>
-<a class="nav-link" href="about.html">About</a>
-
-<a class="nav-link" href="contact.html">Contact</a>
-</div>
-</nav>
+<div id="site-header"></div>
 <header class="page-header">
 <div class="badge">
 <span></span>
@@ -211,8 +190,8 @@
 <ul>
 <li>
             Email:
-            <a class="mailto-link" href="#" data-wt-email-trigger data-email="support@WestTech Home Automation.com" data-subject="WestTech Home Automation Support Request">
-              support@WestTech Home Automation.com
+            <a class="mailto-link" href="#" data-wt-email-trigger data-email="support@westtechha.com" data-subject="WestTech Home Automation Support Request">
+              support@westtechha.com
             </a>
 </li>
 <li>Mention which panel family (GAP, SAP, MAP, BAP) you’re thinking about.</li>
@@ -225,7 +204,7 @@
 <!-- Same form as order.html, reused here -->
 <p class="support-note">
           You can also use this form to prepare a request. It will open your mail client with
-          the details filled in so you can send it to <strong>orders@WestTech Home Automation.com</strong>.
+          the details filled in so you can send it to <strong>orders@westtechha.com</strong>.
         </p>
 <form id="order-form" onsubmit="return prepareOrderEmail();">
 <div>
@@ -258,14 +237,12 @@
 <button class="btn-submit" type="submit">Prepare Request</button>
 <p class="form-note">
             Tip: until this form is wired up to a backend, you can copy/paste your answers into an email to
-            <strong>orders@WestTech Home Automation.com</strong>.
+            <strong>orders@westtechha.com</strong>.
           </p>
 </form>
 </section>
 </main>
-<footer class="footer">
-<p>© 2026 WestTech Home Automation, LLC · Veteran Owned · Built for DIYers</p>
-</footer>
+<div id="site-footer"></div>
 </div>
 
   <!-- Email chooser modal -->
@@ -283,10 +260,11 @@
         <a class="btn btn-ghost" id="wtEmailMailto">Use Default Mail App</a>
         <button class="btn btn-ghost" id="wtEmailCopy" type="button">Copy Address</button>
       </div>
-      <p class="wt-email-small">To: <span class="mono" id="wtEmailToText">support@WestTech Home Automation.com</span></p>
+      <p class="wt-email-small">To: <span class="mono" id="wtEmailToText">support@westtechha.com</span></p>
     </div>
   </div>
   <div class="wt-email-toast" id="wtEmailToast" aria-hidden="true"></div>
+  <script src="js/site-shell.js"></script>
   <script src="js/theme.js" defer></script>
 <script src="js/email-chooser.js"></script>
 
@@ -324,13 +302,13 @@
 
       if (window.WTEmail && typeof window.WTEmail.open === 'function') {
         window.WTEmail.open({
-          to: 'orders@WestTech Home Automation.com',
+          to: 'orders@westtechha.com',
           subject: subject,
           body: body
         });
       } else {
         // Fallback: default mail app
-        const mailto = 'mailto:orders@WestTech Home Automation.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+        const mailto = 'mailto:orders@westtechha.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
         window.location.href = mailto;
       }
 

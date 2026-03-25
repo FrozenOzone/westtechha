@@ -5,39 +5,14 @@
   <meta charset="utf-8" />
   <title>Contact – WestTech Home Automation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icons/Westtech_Icon_BrainW_Blue_128.png" />
+      <meta name="description" content="Contact WestTech Home Automation for general questions, shipping questions, and order routing. Use contact@westtechha.com or the contact form."/>
+<link rel="icon" type="image/png" href="icons/Westtech_Icon_BrainW_Blue_128.png" />
   <link rel="stylesheet" href="css/site.css" />
 </head>
 
 <body class="contact-page">
   <div class="page">
-    <nav class="nav nav-stack">
-      <div class="nav-brand-wrap">
-        <a class="nav-brand" href="index.html">
-          <img
-            class="nav-logo nav-logo-full"
-            src="images/WestTech_Logo_Blue.png"
-            alt="WestTech Home Automation – IoT &amp; Computing Solutions logo"
-          />
-        </a>
-        <div class="badge badge-nav">
-          <span></span>
-          VETERAN OWNED • IoT PANELS
-        </div>
-      </div>
-
-      <div class="nav-links">
-        <a class="nav-link" href="index.html">Home</a>
-        <a class="nav-link" href="products.html">Products</a>
-        <a class="nav-link" href="services.html">Services</a>
-        <a class="nav-link" href="order.html">Order</a>
-        <a class="nav-link" href="support.html">Support</a>
-        <a class="nav-link" href="forum.html">Forum</a>
-        <a class="nav-link" href="returns.html">Returns</a>
-<a class="nav-link" href="about.html">About</a>
-      
-        <a class="nav-link active" href="contact.html">Contact</a></div>
-    </nav>
+    <div id="site-header"></div>
 
     <header class="page-header">
       <div class="badge">
@@ -58,18 +33,31 @@
           <span class="section-tag">Support</span>
         </div>
 
-        <div class="product-grid">
+                <div class="product-grid">
           <article class="product-card">
-            <div class="product-label">Email</div>
-            <div class="product-name">support@WestTech Home Automation.com</div>
-            <div class="product-status">Fastest response</div>
+            <div class="product-label">Contact</div>
+            <div class="product-name">contact@westtechha.com</div>
+            <div class="product-status">General questions</div>
             <p class="product-body">
-              You can always email us directly. If possible, attach photos/screenshots and include
-              your panel type and firmware version.
+              Use this address for general questions, shipping questions, and non-order contact. If possible,
+              attach photos/screenshots and include your panel type and firmware version.
             </p>
             <div class="product-footer">
-              <span class="chip">EMAIL</span>
-              <a class="link-inline" href="#" data-wt-email-trigger data-email="support@WestTech Home Automation.com" data-subject="WestTech Home Automation Support Request">Compose email</a>
+              <span class="chip">CONTACT</span>
+              <a class="link-inline" href="#" data-wt-email-trigger data-email="contact@westtechha.com" data-subject="WestTech Home Automation Contact Request">Compose email</a>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <div class="product-label">Orders</div>
+            <div class="product-name">orders@westtechha.com</div>
+            <div class="product-status">Order-specific questions</div>
+            <p class="product-body">
+              Use this address for order status, purchase questions, and order-specific issues.
+            </p>
+            <div class="product-footer">
+              <span class="chip">ORDERS</span>
+              <a class="link-inline" href="#" data-wt-email-trigger data-email="orders@westtechha.com" data-subject="WestTech Home Automation Order Question">Compose email</a>
             </div>
           </article>
         </div>
@@ -87,7 +75,7 @@
           Worker, etc.), we can swap the form action.
         </p>
 
-        <form action="https://formsubmit.co/support@WestTech Home Automation.com" method="POST">
+        <form action="https://formsubmit.co/contact@westtechha.com" method="POST">
           <!-- Optional FormSubmit options (safe defaults). You can remove or tweak later. -->
           <input type="hidden" name="_subject" value="WestTech Home Automation Contact Form" />
           <input type="hidden" name="_captcha" value="true" />
@@ -127,16 +115,16 @@
           <button class="btn btn-primary" type="submit">Send message</button>
 
           <p class="form-note">
-            Prefer email? Send details to
-            <a class="mailto-link" href="#" data-wt-email-trigger data-email="support@WestTech Home Automation.com" data-subject="WestTech Home Automation Support Request">support@WestTech Home Automation.com</a>.
+            Prefer email? Send general questions to
+            <a class="mailto-link" href="#" data-wt-email-trigger data-email="contact@westtechha.com" data-subject="WestTech Home Automation Contact Request">contact@westtechha.com</a>.
+            For order-specific questions, use
+            <a class="mailto-link" href="#" data-wt-email-trigger data-email="orders@westtechha.com" data-subject="WestTech Home Automation Order Question">orders@westtechha.com</a>.
           </p>
         </form>
       </section>
     </main>
 
-    <footer class="footer">
-      <p>© 2026 WestTech Home Automation, LLC · Veteran Owned · Built for DIYers</p>
-    </footer>
+    <div id="site-footer"></div>
   </div>
 
   <!-- Email chooser modal -->
@@ -154,10 +142,11 @@
         <a class="btn btn-ghost" id="wtEmailMailto">Use Default Mail App</a>
         <button class="btn btn-ghost" id="wtEmailCopy" type="button">Copy Address</button>
       </div>
-      <p class="wt-email-small">To: <span class="mono" id="wtEmailToText">support@WestTech Home Automation.com</span></p>
+      <p class="wt-email-small">To: <span class="mono" id="wtEmailToText">contact@westtechha.com</span></p>
     </div>
   </div>
   <div class="wt-email-toast" id="wtEmailToast" aria-hidden="true"></div>
+  <script src="js/site-shell.js"></script>
   <script src="js/theme.js" defer></script>
 <script src="js/email-chooser.js"></script>
 </body>
