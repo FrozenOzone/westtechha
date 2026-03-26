@@ -14,7 +14,6 @@
 
   <style>
     :root {
-      --forum-bg: #0b1220;
       --forum-panel: rgba(255, 255, 255, 0.05);
       --forum-panel-strong: rgba(255, 255, 255, 0.08);
       --forum-border: rgba(255, 255, 255, 0.12);
@@ -25,26 +24,12 @@
       --forum-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
       --forum-radius: 18px;
       --forum-radius-sm: 12px;
-      --forum-max: 1200px;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      color: var(--forum-text);
-      background:
-        radial-gradient(circle at top left, rgba(77, 184, 255, 0.14), transparent 28%),
-        radial-gradient(circle at top right, rgba(125, 240, 200, 0.10), transparent 22%),
-        linear-gradient(180deg, #08101d 0%, #0b1220 100%);
     }
 
     .forum-page {
-      width: min(calc(100% - 32px), var(--forum-max));
-      margin: 0 auto;
-      padding: 34px 0 80px;
+      width: 100%;
+      margin: 0;
+      padding: 0;
     }
 
     .forum-surface {
@@ -57,9 +42,10 @@
 
     .forum-hero {
       padding: 34px;
-      margin-bottom: 28px;
+      margin: 14px 0 28px;
       overflow: hidden;
       position: relative;
+      color: var(--forum-text);
     }
 
     .forum-hero::after {
@@ -134,6 +120,7 @@
 
     .forum-section {
       margin-bottom: 28px;
+      color: var(--forum-text);
     }
 
     .forum-section-head {
@@ -147,6 +134,7 @@
     .forum-section-head h2 {
       margin: 0;
       font-size: 1.5rem;
+      color: var(--forum-text);
     }
 
     .forum-section-head p {
@@ -197,6 +185,7 @@
     .forum-card h3 {
       margin: 0 0 10px;
       font-size: 1.12rem;
+      color: var(--forum-text);
     }
 
     .forum-card p {
@@ -254,6 +243,7 @@
       display: block;
       margin-bottom: 4px;
       font-size: 1rem;
+      color: var(--forum-text);
     }
 
     .forum-topic small {
@@ -286,11 +276,13 @@
     .forum-cta {
       text-align: center;
       padding: 30px 24px;
+      color: var(--forum-text);
     }
 
     .forum-cta h2 {
       margin: 0 0 10px;
       font-size: 1.7rem;
+      color: var(--forum-text);
     }
 
     .forum-cta p {
@@ -312,11 +304,6 @@
     }
 
     @media (max-width: 720px) {
-      .forum-page {
-        width: min(calc(100% - 20px), var(--forum-max));
-        padding-top: 22px;
-      }
-
       .forum-hero,
       .forum-card {
         padding: 18px;
