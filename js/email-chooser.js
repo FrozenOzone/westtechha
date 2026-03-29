@@ -12,7 +12,7 @@
 (function () {
   'use strict';
 
-  const DEFAULT_TO = 'contact@westtechha.com';
+  const DEFAULT_TO = 'support@WestTechHA.com';
 
   function ensureModal() {
     if (document.getElementById('wtEmailModal')) return;

@@ -7,15 +7,15 @@
     { href: 'products.html', label: 'Products' },
     { href: 'services.html', label: 'Services' },
     { href: 'order.html',    label: 'Order' },
-    { href: 'support.html',  label: 'Support Center' },
+    { href: 'support.html',  label: 'Support' },
     { href: 'contact.html',  label: 'Contact' }
   ];
 
-  const utilityLinks = [
-    { href: 'shipping.html', label: 'Shipping Policy' },
+  const footerLinks = [
+    { href: 'forum.html', label: 'Forum' },
     { href: 'returns.html',  label: 'Returns & Warranty' },
-    { href: 'about.html',    label: 'About' },
-    { href: 'forum.html',    label: 'Forum' }
+    { href: 'shipping.html', label: 'Shipping Policy' },
+    { href: 'about.html',    label: 'About' }
   ];
 
   const currentFile = (() => {
@@ -24,9 +24,9 @@
     return file || 'index.html';
   })();
 
-  function linkHtml(link) {
+  function linkHtml(link, className = 'nav-link') {
     const isActive = currentFile === link.href || (currentFile === '' && link.href === 'index.html');
-    const classes = 'nav-link' + (isActive ? ' active' : '');
+    const classes = className + (isActive ? ' active' : '');
     const aria = isActive ? ' aria-current="page"' : '';
     return `<a class="${classes}" href="${link.href}"${aria}>${link.label}</a>`;
   }
@@ -49,10 +49,7 @@
 
       <div class="nav-menu">
         <div class="nav-links nav-primary">
-          ${primaryLinks.map(linkHtml).join('')}
-        </div>
-        <div class="nav-links nav-utility" aria-label="Secondary navigation">
-          ${utilityLinks.map(linkHtml).join('')}
+          ${primaryLinks.map(link => linkHtml(link, 'nav-link')).join('')}
         </div>
       </div>
     </nav>
@@ -60,6 +57,9 @@
 
   const footerHtml = `
     <footer class="footer">
+      <div class="footer-links" aria-label="Footer navigation">
+        ${footerLinks.map(link => linkHtml(link, 'footer-link')).join('')}
+      </div>
       <p>© 2026 WestTech Home Automation, LLC · Veteran Owned · Built for DIYers</p>
     </footer>
   `;

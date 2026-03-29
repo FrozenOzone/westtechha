@@ -1,15 +1,13 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>Contact – WestTech Home Automation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <meta name="description" content="Contact WestTech Home Automation for general questions, shipping questions, and order routing. Use contact@westtechha.com or the contact form."/>
-<link rel="icon" type="image/png" href="icons/Westtech_Icon_BrainW_Blue_128.png" />
+  <meta name="description" content="Contact WestTech Home Automation for product questions, quotes, shipping questions, and general support."/>
+  <link rel="icon" type="image/png" href="icons/Westtech_Icon_BrainW_Blue_128.png" />
   <link rel="stylesheet" href="css/site.css" />
 </head>
-
 <body class="contact-page">
   <div class="page">
     <div id="site-header"></div>
@@ -21,8 +19,8 @@
       </div>
       <h1>Contact WestTech Home Automation</h1>
       <p class="tagline">
-        Send a message and we’ll get back to you. If this is a support request, include your panel
-        type, firmware version, and a quick description of what you’re seeing.
+        Send a message and we’ll get back to you. The easiest way to help is to tell us whether your question
+        is about a shell, a kit, shipping, or a custom-build quote.
       </p>
     </header>
 
@@ -30,17 +28,18 @@
       <section class="section">
         <div class="section-header">
           <div class="section-title">Contact Options</div>
-          <span class="section-tag">Support</span>
+          <span class="section-tag">Email</span>
         </div>
 
-                <div class="product-grid">
+        
+<div class="product-grid">
           <article class="product-card">
-            <div class="product-label">Contact</div>
+            <div class="product-label">General Contact</div>
             <div class="product-name">contact@westtechha.com</div>
             <div class="product-status">General questions</div>
             <p class="product-body">
-              Use this address for general questions, shipping questions, and non-order contact. If possible,
-              attach photos/screenshots and include your panel type and firmware version.
+              Use this address for general questions, shipping questions, and product questions that are not
+              specifically tied to an active order.
             </p>
             <div class="product-footer">
               <span class="chip">CONTACT</span>
@@ -49,19 +48,34 @@
           </article>
 
           <article class="product-card">
-            <div class="product-label">Orders</div>
+            <div class="product-label">Orders &amp; Quotes</div>
             <div class="product-name">orders@westtechha.com</div>
-            <div class="product-status">Order-specific questions</div>
+            <div class="product-status">Quotes and order-specific questions</div>
             <p class="product-body">
-              Use this address for order status, purchase questions, and order-specific issues.
+              Use this address for quote requests, order status, purchase questions, and custom-build discussions.
             </p>
             <div class="product-footer">
               <span class="chip">ORDERS</span>
               <a class="link-inline" href="#" data-wt-email-trigger data-email="orders@westtechha.com" data-subject="WestTech Home Automation Order Question">Compose email</a>
             </div>
           </article>
+
+          <article class="product-card">
+            <div class="product-label">Community Help</div>
+            <div class="product-name">Forum</div>
+            <div class="product-status">Possible answers already posted</div>
+            <p class="product-body">
+              Before sending an email, check the forum. Your question may already have an answer, and it is also
+              a good place to ask project questions, see ideas, and learn from other builds.
+            </p>
+            <div class="product-footer">
+              <span class="chip">FORUM</span>
+              <a class="link-inline" href="forum.html">Open forum</a>
+            </div>
+          </article>
         </div>
       </section>
+
 
       <section class="section">
         <div class="section-header">
@@ -70,13 +84,11 @@
         </div>
 
         <p>
-          This form is ready for a static website. It uses FormSubmit to deliver messages to your
-          inbox (no server required). If you’d rather use a different provider (Formspree, Cloudflare
-          Worker, etc.), we can swap the form action.
+          This form uses FormSubmit for a simple static-site contact flow. You can keep this approach or swap
+          it later if you move to a different provider.
         </p>
 
         <form action="https://formsubmit.co/contact@westtechha.com" method="POST">
-          <!-- Optional FormSubmit options (safe defaults). You can remove or tweak later. -->
           <input type="hidden" name="_subject" value="WestTech Home Automation Contact Form" />
           <input type="hidden" name="_captcha" value="true" />
           <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" />
@@ -94,22 +106,22 @@
           <div>
             <label for="topic">Topic</label>
             <select id="topic" name="topic" required>
-              <option value="Support">Support / Troubleshooting</option>
-              <option value="Order">Order / Quote</option>
-              <option value="Partnership">Partnership / Installer</option>
               <option value="General">General Question</option>
+              <option value="Product">Shell / Kit Question</option>
+              <option value="Order">Order / Quote</option>
+              <option value="Support">Support / Troubleshooting</option>
             </select>
           </div>
 
           <div>
-            <label for="panel">Panel / Product (optional)</label>
-            <input id="panel" name="panel" type="text" placeholder="GAP / SAP / MAP / BAP" />
+            <label for="product">Product / Project (optional)</label>
+            <input id="product" name="product" type="text" placeholder="Small Shell / Med Kit / Custom build / other" />
           </div>
 
           <div>
             <label for="message">Message</label>
             <textarea id="message" name="message" rows="6" required
-              placeholder="What can we help with? Include steps you’ve tried, and anything that changed recently."></textarea>
+              placeholder="Tell us what you are trying to do and where you need help."></textarea>
           </div>
 
           <button class="btn btn-primary" type="submit">Send message</button>
@@ -117,7 +129,7 @@
           <p class="form-note">
             Prefer email? Send general questions to
             <a class="mailto-link" href="#" data-wt-email-trigger data-email="contact@westtechha.com" data-subject="WestTech Home Automation Contact Request">contact@westtechha.com</a>.
-            For order-specific questions, use
+            For quotes or order-specific questions, use
             <a class="mailto-link" href="#" data-wt-email-trigger data-email="orders@westtechha.com" data-subject="WestTech Home Automation Order Question">orders@westtechha.com</a>.
           </p>
         </form>
@@ -127,7 +139,6 @@
     <div id="site-footer"></div>
   </div>
 
-  <!-- Email chooser modal -->
   <div class="wt-email-modal" id="wtEmailModal" aria-hidden="true">
     <div class="wt-email-backdrop" data-wt-email-close></div>
     <div class="wt-email-card" role="dialog" aria-modal="true" aria-label="Email options">
@@ -146,8 +157,9 @@
     </div>
   </div>
   <div class="wt-email-toast" id="wtEmailToast" aria-hidden="true"></div>
+
   <script src="js/site-shell.js"></script>
   <script src="js/theme.js" defer></script>
-<script src="js/email-chooser.js"></script>
+  <script src="js/email-chooser.js"></script>
 </body>
 </html>

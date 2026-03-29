@@ -1,470 +1,183 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
 <title>Order Request – WestTech Home Automation</title>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <meta name="description" content="Start a WestTech Home Automation order request for panels, custom builds, or product questions using the order form."/>
+<meta name="description" content="Request a quote or start an order for WestTech Home Automation enclosure shells, kits, or custom ESP32 builds."/>
 <link href="icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
 <link href="css/site.css" rel="stylesheet"/>
 </head>
-<body>
+<body class="order-page">
 <div class="page">
-<div id="site-header"></div>
-<header class="page-header">
-<div class="badge">
-<span></span>
-        ORDER • PANELS &amp; PROJECTS
-      </div>
-<h1>Order a WestTech Home Automation Panel</h1>
-<p class="tagline">
-        WestTech Home Automation panels are built in small batches and tuned for real homes. Use this page to
-        start an order, request a quote, or ask about a custom build.
-      </p>
-</header>
-<main>
-<section class="section">
-  <div class="section-header">
-    <div class="section-title">Panels You Can Request</div>
-    <span class="section-tag">Lineup</span>
-  </div>
-  <p>
-    These are the initial WestTech Home Automation panels and projects you can ask about when you place an order.
-    Availability and exact options may change as the product line evolves.
-  </p>
+  <div id="site-header"></div>
 
-  <div class="product-grid">
-    <article class="product-card">
-      <div class="product-label">Flagship Panel</div>
-      <div class="product-name">Garage Automation Panel (GAP)</div>
-      <div class="product-status">Available • Ethernet-first smart garage controller</div>
-      <p class="product-body">
-        Veteran-built garage controller with ESP32, Ethernet-first networking, door reeds, safety beam,
-        inside/outside motion inputs, buzzer pre-warn, and an LCD/OLED display (per model).
-      </p>
-      <ul class="product-list">
-        <li>Designed for Home Assistant users who want reliable, local control</li>
-        <li>Documented wiring + stable-tested firmware patterns</li>
-        <li>Installer-friendly labeling and support mindset</li>
-      </ul>
-      <div class="product-footer">
-        <span class="chip">GAP</span>
-        <a class="link-inline" href="products.html">See details</a>
-      </div>
-    </article>
-
-    <article class="product-card">
-      <div class="product-label">Coming Soon</div>
-      <div class="product-name">Sprinkler Automation Panel (SAP)</div>
-      <div class="product-status">In development • Smart irrigation controller</div>
-      <p class="product-body">
-        Smart irrigation controller with a 20×4 LCD for at-a-glance zone status, built on ESP32 with the
-        same stable firmware philosophy as GAP.
-      </p>
-      <ul class="product-list">
-        <li>Zone visibility at the panel (planned)</li>
-        <li>Home Assistant integration focus</li>
-        <li>Clean wiring + serviceability</li>
-      </ul>
-      <div class="product-footer">
-        <span class="chip">SAP</span>
-        <span class="product-status">In progress</span>
-      </div>
-    </article>
-
-    <article class="product-card">
-      <div class="product-label">Planned</div>
-      <div class="product-name">Main Automation Panel (MAP)</div>
-      <div class="product-status">Roadmap • Structured-media hub</div>
-      <p class="product-body">
-        A structured-media–friendly hub that aggregates sensors and relays with Ethernet-first options
-        and clear wiring docs.
-      </p>
-      <ul class="product-list">
-        <li>Sensor aggregation + relay expansion (planned)</li>
-        <li>Built for neat installs and maintainability</li>
-        <li>Fits the broader WestTech Home Automation ecosystem</li>
-      </ul>
-      <div class="product-footer">
-        <span class="chip">MAP</span>
-        <a class="link-inline" href="products.html">See roadmap</a>
-      </div>
-    </article>
-
-    <article class="product-card">
-      <div class="product-label">Focused Builds</div>
-      <div class="product-name">Basement / Utility Panels (BAP) &amp; Pods</div>
-      <div class="product-status">Available/Planned • Targeted enclosures</div>
-      <p class="product-body">
-        Smaller panels and pods for motion, presence, and utility sensing—built to be repeatable and easy to support.
-      </p>
-      <ul class="product-list">
-        <li>Utility sensing, motion/presence pods (varies)</li>
-        <li>Installer-friendly labeling and documentation</li>
-        <li>Same stable-tested philosophy</li>
-      </ul>
-      <div class="product-footer">
-        <span class="chip">BAP</span>
-        <a class="link-inline" href="products.html">Explore lineup</a>
-      </div>
-    </article>
-  </div>
-</section>
-<section class="section">
-<div class="section-header">
-<div class="section-title">Request a Quote or Panel</div>
-<span class="section-tag">Form</span>
-</div>
-<p>
-          Fill out the details below and click <strong>Prepare Request</strong>.
-          Your browser will open an email composer (Gmail/Outlook/Mail app) with your answers pre‑filled
-          to <strong>orders@westtechha.com</strong>.
-        </p>
-<!-- GAP order form + MAP/SAP waitlist (local only, email-prep via chooser) -->
-<form class="wt-order" id="order-form" onsubmit="return prepareOrderEmail();">
-
-  <fieldset class="wt-fieldset">
-    <legend>Customer &amp; install context</legend>
-    <div class="wt-grid">
-      <div>
-        <label for="name">Name</label>
-        <input id="name" name="name" placeholder="Your name" type="text"/>
-      </div>
-      <div>
-        <label for="email">Email</label>
-        <input id="email" name="email" placeholder="you@example.com" type="email"/>
-      </div>
-      <div>
-        <label for="phone">Phone (optional)</label>
-        <input id="phone" name="phone" placeholder="(555) 555-5555" type="tel"/>
-      </div>
-      <div>
-        <label for="installType">Install type</label>
-        <select id="installType" name="installType">
-          <option value="">Select…</option>
-          <option value="diy">DIY (I’ll install)</option>
-          <option value="westtech">WestTech install (quote required)</option>
-        </select>
-      </div>
-      <div class="wt-full">
-        <label for="shipAddr">Shipping address</label>
-        <textarea id="shipAddr" name="shipAddr" placeholder="Street, City, State, ZIP"></textarea>
-      </div>
-      <div>
-        <label for="opener">Garage door opener brand/model (optional)</label>
-        <input id="opener" name="opener" placeholder="e.g., LiftMaster 8500W" type="text"/>
-      </div>
-      <div>
-        <label for="doorType">Door type</label>
-        <select id="doorType" name="doorType">
-          <option value="">Select…</option>
-          <option value="single">Single</option>
-          <option value="double">Double</option>
-          <option value="other">Other / Unsure</option>
-        </select>
-      </div>
-      <div>
-        <label for="usage">Typical usage (daily cycles)</label>
-        <select id="usage" name="usage">
-          <option value="">Select…</option>
-          <option value="low">Low (0–4)</option>
-          <option value="med">Medium (5–10)</option>
-          <option value="high">High (11+)</option>
-        </select>
-      </div>
-      <div>
-        <label for="timeline">Timing / when do you want it?</label>
-        <select id="timeline" name="timeline">
-          <option value="">Select…</option>
-          <option value="asap">ASAP</option>
-          <option value="2w">~2 weeks</option>
-          <option value="month">~1 month</option>
-          <option value="flex">Flexible</option>
-        </select>
-      </div>
+  <header class="page-header">
+    <div class="badge">
+      <span></span>
+      ORDER • QUOTE • CUSTOM REQUEST
     </div>
-  </fieldset>
+    <h1>Request a WestTechHA Quote</h1>
+    <p class="tagline">
+      Use this page to request an enclosure shell, an enclosure kit, or a custom ESP32 build.
+      The public direction is enclosure-first, with custom builds handled by quote when the project needs more.
+    </p>
+  </header>
 
-  <fieldset class="wt-fieldset">
-    <legend>What are you requesting?</legend>
-    <div class="wt-grid">
-      <div>
-        <label for="panel">Panel</label>
-        <select id="panel" name="panel">
-          <option value="">Select a panel…</option>
-          <option value="gap">Garage Automation Panel (GAP)</option>
-          <option value="sap">Sprinkler Automation Panel (SAP) — Waitlist</option>
-          <option value="map">Main Automation Panel (MAP) — Waitlist</option>
-          <option value="bap">Basement / Utility Panel</option>
-          <option value="custom">Custom / Other</option>
-        </select>
-        <p class="wt-help">GAP shows the full build spec. MAP/SAP show a waitlist block.</p>
+  <main>
+    <section class="section">
+      <div class="section-header">
+        <div class="section-title">What Can You Request?</div>
+        <span class="section-tag">Current Catalog Direction</span>
       </div>
-      <div>
-        <label for="env">Environment (short)</label>
-        <input id="env" name="environment" placeholder="e.g., Ethernet at opener, HA on mini PC…" type="text"/>
-      </div>
-    </div>
-  </fieldset>
 
-  <!-- GAP build/spec questions -->
-  <fieldset class="wt-fieldset wt-toggle" id="gapSpec" aria-hidden="true">
-    <legend>GAP build specifications</legend>
+      <div class="product-grid">
+        <article class="product-card">
+          <div class="product-label">Simple Start</div>
+          <div class="product-name">Shells</div>
+          <div class="product-status">Enclosure only</div>
+          <p class="product-body">
+            Best for customers who already know their hardware and just want a cleaner enclosure.
+          </p>
+        </article>
 
-    <div class="wt-subhead">Connectivity &amp; environment</div>
-    <div class="wt-grid">
-      <div>
-        <label for="ethAvail">Ethernet available at install location?</label>
-        <select id="ethAvail" name="ethAvail">
-          <option value="">Select…</option>
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-          <option value="unsure">Unsure</option>
-        </select>
-      </div>
-      <div>
-        <label for="wifiAvail">Wi‑Fi available (2.4 GHz)?</label>
-        <select id="wifiAvail" name="wifiAvail">
-          <option value="">Select…</option>
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-          <option value="unsure">Unsure</option>
-        </select>
-      </div>
-      <div>
-        <label for="haVer">Home Assistant version (optional)</label>
-        <input id="haVer" name="haVer" placeholder="e.g., 2026.1.x" type="text"/>
-      </div>
-      <div>
-        <label for="ipPref">Preferred IP</label>
-        <select id="ipPref" name="ipPref">
-          <option value="">Select…</option>
-          <option value="dhcp">DHCP</option>
-          <option value="static">Static</option>
-        </select>
-      </div>
-      <div class="wt-full wt-toggle" id="staticIpBlock" aria-hidden="true">
-        <div class="wt-grid wt-grid-3">
-          <div>
-            <label for="staticIp">Static IP</label>
-            <input id="staticIp" name="staticIp" placeholder="192.168.1.50" type="text"/>
-          </div>
-          <div>
-            <label for="gateway">Gateway</label>
-            <input id="gateway" name="gateway" placeholder="192.168.1.1" type="text"/>
-          </div>
-          <div>
-            <label for="subnet">Subnet</label>
-            <input id="subnet" name="subnet" placeholder="255.255.255.0" type="text"/>
-          </div>
-        </div>
-      </div>
-    </div>
+        <article class="product-card">
+          <div class="product-label">More Complete</div>
+          <div class="product-name">Kits</div>
+          <div class="product-status">Selected accessories included</div>
+          <p class="product-body">
+            Best for customers who want a cleaner install package without stepping into a full custom build.
+          </p>
+        </article>
 
-    <div class="wt-subhead">Core hardware choices</div>
-    <div class="wt-grid">
-      <div>
-        <label for="model">Model</label>
-        <select id="model" name="model">
-          <option value="">Select…</option>
-          <option value="eth">Ethernet‑first</option>
-          <option value="wifi">Wi‑Fi‑only</option>
-          <option value="both">Ethernet + Wi‑Fi backup</option>
-        </select>
+        <article class="product-card">
+          <div class="product-label">By Request</div>
+          <div class="product-name">Custom Builds</div>
+          <div class="product-status">Quote-based</div>
+          <p class="product-body">
+            Best for projects that need hardware selection, cutouts, or programming included.
+          </p>
+        </article>
       </div>
-      <div>
-        <label for="display">Display</label>
-        <select id="display" name="display">
-          <option value="">Select…</option>
-          <option value="none">None</option>
-          <option value="oled">0.96" OLED</option>
-          <option value="lcd">20×4 LCD</option>
-        </select>
-      </div>
-      <div>
-        <label for="buzzer">Buzzer</label>
-        <select id="buzzer" name="buzzer">
-          <option value="">Select…</option>
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select>
-      </div>
-      <div>
-        <label for="buzzerPref">Buzzer preference</label>
-        <select id="buzzerPref" name="buzzerPref">
-          <option value="">Select…</option>
-          <option value="standard">Standard pre‑warn</option>
-          <option value="short">Shorter/less loud</option>
-          <option value="loud">Louder/more obvious</option>
-        </select>
-      </div>
-    </div>
+    </section>
 
-    <div class="wt-subhead">Sensors &amp; add‑ons</div>
-    <div class="wt-grid">
-      <div class="wt-check">
-        <input id="reedMain" type="checkbox"/>
-        <label for="reedMain">Door reed switch included</label>
+    <section class="section">
+      <div class="section-header">
+        <div class="section-title">Request a Quote</div>
+        <span class="section-tag">Email Prep</span>
       </div>
-      <div class="wt-check">
-        <input id="reedInside" type="checkbox"/>
-        <label for="reedInside">Extra reed: inside</label>
-      </div>
-      <div class="wt-check">
-        <input id="reedOutside" type="checkbox"/>
-        <label for="reedOutside">Extra reed: outside</label>
-      </div>
-      <div class="wt-check">
-        <input id="pirInside" type="checkbox"/>
-        <label for="pirInside">PIR motion: inside</label>
-      </div>
-      <div class="wt-check">
-        <input id="pirOutside" type="checkbox"/>
-        <label for="pirOutside">PIR motion: outside</label>
-      </div>
-      <div class="wt-check">
-        <input id="cableKit" type="checkbox"/>
-        <label for="cableKit">Include pre‑cut cabling kit</label>
-      </div>
-      <div class="wt-full wt-toggle" id="cableBlock" aria-hidden="true">
-        <div class="wt-grid">
-          <div>
-            <label for="cableLen">Typical length (per sensor)</label>
-            <select id="cableLen" name="cableLen">
-              <option value="">Select…</option>
-              <option value="10">10 ft</option>
-              <option value="20">20 ft</option>
-              <option value="30">30 ft</option>
-            </select>
+
+      <p>
+        Fill out the details below and click <strong>Prepare Request</strong>. Your browser will open an
+        email composer with your request pre-filled to <strong>orders@westtechha.com</strong>.
+      </p>
+
+      <form class="wt-order" id="order-form" onsubmit="return prepareOrderEmail();">
+        <fieldset class="wt-fieldset">
+          <legend>Contact Details</legend>
+          <div class="wt-grid">
+            <div>
+              <label for="name">Name</label>
+              <input id="name" name="name" placeholder="Your name" type="text"/>
+            </div>
+            <div>
+              <label for="email">Email</label>
+              <input id="email" name="email" placeholder="you@example.com" type="email"/>
+            </div>
+            <div>
+              <label for="phone">Phone (optional)</label>
+              <input id="phone" name="phone" placeholder="(555) 555-5555" type="tel"/>
+            </div>
+            <div>
+              <label for="timeline">Timing</label>
+              <select id="timeline" name="timeline">
+                <option value="">Select…</option>
+                <option value="asap">ASAP</option>
+                <option value="2w">~2 weeks</option>
+                <option value="month">~1 month</option>
+                <option value="flex">Flexible</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label for="connector">Connector type</label>
-            <select id="connector" name="connector">
-              <option value="">Select…</option>
-              <option value="pigtails">Pigtails</option>
-              <option value="terminal">Terminal ends</option>
-              <option value="harness">Labeled harness</option>
-            </select>
+        </fieldset>
+
+        <fieldset class="wt-fieldset">
+          <legend>What are you requesting?</legend>
+          <div class="wt-grid">
+            <div>
+              <label for="product">Product / Request Type</label>
+              <select id="product" name="product">
+                <option value="">Select…</option>
+                <option value="small-shell">Small Shell</option>
+                <option value="med-shell">Med Shell</option>
+                <option value="big-shell">Big Shell</option>
+                <option value="small-kit">Small Kit</option>
+                <option value="med-kit">Med Kit</option>
+                <option value="big-kit">Big Kit</option>
+                <option value="custom-build">Custom ESP32 Build</option>
+                <option value="other">Other / Not Sure Yet</option>
+              </select>
+            </div>
+            <div>
+              <label for="quantity">Quantity</label>
+              <input id="quantity" name="quantity" placeholder="1, 2, 5..." type="text"/>
+            </div>
+            <div>
+              <label for="projectType">Project Type</label>
+              <select id="projectType" name="projectType">
+                <option value="">Select…</option>
+                <option value="diy">DIY / Bring My Own Hardware</option>
+                <option value="installer">Installer / Repeatable Project</option>
+                <option value="custom">Need Hardware + Programming</option>
+                <option value="unsure">Not Sure Yet</option>
+              </select>
+            </div>
+            <div>
+              <label for="display">Display / Lid Preference (optional)</label>
+              <select id="display" name="display">
+                <option value="">Select…</option>
+                <option value="blank">Blank / no display opening</option>
+                <option value="oled">OLED-style lid</option>
+                <option value="lcd">LCD-style lid</option>
+                <option value="unsure">Not sure</option>
+              </select>
+            </div>
+            <div>
+              <label for="sizeNotes">Board / hardware notes (optional)</label>
+              <input id="sizeNotes" name="sizeNotes" placeholder="ESP32 30-pin, relay board, sensors, etc." type="text"/>
+            </div>
+            <div>
+              <label for="shippingState">Shipping State / Region (optional)</label>
+              <input id="shippingState" name="shippingState" placeholder="e.g., Colorado" type="text"/>
+            </div>
+            <div class="wt-full">
+              <label for="details">Project Details</label>
+              <textarea id="details" name="details" placeholder="Tell us what you are building, what hardware you already have, what size you think you need, and whether you want shell-only, a kit, or a custom build."></textarea>
+            </div>
           </div>
+        </fieldset>
+
+        <fieldset class="wt-fieldset">
+          <legend>Acknowledgement</legend>
           <div class="wt-check">
-            <input id="labeling" type="checkbox"/>
-            <label for="labeling">Labeling required</label>
+            <input id="ack" type="checkbox"/>
+            <label for="ack">I understand this page starts a quote / request and does not guarantee immediate availability.</label>
           </div>
-          <div class="wt-full">
-            <label for="cableNotes">Cabling notes (optional)</label>
-            <input id="cableNotes" placeholder="If different lengths per sensor, note it here." type="text"/>
-          </div>
-        </div>
-      </div>
-    </div>
+        </fieldset>
 
-    <div class="wt-subhead">Mounting / enclosure options</div>
-    <div class="wt-grid">
-      <div>
-        <label for="enclosure">Enclosure</label>
-        <select id="enclosure" name="enclosure">
-          <option value="">Select…</option>
-          <option value="standard">Standard</option>
-          <option value="hardened">Installer hardened</option>
-        </select>
-      </div>
-      <div>
-        <label for="cableEntry">Cable entry side preference</label>
-        <select id="cableEntry" name="cableEntry">
-          <option value="">Select…</option>
-          <option value="left">Left</option>
-          <option value="right">Right</option>
-          <option value="top">Top</option>
-          <option value="bottom">Bottom</option>
-          <option value="any">Any / No preference</option>
-        </select>
-      </div>
-      <div class="wt-check">
-        <input id="cutouts" type="checkbox"/>
-        <label for="cutouts">Custom cutouts requested</label>
-      </div>
-      <div class="wt-full wt-toggle" id="cutoutsBlock" aria-hidden="true">
-        <label for="cutoutsNotes">Custom cutouts details</label>
-        <input id="cutoutsNotes" placeholder="Describe what/where. (Custom work may add cost/time.)" type="text"/>
-      </div>
-    </div>
+        <button class="btn-submit" type="submit">Prepare Request</button>
+        <p class="form-note">
+          This prepares an email to <strong>orders@westtechha.com</strong>. You can then send it with Gmail,
+          Outlook, or your default mail app.
+        </p>
+      </form>
+    </section>
+  </main>
 
-    <div class="wt-subhead">Behavior preferences</div>
-    <div class="wt-grid">
-      <div>
-        <label for="autoClose">Auto‑close desired?</label>
-        <select id="autoClose" name="autoClose">
-          <option value="">Select…</option>
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-          <option value="maybe">Maybe / discuss</option>
-        </select>
-      </div>
-      <div>
-        <label for="beam">Safety beam integration planned?</label>
-        <select id="beam" name="beam">
-          <option value="">Select…</option>
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-          <option value="unsure">Unsure</option>
-        </select>
-      </div>
-      <div class="wt-check">
-        <input id="alertBuzzer" type="checkbox"/>
-        <label for="alertBuzzer">Buzzer warnings</label>
-      </div>
-      <div class="wt-check">
-        <input id="alertHA" type="checkbox"/>
-        <label for="alertHA">Home Assistant notifications</label>
-      </div>
-    </div>
-  </fieldset>
-
-  <!-- MAP/SAP waitlist -->
-  <fieldset class="wt-fieldset wt-toggle" id="waitlist" aria-hidden="true">
-    <legend>MAP/SAP waitlist</legend>
-    <div class="wt-grid">
-      <div>
-        <label for="waitUse">Desired usage</label>
-        <input id="waitUse" placeholder="What would you like the panel to do?" type="text"/>
-      </div>
-      <div>
-        <label for="waitOptions">Options / add‑ons you care about</label>
-        <input id="waitOptions" placeholder="e.g., 20×4 LCD, zone status, relays, sensors…" type="text"/>
-      </div>
-      <div class="wt-full">
-        <label for="waitNotes">Anything else?</label>
-        <textarea id="waitNotes" placeholder="Notes, timeline, install constraints…"></textarea>
-      </div>
-    </div>
-  </fieldset>
-
-  <fieldset class="wt-fieldset">
-    <legend>Anything unusual?</legend>
-    <div class="wt-grid">
-      <div class="wt-full">
-        <label for="message">Project details / notes</label>
-        <textarea id="message" name="message" placeholder="Any unique wiring, power, mounting, or workflow needs."></textarea>
-      </div>
-      <div class="wt-full wt-check">
-        <input id="ack" type="checkbox"/>
-        <label for="ack">I understand this is a custom-built device and lead time depends on options.</label>
-      </div>
-    </div>
-  </fieldset>
-
-  <button class="btn-submit" type="submit">Prepare Request</button>
-  <p class="form-note">
-    Tip: this prepares an email to <strong>orders@westtechha.com</strong>. You’ll be able to choose Gmail/Outlook/Mail app.
-  </p>
-</form>
-</section>
-</main>
-<div id="site-footer"></div>
+  <div id="site-footer"></div>
 </div>
 
-  <!-- Email chooser modal -->
+
   <div class="wt-email-modal" id="wtEmailModal" aria-hidden="true">
     <div class="wt-email-backdrop" data-wt-email-close></div>
     <div class="wt-email-card" role="dialog" aria-modal="true" aria-label="Email options">
@@ -479,193 +192,71 @@
         <a class="btn btn-ghost" id="wtEmailMailto">Use Default Mail App</a>
         <button class="btn btn-ghost" id="wtEmailCopy" type="button">Copy Address</button>
       </div>
-      <p class="wt-email-small">To: <span class="mono" id="wtEmailToText">support@westtechha.com</span></p>
+      <p class="wt-email-small">To: <span class="mono" id="wtEmailToText">orders@westtechha.com</span></p>
     </div>
   </div>
   <div class="wt-email-toast" id="wtEmailToast" aria-hidden="true"></div>
-  <script src="js/site-shell.js"></script>
-  <script src="js/theme.js" defer></script>
+
+<script src="js/site-shell.js"></script>
+<script src="js/theme.js" defer></script>
 <script src="js/email-chooser.js"></script>
 
-<!-- Local-only handler: toggles form blocks + prepares an email via the chooser -->
 <script>
-  (function () {
-    const $ = (id) => document.getElementById(id);
-    const val = (id) => (($(id)?.value || '').toString().trim());
-    const checked = (id) => !!($(id)?.checked);
-    const selText = (id) => {
-      const el = $(id);
-      if (!el || !('selectedIndex' in el)) return '';
-      const opt = el.options[el.selectedIndex];
-      return (opt && opt.value) ? opt.text : '';
-    };
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const val = (id) => (($(id)?.value || '').toString().trim());
+  const checked = (id) => !!($(id)?.checked);
+  const selText = (id) => {
+    const el = $(id);
+    if (!el || !('selectedIndex' in el)) return '';
+    const opt = el.options[el.selectedIndex];
+    return (opt && opt.value) ? opt.text : '';
+  };
 
-    const setShown = (el, show) => {
-      if (!el) return;
-      el.setAttribute('aria-hidden', show ? 'false' : 'true');
-    };
+  window.prepareOrderEmail = function prepareOrderEmail() {
+    const productTxt = selText('product') || '(not selected)';
+    const subject = productTxt !== '(not selected)'
+      ? `WestTech Home Automation request: ${productTxt}`
+      : 'WestTech Home Automation quote request';
 
-    function updatePanelVisibility() {
-      const p = val('panel');
-      const isGap = p === 'gap';
-      const isWait = p === 'map' || p === 'sap';
+    const lines = [];
+    lines.push('New request from WestTech Home Automation.com (Order page)');
+    lines.push('');
+    lines.push('Contact');
+    lines.push(`Name: ${val('name') || '(not provided)'}`);
+    lines.push(`Email: ${val('email') || '(not provided)'}`);
+    lines.push(`Phone: ${val('phone') || '(not provided)'}`);
+    lines.push(`Timing: ${selText('timeline') || '(not selected)'}`);
+    lines.push('');
+    lines.push('Request');
+    lines.push(`Product / request type: ${productTxt}`);
+    lines.push(`Quantity: ${val('quantity') || '(not provided)'}`);
+    lines.push(`Project type: ${selText('projectType') || '(not selected)'}`);
+    lines.push(`Display / lid preference: ${selText('display') || '(not selected)'}`);
+    lines.push(`Board / hardware notes: ${val('sizeNotes') || '(not provided)'}`);
+    lines.push(`Shipping state / region: ${val('shippingState') || '(not provided)'}`);
+    lines.push('');
+    lines.push('Project details');
+    lines.push(val('details') || '(not provided)');
+    lines.push('');
+    lines.push(`Acknowledgement: ${checked('ack') ? 'Checked' : 'Not checked'}`);
 
-      setShown($('gapSpec'), isGap);
-      setShown($('waitlist'), isWait);
+    const body = lines.join('\n');
 
-      // Reset dependent blocks when GAP is not selected
-      if (!isGap) {
-        setShown($('staticIpBlock'), false);
-        setShown($('cableBlock'), false);
-        setShown($('cutoutsBlock'), false);
-      }
+    if (window.WTEmail && typeof window.WTEmail.open === 'function') {
+      window.WTEmail.open({
+        to: 'orders@westtechha.com',
+        subject: subject,
+        body: body
+      });
+    } else {
+      const mailto = `mailto:orders@westtechha.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.location.href = mailto;
     }
 
-    function updateStaticIp() {
-      setShown($('staticIpBlock'), val('ipPref') === 'static');
-    }
-
-    function updateCabling() {
-      setShown($('cableBlock'), checked('cableKit'));
-    }
-
-    function updateCutouts() {
-      setShown($('cutoutsBlock'), checked('cutouts'));
-    }
-
-    window.prepareOrderEmail = function prepareOrderEmail() {
-      const panelVal = val('panel');
-      const panelTxt = selText('panel') || '(not selected)';
-
-      const subject = panelVal ? `WestTech Home Automation request: ${panelTxt}` : 'WestTech Home Automation request from website';
-
-      const lines = [];
-      lines.push('New request from WestTech Home Automation.com (Order page)');
-      lines.push('');
-
-      // A) Customer + install context
-      lines.push('A) Customer & install context');
-      lines.push(`Name: ${val('name') || '(not provided)'}`);
-      lines.push(`Email: ${val('email') || '(not provided)'}`);
-      lines.push(`Phone: ${val('phone') || '(not provided)'}`);
-      lines.push(`Install type: ${selText('installType') || '(not selected)'}`);
-      lines.push(`Shipping address: ${val('shipAddr') || '(not provided)'}`);
-      lines.push(`Opener brand/model: ${val('opener') || '(not provided)'}`);
-      lines.push(`Door type: ${selText('doorType') || '(not selected)'}`);
-      lines.push(`Typical usage: ${selText('usage') || '(not selected)'}`);
-      lines.push(`Timing: ${selText('timeline') || '(not selected)'}`);
-      lines.push('');
-
-      // Panel selection + environment
-      lines.push('Panel / project');
-      lines.push(`Panel: ${panelTxt}`);
-      lines.push(`Environment (short): ${val('env') || '(not provided)'}`);
-      lines.push('');
-
-      if (panelVal === 'gap') {
-        // B–F for GAP
-        lines.push('B) Connectivity & environment');
-        lines.push(`Ethernet available: ${selText('ethAvail') || '(not selected)'}`);
-        lines.push(`Wi‑Fi available (2.4): ${selText('wifiAvail') || '(not selected)'}`);
-        lines.push(`Home Assistant version: ${val('haVer') || '(not provided)'}`);
-        lines.push(`Preferred IP: ${selText('ipPref') || '(not selected)'}`);
-        if (val('ipPref') === 'static') {
-          lines.push(`Static IP: ${val('staticIp') || '(not provided)'}`);
-          lines.push(`Gateway: ${val('gateway') || '(not provided)'}`);
-          lines.push(`Subnet: ${val('subnet') || '(not provided)'}`);
-        }
-        lines.push('');
-
-        lines.push('C) Core hardware choices');
-        lines.push(`Model: ${selText('model') || '(not selected)'}`);
-        lines.push(`Display: ${selText('display') || '(not selected)'}`);
-        lines.push(`Buzzer: ${selText('buzzer') || '(not selected)'}`);
-        lines.push(`Buzzer preference: ${selText('buzzerPref') || '(not selected)'}`);
-        lines.push('');
-
-        lines.push('D) Sensors & add-ons');
-        const sensors = [];
-        if (checked('reedMain')) sensors.push('Door reed included');
-        if (checked('reedInside')) sensors.push('Extra reed (inside)');
-        if (checked('reedOutside')) sensors.push('Extra reed (outside)');
-        if (checked('pirInside')) sensors.push('PIR (inside)');
-        if (checked('pirOutside')) sensors.push('PIR (outside)');
-        lines.push(`Selections: ${sensors.length ? sensors.join(', ') : '(none selected)'}`);
-
-        if (checked('cableKit')) {
-          lines.push('Cabling kit: Yes');
-          lines.push(`Typical length: ${selText('cableLen') || '(not selected)'}`);
-          lines.push(`Connector type: ${selText('connector') || '(not selected)'}`);
-          lines.push(`Labeling required: ${checked('labeling') ? 'Yes' : 'No'}`);
-          lines.push(`Cabling notes: ${val('cableNotes') || '(none)'}`);
-        } else {
-          lines.push('Cabling kit: No');
-        }
-        lines.push('');
-
-        lines.push('Mounting / enclosure');
-        lines.push(`Enclosure: ${selText('enclosure') || '(not selected)'}`);
-        lines.push(`Cable entry preference: ${selText('cableEntry') || '(not selected)'}`);
-        lines.push(`Custom cutouts: ${checked('cutouts') ? 'Yes' : 'No'}`);
-        if (checked('cutouts')) {
-          lines.push(`Cutouts details: ${val('cutoutsNotes') || '(not provided)'}`);
-        }
-        lines.push('');
-
-        lines.push('E) Behavior preferences');
-        lines.push(`Auto-close: ${selText('autoClose') || '(not selected)'}`);
-        lines.push(`Safety beam planned: ${selText('beam') || '(not selected)'}`);
-        const alerts = [];
-        if (checked('alertBuzzer')) alerts.push('Buzzer warnings');
-        if (checked('alertHA')) alerts.push('Home Assistant notifications');
-        lines.push(`Alerts: ${alerts.length ? alerts.join(', ') : '(none selected)'}`);
-        lines.push('');
-      }
-
-      if (panelVal === 'map' || panelVal === 'sap') {
-        lines.push('MAP/SAP waitlist details');
-        lines.push(`Desired usage: ${val('waitUse') || '(not provided)'}`);
-        lines.push(`Options/add-ons: ${val('waitOptions') || '(not provided)'}`);
-        lines.push(`Notes: ${val('waitNotes') || '(not provided)'}`);
-        lines.push('');
-      }
-
-      // F) Anything unusual + acknowledgement
-      lines.push('F) Notes');
-      lines.push(val('message') || '(not provided)');
-      lines.push('');
-      lines.push(`Acknowledgement: ${checked('ack') ? 'Checked' : 'Not checked'}`);
-
-      const body = lines.join('\n');
-
-      if (window.WTEmail && typeof window.WTEmail.open === 'function') {
-        window.WTEmail.open({
-          to: 'orders@westtechha.com',
-          subject: subject,
-          body: body
-        });
-      } else {
-        const mailto = `mailto:orders@westtechha.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        window.location.href = mailto;
-      }
-
-      return false;
-    };
-
-    document.addEventListener('DOMContentLoaded', () => {
-      // Wire up toggles
-      $('panel')?.addEventListener('change', updatePanelVisibility);
-      $('ipPref')?.addEventListener('change', updateStaticIp);
-      $('cableKit')?.addEventListener('change', updateCabling);
-      $('cutouts')?.addEventListener('change', updateCutouts);
-
-      // Initial state
-      updatePanelVisibility();
-      updateStaticIp();
-      updateCabling();
-      updateCutouts();
-    });
-  })();
+    return false;
+  };
+})();
 </script>
 </body>
 </html>
