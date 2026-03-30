@@ -880,3 +880,484 @@ textarea {
   }
 }
 
+
+
+/* ===== Layout balance pass ===== */
+:root{
+  --maxw: 1200px;
+}
+
+#site-header{
+  backdrop-filter: blur(14px);
+}
+
+.nav-shell{
+  gap: 14px;
+  padding: 10px 0;
+}
+
+.brand{
+  gap: 10px;
+}
+
+.brand img{
+  height: 42px;
+}
+
+.brand-title{
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.brand-sub{
+  margin-top: 3px;
+  font-size: 0.66rem;
+  letter-spacing: 0.13em;
+}
+
+.nav-links{
+  gap: 8px;
+}
+
+.nav-link,
+.footer-link{
+  padding: 9px 12px;
+  font-size: 0.88rem;
+}
+
+.page-header{
+  padding-top: 20px;
+  padding-bottom: 4px;
+}
+
+.page-header h1{
+  font-size: clamp(2.15rem, 5vw, 3.65rem);
+  line-height: 1.03;
+  letter-spacing: -0.04em;
+}
+
+.page-header p{
+  font-size: clamp(1rem, 1.5vw, 1.08rem);
+  line-height: 1.8;
+}
+
+.hero-panel,
+.hero-ladder,
+.section,
+.product-card,
+.forum-card,
+.spotlight-card,
+.forum-hero,
+.forum-section,
+.wt-fieldset,
+fieldset{
+  padding: 30px;
+}
+
+.section-title,
+.ladder-title,
+.card-title,
+.product-name,
+.forum-card h3{
+  letter-spacing: -0.03em;
+}
+
+.section-title{
+  font-size: clamp(1.5rem, 2.3vw, 2rem);
+}
+
+.product-name,
+.card-title,
+.forum-card h3{
+  font-size: 1.32rem;
+}
+
+.product-body,
+.forum-card p,
+.product-list,
+.forum-list,
+.list-tight,
+ul{
+  font-size: 0.98rem;
+}
+
+.product-status,
+.forum-card-note{
+  font-size: 0.95rem;
+}
+
+.hero-panel p,
+.section p{
+  font-size: 1rem;
+}
+
+.pill,
+.eyebrow,
+.section-tag,
+.kicker,
+.badge,
+.forum-card-kicker,
+.product-label{
+  font-size: 0.78rem;
+}
+
+.ladder-item{
+  padding: 20px;
+}
+
+.ladder-item strong{
+  font-size: 1.06rem;
+}
+
+.ladder-item p{
+  font-size: 0.96rem;
+}
+
+@media (max-width: 920px){
+  .nav-shell{
+    padding: 10px 0;
+  }
+
+  .brand img{
+    height: 40px;
+  }
+
+  .page-header{
+    padding-top: 16px;
+  }
+
+  .page-header h1{
+    font-size: clamp(1.95rem, 7vw, 3rem);
+  }
+
+  .hero-panel,
+  .hero-ladder,
+  .section,
+  .product-card,
+  .forum-card,
+  .spotlight-card,
+  .forum-hero,
+  .forum-section,
+  .wt-fieldset,
+  fieldset{
+    padding: 24px;
+  }
+
+  .product-name,
+  .card-title,
+  .forum-card h3{
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 700px){
+  .brand img{
+    height: 38px;
+  }
+
+  .nav-link,
+  .footer-link{
+    padding: 8px 10px;
+    font-size: 0.84rem;
+  }
+
+  .page-header{
+    padding-top: 14px;
+  }
+
+  .page-header h1{
+    font-size: clamp(1.75rem, 8vw, 2.5rem);
+  }
+
+  .hero-panel,
+  .hero-ladder,
+  .section,
+  .product-card,
+  .forum-card,
+  .spotlight-card,
+  .forum-hero,
+  .forum-section,
+  .wt-fieldset,
+  fieldset{
+    padding: 20px;
+  }
+
+  .section-title{
+    font-size: 1.35rem;
+  }
+
+  .product-name,
+  .card-title,
+  .forum-card h3{
+    font-size: 1.12rem;
+  }
+
+  .product-body,
+  .forum-card p,
+  .product-list,
+  .forum-list,
+  .list-tight,
+  ul,
+  .hero-panel p,
+  .section p{
+    font-size: 0.96rem;
+  }
+}
+
+@media (max-width: 460px){
+  .brand img{
+    height: 34px;
+  }
+
+  .brand-title{
+    font-size: 0.88rem;
+  }
+
+  .brand-sub{
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+  }
+
+  .page-header h1{
+    font-size: clamp(1.58rem, 9vw, 2.1rem);
+  }
+}
+
+
+
+/* ===================== Shared Header / Footer Shell ===================== */
+.nav-menu{
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  width: 100%;
+}
+
+.nav-primary{
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.nav-utility{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-size: 0.82rem;
+}
+
+.nav-utility .nav-link{
+  padding: 4px 9px;
+  opacity: 0.92;
+}
+
+@media (min-width: 860px){
+  .nav-stack{
+    grid-template-columns: max-content max-content;
+    justify-content: center;
+    --brand-x: 0px;
+    --nav-x: 0px;
+    --nav-y: -8px;
+    --brand-nav-gap: 56px;
+    column-gap: var(--brand-nav-gap);
+    row-gap: 0;
+    align-items: center;
+    justify-items: start;
+    padding: 14px 0 6px;
+  }
+
+  .nav-brand-wrap{
+    grid-column: 1;
+    justify-self: start;
+    transform: translateX(var(--brand-x));
+  }
+
+  .nav-logo-full{
+    width: clamp(420px, 44vw, 620px);
+    height: auto;
+  }
+
+  .nav-menu{
+    grid-column: 2;
+    justify-self: start;
+    align-self: center;
+    justify-items: start;
+    transform: translate(var(--nav-x), var(--nav-y));
+    width: auto;
+  }
+
+  .nav-primary{
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
+    gap: 10px 16px;
+    justify-content: start;
+  }
+
+  .nav-utility{
+    justify-content: start;
+    gap: 8px 10px;
+  }
+}
+
+
+
+/* ===================== Footer Link Row ===================== */
+.footer-links{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 16px;
+  margin-bottom: 10px;
+}
+
+.footer-link{
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.82rem;
+}
+
+.footer-link:hover,
+.footer-link:focus-visible{
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.footer-link.active{
+  color: var(--text);
+  font-weight: 600;
+}
+
+
+
+
+/* ===== Restored standard header on professional site ===== */
+#site-header{
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(248,251,255,0.84);
+  border-bottom: 1px solid rgba(219,228,240,0.95);
+  backdrop-filter: blur(18px);
+}
+html[data-theme="dark"] #site-header{
+  background: rgba(8,17,32,0.84);
+  border-bottom-color: rgba(148,163,184,0.16);
+}
+@media (prefers-color-scheme: dark){
+  html:not([data-theme]) #site-header{
+    background: rgba(8,17,32,0.84);
+    border-bottom-color: rgba(148,163,184,0.16);
+  }
+}
+
+.nav-stack{
+  display: grid;
+  align-items: center;
+}
+.nav-brand-wrap{
+  min-width: 0;
+}
+.badge-nav{
+  margin-top: 8px;
+}
+.nav-primary .nav-link{
+  box-shadow: none;
+}
+.nav-primary .nav-link:hover{
+  box-shadow: var(--shadow-soft);
+}
+
+@media (max-width: 859px){
+  .nav-stack{
+    grid-template-columns: 1fr;
+    justify-items: center;
+    row-gap: 10px;
+    padding: 12px 0 8px;
+  }
+  .nav-logo-full{
+    width: min(92vw, 520px);
+    height: auto;
+  }
+  .nav-menu{
+    width: 100%;
+    justify-items: center;
+  }
+  .nav-primary{
+    justify-content: center;
+  }
+}
+
+
+
+/* ===== Professional footer restore fix ===== */
+.footer-pro{
+  background: transparent;
+  border: 0;
+  margin-top: 54px;
+}
+.footer-shell-pro{
+  width: min(var(--maxw), calc(100% - 32px));
+  margin-inline: auto;
+  padding: 0 0 22px;
+  border-top: 0;
+}
+.footer-top-pro{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 22px 0 8px;
+}
+.footer-links-pro{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.footer-meta-pro{
+  margin: 12px 0 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.footer-links-pro .footer-link{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+}
+.footer-links-pro .footer-link:hover,
+.footer-links-pro .footer-link:focus-visible{
+  background: var(--surface-strong);
+}
+
+html[data-theme="dark"] .footer-links-pro .footer-link{
+  background: rgba(15, 23, 42, 0.72);
+  border-color: rgba(148, 163, 184, 0.18);
+}
+html[data-theme="dark"] .footer-links-pro .footer-link:hover,
+html[data-theme="dark"] .footer-links-pro .footer-link:focus-visible{
+  background: rgba(19, 32, 52, 0.92);
+}
+@media (prefers-color-scheme: dark){
+  html:not([data-theme]) .footer-links-pro .footer-link{
+    background: rgba(15, 23, 42, 0.72);
+    border-color: rgba(148, 163, 184, 0.18);
+  }
+  html:not([data-theme]) .footer-links-pro .footer-link:hover,
+  html:not([data-theme]) .footer-links-pro .footer-link:focus-visible{
+    background: rgba(19, 32, 52, 0.92);
+  }
+}
+
+@media (max-width: 700px){
+  .footer-shell-pro{
+    width: calc(100% - 20px);
+    padding-bottom: 18px;
+  }
+  .footer-meta-pro{
+    font-size: 0.84rem;
+  }
+}
+
