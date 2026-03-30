@@ -56,6 +56,8 @@
     }
     icon.textContent = effective === "dark" ? "☾" : "☀";
     label.textContent = `Theme: ${mode[0].toUpperCase()}${mode.slice(1)}`;
+    btn.setAttribute('data-theme-current', mode);
+    btn.setAttribute('data-theme-effective', effective);
   }
 
   btn.addEventListener("click", () => {
