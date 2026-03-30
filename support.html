@@ -1,167 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<title>Support Center – WestTech Home Automation</title>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta name="description" content="Get support for WestTech Home Automation enclosure shells, kits, and custom builds, including docs, help, and common questions."/>
-<link href="icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
-<link href="css/site.css" rel="stylesheet"/>
+  <meta charset="utf-8"/>
+  <title>Support – WestTech Home Automation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Get support for WestTech Home Automation enclosure shells, kits, and custom builds, including docs, help, and common questions."/>
+  <link href="icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="css/site.css" rel="stylesheet"/>
 </head>
-<body class="support-page">
-<div class="page">
-  <div id="site-header"></div>
 
-  <header class="page-header">
-    <div class="badge">
-      <span></span>
-      SUPPORT • DOCS • HELP
+<body><div class="page"><div id="site-header"></div>
+<header class="page-header"><div class="eyebrow"><span class="dot"></span>Support • Docs • Help</div><h1>Support without the clutter.</h1><p class="tagline">Need help with an enclosure, a kit, or a custom-build request? This page keeps the support paths practical: product questions, documentation, common questions, and a link to the forum when community answers may help.</p></header>
+<section class="section"><div class="section-header"><div><div class="section-tag">Support Focus</div><div class="section-title">What support currently centers around</div></div><p>WestTechHA support currently centers around enclosure sizing, product questions, documentation, and quote-related help.</p></div>
+<div class="product-grid">
+<article class="product-card"><div class="product-label">Most Common</div><div class="product-name">Shell / Kit Questions</div><span class="product-status">Sizing • selection • fit</span><p class="product-body">Help choosing the right enclosure size, deciding between shell vs kit, and understanding what each product level is meant to solve.</p></article>
+<article class="product-card"><div class="product-label">Documentation</div><div class="product-name">Build Notes &amp; References</div><span class="product-status">Wiring • guidance • known-good references</span><p class="product-body">Product pages and docs are meant to help DIYers and installers avoid unnecessary guessing.</p></article>
+<article class="product-card"><div class="product-label">Advanced Help</div><div class="product-name">Custom Build Support</div><span class="product-status">Quote-based projects</span><p class="product-body">If your project goes beyond an enclosure or kit, support can still help route you toward a custom-build discussion.</p></article>
+</div></section>
+<section class="spotlight">
+<article class="spotlight-card"><div class="section-tag">Helpful Starting Points</div><h3>Start in the right place.</h3><ul class="product-list"><li><a class="doc-link" href="products.html">Products – shells, kits, and custom-build direction</a></li><li><a class="doc-link" href="shipping.html">Shipping Policy – current shipping expectations</a></li><li><a class="doc-link" href="returns.html">Returns &amp; Warranty – current policy</a></li><li><a class="doc-link" href="forum.html">Forum – questions, ideas, and project discussion</a></li></ul><p class="support-note">This support structure is intentionally practical. It is designed to help customers and DIYers without pretending every question needs a giant ticketing system.</p></article>
+<article class="spotlight-card"><div class="section-tag">Common Questions</div><h3>Questions we expect people to ask.</h3><ul class="product-list"><li><strong>“Should I buy a shell or a kit?”</strong><br/>Start with a shell if you already know your hardware and just need a cleaner enclosure. Step up to a kit if you want a more complete install package.</li><li><strong>“Can I request a custom opening or layout?”</strong><br/>Yes, but that may move the request into quote territory depending on how custom the build needs to be.</li><li><strong>“Do you still do custom ESP32 builds?”</strong><br/>Yes. Custom builds are still available, but they are now a request/quote path instead of the main public catalog.</li></ul><div class="hero-actions"><a class="btn btn-primary" href="forum.html">Visit the Forum</a><a class="btn btn-outline" href="contact.html">Contact Support</a></div></article>
+</section>
+<section class="section"><div class="section-header"><div><div class="section-tag">Contact Support</div><div class="section-title">Reach out with the right details.</div></div><p>For anything not covered here, please reach out and we’ll work through it with you.</p></div><ul class="product-list"><li>Support: <a class="mailto-link" href="#" data-wt-email-trigger data-email="support@westtechha.com" data-subject="WestTech Home Automation Support Request">support@westtechha.com</a></li><li>General contact: <a class="mailto-link" href="#" data-wt-email-trigger data-email="contact@westtechha.com" data-subject="WestTech Home Automation Contact Request">contact@westtechha.com</a></li><li>Include product, size, photos, and project details if you have them.</li></ul></section>
+<div id="site-footer"></div></div>
+<div class="wt-email-modal" id="wtEmailModal" aria-hidden="true">
+  <div class="wt-email-backdrop" data-wt-email-close></div>
+  <div class="wt-email-card" role="dialog" aria-modal="true" aria-label="Email options">
+    <div class="wt-email-head">
+      <div class="wt-email-title">Email WestTech Home Automation</div>
+      <button class="wt-email-close" id="wtEmailClose" type="button" aria-label="Close">×</button>
     </div>
-    <h1>WestTech Home Automation Support</h1>
-    <p class="tagline">
-      Need help with an enclosure, a kit, or a custom-build request? This page collects documentation,
-      common questions, and how to reach support without making the site feel like a giant enterprise portal.
-    </p>
-  </header>
-
-  <main>
-    <section class="section">
-      <div class="section-header">
-        <div class="section-title">Support Focus</div>
-        <span class="section-tag">Current Direction</span>
-      </div>
-      <p>
-        WestTechHA support currently centers around enclosure sizing, product questions, documentation,
-        and quote-related help. Support for fully custom builds is still available, but it sits behind the
-        enclosure-first product line.
-      </p>
-      <div class="product-grid">
-        <article class="product-card">
-          <div class="product-label">Most Common</div>
-          <div class="product-name">Shell / Kit Questions</div>
-          <div class="product-status">Sizing • selection • fit</div>
-          <p class="product-body">
-            Help choosing the right enclosure size, deciding between shell vs kit, and understanding
-            what each product level is meant to solve.
-          </p>
-        </article>
-
-        <article class="product-card">
-          <div class="product-label">Documentation</div>
-          <div class="product-name">Build Notes &amp; References</div>
-          <div class="product-status">Wiring • guidance • known-good references</div>
-          <p class="product-body">
-            Product pages and docs are meant to help DIYers and installers avoid unnecessary guessing.
-          </p>
-        </article>
-
-        <article class="product-card">
-          <div class="product-label">Advanced Help</div>
-          <div class="product-name">Custom Build Support</div>
-          <div class="product-status">Quote-based projects</div>
-          <p class="product-body">
-            If your project goes beyond an enclosure or kit, support can still help route you toward a
-            custom-build discussion.
-          </p>
-        </article>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-header">
-        <div class="section-title">Helpful Starting Points</div>
-        <span class="section-tag">Docs</span>
-      </div>
-
-      <ul>
-        <li><a class="doc-link" href="products.html">Products – shells, kits, and custom-build direction</a></li>
-        <li><a class="doc-link" href="shipping.html">Shipping Policy – current shipping expectations</a></li>
-        <li><a class="doc-link" href="returns.html">Returns &amp; Warranty – current policy</a></li>
-        <li><a class="doc-link" href="forum.html">Community Forum – questions, ideas, and project discussion</a></li>
-        <p class="support-note">Need community discussion or project ideas too? Visit the <a class="link-inline" href="forum.html">Forum</a>.</p>
-      </ul>
-
-      <p class="support-note">
-        This support structure is intentionally practical. It is designed to help customers and DIYers
-        without pretending every question needs a giant ticketing system.
-      </p>
-    </section>
-
-    <section class="section">
-      <div class="section-header">
-        <div class="section-title">Known Questions</div>
-        <span class="section-tag">Common Themes</span>
-      </div>
-
-      <ul>
-        <li>
-          <span class="issue-title">“Should I buy a shell or a kit?”</span><br/>
-          Start with a shell if you already know your hardware and just need a cleaner enclosure.
-          Step up to a kit if you want a more complete install package.
-        </li>
-        <li>
-          <span class="issue-title">“Can I request a custom opening or layout?”</span><br/>
-          Yes, but that may move the request into quote territory depending on how custom the build needs to be.
-        </li>
-        <li>
-          <span class="issue-title">“Do you still do custom ESP32 builds?”</span><br/>
-          Yes. Custom builds are still available, but they are now a request/quote path instead of the main public catalog.
-        </li>
-      </ul>
-    </section>
-
-    <section class="section">
-      <div class="section-header">
-        <div class="section-title">Contact Support</div>
-        <span class="section-tag">Reach Out</span>
-      </div>
-
-      <p>
-        For anything not covered here, please reach out and we’ll work through it with you.
-      </p>
-
-      <ul>
-        <li>
-          Support:
-          <a class="mailto-link" href="#" data-wt-email-trigger data-email="support@westtechha.com" data-subject="WestTech Home Automation Support Request">
-            support@westtechha.com
-          </a>
-        </li>
-        <li>
-          General contact:
-          <a class="mailto-link" href="#" data-wt-email-trigger data-email="contact@westtechha.com" data-subject="WestTech Home Automation Contact Request">
-            contact@westtechha.com
-          </a>
-        </li>
-        <li>Include product, size, photos, and project details if you have them.</li>
-      </ul>
-    </section>
-  </main>
-
-  <div id="site-footer"></div>
-</div>
-
-  <div class="wt-email-modal" id="wtEmailModal" aria-hidden="true">
-    <div class="wt-email-backdrop" data-wt-email-close></div>
-    <div class="wt-email-card" role="dialog" aria-modal="true" aria-label="Email options">
-      <div class="wt-email-head">
-        <div class="wt-email-title">Email WestTech Home Automation</div>
-        <button class="wt-email-close" id="wtEmailClose" type="button" aria-label="Close">×</button>
-      </div>
-      <p class="wt-email-text">Choose how you’d like to compose this message:</p>
-      <div class="wt-email-actions">
-        <a class="btn btn-primary" id="wtEmailGmail" target="_blank" rel="noopener">Open Gmail</a>
-        <a class="btn btn-primary" id="wtEmailOutlook" target="_blank" rel="noopener">Open Outlook Web</a>
-        <a class="btn btn-ghost" id="wtEmailMailto">Use Default Mail App</a>
-        <button class="btn btn-ghost" id="wtEmailCopy" type="button">Copy Address</button>
-      </div>
-      <p class="wt-email-small">To: <span class="mono" id="wtEmailToText">support@westtechha.com</span></p>
+    <p class="wt-email-text">Choose how you’d like to compose this message:</p>
+    <div class="wt-email-actions">
+      <a class="btn btn-primary" id="wtEmailGmail" target="_blank" rel="noopener">Open Gmail</a>
+      <a class="btn btn-primary" id="wtEmailOutlook" target="_blank" rel="noopener">Open Outlook Web</a>
+      <a class="btn btn-outline" id="wtEmailMailto">Use Default Mail App</a>
+      <button class="btn btn-outline" id="wtEmailCopy" type="button">Copy Address</button>
     </div>
+    <p class="wt-email-small">To: <span class="mono" id="wtEmailToText">support@westtechha.com</span></p>
   </div>
-  <div class="wt-email-toast" id="wtEmailToast" aria-hidden="true"></div>
-
-<script src="js/site-shell.js"></script>
-<script src="js/theme.js" defer></script>
-<script src="js/email-chooser.js"></script>
-</body>
-</html>
+</div>
+<div class="wt-email-toast" id="wtEmailToast" aria-hidden="true"></div>
+<script src="js/site-shell.js"></script><script src="js/theme.js" defer></script><script src="js/email-chooser.js"></script></body></html>
