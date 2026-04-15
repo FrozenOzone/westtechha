@@ -4,19 +4,22 @@
   <meta charset="utf-8"/>
   <title>Order Request – WestTech Home Automation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Request a quote or start an order for WestTech Home Automation enclosure shells, kits, or custom ESP32 builds."/>
+  <meta name="description" content="Request a quote or start an order for WestTech Home Automation enclosure kits, compatible board layouts, and special-request product discussions."/>
   <link href="icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
   <link href="css/site.css" rel="stylesheet"/>
 </head>
 
 <body><div class="page"><div id="site-header"></div>
-<header class="page-header"><div class="eyebrow"><span class="dot"></span>Order • Quote • Custom Request</div><h1>Request a WestTechHA quote.</h1><p class="tagline">Use this page to request an enclosure shell, an enclosure kit, or a custom ESP32 build. The public direction is enclosure-first, with custom builds handled by quote when the project needs more.</p></header>
-<section class="section"><div class="section-header"><div><div class="section-tag">Order Path</div><div class="section-title">What can you request?</div></div><p>Start with the simplest product level that matches your project.</p></div>
+<header class="page-header"><div class="eyebrow"><span class="dot"></span>Order • Quote • Special Request</div><h1>Request a WestTechHA quote.</h1><p class="tagline">Use this page to request a Small, Med, or Big enclosure kit, ask about 30-pin or 38-pin compatibility, or start a special-request conversation when your project needs more review.</p></header>
+
+<section class="section"><div class="section-header"><div><div class="section-tag">Order Path</div><div class="section-title">What can you request?</div></div><p>Start with the kit size that best fits your project, then add the details that help WestTechHA confirm fit and availability.</p></div>
 <div class="product-grid">
-<article class="product-card"><div class="product-label">Simple Start</div><div class="product-name">Shells</div><span class="product-status">Enclosure only</span><p class="product-body">Best for customers who already know their hardware and just need a cleaner enclosure.</p></article>
-<article class="product-card"><div class="product-label">More Complete</div><div class="product-name">Kits</div><span class="product-status">Selected accessories included</span><p class="product-body">Best for customers who want a cleaner install package without stepping into a full custom build.</p></article>
-<article class="product-card"><div class="product-label">By Request</div><div class="product-name">Custom Builds</div><span class="product-status">Quote-based</span><p class="product-body">Best for projects that need hardware selection, cutouts, or programming included.</p></article>
+<article class="product-card"><div class="product-label">Compact Option</div><div class="product-name">Small Kits</div><span class="product-status">30-pin or 38-pin</span><p class="product-body">A compact kit with enclosure, lid, installed screws, flush-mounted magnets, and the included insert set for smaller builds.</p></article>
+<article class="product-card"><div class="product-label">Balanced Option</div><div class="product-name">Med Kits</div><span class="product-status">30-pin or 38-pin</span><p class="product-body">A more flexible middle-ground kit with added space and included OLED insert support for builds that need more room.</p></article>
+<article class="product-card"><div class="product-label">Largest Option</div><div class="product-name">Big Kits</div><span class="product-status">30-pin or 38-pin</span><p class="product-body">The largest kit option, built for projects that need more enclosure space and OLED or LCD-style lid possibilities.</p></article>
+<article class="product-card"><div class="product-label">By Discussion</div><div class="product-name">Special Requests</div><span class="product-status">Quote-based</span><p class="product-body">Use this path when you need quantity discussion, fit review, or a request that falls outside the standard Small / Med / Big kit line.</p></article>
 </div></section>
+
 <section class="section"><div class="section-header"><div><div class="section-tag">Email Prep</div><div class="section-title">Prepare a quote request</div></div><p>Fill out the details below and click <strong>Prepare Request</strong>. Your browser will open an email composer with your request pre-filled to <strong>orders@westtechha.com</strong>.</p></div>
 <form class="wt-order" id="order-form" onsubmit="return prepareOrderEmail();">
 <fieldset class="wt-fieldset"><legend>Contact Details</legend><div class="wt-grid">
@@ -26,18 +29,20 @@
 <div><label for="timeline">Timing</label><select id="timeline" name="timeline"><option value="">Select…</option><option value="asap">ASAP</option><option value="2w">~2 weeks</option><option value="month">~1 month</option><option value="flex">Flexible</option></select></div>
 </div></fieldset>
 <fieldset class="wt-fieldset"><legend>What are you requesting?</legend><div class="wt-grid">
-<div><label for="product">Product / Request Type</label><select id="product" name="product"><option value="">Select…</option><option value="small-shell">Small Shell</option><option value="med-shell">Med Shell</option><option value="big-shell">Big Shell</option><option value="small-kit">Small Kit</option><option value="med-kit">Med Kit</option><option value="big-kit">Big Kit</option><option value="custom-build">Custom ESP32 Build</option><option value="other">Other / Not Sure Yet</option></select></div>
+<div><label for="product">Product / Request Type</label><select id="product" name="product"><option value="">Select…</option><option value="small-kit">Small Kit</option><option value="med-kit">Med Kit</option><option value="big-kit">Big Kit</option><option value="special-request">Special Request</option><option value="other">Not Sure Yet</option></select></div>
+<div><label for="boardLayout">Board Layout</label><select id="boardLayout" name="boardLayout"><option value="">Select…</option><option value="30-pin">30-pin</option><option value="38-pin">38-pin</option><option value="unsure">Not sure yet</option></select></div>
 <div><label for="quantity">Quantity</label><input id="quantity" name="quantity" placeholder="1, 2, 5..." type="text"/></div>
-<div><label for="projectType">Project Type</label><select id="projectType" name="projectType"><option value="">Select…</option><option value="diy">DIY / Bring My Own Hardware</option><option value="installer">Installer / Repeatable Project</option><option value="custom">Need Hardware + Programming</option><option value="unsure">Not Sure Yet</option></select></div>
+<div><label for="projectType">Project Type</label><select id="projectType" name="projectType"><option value="">Select…</option><option value="diy">DIY / Bring My Own Hardware</option><option value="installer">Installer / Repeatable Project</option><option value="fit-help">Need Fit / Compatibility Help</option><option value="unsure">Not Sure Yet</option></select></div>
 <div><label for="display">Display / Lid Preference (optional)</label><select id="display" name="display"><option value="">Select…</option><option value="blank">Blank / no display opening</option><option value="oled">OLED-style lid</option><option value="lcd">LCD-style lid</option><option value="unsure">Not sure</option></select></div>
-<div><label for="sizeNotes">Board / hardware notes (optional)</label><input id="sizeNotes" name="sizeNotes" placeholder="ESP32 30-pin, relay board, sensors, etc." type="text"/></div>
+<div><label for="sizeNotes">Board / hardware notes (optional)</label><input id="sizeNotes" name="sizeNotes" placeholder="Breakout board, relay board, sensors, spacing notes, etc." type="text"/></div>
 <div><label for="shippingState">Shipping State / Region (optional)</label><input id="shippingState" name="shippingState" placeholder="e.g., Colorado" type="text"/></div>
-<div class="wt-full"><label for="details">Project Details</label><textarea id="details" name="details" placeholder="Tell us what you are building, what hardware you already have, what size you think you need, and whether you want shell-only, a kit, or a custom build."></textarea></div>
+<div class="wt-full"><label for="details">Project Details</label><textarea id="details" name="details" placeholder="Tell us what you are building, which size you are considering, which board layout you need, and any fit or quantity questions you want reviewed."></textarea></div>
 </div></fieldset>
-<fieldset class="wt-fieldset"><legend>Acknowledgement</legend><div class="wt-check"><input id="ack" type="checkbox"/><label for="ack">I understand this page starts a quote / request and does not guarantee immediate availability.</label></div></fieldset>
+<fieldset class="wt-fieldset"><legend>Acknowledgement</legend><div class="wt-check"><input id="ack" type="checkbox"/><label for="ack">I understand this page starts a quote or order request and does not guarantee immediate availability.</label></div></fieldset>
 <button class="btn-submit" type="submit">Prepare Request</button>
 <p class="form-note">This prepares an email to <strong>orders@westtechha.com</strong>. You can then send it with Gmail, Outlook, or your default mail app.</p>
 </form></section>
+
 <div id="site-footer"></div></div>
 <div class="wt-email-modal" id="wtEmailModal" aria-hidden="true">
   <div class="wt-email-backdrop" data-wt-email-close></div>
@@ -48,8 +53,8 @@
     </div>
     <p class="wt-email-text">Choose how you’d like to compose this message:</p>
     <div class="wt-email-actions">
-      <a class="btn btn-primary" id="wtEmailGmail" target="_blank" rel="noopener">Open Gmail</a>
-      <a class="btn btn-primary" id="wtEmailOutlook" target="_blank" rel="noopener">Open Outlook Web</a>
+      <a class="btn btn-outline" id="wtEmailGmail" target="_blank" rel="noopener">Open Gmail</a>
+      <a class="btn btn-outline" id="wtEmailOutlook" target="_blank" rel="noopener">Open Outlook Web</a>
       <a class="btn btn-outline" id="wtEmailMailto">Use Default Mail App</a>
       <button class="btn btn-outline" id="wtEmailCopy" type="button">Copy Address</button>
     </div>
@@ -79,7 +84,7 @@
       : 'WestTech Home Automation quote request';
 
     const lines = [];
-    lines.push('New request from WestTech Home Automation.com (Order page)');
+    lines.push('New request from WestTechHomeAutomation.com (Order page)');
     lines.push('');
     lines.push('Contact');
     lines.push(`Name: ${val('name') || '(not provided)'}`);
@@ -89,6 +94,7 @@
     lines.push('');
     lines.push('Request');
     lines.push(`Product / request type: ${productTxt}`);
+    lines.push(`Board layout: ${selText('boardLayout') || '(not selected)'}`);
     lines.push(`Quantity: ${val('quantity') || '(not provided)'}`);
     lines.push(`Project type: ${selText('projectType') || '(not selected)'}`);
     lines.push(`Display / lid preference: ${selText('display') || '(not selected)'}`);

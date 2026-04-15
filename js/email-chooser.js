@@ -30,8 +30,8 @@
           <div class="wt-email-actions">
             <a class="btn btn-primary" id="wtEmailGmail" target="_blank" rel="noopener">Open Gmail</a>
             <a class="btn btn-primary" id="wtEmailOutlook" target="_blank" rel="noopener">Open Outlook Web</a>
-            <a class="btn btn-ghost" id="wtEmailMailto">Use Default Mail App</a>
-            <button class="btn btn-ghost" id="wtEmailCopy" type="button">Copy Address</button>
+            <a class="btn btn-outline" id="wtEmailMailto">Use Default Mail App</a>
+            <button class="btn btn-outline" id="wtEmailCopy" type="button">Copy Address</button>
           </div>
           <p class="wt-email-small">To: <span class="mono" id="wtEmailToText">${DEFAULT_TO}</span></p>
         </div>

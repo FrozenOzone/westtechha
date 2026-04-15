@@ -4,32 +4,35 @@
   <meta charset="utf-8"/>
   <title>Contact – WestTech Home Automation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Contact WestTech Home Automation for product questions, quotes, shipping questions, and general support."/>
+  <meta name="description" content="Contact WestTech Home Automation for product questions, sizing help, quotes, shipping questions, and general support."/>
   <link href="icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
   <link href="css/site.css" rel="stylesheet"/>
 </head>
 
 <body><div class="page"><div id="site-header"></div>
-<header class="page-header"><div class="eyebrow"><span class="dot"></span>Contact • Quotes • Community</div><h1>Contact WestTechHA the easy way.</h1><p class="tagline">Start with the contact path that fits your question best. General contact, order/quote email, and the forum are all available depending on what you need.</p></header>
-<section class="section"><div class="section-header"><div><div class="section-tag">Contact Options</div><div class="section-title">Three simple ways to get help.</div></div><p>Use email for direct questions or the forum if you think the answer may already be there.</p></div>
+<header class="page-header"><div class="eyebrow"><span class="dot"></span>Contact • Quotes • Community</div><h1>Contact WestTechHA the easy way.</h1><p class="tagline">Use the contact path that best matches your question: support for product and policy help, orders for quotes and purchases, or the forum for shared discussion and ideas.</p></header>
+
+<section class="section"><div class="section-header"><div><div class="section-tag">Contact Options</div><div class="section-title">Three simple ways to get help.</div></div><p>Start with direct email for product or order questions, or use the forum when the discussion may help other people too.</p></div>
 <div class="product-grid">
-<article class="product-card"><div class="product-label">General Contact</div><div class="product-name">contact@westtechha.com</div><span class="product-status">General questions</span><p class="product-body">Use this address for general questions, shipping questions, and product questions not tied to an active order.</p><div class="product-footer"><span class="pill">Contact</span><a class="link-inline" href="#" data-wt-email-trigger data-email="contact@westtechha.com" data-subject="WestTech Home Automation Contact Request">Compose email</a></div></article>
-<article class="product-card"><div class="product-label">Orders &amp; Quotes</div><div class="product-name">orders@westtechha.com</div><span class="product-status">Quotes and order-specific questions</span><p class="product-body">Use this address for quote requests, order status, purchase questions, and custom-build discussions.</p><div class="product-footer"><span class="pill">Orders</span><a class="link-inline" href="#" data-wt-email-trigger data-email="orders@westtechha.com" data-subject="WestTech Home Automation Order Question">Compose email</a></div></article>
-<article class="product-card"><div class="product-label">Community Help</div><div class="product-name">Forum</div><span class="product-status">Possible answers already posted</span><p class="product-body">Before sending an email, check the forum. Your question may already have an answer, and it is also a good place to ask project questions and see ideas.</p><div class="product-footer"><span class="pill">Forum</span><a class="link-inline" href="forum.html">Open forum</a></div></article>
+<article class="product-card"><div class="product-label">Product &amp; Support</div><div class="product-name">support@westtechha.com</div><span class="product-status">Product, fit, shipping, and policy questions</span><p class="product-body">Use this address for product guidance, size questions, insert questions, documentation help, shipping problems, and return or warranty requests.</p><div class="product-footer"><span class="pill">Support</span><a class="link-inline" href="#" data-wt-email-trigger data-email="support@westtechha.com" data-subject="WestTech Home Automation Support Request">Compose email</a></div></article>
+<article class="product-card"><div class="product-label">Orders &amp; Quotes</div><div class="product-name">orders@westtechha.com</div><span class="product-status">Quotes, purchase questions, and order-specific help</span><p class="product-body">Use this address for quote requests, order questions, quantity requests, and special-request discussions tied to a purchase.</p><div class="product-footer"><span class="pill">Orders</span><a class="link-inline" href="#" data-wt-email-trigger data-email="orders@westtechha.com" data-subject="WestTech Home Automation Order Question">Compose email</a></div></article>
+<article class="product-card"><div class="product-label">Community Help</div><div class="product-name">Forum</div><span class="product-status">Build ideas and shared discussion</span><p class="product-body">Check the forum for enclosure ideas, compatibility questions, shared builds, and answers that may already be posted by WestTechHA or the community.</p><div class="product-footer"><span class="pill">Forum</span><a class="link-inline" href="forum.html">Open forum</a></div></article>
 </div></section>
+
 <section class="section"><div class="section-header"><div><div class="section-tag">Contact Form</div><div class="section-title">Send a message</div></div><p>This form uses FormSubmit for a simple static-site contact flow.</p></div>
-<form action="https://formsubmit.co/contact@westtechha.com" method="POST">
+<form action="https://formsubmit.co/support@westtechha.com" method="POST">
 <input type="hidden" name="_subject" value="WestTech Home Automation Contact Form" /><input type="hidden" name="_captcha" value="true" /><input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" />
 <div class="form-grid">
 <div><label for="name">Your name</label><input id="name" name="name" type="text" autocomplete="name" required /></div>
 <div><label for="email">Your email</label><input id="email" name="email" type="email" autocomplete="email" required /></div>
-<div><label for="topic">Topic</label><select id="topic" name="topic" required><option value="General">General Question</option><option value="Product">Shell / Kit Question</option><option value="Order">Order / Quote</option><option value="Support">Support / Troubleshooting</option></select></div>
-<div><label for="product">Product / Project (optional)</label><input id="product" name="product" type="text" placeholder="Small Shell / Med Kit / Custom build / other" /></div>
-<div class="wt-full"><label for="message">Message</label><textarea id="message" name="message" rows="6" required placeholder="Tell us what you are trying to do and where you need help."></textarea></div>
+<div><label for="topic">Topic</label><select id="topic" name="topic" required><option value="Product Fit">Product Fit / Compatibility</option><option value="Order">Order / Quote</option><option value="Shipping">Shipping / Delivery</option><option value="Returns">Returns / Warranty</option><option value="General">General Question</option></select></div>
+<div><label for="product">Product / Project (optional)</label><input id="product" name="product" type="text" placeholder="Small Kit, Med Kit, Big Kit, 30-pin, 38-pin, or other" /></div>
+<div class="wt-full"><label for="message">Message</label><textarea id="message" name="message" rows="6" required placeholder="Tell us what you are building, what size or layout you are considering, and where you need help."></textarea></div>
 </div>
 <button class="btn btn-primary" type="submit">Send message</button>
-<p class="form-note">Prefer email? Send general questions to <a class="mailto-link" href="#" data-wt-email-trigger data-email="contact@westtechha.com" data-subject="WestTech Home Automation Contact Request">contact@westtechha.com</a>. For quotes or order-specific questions, use <a class="mailto-link" href="#" data-wt-email-trigger data-email="orders@westtechha.com" data-subject="WestTech Home Automation Order Question">orders@westtechha.com</a>.</p>
+<p class="form-note">Prefer email? Send product and support questions to <a class="mailto-link" href="#" data-wt-email-trigger data-email="support@westtechha.com" data-subject="WestTech Home Automation Support Request">support@westtechha.com</a>. For quotes or order-specific questions, use <a class="mailto-link" href="#" data-wt-email-trigger data-email="orders@westtechha.com" data-subject="WestTech Home Automation Order Question">orders@westtechha.com</a>.</p>
 </form></section>
+
 <div id="site-footer"></div></div>
 <div class="wt-email-modal" id="wtEmailModal" aria-hidden="true">
   <div class="wt-email-backdrop" data-wt-email-close></div>
@@ -40,12 +43,12 @@
     </div>
     <p class="wt-email-text">Choose how you’d like to compose this message:</p>
     <div class="wt-email-actions">
-      <a class="btn btn-primary" id="wtEmailGmail" target="_blank" rel="noopener">Open Gmail</a>
-      <a class="btn btn-primary" id="wtEmailOutlook" target="_blank" rel="noopener">Open Outlook Web</a>
+      <a class="btn btn-outline" id="wtEmailGmail" target="_blank" rel="noopener">Open Gmail</a>
+      <a class="btn btn-outline" id="wtEmailOutlook" target="_blank" rel="noopener">Open Outlook Web</a>
       <a class="btn btn-outline" id="wtEmailMailto">Use Default Mail App</a>
       <button class="btn btn-outline" id="wtEmailCopy" type="button">Copy Address</button>
     </div>
-    <p class="wt-email-small">To: <span class="mono" id="wtEmailToText">contact@westtechha.com</span></p>
+    <p class="wt-email-small">To: <span class="mono" id="wtEmailToText">support@westtechha.com</span></p>
   </div>
 </div>
 <div class="wt-email-toast" id="wtEmailToast" aria-hidden="true"></div>
