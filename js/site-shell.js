@@ -43,7 +43,7 @@
         </a>
         <div class="badge badge-nav">
           <span></span>
-          VETERAN OWNED • IoT PANELS
+          VETERAN OWNED • SCOUT • RANGER • COMMAND
         </div>
       </div>
 
@@ -63,7 +63,7 @@
             ${footerLinks.map(link => linkHtml(link, 'footer-link')).join('')}
           </div>
         </div>
-        <p class="footer-meta footer-meta-pro">© 2026 WestTech Home Automation, LLC · Veteran Owned · Built for DIYers</p>
+        <p class="footer-meta footer-meta-pro">© 2026 WestTech Home Automation, LLC · Veteran Owned · Built for Installers and DIYers</p>
       </div>
     </footer>
   `;
