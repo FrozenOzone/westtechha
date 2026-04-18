@@ -75,8 +75,18 @@
 
   function syncFixedHeaderOffset() {
     if (!headerHost || !PIN_HEADER_ON_SCROLL) return;
+
+    const bodyWasScrolled = document.body.classList.contains('header-scrolled');
+    const headerWasScrolled = headerHost.classList.contains('is-scrolled');
+
+    document.body.classList.remove('header-scrolled');
+    headerHost.classList.remove('is-scrolled');
+
     const height = Math.ceil(headerHost.getBoundingClientRect().height);
     document.documentElement.style.setProperty('--site-header-offset', `${height}px`);
+
+    if (bodyWasScrolled) document.body.classList.add('header-scrolled');
+    if (headerWasScrolled) headerHost.classList.add('is-scrolled');
   }
 
   function syncScrolledHeaderState() {
@@ -84,7 +94,6 @@
     const isScrolled = (window.scrollY || window.pageYOffset || 0) > 18;
     document.body.classList.toggle('header-scrolled', isScrolled);
     headerHost.classList.toggle('is-scrolled', isScrolled);
-    syncFixedHeaderOffset();
   }
 
   if (headerHost) {
