@@ -43,7 +43,7 @@
         </a>
         <div class="badge badge-nav">
           <span></span>
-          VETERAN OWNED • SCOUT • RANGER • COMMAND
+          SCOUT • RANGER • COMMAND
         </div>
       </div>
 
