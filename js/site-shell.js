@@ -41,13 +41,14 @@
             alt="WestTech Home Automation – IoT & Computing Solutions logo"
           />
         </a>
+      </div>
+
+      <div class="nav-menu">
         <div class="badge badge-nav">
           <span></span>
           SCOUT • RANGER • COMMAND
         </div>
-      </div>
 
-      <div class="nav-menu">
         <div class="nav-links nav-primary">
           ${primaryLinks.map(link => linkHtml(link, 'nav-link')).join('')}
         </div>

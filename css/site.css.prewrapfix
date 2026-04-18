@@ -1177,7 +1177,7 @@ html[data-theme="dark"] #site-header{
   width: min(var(--maxw), calc(100% - 32px));
   margin-inline: auto;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(520px, 620px);
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 520px);
   align-items: end;
   gap: 18px 28px;
   padding: 14px 0 10px;
@@ -1194,36 +1194,30 @@ html[data-theme="dark"] #site-header{
 }
 
 .nav-logo-full{
-  width: clamp(340px, 36vw, 600px);
+  width: clamp(360px, 38vw, 620px);
   height: auto;
 }
 
 .nav-menu{
-  width: min(100%, 620px);
+  width: min(100%, 520px);
   min-height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   align-items: stretch;
-  gap: 14px;
+  gap: 12px;
 }
 
 .nav-primary{
-  gap: 8px 10px;
+  gap: 10px 16px;
   justify-content: flex-start;
   align-content: end;
-  flex-wrap: nowrap;
 }
 
 .badge-nav{
   margin-top: 0;
   align-self: center;
   text-align: left;
-}
-
-.nav-primary .nav-link{
-  font-size: 0.94rem;
-  white-space: nowrap;
 }
 
 .nav-primary .nav-link{
@@ -1260,58 +1254,18 @@ html[data-theme="dark"] #site-header{
   font-weight: 600;
 }
 
-@media (max-width: 1180px){
-  .nav-stack{
-    grid-template-columns: minmax(0, 1fr) minmax(460px, 560px);
-    gap: 14px 20px;
-  }
-
-  .nav-logo-full{
-    width: clamp(320px, 35vw, 560px);
-  }
-
-  .nav-primary{
-    gap: 8px 8px;
-  }
-}
-
 @media (max-width: 980px){
   .nav-stack{
-    grid-template-columns: 1fr;
-    justify-items: center;
-    gap: 10px;
-    padding: 12px 0 8px;
-  }
-
-  .nav-brand-wrap{
-    justify-self: center;
-  }
-
-  .nav-brand{
-    justify-content: center;
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 460px);
+    gap: 14px 18px;
   }
 
   .nav-logo-full{
-    width: min(92vw, 520px);
-    height: auto;
-  }
-
-  .nav-menu{
-    width: 100%;
-    min-height: auto;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    width: clamp(300px, 42vw, 500px);
   }
 
   .nav-primary{
-    flex-wrap: wrap;
-    justify-content: center;
     gap: 8px 12px;
-  }
-
-  .badge-nav{
-    align-self: center;
   }
 }
 
