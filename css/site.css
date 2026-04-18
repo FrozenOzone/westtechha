@@ -1172,6 +1172,10 @@ body.header-fixed #site-header{
   background: rgba(248,251,255,0.84);
   border-bottom: 1px solid rgba(219,228,240,0.95);
   backdrop-filter: blur(18px);
+  transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+body.header-scrolled #site-header{
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
 }
 html[data-theme="dark"] #site-header{
   background: rgba(8,17,32,0.84);
@@ -1192,6 +1196,7 @@ html[data-theme="dark"] #site-header{
   align-items: end;
   gap: 18px 28px;
   padding: 14px 0 10px;
+  transition: gap .18s ease, padding .18s ease;
 }
 
 .nav-brand-wrap{
@@ -1205,8 +1210,9 @@ html[data-theme="dark"] #site-header{
 }
 
 .nav-logo-full{
-  width: clamp(340px, 36vw, 600px);
+  width: clamp(300px, 31vw, 500px);
   height: auto;
+  transition: width .18s ease;
 }
 
 .nav-menu{
@@ -1217,6 +1223,7 @@ html[data-theme="dark"] #site-header{
   justify-content: flex-end;
   align-items: stretch;
   gap: 14px;
+  transition: gap .18s ease;
 }
 
 .nav-primary{
@@ -1230,11 +1237,13 @@ html[data-theme="dark"] #site-header{
   margin-top: 0;
   align-self: center;
   text-align: left;
+  transition: padding .18s ease, font-size .18s ease, letter-spacing .18s ease;
 }
 
 .nav-primary .nav-link{
   font-size: 0.94rem;
   white-space: nowrap;
+  transition: padding .18s ease, font-size .18s ease, box-shadow .18s ease, background-color .18s ease, color .18s ease;
 }
 
 .nav-primary .nav-link{
@@ -1243,6 +1252,32 @@ html[data-theme="dark"] #site-header{
 
 .nav-primary .nav-link:hover{
   box-shadow: var(--shadow-soft);
+}
+
+@media (min-width: 981px){
+  body.header-scrolled .nav-stack{
+    gap: 12px 24px;
+    padding: 9px 0 7px;
+  }
+
+  body.header-scrolled .nav-logo-full{
+    width: clamp(250px, 26vw, 410px);
+  }
+
+  body.header-scrolled .nav-menu{
+    gap: 8px;
+  }
+
+  body.header-scrolled .badge-nav{
+    padding: 6px 12px;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+  }
+
+  body.header-scrolled .nav-primary .nav-link{
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
 }
 
 /* ===================== Footer Link Row ===================== */
@@ -1278,7 +1313,7 @@ html[data-theme="dark"] #site-header{
   }
 
   .nav-logo-full{
-    width: clamp(320px, 35vw, 560px);
+    width: clamp(290px, 33vw, 470px);
   }
 
   .nav-primary{

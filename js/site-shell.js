@@ -79,16 +79,29 @@
     document.documentElement.style.setProperty('--site-header-offset', `${height}px`);
   }
 
+  function syncScrolledHeaderState() {
+    if (!headerHost || !PIN_HEADER_ON_SCROLL) return;
+    const isScrolled = (window.scrollY || window.pageYOffset || 0) > 18;
+    document.body.classList.toggle('header-scrolled', isScrolled);
+    headerHost.classList.toggle('is-scrolled', isScrolled);
+    syncFixedHeaderOffset();
+  }
+
   if (headerHost) {
     headerHost.innerHTML = headerHtml;
 
     if (PIN_HEADER_ON_SCROLL) {
       document.body.classList.add('header-fixed');
       syncFixedHeaderOffset();
+      syncScrolledHeaderState();
       window.addEventListener('resize', syncFixedHeaderOffset);
-      window.addEventListener('load', syncFixedHeaderOffset);
+      window.addEventListener('scroll', syncScrolledHeaderState, { passive: true });
+      window.addEventListener('load', syncScrolledHeaderState);
       if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(syncFixedHeaderOffset).catch(() => {});
+        document.fonts.ready.then(() => {
+          syncFixedHeaderOffset();
+          syncScrolledHeaderState();
+        }).catch(() => {});
       }
     }
   }
