@@ -370,7 +370,7 @@ legend{ padding:0 10px; font-weight:700; color:var(--text); }
   .hero-band,.spotlight,.product-grid,.card-grid,.support-grid,.forum-grid,.two-col,.split,.metric-row{ grid-template-columns:1fr; }
 }
 @media (max-width: 760px){
-  #site-header{ position:relative; }
+  body:not(.header-fixed) #site-header{ position:relative; }
   .nav-shell{ flex-direction:column; align-items:flex-start; }
   .nav-links{ width:100%; justify-content:flex-start; }
   .page-header{ padding-top:26px; }
@@ -1151,6 +1151,17 @@ ul{
 .nav-utility .nav-link{
   padding: 4px 9px;
   opacity: 0.92;
+}
+
+
+:root{ --site-header-offset: 0px; }
+body.header-fixed{ padding-top: var(--site-header-offset); }
+body.header-fixed #site-header{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
 }
 
 /* ===== Restored standard header on professional site ===== */

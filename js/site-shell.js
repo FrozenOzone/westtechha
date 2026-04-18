@@ -18,6 +18,8 @@
     { href: 'forum.html',    label: 'Forum' }
   ];
 
+  const PIN_HEADER_ON_SCROLL = true;
+
   const currentFile = (() => {
     const path = window.location.pathname || '';
     const file = path.split('/').pop();
@@ -70,8 +72,25 @@
   `;
 
   const headerHost = document.getElementById('site-header');
+
+  function syncFixedHeaderOffset() {
+    if (!headerHost || !PIN_HEADER_ON_SCROLL) return;
+    const height = Math.ceil(headerHost.getBoundingClientRect().height);
+    document.documentElement.style.setProperty('--site-header-offset', `${height}px`);
+  }
+
   if (headerHost) {
     headerHost.innerHTML = headerHtml;
+
+    if (PIN_HEADER_ON_SCROLL) {
+      document.body.classList.add('header-fixed');
+      syncFixedHeaderOffset();
+      window.addEventListener('resize', syncFixedHeaderOffset);
+      window.addEventListener('load', syncFixedHeaderOffset);
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(syncFixedHeaderOffset).catch(() => {});
+      }
+    }
   }
 
   const footerHost = document.getElementById('site-footer');
