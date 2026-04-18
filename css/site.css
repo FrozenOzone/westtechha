@@ -1720,3 +1720,91 @@ html[data-theme="dark"] .product-gallery img,
     grid-template-columns:1fr;
   }
 }
+
+
+/* ===== Phone-first compact fixed header ===== */
+@media (max-width: 700px){
+  .nav-stack{
+    width: min(var(--maxw), calc(100% - 16px));
+    gap: 6px;
+    padding: 8px 0 6px;
+  }
+
+  .nav-logo-full{
+    width: min(68vw, 300px);
+  }
+
+  .nav-menu{
+    gap: 6px;
+  }
+
+  .badge-nav{
+    padding: 5px 10px;
+    font-size: 0.64rem;
+    letter-spacing: 0.12em;
+  }
+
+  .nav-primary{
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px 8px;
+    justify-items: stretch;
+    align-items: stretch;
+  }
+
+  .nav-primary .nav-link,
+  #site-header .nav-link{
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
+    text-align: center;
+    padding: 7px 8px;
+    font-size: 0.84rem;
+  }
+
+  body.header-scrolled .nav-stack{
+    gap: 4px;
+    padding: 6px 0 5px;
+  }
+
+  body.header-scrolled .nav-logo-full{
+    width: min(58vw, 240px);
+  }
+
+  body.header-scrolled .nav-menu{
+    gap: 4px;
+  }
+
+  body.header-scrolled .badge-nav{
+    padding: 4px 9px;
+    font-size: 0.6rem;
+    letter-spacing: 0.11em;
+  }
+
+  body.header-scrolled .nav-primary .nav-link,
+  body.header-scrolled #site-header .nav-link{
+    padding: 6px 7px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 420px){
+  .nav-logo-full{
+    width: min(64vw, 260px);
+  }
+
+  .badge-nav{
+    max-width: 100%;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+  }
+
+  .nav-primary{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body.header-scrolled .nav-logo-full{
+    width: min(54vw, 210px);
+  }
+}
