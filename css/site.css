@@ -395,7 +395,7 @@ legend{ padding:0 10px; font-weight:700; color:var(--text); }
 .forum-topic{ display:flex; justify-content:space-between; gap:14px; align-items:flex-start; padding:16px 18px; border-radius:18px; border:1px solid var(--subcard-border); background:var(--subcard-surface); transition: background .18s ease, border-color .18s ease, transform .18s ease; }
 .forum-topic strong{ display:block; color:var(--subcard-text); font-size:1rem; font-weight:760; }
 .forum-topic small{ display:block; margin-top:6px; color:var(--subcard-muted); font-size:0.92rem; line-height:1.65; }
-.forum-topic-tag{ display:inline-flex; align-items:center; padding:6px 10px; border-radius:999px; background:var(--subcard-pill-bg); color:var(--subcard-pill-text); font-size:0.75rem; font-weight:700; white-space:nowrap; border:1px solid transparent; }
+.forum-topic-tag{ display:inline-flex; align-items:center; justify-content:center; min-height:32px; padding:8px 12px; border-radius:999px; background:var(--subcard-pill-bg); color:var(--subcard-pill-text); font-size:0.82rem; font-weight:600; line-height:1; white-space:nowrap; border:1px solid transparent; }
 .forum-topic-action{
   text-decoration:none;
   cursor:pointer;
@@ -469,6 +469,19 @@ legend{ padding:0 10px; font-weight:700; color:var(--text); }
 }
 
 .metric{ cursor: default; }
+
+
+.forum-topic-list-static .forum-topic,
+.forum-topic-list-static .forum-topic:hover,
+.forum-topic-list-static .forum-topic:focus-within{
+  transform:none;
+  border-color:var(--subcard-border);
+  background:var(--subcard-surface);
+}
+
+.forum-topic-list-static .forum-topic{
+  cursor:default;
+}
 
 .spotlight-card p,
 .product-card p,
@@ -2200,4 +2213,17 @@ html[data-theme="dark"] .forum-topic-action:focus-visible{
     border-color: rgba(181, 205, 236, 0.30);
     box-shadow: 0 10px 24px rgba(2, 6, 23, 0.28);
   }
+}
+
+/* Strong override: static info rows should never hover */
+.forum-topic-list-static .forum-topic:hover,
+.forum-topic-list-static .forum-topic:focus-within,
+html[data-theme="light"] .forum-topic-list-static .forum-topic:hover,
+html[data-theme="light"] .forum-topic-list-static .forum-topic:focus-within,
+html[data-theme="dark"] .forum-topic-list-static .forum-topic:hover,
+html[data-theme="dark"] .forum-topic-list-static .forum-topic:focus-within{
+  transform:none !important;
+  border-color:var(--subcard-border) !important;
+  background:var(--subcard-surface) !important;
+  box-shadow:none !important;
 }
