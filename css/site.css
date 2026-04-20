@@ -496,6 +496,96 @@ html[data-theme="dark"] .forum-topic{
   border-color: rgba(255,255,255,0.42) !important;
 }
 
+html[data-theme="light"] .cta-band{
+  background: linear-gradient(135deg, rgba(76, 112, 178, 0.34), rgba(118, 149, 206, 0.28));
+  border: 1px solid rgba(76, 112, 178, 0.18);
+  color: #163761;
+  box-shadow: 0 18px 30px rgba(37, 99, 235, 0.08);
+}
+html[data-theme="light"] .cta-band h2{
+  color: #163761;
+}
+html[data-theme="light"] .cta-band p{
+  color: rgba(22, 55, 97, 0.88);
+}
+html[data-theme="light"] .cta-band .btn,
+html[data-theme="light"] .cta-band .btn-primary,
+html[data-theme="light"] .cta-band .btn-submit,
+html[data-theme="light"] .cta-band .forum-btn-primary{
+  background: rgba(255,255,255,0.44);
+  border-color: rgba(76, 112, 178, 0.20);
+  color: #163761;
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.06);
+}
+html[data-theme="light"] .cta-band .btn:hover,
+html[data-theme="light"] .cta-band .btn-primary:hover,
+html[data-theme="light"] .cta-band .btn-submit:hover,
+html[data-theme="light"] .cta-band .forum-btn-primary:hover,
+html[data-theme="light"] .cta-band .btn:focus-visible,
+html[data-theme="light"] .cta-band .btn-primary:focus-visible,
+html[data-theme="light"] .cta-band .btn-submit:focus-visible,
+html[data-theme="light"] .cta-band .forum-btn-primary:focus-visible{
+  background: rgba(255,255,255,0.62);
+  border-color: rgba(76, 112, 178, 0.28);
+  color: #163761;
+}
+html[data-theme="light"] .cta-band .btn-outline{
+  background: rgba(255,255,255,0.30) !important;
+  border-color: rgba(76, 112, 178, 0.22) !important;
+  color: #163761 !important;
+}
+html[data-theme="light"] .cta-band .btn-outline:hover{
+  background: rgba(255,255,255,0.50) !important;
+  border-color: rgba(76, 112, 178, 0.30) !important;
+  color: #163761 !important;
+}
+
+@media (prefers-color-scheme: light){
+  html:not([data-theme]) .cta-band{
+    background: linear-gradient(135deg, rgba(76, 112, 178, 0.34), rgba(118, 149, 206, 0.28));
+    border: 1px solid rgba(76, 112, 178, 0.18);
+    color: #163761;
+    box-shadow: 0 18px 30px rgba(37, 99, 235, 0.08);
+  }
+  html:not([data-theme]) .cta-band h2{
+    color: #163761;
+  }
+  html:not([data-theme]) .cta-band p{
+    color: rgba(22, 55, 97, 0.88);
+  }
+  html:not([data-theme]) .cta-band .btn,
+  html:not([data-theme]) .cta-band .btn-primary,
+  html:not([data-theme]) .cta-band .btn-submit,
+  html:not([data-theme]) .cta-band .forum-btn-primary{
+    background: rgba(255,255,255,0.44);
+    border-color: rgba(76, 112, 178, 0.20);
+    color: #163761;
+    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.06);
+  }
+  html:not([data-theme]) .cta-band .btn:hover,
+  html:not([data-theme]) .cta-band .btn-primary:hover,
+  html:not([data-theme]) .cta-band .btn-submit:hover,
+  html:not([data-theme]) .cta-band .forum-btn-primary:hover,
+  html:not([data-theme]) .cta-band .btn:focus-visible,
+  html:not([data-theme]) .cta-band .btn-primary:focus-visible,
+  html:not([data-theme]) .cta-band .btn-submit:focus-visible,
+  html:not([data-theme]) .cta-band .forum-btn-primary:focus-visible{
+    background: rgba(255,255,255,0.62);
+    border-color: rgba(76, 112, 178, 0.28);
+    color: #163761;
+  }
+  html:not([data-theme]) .cta-band .btn-outline{
+    background: rgba(255,255,255,0.30) !important;
+    border-color: rgba(76, 112, 178, 0.22) !important;
+    color: #163761 !important;
+  }
+  html:not([data-theme]) .cta-band .btn-outline:hover{
+    background: rgba(255,255,255,0.50) !important;
+    border-color: rgba(76, 112, 178, 0.30) !important;
+    color: #163761 !important;
+  }
+}
+
 
 
 input::placeholder,
