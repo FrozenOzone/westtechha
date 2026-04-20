@@ -20,14 +20,27 @@
 
   const PIN_HEADER_ON_SCROLL = true;
 
-  const currentFile = (() => {
-    const path = window.location.pathname || '';
-    const file = path.split('/').pop();
-    return file || 'index.html';
-  })();
+  function normalizePageName(value) {
+    let v = String(value || '').trim();
+    v = v.split('#')[0].split('?')[0];
+    if (!v) return 'index';
+
+    v = v.replace(/^https?:\/\/[^/]+/i, '');
+    v = v.replace(/^\.\//, '');
+    v = v.replace(/\/+/g, '/');
+
+    if (v.endsWith('/')) v += 'index.html';
+
+    const file = v.split('/').pop() || 'index.html';
+    const base = file.replace(/\.html?$/i, '');
+    return base || 'index';
+  }
+
+  const currentPage = normalizePageName(window.location.pathname || '');
 
   function linkHtml(link, className = 'nav-link') {
-    const isActive = currentFile === link.href || (currentFile === '' && link.href === 'index.html');
+    const linkPage = normalizePageName(link.href);
+    const isActive = currentPage === linkPage;
     const classes = className + (isActive ? ' active' : '');
     const aria = isActive ? ' aria-current="page"' : '';
     return `<a class="${classes}" href="${link.href}"${aria}>${link.label}</a>`;
