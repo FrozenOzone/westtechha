@@ -1544,10 +1544,11 @@ html[data-theme="dark"]{
 #site-header .nav-link.active,
 #site-footer .footer-link.active,
 .footer-links-pro .footer-link.active{
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: #fff;
-  border-color: transparent;
-  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.24);
+  color: var(--shell-link-hover-color);
+  background: var(--shell-link-hover-bg);
+  border-color: var(--shell-link-hover-border);
+  text-decoration: none;
+  box-shadow: var(--shadow-soft);
 }
 
 
