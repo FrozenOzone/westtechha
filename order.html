@@ -19,8 +19,12 @@
 <article class="product-card"><div class="product-label">By Discussion</div><div class="product-name">Special Requests</div><span class="product-status">Quote-based</span><p class="product-body">Use this path when you need quantity discussion, fit review, or a request that falls outside the standard Scout / Ranger / Command family line.</p></article>
 </div></section>
 
-<section class="section"><div class="section-header"><div><div class="section-tag">Email Prep</div><div class="section-title">Prepare a quote request</div></div><p>Fill out the details below and click <strong>Prepare Request</strong>. Your browser will open an email composer with your request pre-filled to <strong>orders@westtechha.com</strong>.</p></div>
-<form class="wt-order" id="order-form" onsubmit="return prepareOrderEmail();">
+<section class="section"><div class="section-header"><div><div class="section-tag">Order Form</div><div class="section-title">Send a quote request</div></div><p>Fill out the details below and click <strong>Send Request</strong>. This form submits directly to <strong>orders@westtechha.com</strong> and returns the visitor to the thank-you page.</p></div>
+<form class="wt-order" id="order-form" action="https://formsubmit.co/orders@westtechha.com" method="POST">
+<input id="order-subject" type="hidden" name="_subject" value="WestTech Home Automation Order Form" />
+<input id="order-next" type="hidden" name="_next" value="" />
+<input type="hidden" name="_captcha" value="true" />
+<input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" />
 <fieldset class="wt-fieldset"><legend>Contact Details</legend><div class="wt-grid">
 <div><label for="name">Name</label><input id="name" name="name" placeholder="Your name" type="text"/></div>
 <div><label for="email">Email</label><input id="email" name="email" placeholder="you@example.com" type="email"/></div>
@@ -39,91 +43,43 @@
 <div class="wt-full"><label for="details">Project Details</label><textarea id="details" name="details" placeholder="Tell us what you are building, which family you are considering, whether you want Ready or Loaded, which board layout you need, and any fit or quantity questions you want reviewed."></textarea></div>
 </div></fieldset>
 <fieldset class="wt-fieldset"><legend>Acknowledgement</legend><div class="wt-check"><input id="ack" type="checkbox"/><label for="ack">I understand this page starts a quote or order request, does not guarantee immediate availability, and that Command is currently coming soon.</label></div></fieldset>
-<button class="btn-submit" type="submit">Prepare Request</button>
-<p class="form-note">This prepares an email to <strong>orders@westtechha.com</strong>. You can then send it with Gmail, Outlook, or your default mail app.</p>
+<button class="btn-submit" type="submit">Send Request</button>
+<p class="form-note">This form sends the request to <strong>orders@westtechha.com</strong> and then returns the visitor to the WestTechHA thank-you page.</p>
 </form></section>
 
 <div id="site-footer"></div></div>
-<div class="wt-email-modal" id="wtEmailModal" aria-hidden="true">
-  <div class="wt-email-backdrop" data-wt-email-close></div>
-  <div class="wt-email-card" role="dialog" aria-modal="true" aria-label="Email options">
-    <div class="wt-email-head">
-      <div class="wt-email-title">Email WestTech Home Automation</div>
-      <button class="wt-email-close" id="wtEmailClose" type="button" aria-label="Close">×</button>
-    </div>
-    <p class="wt-email-text">Choose how you’d like to compose this message:</p>
-    <div class="wt-email-actions">
-      <a class="btn btn-outline" id="wtEmailGmail" target="_blank" rel="noopener">Open Gmail</a>
-      <a class="btn btn-outline" id="wtEmailOutlook" target="_blank" rel="noopener">Open Outlook Web</a>
-      <a class="btn btn-outline" id="wtEmailMailto">Use Default Mail App</a>
-      <button class="btn btn-outline" id="wtEmailCopy" type="button">Copy Address</button>
-    </div>
-    <p class="wt-email-small">To: <span class="mono" id="wtEmailToText">orders@westtechha.com</span></p>
-  </div>
-</div>
-<div class="wt-email-toast" id="wtEmailToast" aria-hidden="true"></div>
 <script src="js/site-shell.js"></script>
 <script src="js/theme.js" defer></script>
-<script src="js/email-chooser.js"></script>
 <script>
 (function () {
-  const $ = (id) => document.getElementById(id);
-  const val = (id) => (($(id)?.value || '').toString().trim());
-  const checked = (id) => !!($(id)?.checked);
-  const selText = (id) => {
-    const el = $(id);
-    if (!el || !('selectedIndex' in el)) return '';
-    const opt = el.options[el.selectedIndex];
-    return (opt && opt.value) ? opt.text : '';
-  };
+  const form = document.getElementById('order-form');
+  const product = document.getElementById('product');
+  const offerLevel = document.getElementById('offerLevel');
+  const subject = document.getElementById('order-subject');
+  const next = document.getElementById('order-next');
 
-  window.prepareOrderEmail = function prepareOrderEmail() {
-    const productTxt = selText('product') || '(not selected)';
-    const offerTxt = selText('offerLevel') || '(not selected)';
-    const subject = productTxt !== '(not selected)'
-      ? `WestTech Home Automation request: ${productTxt}${offerTxt !== '(not selected)' ? ' - ' + offerTxt : ''}`
-      : 'WestTech Home Automation quote request';
+  if (!form || !subject || !next) return;
 
-    const lines = [];
-    lines.push('New request from WestTechHomeAutomation.com (Order page)');
-    lines.push('');
-    lines.push('Contact');
-    lines.push(`Name: ${val('name') || '(not provided)'}`);
-    lines.push(`Email: ${val('email') || '(not provided)'}`);
-    lines.push(`Phone: ${val('phone') || '(not provided)'}`);
-    lines.push(`Timing: ${selText('timeline') || '(not selected)'}`);
-    lines.push('');
-    lines.push('Request');
-    lines.push(`Family / request type: ${productTxt}`);
-    lines.push(`Offer level: ${offerTxt}`);
-    lines.push(`Board layout: ${selText('boardLayout') || '(not selected)'}`);
-    lines.push(`Quantity: ${val('quantity') || '(not provided)'}`);
-    lines.push(`Project type: ${selText('projectType') || '(not selected)'}`);
-    lines.push(`Display / lid preference: ${selText('display') || '(not selected)'}`);
-    lines.push(`Board / hardware notes: ${val('sizeNotes') || '(not provided)'}`);
-    lines.push(`Shipping state / region: ${val('shippingState') || '(not provided)'}`);
-    lines.push('');
-    lines.push('Project details');
-    lines.push(val('details') || '(not provided)');
-    lines.push('');
-    lines.push(`Acknowledgement: ${checked('ack') ? 'Checked' : 'Not checked'}`);
+  function applyOrderMeta() {
+    const productText = product && product.selectedIndex >= 0 ? product.options[product.selectedIndex].text : '';
+    const offerText = offerLevel && offerLevel.selectedIndex >= 0 ? offerLevel.options[offerLevel.selectedIndex].text : '';
 
-    const body = lines.join('
-');
+    let subjectLine = 'WestTech Home Automation Order Form';
 
-    if (window.WTEmail && typeof window.WTEmail.open === 'function') {
-      window.WTEmail.open({
-        to: 'orders@westtechha.com',
-        subject: subject,
-        body: body
-      });
-    } else {
-      const mailto = `mailto:orders@westtechha.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      window.location.href = mailto;
+    if (product && product.value) {
+      subjectLine = 'WestTech Home Automation request: ' + productText;
+      if (offerLevel && offerLevel.value) subjectLine += ' - ' + offerText;
     }
 
-    return false;
-  };
+    subject.value = subjectLine;
+  }
+
+  next.value = new URL('thank-you.html', window.location.href).href;
+  applyOrderMeta();
+
+  if (product) product.addEventListener('change', applyOrderMeta);
+  if (offerLevel) offerLevel.addEventListener('change', applyOrderMeta);
+  form.addEventListener('submit', applyOrderMeta);
 })();
 </script>
 </body></html>
