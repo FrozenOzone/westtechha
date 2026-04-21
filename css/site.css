@@ -1863,6 +1863,115 @@ html[data-theme="dark"] .product-gallery img,
 .product-gallery figcaption{
   font-size:0.92rem;
 }
+.product-gallery figure img{
+  cursor: zoom-in;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.product-gallery figure img:hover,
+.product-gallery figure img:focus-visible{
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+  border-color: rgba(37,99,235,0.28);
+}
+.product-gallery figure img:focus-visible{
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.product-lightbox{
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(7, 17, 31, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.product-lightbox[hidden]{
+  display: none;
+}
+.product-lightbox-dialog{
+  position: relative;
+  width: min(1080px, 100%);
+  max-height: min(90vh, 980px);
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+}
+.product-lightbox-image-wrap{
+  width: 100%;
+  display: grid;
+  place-items: center;
+  padding: 14px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(15, 23, 42, 0.72);
+  box-shadow: 0 28px 70px rgba(2, 6, 23, 0.45);
+}
+.product-lightbox-image{
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: calc(90vh - 140px);
+  border-radius: 16px;
+}
+.product-lightbox-caption{
+  width: min(900px, 100%);
+  margin: 0;
+  padding: 0 12px;
+  color: #eef4ff;
+  text-align: center;
+  line-height: 1.7;
+}
+.product-lightbox-close{
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.92);
+  color: #eef4ff;
+  font-size: 1.35rem;
+  cursor: pointer;
+  box-shadow: 0 16px 35px rgba(2, 6, 23, 0.4);
+}
+.product-lightbox-close:hover,
+.product-lightbox-close:focus-visible{
+  background: rgba(30, 64, 175, 0.95);
+  border-color: rgba(191, 219, 254, 0.34);
+}
+.product-lightbox-close:focus-visible{
+  outline: 2px solid #bfdbfe;
+  outline-offset: 2px;
+}
+body.lightbox-open{
+  overflow: hidden;
+}
+@media (max-width: 700px){
+  .product-lightbox{
+    padding: 14px;
+  }
+  .product-lightbox-dialog{
+    width: 100%;
+  }
+  .product-lightbox-image-wrap{
+    padding: 10px;
+    border-radius: 18px;
+  }
+  .product-lightbox-image{
+    max-height: calc(100vh - 180px);
+  }
+  .product-lightbox-close{
+    top: -6px;
+    right: -2px;
+  }
+}
 .product-note{
   margin-top:18px;
 }
