@@ -3,10 +3,14 @@ const JSON_HEADERS = {
   "Cache-Control": "no-store"
 };
 
+function sanitizeEnvValue(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
 export async function onRequestGet(context) {
-  const clientId = context.env.PAYPAL_CLIENT_ID;
-  const currency = context.env.PAYPAL_CURRENCY || "USD";
-  const env = (context.env.PAYPAL_ENV || "sandbox").toLowerCase();
+  const clientId = sanitizeEnvValue(context.env.PAYPAL_CLIENT_ID);
+  const currency = sanitizeEnvValue(context.env.PAYPAL_CURRENCY) || "USD";
+  const env = (sanitizeEnvValue(context.env.PAYPAL_ENV) || "sandbox").toLowerCase();
 
   if (!clientId) {
     return new Response(JSON.stringify({

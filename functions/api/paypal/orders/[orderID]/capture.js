@@ -3,15 +3,29 @@ const JSON_HEADERS = {
   "Cache-Control": "no-store"
 };
 
-function paypalBaseUrl(env) {
-  return (env || "sandbox").toLowerCase() === "live"
+function sanitizeEnvValue(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function paypalBaseUrl(envValue) {
+  return sanitizeEnvValue(envValue).toLowerCase() === "live"
     ? "https://api-m.paypal.com"
     : "https://api-m.sandbox.paypal.com";
 }
 
+async function readJsonSafe(response) {
+  const text = await response.text();
+  if (!text) return {};
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { raw: text };
+  }
+}
+
 async function generateAccessToken(env) {
-  const clientId = env.PAYPAL_CLIENT_ID;
-  const clientSecret = env.PAYPAL_CLIENT_SECRET;
+  const clientId = sanitizeEnvValue(env.PAYPAL_CLIENT_ID);
+  const clientSecret = sanitizeEnvValue(env.PAYPAL_CLIENT_SECRET);
 
   if (!clientId || !clientSecret) {
     throw new Error("Missing PAYPAL_CLIENT_ID or PAYPAL_CLIENT_SECRET environment variable.");
@@ -22,15 +36,17 @@ async function generateAccessToken(env) {
     method: "POST",
     headers: {
       Authorization: `Basic ${auth}`,
-      "Content-Type": "application/x-www-form-urlencoded"
+      "Content-Type": "application/x-www-form-urlencoded",
+      Accept: "application/json"
     },
     body: "grant_type=client_credentials"
   });
 
-  const data = await response.json();
+  const data = await readJsonSafe(response);
 
   if (!response.ok || !data.access_token) {
-    throw new Error(data.error_description || data.error || "Failed to generate PayPal access token.");
+    const detail = data.error_description || data.error || data.message || data.raw || "Failed to generate PayPal access token.";
+    throw new Error(`PayPal token request failed (${response.status}): ${detail}`);
   }
 
   return data.access_token;
@@ -60,12 +76,12 @@ export async function onRequestPost(context) {
       }
     });
 
-    const data = await response.json();
+    const data = await readJsonSafe(response);
 
     if (!response.ok) {
       return new Response(JSON.stringify({
         ok: false,
-        message: data.message || data.details?.[0]?.description || "Could not capture the PayPal order.",
+        message: data.message || data.details?.[0]?.description || data.raw || "Could not capture the PayPal order.",
         details: data.details || null,
         debug_id: data.debug_id || null
       }), {
