@@ -2634,3 +2634,62 @@ html[data-theme="dark"] .forum-topic-list-static .forum-topic:focus-within{
   background:var(--subcard-surface) !important;
   box-shadow:none !important;
 }
+
+.checkout-address-card{
+  margin-top:20px;
+}
+.checkout-address-form{
+  display:grid;
+  gap:16px;
+  margin-top:12px;
+}
+.checkout-field-grid{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:14px;
+}
+.checkout-field{
+  display:grid;
+  gap:8px;
+}
+.checkout-field-full{
+  grid-column:1 / -1;
+}
+.checkout-field span{
+  font-size:0.92rem;
+  font-weight:700;
+  color:var(--text);
+}
+.checkout-field em{
+  font-style:normal;
+  color:var(--muted);
+  font-weight:600;
+}
+.checkout-field input,
+.checkout-field select{
+  width:100%;
+  padding:12px 14px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:var(--surface);
+  color:var(--text);
+  font:inherit;
+}
+.checkout-field input:focus,
+.checkout-field select:focus{
+  outline:none;
+  border-color:var(--accent);
+  box-shadow:0 0 0 4px rgba(37,99,235,0.12);
+}
+.checkout-tax-button{
+  width:100%;
+  justify-content:center;
+}
+.paypal-button-container.is-hidden{
+  display:none;
+}
+@media (max-width: 700px){
+  .checkout-field-grid{
+    grid-template-columns:1fr;
+  }
+}

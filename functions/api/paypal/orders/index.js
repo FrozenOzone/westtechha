@@ -1,72 +1,35 @@
-const JSON_HEADERS = {
-  "Content-Type": "application/json",
-  "Cache-Control": "no-store"
-};
+import { generateAccessToken, paypalBaseUrl } from "../../../_lib/paypal.js";
+import { PRODUCT } from "../../../_lib/product.js";
+import { jsonResponse, readJsonSafe, sanitizeEnvValue } from "../../../_lib/shared.js";
+import { buildTaxQuote } from "../../../_lib/tax.js";
 
-const PRODUCT = Object.freeze({
-  sku: "scout-30-unloaded",
-  name: "Scout 30 - Unloaded",
-  description: "Scout family launch product with 30-pin unloaded layout.",
-  quantity: "1",
-  itemAmount: "35.00",
-  shippingAmount: "8.95",
-  currency: "USD"
-});
-
-function sanitizeEnvValue(value) {
-  return typeof value === "string" ? value.trim() : "";
-}
-
-function paypalBaseUrl(envValue) {
-  return sanitizeEnvValue(envValue).toLowerCase() === "live"
-    ? "https://api-m.paypal.com"
-    : "https://api-m.sandbox.paypal.com";
-}
-
-async function readJsonSafe(response) {
-  const text = await response.text();
-  if (!text) return {};
-  try {
-    return JSON.parse(text);
-  } catch {
-    return { raw: text };
-  }
-}
-
-async function generateAccessToken(env) {
-  const clientId = sanitizeEnvValue(env.PAYPAL_CLIENT_ID);
-  const clientSecret = sanitizeEnvValue(env.PAYPAL_CLIENT_SECRET);
-
-  if (!clientId || !clientSecret) {
-    throw new Error("Missing PAYPAL_CLIENT_ID or PAYPAL_CLIENT_SECRET environment variable.");
-  }
-
-  const auth = btoa(`${clientId}:${clientSecret}`);
-  const response = await fetch(`${paypalBaseUrl(env.PAYPAL_ENV)}/v1/oauth2/token`, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${auth}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-      Accept: "application/json"
+function toPayPalShippingAddress(address) {
+  const shipping = {
+    name: {
+      full_name: address.fullName
     },
-    body: "grant_type=client_credentials"
-  });
+    address: {
+      address_line_1: address.address1,
+      admin_area_2: address.city,
+      admin_area_1: address.state,
+      postal_code: address.postalCode,
+      country_code: address.countryCode
+    }
+  };
 
-  const data = await readJsonSafe(response);
-
-  if (!response.ok || !data.access_token) {
-    const detail = data.error_description || data.error || data.message || data.raw || "Failed to generate PayPal access token.";
-    throw new Error(`PayPal token request failed (${response.status}): ${detail}`);
+  if (address.address2) {
+    shipping.address.address_line_2 = address.address2;
   }
 
-  return data.access_token;
+  return shipping;
 }
 
-function buildOrderPayload(env) {
+function buildOrderPayload(env, taxQuote) {
   const currency = sanitizeEnvValue(env.PAYPAL_CURRENCY) || PRODUCT.currency;
   const itemValue = PRODUCT.itemAmount;
   const shippingValue = PRODUCT.shippingAmount;
-  const totalValue = (Number(itemValue) + Number(shippingValue)).toFixed(2);
+  const taxValue = taxQuote.taxAmount;
+  const totalValue = taxQuote.totalAmount;
 
   return {
     intent: "CAPTURE",
@@ -85,9 +48,14 @@ function buildOrderPayload(env) {
             shipping: {
               currency_code: currency,
               value: shippingValue
+            },
+            tax_total: {
+              currency_code: currency,
+              value: taxValue
             }
           }
         },
+        shipping: toPayPalShippingAddress(taxQuote.address),
         items: [
           {
             name: PRODUCT.name,
@@ -98,16 +66,34 @@ function buildOrderPayload(env) {
               currency_code: currency,
               value: itemValue
             },
+            tax: {
+              currency_code: currency,
+              value: taxValue
+            },
             category: "PHYSICAL_GOODS"
           }
         ]
       }
-    ]
+    ],
+    payment_source: {
+      paypal: {
+        experience_context: {
+          shipping_preference: "SET_PROVIDED_ADDRESS",
+          user_action: "PAY_NOW"
+        }
+      }
+    }
   };
 }
 
 export async function onRequestPost(context) {
   try {
+    const body = await context.request.json();
+    const taxQuote = await buildTaxQuote(context.env, body?.shippingAddress || body, {
+      taxableAmount: PRODUCT.itemAmount,
+      shippingAmount: PRODUCT.shippingAmount
+    });
+
     const accessToken = await generateAccessToken(context.env);
     const response = await fetch(`${paypalBaseUrl(context.env.PAYPAL_ENV)}/v2/checkout/orders`, {
       method: "POST",
@@ -116,38 +102,35 @@ export async function onRequestPost(context) {
         "Content-Type": "application/json",
         Prefer: "return=representation"
       },
-      body: JSON.stringify(buildOrderPayload(context.env))
+      body: JSON.stringify(buildOrderPayload(context.env, taxQuote))
     });
 
     const data = await readJsonSafe(response);
 
     if (!response.ok || !data.id) {
-      return new Response(JSON.stringify({
+      return jsonResponse({
         ok: false,
         message: data.message || data.details?.[0]?.description || data.raw || "Could not create the PayPal order.",
         details: data.details || null,
         debug_id: data.debug_id || null
-      }), {
-        status: response.status || 500,
-        headers: JSON_HEADERS
-      });
+      }, response.status || 500);
     }
 
-    return new Response(JSON.stringify({
+    return jsonResponse({
       ok: true,
       id: data.id,
-      status: data.status || null
-    }), {
-      status: 200,
-      headers: JSON_HEADERS
+      status: data.status || null,
+      tax: {
+        amount: taxQuote.taxAmount,
+        rate: taxQuote.taxRate,
+        isColorado: taxQuote.isColorado,
+        jurisdictionCode: taxQuote.jurisdictionCode || null
+      }
     });
   } catch (error) {
-    return new Response(JSON.stringify({
+    return jsonResponse({
       ok: false,
       message: error.message || "Unexpected error while creating the PayPal order."
-    }), {
-      status: 500,
-      headers: JSON_HEADERS
-    });
+    }, 500);
   }
 }
