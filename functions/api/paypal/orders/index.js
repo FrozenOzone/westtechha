@@ -84,7 +84,7 @@ function buildOrderPayload(env) {
             },
             category: "PHYSICAL_GOODS"
           }
-        }
+        ]
       }
     ]
   };
