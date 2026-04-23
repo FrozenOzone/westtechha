@@ -376,6 +376,18 @@ a:hover{ text-decoration:underline; }
 }
 .btn-outline,.btn-ghost,.btn-secondary,.forum-btn-secondary{ border-color:var(--border); color:var(--text); background:var(--button-secondary-bg); }
 .btn-outline:hover,.btn-secondary:hover,.forum-btn-secondary:hover{ background:var(--button-secondary-bg-hover); border-color:var(--accent); color:var(--text); }
+.btn-buy-pop{
+  background: linear-gradient(180deg, #d9a51f 0%, #bf8810 100%);
+  border-color: rgba(255, 214, 102, 0.42);
+  color: #0b1020;
+  box-shadow: 0 12px 26px rgba(191, 136, 16, 0.28);
+}
+.btn-buy-pop:hover,.btn-buy-pop:focus-visible{
+  background: linear-gradient(180deg, #e5b43a 0%, #cb951c 100%);
+  border-color: rgba(255, 224, 140, 0.56);
+  color: #0b1020;
+  box-shadow: 0 16px 30px rgba(191, 136, 16, 0.34);
+}
 button{ font:inherit; }
 form{ display:grid; gap:16px; }
 label{ display:block; margin-bottom:7px; font-weight:650; font-size:0.92rem; }
@@ -2364,6 +2376,21 @@ html[data-theme="light"] .forum-btn-secondary{
   box-shadow: var(--action-link-shadow);
 }
 
+html[data-theme="light"] .btn-buy-pop{
+  background: linear-gradient(180deg, #e0ad2d 0%, #ca8e10 100%);
+  color: #102542;
+  border-color: rgba(181, 118, 0, 0.24);
+  box-shadow: 0 12px 24px rgba(161, 109, 8, 0.16);
+}
+
+html[data-theme="light"] .btn-buy-pop:hover,
+html[data-theme="light"] .btn-buy-pop:focus-visible{
+  background: linear-gradient(180deg, #e8ba47 0%, #d6991b 100%);
+  color: #102542;
+  border-color: rgba(181, 118, 0, 0.34);
+  box-shadow: 0 14px 28px rgba(161, 109, 8, 0.20);
+}
+
 html[data-theme="light"] .btn:hover,
 html[data-theme="light"] .btn-primary:hover,
 html[data-theme="light"] .btn-submit:hover,
@@ -2444,6 +2471,21 @@ html[data-theme="light"] .forum-topic:focus-within{
     color: var(--action-link-text);
     border-color: var(--action-link-border);
     box-shadow: var(--action-link-shadow);
+  }
+
+  html:not([data-theme]) .btn-buy-pop{
+    background: linear-gradient(180deg, #e0ad2d 0%, #ca8e10 100%);
+    color: #102542;
+    border-color: rgba(181, 118, 0, 0.24);
+    box-shadow: 0 12px 24px rgba(161, 109, 8, 0.16);
+  }
+
+  html:not([data-theme]) .btn-buy-pop:hover,
+  html:not([data-theme]) .btn-buy-pop:focus-visible{
+    background: linear-gradient(180deg, #e8ba47 0%, #d6991b 100%);
+    color: #102542;
+    border-color: rgba(181, 118, 0, 0.34);
+    box-shadow: 0 14px 28px rgba(161, 109, 8, 0.20);
   }
 
   html:not([data-theme]) .btn:hover,
