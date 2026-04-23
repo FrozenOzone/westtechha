@@ -1,35 +1,31 @@
 import { generateAccessToken, paypalBaseUrl } from "../../../_lib/paypal.js";
 import { PRODUCT } from "../../../_lib/product.js";
 import { jsonResponse, readJsonSafe, sanitizeEnvValue } from "../../../_lib/shared.js";
-import { buildTaxQuote } from "../../../_lib/tax.js";
 
-function toPayPalShippingAddress(address) {
-  const shipping = {
-    name: {
-      full_name: address.fullName
-    },
-    address: {
-      address_line_1: address.address1,
-      admin_area_2: address.city,
-      admin_area_1: address.state,
-      postal_code: address.postalCode,
-      country_code: address.countryCode
+function baseAmountBreakdown(currency) {
+  return {
+    currency_code: currency,
+    value: (Number(PRODUCT.itemAmount) + Number(PRODUCT.shippingAmount)).toFixed(2),
+    breakdown: {
+      item_total: {
+        currency_code: currency,
+        value: PRODUCT.itemAmount
+      },
+      shipping: {
+        currency_code: currency,
+        value: PRODUCT.shippingAmount
+      },
+      tax_total: {
+        currency_code: currency,
+        value: "0.00"
+      }
     }
   };
-
-  if (address.address2) {
-    shipping.address.address_line_2 = address.address2;
-  }
-
-  return shipping;
 }
 
-function buildOrderPayload(env, taxQuote) {
-  const currency = sanitizeEnvValue(env.PAYPAL_CURRENCY) || PRODUCT.currency;
-  const itemValue = PRODUCT.itemAmount;
-  const shippingValue = PRODUCT.shippingAmount;
-  const taxValue = taxQuote.taxAmount;
-  const totalValue = taxQuote.totalAmount;
+function buildOrderPayload(context) {
+  const currency = sanitizeEnvValue(context.env.PAYPAL_CURRENCY) || PRODUCT.currency;
+  const callbackUrl = new URL("/api/paypal/orders/update-callback", context.request.url).toString();
 
   return {
     intent: "CAPTURE",
@@ -37,25 +33,7 @@ function buildOrderPayload(env, taxQuote) {
       {
         reference_id: PRODUCT.sku,
         description: PRODUCT.description,
-        amount: {
-          currency_code: currency,
-          value: totalValue,
-          breakdown: {
-            item_total: {
-              currency_code: currency,
-              value: itemValue
-            },
-            shipping: {
-              currency_code: currency,
-              value: shippingValue
-            },
-            tax_total: {
-              currency_code: currency,
-              value: taxValue
-            }
-          }
-        },
-        shipping: toPayPalShippingAddress(taxQuote.address),
+        amount: baseAmountBreakdown(currency),
         items: [
           {
             name: PRODUCT.name,
@@ -64,11 +42,11 @@ function buildOrderPayload(env, taxQuote) {
             quantity: PRODUCT.quantity,
             unit_amount: {
               currency_code: currency,
-              value: itemValue
+              value: PRODUCT.itemAmount
             },
             tax: {
               currency_code: currency,
-              value: taxValue
+              value: "0.00"
             },
             category: "PHYSICAL_GOODS"
           }
@@ -78,8 +56,12 @@ function buildOrderPayload(env, taxQuote) {
     payment_source: {
       paypal: {
         experience_context: {
-          shipping_preference: "SET_PROVIDED_ADDRESS",
-          user_action: "PAY_NOW"
+          shipping_preference: "GET_FROM_FILE",
+          user_action: "PAY_NOW",
+          order_update_callback_config: {
+            callback_events: ["SHIPPING_ADDRESS"],
+            callback_url: callbackUrl
+          }
         }
       }
     }
@@ -88,12 +70,6 @@ function buildOrderPayload(env, taxQuote) {
 
 export async function onRequestPost(context) {
   try {
-    const body = await context.request.json();
-    const taxQuote = await buildTaxQuote(context.env, body?.shippingAddress || body, {
-      taxableAmount: PRODUCT.itemAmount,
-      shippingAmount: PRODUCT.shippingAmount
-    });
-
     const accessToken = await generateAccessToken(context.env);
     const response = await fetch(`${paypalBaseUrl(context.env.PAYPAL_ENV)}/v2/checkout/orders`, {
       method: "POST",
@@ -102,7 +78,7 @@ export async function onRequestPost(context) {
         "Content-Type": "application/json",
         Prefer: "return=representation"
       },
-      body: JSON.stringify(buildOrderPayload(context.env, taxQuote))
+      body: JSON.stringify(buildOrderPayload(context))
     });
 
     const data = await readJsonSafe(response);
@@ -119,13 +95,7 @@ export async function onRequestPost(context) {
     return jsonResponse({
       ok: true,
       id: data.id,
-      status: data.status || null,
-      tax: {
-        amount: taxQuote.taxAmount,
-        rate: taxQuote.taxRate,
-        isColorado: taxQuote.isColorado,
-        jurisdictionCode: taxQuote.jurisdictionCode || null
-      }
+      status: data.status || null
     });
   } catch (error) {
     return jsonResponse({

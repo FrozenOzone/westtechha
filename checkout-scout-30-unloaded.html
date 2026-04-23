@@ -15,7 +15,7 @@
   <header class="page-header">
     <div class="eyebrow"><span class="dot"></span>Scout 30 - Unloaded • Secure Checkout</div>
     <h1>Complete your Scout 30 - Unloaded order.</h1>
-    <p class="tagline">This purchase page is designed to feel like a real checkout step: clear product summary, full shipping address collection, Colorado-only tax lookup by destination, and a dedicated PayPal checkout area instead of dropping the customer straight into a popup from the product page.</p>
+    <p class="tagline">PayPal now starts the checkout flow first. Your PayPal shipping address becomes the tax address, the PayPal shipping address, and the shipping label address for the order.</p>
   </header>
 
   <section class="section checkout-layout">
@@ -49,7 +49,7 @@
           <div class="product-label">Order Notes</div>
           <ul class="product-list">
             <li><strong>Shipping:</strong> $8.95 flat rate to the 48 contiguous U.S.</li>
-            <li><strong>Tax:</strong> Colorado orders are calculated by delivery address</li>
+            <li><strong>Tax:</strong> any applicable sales tax is calculated from the shipping address selected in PayPal</li>
             <li><strong>Support:</strong> support@westtechha.com</li>
             <li><strong>Loaded / custom:</strong> use the quote page instead of this checkout path</li>
           </ul>
@@ -58,7 +58,7 @@
 
       <div class="checkout-mini-card">
         <div class="product-label">What happens next</div>
-        <p>Enter the shipping address first so the order summary can show the correct total before payment. Colorado orders will calculate tax by destination. Orders outside Colorado will continue with no sales tax added at checkout.</p>
+        <p>Click PayPal to begin. PayPal will use the shipping address from the buyer's wallet, and that same address will be used to calculate any applicable tax and to create the shipping label for the order.</p>
       </div>
     </article>
 
@@ -68,96 +68,16 @@
       <div class="checkout-summary-lines">
         <div class="checkout-line"><span>Scout 30 - Unloaded</span><strong id="checkout-item-amount">$35.00</strong></div>
         <div class="checkout-line"><span>Flat shipping</span><strong id="checkout-shipping-amount">$8.95</strong></div>
-        <div class="checkout-line checkout-line-note"><span>Tax</span><strong id="checkout-tax-amount">Enter shipping address</strong></div>
+        <div class="checkout-line checkout-line-note"><span>Tax</span><strong id="checkout-tax-amount">Calculated in PayPal</strong></div>
       </div>
       <div class="checkout-total-line">
-        <span>Total</span>
+        <span>Base total before any applicable tax</span>
         <strong id="checkout-total-amount">$43.95</strong>
       </div>
 
       <div class="checkout-mini-card checkout-address-card">
-        <div class="product-label">Shipping address</div>
-        <p class="checkout-mini-note">Colorado orders use the delivery address to calculate tax. Orders outside Colorado stay at $0.00 tax.</p>
-        <form id="checkout-address-form" class="checkout-address-form" novalidate>
-          <div class="checkout-field-grid">
-            <label class="checkout-field checkout-field-full">
-              <span>Full name</span>
-              <input id="ship-full-name" name="fullName" type="text" autocomplete="shipping name" required/>
-            </label>
-            <label class="checkout-field checkout-field-full">
-              <span>Address line 1</span>
-              <input id="ship-address1" name="address1" type="text" autocomplete="shipping address-line1" required/>
-            </label>
-            <label class="checkout-field checkout-field-full">
-              <span>Address line 2 <em>(optional)</em></span>
-              <input id="ship-address2" name="address2" type="text" autocomplete="shipping address-line2"/>
-            </label>
-            <label class="checkout-field">
-              <span>City</span>
-              <input id="ship-city" name="city" type="text" autocomplete="shipping address-level2" required/>
-            </label>
-            <label class="checkout-field">
-              <span>State</span>
-              <select id="ship-state" name="state" autocomplete="shipping address-level1" required>
-                <option value="">Select</option>
-                <option value="AL">Alabama</option>
-                <option value="AZ">Arizona</option>
-                <option value="AR">Arkansas</option>
-                <option value="CA">California</option>
-                <option value="CO">Colorado</option>
-                <option value="CT">Connecticut</option>
-                <option value="DE">Delaware</option>
-                <option value="DC">District of Columbia</option>
-                <option value="FL">Florida</option>
-                <option value="GA">Georgia</option>
-                <option value="ID">Idaho</option>
-                <option value="IL">Illinois</option>
-                <option value="IN">Indiana</option>
-                <option value="IA">Iowa</option>
-                <option value="KS">Kansas</option>
-                <option value="KY">Kentucky</option>
-                <option value="LA">Louisiana</option>
-                <option value="ME">Maine</option>
-                <option value="MD">Maryland</option>
-                <option value="MA">Massachusetts</option>
-                <option value="MI">Michigan</option>
-                <option value="MN">Minnesota</option>
-                <option value="MS">Mississippi</option>
-                <option value="MO">Missouri</option>
-                <option value="MT">Montana</option>
-                <option value="NE">Nebraska</option>
-                <option value="NV">Nevada</option>
-                <option value="NH">New Hampshire</option>
-                <option value="NJ">New Jersey</option>
-                <option value="NM">New Mexico</option>
-                <option value="NY">New York</option>
-                <option value="NC">North Carolina</option>
-                <option value="ND">North Dakota</option>
-                <option value="OH">Ohio</option>
-                <option value="OK">Oklahoma</option>
-                <option value="OR">Oregon</option>
-                <option value="PA">Pennsylvania</option>
-                <option value="RI">Rhode Island</option>
-                <option value="SC">South Carolina</option>
-                <option value="SD">South Dakota</option>
-                <option value="TN">Tennessee</option>
-                <option value="TX">Texas</option>
-                <option value="UT">Utah</option>
-                <option value="VT">Vermont</option>
-                <option value="VA">Virginia</option>
-                <option value="WA">Washington</option>
-                <option value="WV">West Virginia</option>
-                <option value="WI">Wisconsin</option>
-                <option value="WY">Wyoming</option>
-              </select>
-            </label>
-            <label class="checkout-field">
-              <span>ZIP code</span>
-              <input id="ship-postal-code" name="postalCode" type="text" inputmode="numeric" autocomplete="shipping postal-code" required/>
-            </label>
-          </div>
-          <button type="submit" class="btn btn-primary checkout-tax-button">Calculate total</button>
-        </form>
+        <div class="product-label">Shipping and tax address</div>
+        <p class="checkout-mini-note">PayPal starts the checkout flow using the buyer's saved shipping address. That address becomes the tax address, the PayPal shipping address, and the shipping label address for this order. If the address needs to be changed, the buyer should change it in PayPal before paying.</p>
       </div>
 
       <div class="checkout-paypal-shell">
@@ -168,14 +88,14 @@
           </div>
           <span class="checkout-security-pill">PayPal</span>
         </div>
-        <p class="checkout-mini-note">Complete the shipping address step first. The PayPal order will use the same address and lock the final total before approval.</p>
+        <p class="checkout-mini-note">When PayPal opens, the buyer should confirm the shipping address first. Any applicable tax is then calculated from that address before the order is paid.</p>
         <div id="paypal-button-container" class="paypal-button-container is-hidden"></div>
-        <p id="paypal-status" class="checkout-status">Enter the shipping address and calculate the total before PayPal checkout is enabled.</p>
+        <p id="paypal-status" class="checkout-status">Loading secure PayPal checkout…</p>
       </div>
 
       <div class="checkout-policy-list">
         <p><strong>Shipping:</strong> Flat-rate shipping is used for the 48 contiguous U.S. on standard ready-to-ship products.</p>
-        <p><strong>Sales tax:</strong> Colorado orders are calculated by destination address. Orders outside Colorado are not charged sales tax at checkout.</p>
+        <p><strong>Sales tax:</strong> Any applicable sales tax is calculated from the shipping address selected in PayPal.</p>
         <p><strong>Questions before ordering?</strong> <a href="support.html">Visit Support</a> or <a href="contact.html">Contact us</a>.</p>
         <p><strong>Need Loaded or custom instead?</strong> <a href="order.html">Request a quote</a>.</p>
       </div>

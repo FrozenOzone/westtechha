@@ -52,9 +52,6 @@ export function validateShippingAddress(input) {
     countryCode: normalizeCountryCode(input?.countryCode)
   };
 
-  if (!address.fullName) {
-    throw new Error("Enter the full name for the shipping address.");
-  }
   if (!address.address1) {
     throw new Error("Enter the street address.");
   }
