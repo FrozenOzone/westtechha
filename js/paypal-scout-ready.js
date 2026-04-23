@@ -2,7 +2,7 @@
   const CONFIG_ENDPOINT = "/api/paypal/config";
   const CREATE_ORDER_ENDPOINT = "/api/paypal/orders";
   const CAPTURE_ORDER_ENDPOINT = "/api/paypal/orders/{orderID}/capture";
-  const SUCCESS_URL = "thank-you.html";
+  const SUCCESS_URL = "order-thank-you.html";
 
   const status = document.getElementById("paypal-status");
   const container = document.getElementById("paypal-button-container");
@@ -76,7 +76,7 @@
               "Content-Type": "application/json"
             },
             body: JSON.stringify({
-              sku: "scout-30-ready",
+              sku: "scout-30-unloaded",
               quantity: 1
             })
           });

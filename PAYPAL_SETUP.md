@@ -1,4 +1,4 @@
-# PayPal setup for Scout 30 - Ready
+# PayPal setup for Scout 30 - Unloaded
 
 This site is wired for PayPal Standard Checkout using Cloudflare Pages Functions.
 
@@ -26,7 +26,7 @@ Set these in **Workers & Pages -> your Pages project -> Settings -> Variables an
 - `js/paypal-scout-ready.js`
 
 ## Current pricing logic
-The server is authoritative for Scout 30 - Ready:
+The server is authoritative for Scout 30 - Unloaded:
 - Product: $35.00
 - Shipping: $8.95
 - Tax: not yet calculated in the server order payload

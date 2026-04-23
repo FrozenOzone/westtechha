@@ -4,9 +4,9 @@ const JSON_HEADERS = {
 };
 
 const PRODUCT = Object.freeze({
-  sku: "scout-30-ready",
-  name: "Scout 30 - Ready",
-  description: "Scout family launch product with 30-pin ready layout.",
+  sku: "scout-30-unloaded",
+  name: "Scout 30 - Unloaded",
+  description: "Scout family launch product with 30-pin unloaded layout.",
   quantity: "1",
   itemAmount: "35.00",
   shippingAmount: "8.95",
