@@ -100,6 +100,12 @@ async function fetchColoradoRate(env, address) {
     }
   }
 
+  console.log("[tax.fetchColoradoRate] request", JSON.stringify({
+    hasApiKey: Boolean(apiKey),
+    hasProductServiceId: Boolean(productServiceId),
+    payload
+  }));
+
   const response = await fetch("https://api.ttr.services/v1/automation.rates.list", {
     method: "POST",
     headers: {
@@ -111,6 +117,15 @@ async function fetchColoradoRate(env, address) {
   });
 
   const data = await readJsonSafe(response);
+  console.log("[tax.fetchColoradoRate] response", JSON.stringify({
+    status: response.status,
+    ok: response.ok,
+    message: data.message || data.error || data.raw || null,
+    jurisdictionCode: data.jurisdictionCode || null,
+    totalSalesTax: data.totalSalesTax ?? null,
+    address: data.address || null,
+    salesTaxCount: Array.isArray(data.salesTax) ? data.salesTax.length : 0
+  }));
 
   if (!response.ok) {
     const detail = data.message || data.error || data.raw || "Colorado tax lookup failed.";
@@ -132,6 +147,13 @@ async function fetchColoradoRate(env, address) {
 }
 
 export async function buildTaxQuote(env, inputAddress, options = {}) {
+  console.log("[tax.buildTaxQuote] start", JSON.stringify({
+    hasGisKey: Boolean(sanitizeEnvValue(env.CO_GIS_API_KEY)),
+    hasProductServiceId: Boolean(sanitizeEnvValue(env.CO_GIS_PRODUCT_SERVICE_ID)),
+    inputAddress,
+    options
+  }));
+
   const address = validateShippingAddress(inputAddress);
   const taxableAmount = Number(options.taxableAmount ?? PRODUCT.itemAmount);
   const shippingAmount = Number(options.shippingAmount ?? PRODUCT.shippingAmount);
@@ -165,7 +187,7 @@ export async function buildTaxQuote(env, inputAddress, options = {}) {
   const subtotal = Number((taxableAmount + shippingAmount).toFixed(2));
   const totalAmount = Number((subtotal + taxAmount).toFixed(2));
 
-  return {
+  const quote = {
     supported: true,
     isColorado,
     source,
@@ -181,4 +203,19 @@ export async function buildTaxQuote(env, inputAddress, options = {}) {
     totalAmount: totalAmount.toFixed(2),
     salesTax
   };
+
+  console.log("[tax.buildTaxQuote] result", JSON.stringify({
+    source: quote.source,
+    isColorado: quote.isColorado,
+    apiAddress: quote.apiAddress,
+    jurisdictionCode: quote.jurisdictionCode,
+    productService: quote.productService,
+    taxRate: quote.taxRate,
+    taxAmount: quote.taxAmount,
+    subtotal: quote.subtotal,
+    totalAmount: quote.totalAmount,
+    salesTaxCount: Array.isArray(quote.salesTax) ? quote.salesTax.length : 0
+  }));
+
+  return quote;
 }

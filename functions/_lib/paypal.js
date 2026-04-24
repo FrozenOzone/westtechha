@@ -9,6 +9,14 @@ export function paypalBaseUrl(envValue) {
 export async function generateAccessToken(env) {
   const clientId = sanitizeEnvValue(env.PAYPAL_CLIENT_ID);
   const clientSecret = sanitizeEnvValue(env.PAYPAL_CLIENT_SECRET);
+  const envName = (sanitizeEnvValue(env.PAYPAL_ENV) || "sandbox").toLowerCase();
+
+  console.log("[paypal.generateAccessToken] start", JSON.stringify({
+    env: envName,
+    hasClientId: Boolean(clientId),
+    hasClientSecret: Boolean(clientSecret),
+    baseUrl: paypalBaseUrl(envName)
+  }));
 
   if (!clientId || !clientSecret) {
     throw new Error("Missing PAYPAL_CLIENT_ID or PAYPAL_CLIENT_SECRET environment variable.");
@@ -26,6 +34,14 @@ export async function generateAccessToken(env) {
   });
 
   const data = await readJsonSafe(response);
+  console.log("[paypal.generateAccessToken] response", JSON.stringify({
+    status: response.status,
+    ok: response.ok,
+    hasAccessToken: Boolean(data.access_token),
+    error: data.error || null,
+    errorDescription: data.error_description || null,
+    message: data.message || data.raw || null
+  }));
 
   if (!response.ok || !data.access_token) {
     const detail = data.error_description || data.error || data.message || data.raw || "Failed to generate PayPal access token.";
