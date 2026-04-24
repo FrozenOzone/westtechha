@@ -1,5 +1,5 @@
 import { generateAccessToken, paypalBaseUrl } from "../../../_lib/paypal.js";
-import { getProduct, PRODUCT } from "../../../_lib/product.js";
+import { buildCheckoutProduct, PRODUCT } from "../../../_lib/product.js";
 import { allocateInvoiceId, createInitialOrderRecord, requireOrdersDb, setPayPalCreateFailed, setPayPalOrderCreated } from "../../../_lib/orders.js";
 import { jsonResponse, readJsonSafe, sanitizeEnvValue } from "../../../_lib/shared.js";
 
@@ -44,11 +44,7 @@ function buildOrderPayload(context, product, orderMeta) {
             quantity: product.quantity,
             unit_amount: {
               currency_code: currency,
-              value: product.itemAmount
-            },
-            tax: {
-              currency_code: currency,
-              value: "0.00"
+              value: product.unitAmount
             },
             category: "PHYSICAL_GOODS"
           }
@@ -76,10 +72,15 @@ export async function onRequestPost(context) {
   try {
     const body = await context.request.json().catch(() => ({}));
     const requestedSku = sanitizeEnvValue(body?.sku) || PRODUCT.sku;
-    const product = getProduct(requestedSku);
+    const requestedQuantity = sanitizeEnvValue(body?.quantity) || "1";
+    const product = buildCheckoutProduct(requestedSku, requestedQuantity);
 
-    if (!product) {
+    if (!product || !product.sku) {
       return jsonResponse({ ok: false, message: `Unknown product SKU: ${requestedSku}` }, 400);
+    }
+
+    if (product.customQuoteOnly) {
+      return jsonResponse({ ok: false, message: "Direct checkout is available for quantities 1 through 4 only. Please use the custom / email order path for 5+ units." }, 400);
     }
 
     const ordersDb = requireOrdersDb(context.env);
@@ -94,19 +95,6 @@ export async function onRequestPost(context) {
     const payload = buildOrderPayload(context, product, orderMeta);
     payload.payment_source.paypal.experience_context.cancel_url = new URL(checkoutPathForProduct(product), context.request.url).toString();
 
-    console.log("[paypal.orders.create] start", JSON.stringify({
-      env: (sanitizeEnvValue(context.env.PAYPAL_ENV) || "sandbox").toLowerCase(),
-      currency: sanitizeEnvValue(context.env.PAYPAL_CURRENCY) || product.currency,
-      hasClientId: Boolean(sanitizeEnvValue(context.env.PAYPAL_CLIENT_ID)),
-      hasClientSecret: Boolean(sanitizeEnvValue(context.env.PAYPAL_CLIENT_SECRET)),
-      shippingPreference: payload.payment_source?.paypal?.experience_context?.shipping_preference || null,
-      userAction: payload.payment_source?.paypal?.experience_context?.user_action || null,
-      sku: product.sku,
-      invoiceId: orderMeta.invoiceId,
-      customId: product.sku,
-      baseValue: payload.purchase_units?.[0]?.amount?.value || null
-    }));
-
     const accessToken = await generateAccessToken(context.env);
     const response = await fetch(`${paypalBaseUrl(context.env.PAYPAL_ENV)}/v2/checkout/orders`, {
       method: "POST",
@@ -119,18 +107,9 @@ export async function onRequestPost(context) {
     });
 
     const data = await readJsonSafe(response);
-    console.log("[paypal.orders.create] paypal-response", JSON.stringify({
-      status: response.status,
-      ok: response.ok,
-      id: data.id || null,
-      orderStatus: data.status || null,
-      debugId: data.debug_id || null,
-      message: data.message || data.details?.[0]?.description || null,
-      links: Array.isArray(data.links) ? data.links.map((link) => ({ rel: link.rel, href: link.href, method: link.method })) : []
-    }));
 
     if (!response.ok || !data.id) {
-      await setPayPalCreateFailed(ordersDb, { invoiceId: orderMeta.invoiceId }).catch((error) => console.log("[paypal.orders.create] d1-failed-status-error", JSON.stringify({ message: error.message })));
+      await setPayPalCreateFailed(ordersDb, { invoiceId: orderMeta.invoiceId }).catch(() => {});
       return jsonResponse({
         ok: false,
         message: data.message || data.details?.[0]?.description || data.raw || "Could not create the PayPal order.",
@@ -146,14 +125,11 @@ export async function onRequestPost(context) {
       id: data.id,
       status: data.status || null,
       sku: product.sku,
+      quantity: product.quantity,
       invoiceId: orderMeta.invoiceId,
       customId: product.sku
     });
   } catch (error) {
-    console.log("[paypal.orders.create] error", JSON.stringify({ message: error.message || "Unknown error" }));
-    return jsonResponse({
-      ok: false,
-      message: error.message || "Unexpected error while creating the PayPal order."
-    }, 500);
+    return jsonResponse({ ok: false, message: error.message || "Unexpected error while creating the PayPal order." }, 500);
   }
 }

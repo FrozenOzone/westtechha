@@ -1,5 +1,5 @@
 import { generateAccessToken, paypalBaseUrl } from "../../../../_lib/paypal.js";
-import { getProduct, PRODUCT } from "../../../../_lib/product.js";
+import { buildCheckoutProduct, PRODUCT } from "../../../../_lib/product.js";
 import { requireOrdersDb, updateOrderForColorado } from "../../../../_lib/orders.js";
 import { buildTaxQuote, validateShippingAddress } from "../../../../_lib/tax.js";
 import { jsonResponse, readJsonSafe, sanitizeEnvValue } from "../../../../_lib/shared.js";
@@ -28,8 +28,7 @@ function patchBody(referenceId, quote, currency, shippingAddress, product) {
           sku: product.sku,
           description: product.description,
           quantity: product.quantity,
-          unit_amount: { currency_code: currency, value: product.itemAmount },
-          tax: { currency_code: currency, value: quote.taxAmount },
+          unit_amount: { currency_code: currency, value: product.unitAmount },
           category: "PHYSICAL_GOODS"
         }
       ]
@@ -65,10 +64,15 @@ export async function onRequestPost(context) {
   try {
     const body = await context.request.json();
     const requestedSku = sanitizeEnvValue(body?.sku) || PRODUCT.sku;
-    const product = getProduct(requestedSku);
+    const requestedQuantity = sanitizeEnvValue(body?.quantity) || "1";
+    const product = buildCheckoutProduct(requestedSku, requestedQuantity);
 
-    if (!product) {
+    if (!product || !product.sku) {
       return jsonResponse({ ok: false, message: `Unknown product SKU: ${requestedSku}` }, 400);
+    }
+
+    if (product.customQuoteOnly) {
+      return jsonResponse({ ok: false, message: "Direct checkout is available for quantities 1 through 4 only." }, 400);
     }
 
     const shippingAddress = validateShippingAddress({
@@ -95,14 +99,6 @@ export async function onRequestPost(context) {
     const accessToken = await generateAccessToken(context.env);
     const patch = patchBody(referenceId, quote, currency, shippingAddress, product);
 
-    console.log("[paypal.orders.prepare-colorado] patch-request", JSON.stringify({
-      orderID,
-      sku: product.sku,
-      shippingAddress,
-      quote: { taxAmount: quote.taxAmount, totalAmount: quote.totalAmount },
-      patch
-    }));
-
     const response = await fetch(`${paypalBaseUrl(context.env.PAYPAL_ENV)}/v2/checkout/orders/${encodeURIComponent(orderID)}`, {
       method: "PATCH",
       headers: {
@@ -113,11 +109,6 @@ export async function onRequestPost(context) {
     });
 
     const data = await readJsonSafe(response);
-    console.log("[paypal.orders.prepare-colorado] patch-response", JSON.stringify({
-      status: response.status,
-      ok: response.ok,
-      data
-    }));
 
     if (!response.ok) {
       return jsonResponse({
@@ -131,7 +122,7 @@ export async function onRequestPost(context) {
     const ordersDb = requireOrdersDb(context.env);
     await updateOrderForColorado(ordersDb, { paypalOrderId: orderID, quote, shippingAddress });
 
-    return jsonResponse({ ok: true, quote, shippingAddress, sku: product.sku });
+    return jsonResponse({ ok: true, quote, shippingAddress, sku: product.sku, quantity: product.quantity });
   } catch (error) {
     return jsonResponse({ ok: false, message: error.message || "Unexpected error while preparing the Colorado order." }, 500);
   }

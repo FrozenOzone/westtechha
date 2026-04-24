@@ -6,6 +6,7 @@
   const PREPARE_COLORADO_ENDPOINT = "/api/paypal/orders/{orderID}/prepare-colorado";
   const CAPTURE_ORDER_ENDPOINT = "/api/paypal/orders/{orderID}/capture";
   const SUCCESS_URL = "order-thank-you.html";
+  const CUSTOM_QUOTE_MIN_QUANTITY = 5;
 
   const checkoutConfig = window.WESTTECH_CHECKOUT || {};
   let PRODUCT = {
@@ -13,18 +14,30 @@
     name: checkoutConfig.name || "Loading product…",
     layout: checkoutConfig.layout || "",
     family: checkoutConfig.family || "",
+    unitAmount: 0,
     itemAmount: 0,
-    shippingAmount: 0
+    shippingAmount: 0,
+    shippingTierSummary: "",
+    customQuoteOnly: false,
+    customQuoteMinQuantity: CUSTOM_QUOTE_MIN_QUANTITY
   };
 
   const status = document.getElementById("paypal-status");
   const container = document.getElementById("paypal-button-container");
+  const paypalShell = document.querySelector(".checkout-paypal-shell");
   const itemAmountEl = document.getElementById("checkout-item-amount");
   const shippingAmountEl = document.getElementById("checkout-shipping-amount");
   const taxAmountEl = document.getElementById("checkout-tax-amount");
   const totalAmountEl = document.getElementById("checkout-total-amount");
   const totalLabelEl = document.getElementById("checkout-total-label");
   const totalLineEl = document.getElementById("checkout-total-line");
+  const unitAmountEl = document.getElementById("checkout-unit-amount");
+  const quantityDisplayEl = document.getElementById("checkout-quantity-display");
+  const quantitySelect = document.getElementById("checkout-quantity");
+  const shippingTierNoteEl = document.getElementById("checkout-shipping-tier-note");
+  const customCard = document.getElementById("checkout-custom-order-card");
+  const customEmailLink = document.getElementById("checkout-custom-email-link");
+  const customOrderLink = document.getElementById("checkout-custom-order-link");
   const coloradoCard = document.getElementById("checkout-colorado-card");
   const coloradoForm = document.getElementById("checkout-colorado-form");
   const coloradoSummary = document.getElementById("checkout-colorado-summary");
@@ -40,7 +53,7 @@
   const coloradoCompleteBtn = document.getElementById("co-complete-button");
   const invoiceIdEl = document.getElementById("co-invoice-id");
 
-  if (!status || !container || !itemAmountEl || !shippingAmountEl || !taxAmountEl || !totalAmountEl || !totalLabelEl || !totalLineEl || !coloradoCard || !coloradoForm || !coloradoSummary || !coloradoResult || !coloradoVerifyWrap || !coloradoChangeNote || !coloradoVerifyCheckbox || !resultItemEl || !resultShippingEl || !resultTaxEl || !resultTotalEl || !coloradoCompleteBtn) return;
+  if (!status || !container || !itemAmountEl || !shippingAmountEl || !taxAmountEl || !totalAmountEl || !totalLabelEl || !totalLineEl || !coloradoCard || !coloradoForm || !coloradoSummary || !coloradoResult || !coloradoVerifyWrap || !coloradoChangeNote || !coloradoVerifyCheckbox || !resultItemEl || !resultShippingEl || !resultTaxEl || !resultTotalEl || !coloradoCompleteBtn || !quantitySelect || !customCard) return;
 
   let coloradoCompleteNote = document.getElementById("co-complete-note");
   if (!coloradoCompleteNote) {
@@ -66,15 +79,38 @@
     pendingOrderId: null,
     pendingOrderDetails: null,
     pendingQuote: null,
-    pendingInvoiceId: null
+    pendingInvoiceId: null,
+    quantity: 1
   };
 
   function formatMoney(value) {
     return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(value || 0));
   }
 
-  function baseTotal() {
-    return PRODUCT.itemAmount + PRODUCT.shippingAmount;
+  function currentQuantity() {
+    const raw = quantitySelect ? quantitySelect.value : String(state.quantity || 1);
+    if (raw === "5+") return 5;
+    const parsed = Number.parseInt(raw, 10);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+  }
+
+  function isCustomQuantity(quantity) {
+    return Number(quantity || 0) >= Number(PRODUCT.customQuoteMinQuantity || CUSTOM_QUOTE_MIN_QUANTITY);
+  }
+
+  function shippingForQuantity(quantity) {
+    if (quantity === 1) return 8.95;
+    if (quantity === 2) return 10.95;
+    if (quantity === 3 || quantity === 4) return 14.95;
+    return null;
+  }
+
+  function itemSubtotal(quantity) {
+    return Number(PRODUCT.unitAmount || 0) * Number(quantity || 1);
+  }
+
+  function orderDisplayName(quantity) {
+    return quantity > 1 ? `${PRODUCT.name} × ${quantity}` : PRODUCT.name;
   }
 
   function updateInvoiceIdDisplay() {
@@ -82,25 +118,11 @@
     invoiceIdEl.textContent = state.pendingInvoiceId || "Pending…";
   }
 
-  function resetBaseSummary() {
-    taxAmountEl.textContent = "Finalized during checkout";
-    totalLabelEl.textContent = "Base total before any applicable tax";
-    totalAmountEl.textContent = formatMoney(baseTotal());
-    totalLineEl.classList.remove("is-final");
-    coloradoSummary.classList.add("is-hidden");
-    coloradoResult.classList.add("is-hidden");
-    coloradoChangeNote.classList.add("is-hidden");
-    coloradoVerifyWrap.classList.add("is-hidden");
-    coloradoVerifyCheckbox.checked = false;
-    coloradoCompleteBtn.classList.add("is-hidden");
-    coloradoCompleteBtn.disabled = true;
-    coloradoCompleteNote.classList.add("is-hidden");
-    coloradoCompleteNote.textContent = "";
-    resultItemEl.textContent = formatMoney(PRODUCT.itemAmount);
-    resultShippingEl.textContent = formatMoney(PRODUCT.shippingAmount);
-    resultTaxEl.textContent = formatMoney(0);
-    resultTotalEl.textContent = formatMoney(baseTotal());
-    if (resultItemNameEl) resultItemNameEl.textContent = PRODUCT.name;
+  function resetPendingOrderState() {
+    state.pendingOrderId = null;
+    state.pendingOrderDetails = null;
+    state.pendingQuote = null;
+    state.pendingInvoiceId = null;
     updateInvoiceIdDisplay();
   }
 
@@ -117,32 +139,88 @@
     });
   }
 
-  function normalizeProduct(product) {
-    return {
-      sku: product.sku || PRODUCT.sku,
-      name: product.name || PRODUCT.name,
-      layout: product.layout || PRODUCT.layout,
-      family: product.family || PRODUCT.family,
-      itemAmount: Number(product.itemAmount || 0),
-      shippingAmount: Number(product.shippingAmount || 0)
-    };
-  }
-
   function applyProductToPage() {
-    itemAmountEl.textContent = formatMoney(PRODUCT.itemAmount);
-    shippingAmountEl.textContent = formatMoney(PRODUCT.shippingAmount);
     const itemNameEls = document.querySelectorAll("[data-checkout-product-name]");
-    itemNameEls.forEach((el) => { el.textContent = PRODUCT.name; });
-    if (resultItemNameEl) resultItemNameEl.textContent = PRODUCT.name;
-    updateInvoiceIdDisplay();
+    itemNameEls.forEach((el) => { el.textContent = orderDisplayName(currentQuantity()); });
+    if (resultItemNameEl) resultItemNameEl.textContent = orderDisplayName(currentQuantity());
+    if (shippingTierNoteEl) shippingTierNoteEl.textContent = PRODUCT.shippingTierSummary || "Shipping tiers apply by quantity.";
+    if (unitAmountEl) unitAmountEl.textContent = formatMoney(PRODUCT.unitAmount || PRODUCT.itemAmount);
   }
 
   async function loadProductConfig() {
     const endpoint = PRODUCT_ENDPOINT.replace("{sku}", encodeURIComponent(PRODUCT.sku));
-    const data = await fetchJson(endpoint, { method: "GET", headers: { "Content-Type": "application/json" } });
+    const data = await fetchJson(`${endpoint}?quantity=${encodeURIComponent(String(currentQuantity()))}`, { method: "GET", headers: { "Content-Type": "application/json" } });
     if (!data.product) throw new Error("Could not load product pricing.");
-    PRODUCT = normalizeProduct(data.product);
+    PRODUCT = {
+      sku: data.product.sku,
+      name: data.product.name,
+      layout: data.product.layout,
+      family: data.product.family,
+      unitAmount: Number(data.product.unitAmount || data.product.itemAmount || 0),
+      itemAmount: Number(data.product.itemAmount || 0),
+      shippingAmount: Number(data.product.shippingAmount || 0),
+      shippingTierSummary: data.product.shippingTierSummary || "",
+      customQuoteOnly: Boolean(data.product.customQuoteOnly),
+      customQuoteMinQuantity: Number(data.product.customQuoteMinQuantity || CUSTOM_QUOTE_MIN_QUANTITY)
+    };
     applyProductToPage();
+  }
+
+  function resetColoradoState() {
+    coloradoCard.classList.add("is-hidden");
+    coloradoSummary.classList.add("is-hidden");
+    coloradoResult.classList.add("is-hidden");
+    coloradoChangeNote.classList.add("is-hidden");
+    coloradoVerifyWrap.classList.add("is-hidden");
+    coloradoVerifyWrap.classList.remove("is-attention");
+    coloradoVerifyCheckbox.checked = false;
+    coloradoCompleteBtn.classList.add("is-hidden");
+    coloradoCompleteBtn.disabled = true;
+    coloradoCompleteNote.classList.add("is-hidden");
+    coloradoCompleteNote.textContent = "";
+  }
+
+  function updateSummaryFromQuantity() {
+    const quantity = currentQuantity();
+    state.quantity = quantity;
+    const custom = isCustomQuantity(quantity);
+    const itemTotal = itemSubtotal(quantity);
+    const shipping = shippingForQuantity(quantity);
+
+    applyProductToPage();
+    if (quantityDisplayEl) quantityDisplayEl.textContent = custom ? "5+" : String(quantity);
+    itemAmountEl.textContent = formatMoney(itemTotal);
+
+    if (custom) {
+      shippingAmountEl.textContent = "Custom quote required";
+      taxAmountEl.textContent = "Quoted during custom order";
+      totalLabelEl.textContent = "Direct checkout is available for quantities 1 through 4";
+      totalAmountEl.textContent = "Use custom / email order";
+      totalLineEl.classList.remove("is-final");
+      if (paypalShell) paypalShell.classList.add("is-hidden");
+      customCard.classList.remove("is-hidden");
+      resetColoradoState();
+      setStatus("For 5+ units, use the custom / email order path so we can quote shipping correctly.");
+      if (customEmailLink) {
+        const subject = encodeURIComponent(`${PRODUCT.name} - ${quantity}+ unit custom order`);
+        const body = encodeURIComponent(`Hi WestTech Home Automation,
+
+I would like to order ${quantity}+ units of ${PRODUCT.name}. Please send me a shipping quote and next steps.
+`);
+        customEmailLink.href = `mailto:orders@westtechha.com?subject=${subject}&body=${body}`;
+      }
+      return;
+    }
+
+    shippingAmountEl.textContent = formatMoney(shipping);
+    taxAmountEl.textContent = "Finalized during checkout";
+    totalLabelEl.textContent = "Base total before any applicable tax";
+    totalAmountEl.textContent = formatMoney(itemTotal + shipping);
+    totalLineEl.classList.remove("is-final");
+    if (paypalShell) paypalShell.classList.remove("is-hidden");
+    customCard.classList.add("is-hidden");
+    resetColoradoState();
+    setStatus("PayPal is ready. Quantity-based shipping is now applied to this order.");
   }
 
   function loadPayPalSdk(clientId, currency) {
@@ -162,49 +240,6 @@
       script.onerror = reject;
       document.head.appendChild(script);
     });
-  }
-
-  async function showColoradoFallback(details) {
-    coloradoCard.classList.remove("is-hidden");
-    resetBaseSummary();
-    state.pendingQuote = null;
-    fields.fullName.value = details.fullName || "";
-    fields.address1.value = details.address1 || "";
-    fields.address2.value = details.address2 || "";
-    fields.city.value = details.city || "";
-    fields.state.value = details.state || "CO";
-    fields.postalCode.value = details.postalCode || "";
-    setStatus("Colorado address detected. Reviewing the address and calculating the final total now.");
-    await calculateColoradoQuote();
-  }
-
-  function updateSummaryFromQuote(quote) {
-    taxAmountEl.textContent = formatMoney(quote.taxAmount);
-    totalLabelEl.textContent = "Final total including Colorado tax";
-    totalAmountEl.textContent = formatMoney(quote.totalAmount);
-    totalLineEl.classList.add("is-final");
-    coloradoSummary.classList.remove("is-hidden");
-    coloradoSummary.textContent = `Colorado tax: ${formatMoney(quote.taxAmount)} • Final total: ${formatMoney(quote.totalAmount)}`;
-    coloradoResult.classList.remove("is-hidden");
-    resultItemEl.textContent = formatMoney(PRODUCT.itemAmount);
-    resultShippingEl.textContent = formatMoney(PRODUCT.shippingAmount);
-    resultTaxEl.textContent = formatMoney(quote.taxAmount);
-    resultTotalEl.textContent = formatMoney(quote.totalAmount);
-    if (resultItemNameEl) resultItemNameEl.textContent = PRODUCT.name;
-    updateInvoiceIdDisplay();
-  }
-
-  function currentColoradoAddress() {
-    return {
-      fullName: fields.fullName.value.trim(),
-      address1: fields.address1.value.trim(),
-      address2: fields.address2.value.trim(),
-      city: fields.city.value.trim(),
-      state: fields.state.value.trim(),
-      postalCode: fields.postalCode.value.trim(),
-      countryCode: "US",
-      sku: PRODUCT.sku
-    };
   }
 
   async function ensurePayPalReady() {
@@ -227,6 +262,49 @@
     window.location.href = SUCCESS_URL;
   }
 
+  async function showColoradoFallback(details) {
+    coloradoCard.classList.remove("is-hidden");
+    state.pendingQuote = null;
+    fields.fullName.value = details.fullName || "";
+    fields.address1.value = details.address1 || "";
+    fields.address2.value = details.address2 || "";
+    fields.city.value = details.city || "";
+    fields.state.value = details.state || "CO";
+    fields.postalCode.value = details.postalCode || "";
+    setStatus("Colorado address detected. Reviewing the address and calculating the final total now.");
+    await calculateColoradoQuote();
+  }
+
+  function updateSummaryFromQuote(quote) {
+    taxAmountEl.textContent = formatMoney(quote.taxAmount);
+    totalLabelEl.textContent = "Final total including Colorado tax";
+    totalAmountEl.textContent = formatMoney(quote.totalAmount);
+    totalLineEl.classList.add("is-final");
+    coloradoSummary.classList.remove("is-hidden");
+    coloradoSummary.textContent = `Colorado tax: ${formatMoney(quote.taxAmount)} • Final total: ${formatMoney(quote.totalAmount)}`;
+    coloradoResult.classList.remove("is-hidden");
+    resultItemEl.textContent = formatMoney(itemSubtotal(currentQuantity()));
+    resultShippingEl.textContent = formatMoney(shippingForQuantity(currentQuantity()));
+    resultTaxEl.textContent = formatMoney(quote.taxAmount);
+    resultTotalEl.textContent = formatMoney(quote.totalAmount);
+    if (resultItemNameEl) resultItemNameEl.textContent = orderDisplayName(currentQuantity());
+    updateInvoiceIdDisplay();
+  }
+
+  function currentColoradoAddress() {
+    return {
+      fullName: fields.fullName.value.trim(),
+      address1: fields.address1.value.trim(),
+      address2: fields.address2.value.trim(),
+      city: fields.city.value.trim(),
+      state: fields.state.value.trim(),
+      postalCode: fields.postalCode.value.trim(),
+      countryCode: "US",
+      sku: PRODUCT.sku,
+      quantity: String(currentQuantity())
+    };
+  }
+
   async function handleApproval(orderID) {
     const detailsEndpoint = ORDER_DETAILS_ENDPOINT.replace("{orderID}", encodeURIComponent(orderID));
     const details = await fetchJson(detailsEndpoint, { method: "GET", headers: { "Content-Type": "application/json" } });
@@ -245,14 +323,8 @@
   }
 
   function paypalButtonStyle() {
-    return {
-      shape: "rect",
-      layout: "vertical",
-      label: "paypal",
-      color: "gold"
-    };
+    return { shape: "rect", layout: "vertical", label: "paypal", color: "gold" };
   }
-
 
   function clearVerifyPrompt() {
     coloradoVerifyWrap.classList.remove("is-attention");
@@ -267,9 +339,7 @@
     coloradoCompleteNote.textContent = "Please check the box above to verify this shipping address before completing the order.";
     coloradoCompleteNote.classList.add("is-warning");
     coloradoCompleteNote.classList.remove("is-hidden");
-    try {
-      coloradoVerifyWrap.scrollIntoView({ behavior: "smooth", block: "center" });
-    } catch (error) {}
+    try { coloradoVerifyWrap.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (error) {}
     coloradoVerifyCheckbox.focus({ preventScroll: true });
   }
 
@@ -312,11 +382,13 @@
       fundingSource: window.paypal.FUNDING.PAYPAL,
       style: paypalButtonStyle(),
       async createOrder() {
+        const quantity = currentQuantity();
+        if (isCustomQuantity(quantity)) throw new Error("Use the custom / email order path for 5+ units.");
         setStatus("Opening PayPal. Choose the shipping address there first. Colorado orders may return here for one final address confirmation step before payment is captured.");
         const orderData = await fetchJson(CREATE_ORDER_ENDPOINT, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sku: PRODUCT.sku, quantity: 1 })
+          body: JSON.stringify({ sku: PRODUCT.sku, quantity })
         });
         if (!orderData.id) throw new Error("Could not create the PayPal order.");
         state.pendingInvoiceId = orderData.invoiceId || null;
@@ -332,14 +404,17 @@
     }).render("#paypal-button-container");
     state.buttonsRendered = true;
     container.classList.remove("is-hidden");
-    setStatus("PayPal is ready. PayPal opens first, and Colorado orders may return here for one final address confirmation step.");
+    setStatus("PayPal is ready. Quantity-based shipping is now applied to this order.");
   }
+
+  quantitySelect.addEventListener("change", function () {
+    resetPendingOrderState();
+    updateSummaryFromQuantity();
+  });
 
   coloradoVerifyCheckbox.addEventListener("change", function () {
     coloradoCompleteBtn.disabled = !state.pendingQuote;
-    if (coloradoVerifyCheckbox.checked) {
-      clearVerifyPrompt();
-    }
+    if (coloradoVerifyCheckbox.checked) clearVerifyPrompt();
   });
 
   coloradoCompleteBtn.addEventListener("click", async function () {
@@ -370,7 +445,7 @@
   async function initializeCheckout() {
     setStatus("Loading product pricing…");
     await loadProductConfig();
-    resetBaseSummary();
+    updateSummaryFromQuantity();
     await renderButtonsIfNeeded();
   }
 

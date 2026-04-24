@@ -1,48 +1,22 @@
-import { getProduct, PRODUCT } from "../../_lib/product.js";
+import { buildCheckoutProduct, PRODUCT } from "../../_lib/product.js";
 import { jsonResponse } from "../../_lib/shared.js";
 import { buildTaxQuote } from "../../_lib/tax.js";
 
 export async function onRequestPost(context) {
   try {
     const body = await context.request.json();
-    const product = getProduct(body?.sku) || PRODUCT;
+    const product = buildCheckoutProduct(body?.sku || PRODUCT.sku, body?.quantity || "1");
+
+    if (product.customQuoteOnly) {
+      return jsonResponse({ ok: false, message: "Direct tax quoting is available for quantities 1 through 4 only." }, 400);
+    }
+
     const taxableAmount = product.itemAmount;
     const shippingAmount = product.shippingAmount;
+    const quote = await buildTaxQuote(context.env, body, { taxableAmount, shippingAmount });
 
-    console.log("[tax.quote] incoming", JSON.stringify({
-      ...body,
-      sku: product.sku,
-      taxableAmount,
-      shippingAmount
-    }));
-
-    const quote = await buildTaxQuote(context.env, body, {
-      taxableAmount,
-      shippingAmount
-    });
-
-    console.log("[tax.quote] success", JSON.stringify({
-      source: quote.source,
-      isColorado: quote.isColorado,
-      sku: product.sku,
-      taxAmount: quote.taxAmount,
-      totalAmount: quote.totalAmount,
-      apiAddress: quote.apiAddress,
-      jurisdictionCode: quote.jurisdictionCode
-    }));
-
-    return jsonResponse({
-      ok: true,
-      sku: product.sku,
-      ...quote
-    });
+    return jsonResponse({ ok: true, sku: product.sku, quantity: product.quantity, ...quote });
   } catch (error) {
-    console.log("[tax.quote] error", JSON.stringify({
-      message: error.message || "Could not calculate tax for this address."
-    }));
-    return jsonResponse({
-      ok: false,
-      message: error.message || "Could not calculate tax for this address."
-    }, 400);
+    return jsonResponse({ ok: false, message: error.message || "Could not calculate tax for this address." }, 400);
   }
 }

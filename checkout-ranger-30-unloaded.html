@@ -30,7 +30,7 @@
           <div class="product-kicker-row">
             <span class="product-chip">30-pin unloaded layout</span>
             <span class="product-chip">Indoor use</span>
-            <span class="product-chip">Flat shipping</span>
+            <span class="product-chip">Quantity shipping tiers</span>
           </div>
         </div>
       </div>
@@ -48,7 +48,7 @@
         <article class="checkout-mini-card">
           <div class="product-label">Order Notes</div>
           <ul class="product-list">
-            <li><strong>Shipping:</strong> $8.95 flat rate to the 48 contiguous U.S.</li>
+            <li><strong>Shipping tiers:</strong> 1 unit $8.95 • 2 units $10.95 • 3-4 units $14.95 • 5+ custom / email order</li>
             <li><strong>Tax:</strong> any applicable sales tax is finalized before the order is captured</li>
             <li><strong>Support:</strong> support@westtechha.com</li>
             <li><strong>Loaded / custom:</strong> use the quote page instead of this checkout path</li>
@@ -65,7 +65,26 @@
     <aside class="checkout-card checkout-summary-card">
       <div class="product-label">Order Summary</div>
       <h2>Review your purchase</h2>
+      <div class="checkout-mini-card checkout-quantity-card">
+        <div class="product-label">Quantity & Shipping</div>
+        <div class="checkout-quantity-row">
+          <label class="checkout-quantity-label" for="checkout-quantity">
+            <span>Choose quantity</span>
+            <select id="checkout-quantity" class="checkout-quantity-select">
+              <option value="1" selected>1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5+">5+</option>
+            </select>
+          </label>
+          <a class="btn btn-outline checkout-continue-shopping" href="products.html">Continue Shopping</a>
+        </div>
+        <p id="checkout-shipping-tier-note" class="checkout-mini-note">1 unit: $8.95 • 2 units: $10.95 • 3-4 units: $14.95 • 5+ units: custom / email order</p>
+      </div>
       <div class="checkout-summary-lines">
+        <div class="checkout-line"><span>Quantity</span><strong id="checkout-quantity-display">1</strong></div>
+        <div class="checkout-line"><span>Unit price</span><strong id="checkout-unit-amount">$35.00</strong></div>
         <div class="checkout-line"><span data-checkout-product-name>Ranger 30 - Unloaded</span><strong id="checkout-item-amount">$35.00</strong></div>
         <div class="checkout-line"><span>Flat shipping</span><strong id="checkout-shipping-amount">$8.95</strong></div>
         <div class="checkout-line checkout-line-note"><span>Tax</span><strong id="checkout-tax-amount">Finalized during checkout</strong></div>
@@ -128,6 +147,17 @@
         <button id="co-complete-button" class="btn-buy-pop checkout-tax-button checkout-tax-button-primary is-hidden" type="button">Complete Order</button>
       </div>
 
+
+      <div id="checkout-custom-order-card" class="checkout-mini-card checkout-custom-order-card is-hidden">
+        <div class="product-label">5+ Units</div>
+        <h3>Custom / email order required</h3>
+        <p class="checkout-mini-note">For 5 or more units, use the custom / email path so shipping can be quoted correctly before payment.</p>
+        <div class="product-cta-row">
+          <a id="checkout-custom-order-link" class="btn btn-buy-pop" href="order.html">Request Custom Order</a>
+          <a id="checkout-custom-email-link" class="btn btn-outline" href="mailto:orders@westtechha.com">Email Orders</a>
+        </div>
+      </div>
+
       <div class="checkout-paypal-shell">
         <div class="checkout-paypal-head">
           <div>
@@ -141,7 +171,7 @@
       </div>
 
       <div class="checkout-policy-list">
-        <p><strong>Shipping:</strong> Flat-rate shipping is used for the 48 contiguous U.S. on standard ready-to-ship products.</p>
+        <p><strong>Shipping:</strong> Quantity-based shipping applies to 1 through 4 units. Orders for 5+ units use the custom / email order path.</p>
         <p><strong>Sales tax:</strong> Any applicable sales tax is finalized before the order is captured.</p>
         <p><strong>Questions before ordering?</strong> <a href="support.html">Visit Support</a> or <a href="contact.html">Contact us</a>.</p>
         <p><strong>Need Loaded or custom instead?</strong> <a href="order.html">Request a quote</a>.</p>

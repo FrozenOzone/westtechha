@@ -2991,3 +2991,73 @@ html[data-theme="dark"] .checkout-security-pill{
   font-size:clamp(1.45rem, 3vw, 2.1rem);
   letter-spacing:0.03em;
 }
+
+
+/* Quantity-based unloaded checkout */
+.checkout-quantity-card{
+  margin-top:16px;
+}
+.checkout-quantity-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  align-items:end;
+  justify-content:space-between;
+  margin-top:10px;
+}
+.checkout-quantity-label{
+  display:grid;
+  gap:6px;
+  min-width:180px;
+  flex:1 1 180px;
+}
+.checkout-quantity-label span{
+  font-size:0.92rem;
+  font-weight:700;
+  color:var(--text);
+}
+.checkout-quantity-select{
+  width:100%;
+  padding:12px 14px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:var(--surface);
+  color:var(--text);
+  font:inherit;
+}
+.checkout-quantity-select:focus{
+  outline:none;
+  border-color:var(--accent);
+  box-shadow:0 0 0 4px rgba(37,99,235,0.12);
+}
+.checkout-continue-shopping{
+  white-space:nowrap;
+}
+.checkout-custom-order-card.is-hidden,
+.checkout-paypal-shell.is-hidden{
+  display:none;
+}
+.checkout-custom-order-card h3{
+  margin:8px 0 10px;
+}
+.checkout-static-value{
+  display:block;
+  margin:0;
+  line-height:1.25;
+  font-size:1.05rem;
+  font-weight:800;
+  color:var(--text);
+}
+.product-shipping-tier-note{
+  margin-top:12px;
+}
+@media (max-width: 700px){
+  .checkout-quantity-row{
+    flex-direction:column;
+    align-items:stretch;
+  }
+  .checkout-continue-shopping{
+    width:100%;
+    text-align:center;
+  }
+}
