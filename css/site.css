@@ -2794,3 +2794,21 @@ html[data-theme="dark"] .forum-topic-list-static .forum-topic:focus-within{
   height:18px;
   accent-color:#d4a017;
 }
+
+/* Colorado checkout: locked PayPal address fields should look display-only */
+.checkout-address-card .checkout-field input[readonly],
+.checkout-address-card .checkout-field input[readonly]:disabled{
+  color:var(--text);
+  background:rgba(10, 19, 38, 0.96);
+  border-color:rgba(118, 145, 192, 0.24);
+  box-shadow:none;
+  caret-color:transparent;
+}
+
+.checkout-address-card .checkout-field input[readonly]:disabled{
+  opacity:1;
+  -webkit-text-fill-color:var(--text);
+  cursor:not-allowed;
+  pointer-events:none;
+  user-select:none;
+}
