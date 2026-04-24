@@ -1,9 +1,9 @@
 import { generateAccessToken, paypalBaseUrl } from "../../../../_lib/paypal.js";
-import { PRODUCT } from "../../../../_lib/product.js";
+import { getProduct, PRODUCT } from "../../../../_lib/product.js";
 import { buildTaxQuote, validateShippingAddress } from "../../../../_lib/tax.js";
 import { jsonResponse, readJsonSafe, sanitizeEnvValue } from "../../../../_lib/shared.js";
 
-function patchBody(referenceId, quote, currency, shippingAddress) {
+function patchBody(referenceId, quote, currency, shippingAddress, product) {
   return [
     {
       op: "replace",
@@ -23,11 +23,11 @@ function patchBody(referenceId, quote, currency, shippingAddress) {
       path: `/purchase_units/@reference_id=='${referenceId}'/items`,
       value: [
         {
-          name: PRODUCT.name,
-          sku: PRODUCT.sku,
-          description: PRODUCT.description,
-          quantity: PRODUCT.quantity,
-          unit_amount: { currency_code: currency, value: PRODUCT.itemAmount },
+          name: product.name,
+          sku: product.sku,
+          description: product.description,
+          quantity: product.quantity,
+          unit_amount: { currency_code: currency, value: product.itemAmount },
           tax: { currency_code: currency, value: quote.taxAmount },
           category: "PHYSICAL_GOODS"
         }
@@ -63,6 +63,13 @@ export async function onRequestPost(context) {
 
   try {
     const body = await context.request.json();
+    const requestedSku = sanitizeEnvValue(body?.sku) || PRODUCT.sku;
+    const product = getProduct(requestedSku);
+
+    if (!product) {
+      return jsonResponse({ ok: false, message: `Unknown product SKU: ${requestedSku}` }, 400);
+    }
+
     const shippingAddress = validateShippingAddress({
       fullName: body?.fullName,
       address1: body?.address1,
@@ -78,17 +85,18 @@ export async function onRequestPost(context) {
     }
 
     const quote = await buildTaxQuote(context.env, shippingAddress, {
-      taxableAmount: PRODUCT.itemAmount,
-      shippingAmount: PRODUCT.shippingAmount
+      taxableAmount: product.itemAmount,
+      shippingAmount: product.shippingAmount
     });
 
-    const currency = sanitizeEnvValue(context.env.PAYPAL_CURRENCY) || PRODUCT.currency;
-    const referenceId = PRODUCT.sku || "default";
+    const currency = sanitizeEnvValue(context.env.PAYPAL_CURRENCY) || product.currency;
+    const referenceId = product.sku || "default";
     const accessToken = await generateAccessToken(context.env);
-    const patch = patchBody(referenceId, quote, currency, shippingAddress);
+    const patch = patchBody(referenceId, quote, currency, shippingAddress, product);
 
     console.log("[paypal.orders.prepare-colorado] patch-request", JSON.stringify({
       orderID,
+      sku: product.sku,
       shippingAddress,
       quote: { taxAmount: quote.taxAmount, totalAmount: quote.totalAmount },
       patch
@@ -119,7 +127,7 @@ export async function onRequestPost(context) {
       }, response.status || 500);
     }
 
-    return jsonResponse({ ok: true, quote, shippingAddress });
+    return jsonResponse({ ok: true, quote, shippingAddress, sku: product.sku });
   } catch (error) {
     return jsonResponse({ ok: false, message: error.message || "Unexpected error while preparing the Colorado order." }, 500);
   }

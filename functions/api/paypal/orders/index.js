@@ -1,19 +1,19 @@
 import { generateAccessToken, paypalBaseUrl } from "../../../_lib/paypal.js";
-import { PRODUCT } from "../../../_lib/product.js";
+import { getProduct, PRODUCT } from "../../../_lib/product.js";
 import { jsonResponse, readJsonSafe, sanitizeEnvValue } from "../../../_lib/shared.js";
 
-function baseAmountBreakdown(currency) {
+function baseAmountBreakdown(product, currency) {
   return {
     currency_code: currency,
-    value: (Number(PRODUCT.itemAmount) + Number(PRODUCT.shippingAmount)).toFixed(2),
+    value: (Number(product.itemAmount) + Number(product.shippingAmount)).toFixed(2),
     breakdown: {
       item_total: {
         currency_code: currency,
-        value: PRODUCT.itemAmount
+        value: product.itemAmount
       },
       shipping: {
         currency_code: currency,
-        value: PRODUCT.shippingAmount
+        value: product.shippingAmount
       },
       tax_total: {
         currency_code: currency,
@@ -23,25 +23,25 @@ function baseAmountBreakdown(currency) {
   };
 }
 
-function buildOrderPayload(context) {
-  const currency = sanitizeEnvValue(context.env.PAYPAL_CURRENCY) || PRODUCT.currency;
+function buildOrderPayload(context, product) {
+  const currency = sanitizeEnvValue(context.env.PAYPAL_CURRENCY) || product.currency || PRODUCT.currency;
 
   return {
     intent: "CAPTURE",
     purchase_units: [
       {
-        reference_id: PRODUCT.sku,
-        description: PRODUCT.description,
-        amount: baseAmountBreakdown(currency),
+        reference_id: product.sku,
+        description: product.description,
+        amount: baseAmountBreakdown(product, currency),
         items: [
           {
-            name: PRODUCT.name,
-            sku: PRODUCT.sku,
-            description: PRODUCT.description,
-            quantity: PRODUCT.quantity,
+            name: product.name,
+            sku: product.sku,
+            description: product.description,
+            quantity: product.quantity,
             unit_amount: {
               currency_code: currency,
-              value: PRODUCT.itemAmount
+              value: product.itemAmount
             },
             tax: {
               currency_code: currency,
@@ -58,24 +58,38 @@ function buildOrderPayload(context) {
           shipping_preference: "GET_FROM_FILE",
           user_action: "CONTINUE",
           return_url: new URL("/order-thank-you.html", context.request.url).toString(),
-          cancel_url: new URL("/checkout-scout-30-unloaded.html", context.request.url).toString()
+          cancel_url: new URL(checkoutPathForProduct(product), context.request.url).toString()
         }
       }
     }
   };
 }
 
+function checkoutPathForProduct(product) {
+  return `/checkout-${product.sku}.html`;
+}
+
 export async function onRequestPost(context) {
   try {
-    const payload = buildOrderPayload(context);
+    const body = await context.request.json().catch(() => ({}));
+    const requestedSku = sanitizeEnvValue(body?.sku) || PRODUCT.sku;
+    const product = getProduct(requestedSku);
+
+    if (!product) {
+      return jsonResponse({ ok: false, message: `Unknown product SKU: ${requestedSku}` }, 400);
+    }
+
+    const payload = buildOrderPayload(context, product);
+    payload.payment_source.paypal.experience_context.cancel_url = new URL(checkoutPathForProduct(product), context.request.url).toString();
+
     console.log("[paypal.orders.create] start", JSON.stringify({
       env: (sanitizeEnvValue(context.env.PAYPAL_ENV) || "sandbox").toLowerCase(),
-      currency: sanitizeEnvValue(context.env.PAYPAL_CURRENCY) || PRODUCT.currency,
+      currency: sanitizeEnvValue(context.env.PAYPAL_CURRENCY) || product.currency,
       hasClientId: Boolean(sanitizeEnvValue(context.env.PAYPAL_CLIENT_ID)),
       hasClientSecret: Boolean(sanitizeEnvValue(context.env.PAYPAL_CLIENT_SECRET)),
       shippingPreference: payload.payment_source?.paypal?.experience_context?.shipping_preference || null,
       userAction: payload.payment_source?.paypal?.experience_context?.user_action || null,
-      sku: PRODUCT.sku,
+      sku: product.sku,
       baseValue: payload.purchase_units?.[0]?.amount?.value || null
     }));
 
@@ -113,7 +127,8 @@ export async function onRequestPost(context) {
     return jsonResponse({
       ok: true,
       id: data.id,
-      status: data.status || null
+      status: data.status || null,
+      sku: product.sku
     });
   } catch (error) {
     console.log("[paypal.orders.create] error", JSON.stringify({ message: error.message || "Unknown error" }));

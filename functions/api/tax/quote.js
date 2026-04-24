@@ -1,19 +1,35 @@
-import { PRODUCT } from "../../_lib/product.js";
+import { getProduct, PRODUCT } from "../../_lib/product.js";
 import { jsonResponse } from "../../_lib/shared.js";
 import { buildTaxQuote } from "../../_lib/tax.js";
+
+function amountOrDefault(value, fallback) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed.toFixed(2) : fallback;
+}
 
 export async function onRequestPost(context) {
   try {
     const body = await context.request.json();
-    console.log("[tax.quote] incoming", JSON.stringify(body));
+    const product = getProduct(body?.sku) || PRODUCT;
+    const taxableAmount = amountOrDefault(body?.taxableAmount, product.itemAmount);
+    const shippingAmount = amountOrDefault(body?.shippingAmount, product.shippingAmount);
+
+    console.log("[tax.quote] incoming", JSON.stringify({
+      ...body,
+      sku: product.sku,
+      taxableAmount,
+      shippingAmount
+    }));
+
     const quote = await buildTaxQuote(context.env, body, {
-      taxableAmount: PRODUCT.itemAmount,
-      shippingAmount: PRODUCT.shippingAmount
+      taxableAmount,
+      shippingAmount
     });
 
     console.log("[tax.quote] success", JSON.stringify({
       source: quote.source,
       isColorado: quote.isColorado,
+      sku: product.sku,
       taxAmount: quote.taxAmount,
       totalAmount: quote.totalAmount,
       apiAddress: quote.apiAddress,
@@ -22,6 +38,7 @@ export async function onRequestPost(context) {
 
     return jsonResponse({
       ok: true,
+      sku: product.sku,
       ...quote
     });
   } catch (error) {
