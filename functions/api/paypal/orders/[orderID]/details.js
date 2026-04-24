@@ -15,6 +15,14 @@ function extractAddress(data) {
   };
 }
 
+function extractPurchaseMeta(data) {
+  const unit = data?.purchase_units?.[0] || {};
+  return {
+    invoiceId: unit?.invoice_id || "",
+    customId: unit?.custom_id || ""
+  };
+}
+
 export async function onRequestGet(context) {
   const orderID = context.params.orderID;
   if (!orderID) {
@@ -36,7 +44,9 @@ export async function onRequestGet(context) {
       ok: response.ok,
       id: data.id || null,
       orderStatus: data.status || null,
-      shipping: extractAddress(data)
+      shipping: extractAddress(data),
+      invoiceId: extractPurchaseMeta(data).invoiceId || null,
+      customId: extractPurchaseMeta(data).customId || null
     }));
 
     if (!response.ok) {
@@ -53,6 +63,8 @@ export async function onRequestGet(context) {
       id: data.id,
       status: data.status || null,
       shippingAddress: extractAddress(data),
+      invoiceId: extractPurchaseMeta(data).invoiceId || null,
+      customId: extractPurchaseMeta(data).customId || null,
       payer: data.payer || null
     });
   } catch (error) {

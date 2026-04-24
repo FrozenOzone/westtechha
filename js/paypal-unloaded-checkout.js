@@ -233,6 +233,8 @@
     const shippingAddress = details.shippingAddress || {};
     state.pendingOrderId = orderID;
     state.pendingOrderDetails = shippingAddress;
+    state.pendingInvoiceId = details.invoiceId || state.pendingInvoiceId || null;
+    updateInvoiceIdDisplay();
 
     if ((shippingAddress.state || "").toUpperCase() === "CO") {
       await showColoradoFallback(shippingAddress);
