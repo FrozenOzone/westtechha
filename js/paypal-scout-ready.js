@@ -21,14 +21,15 @@
   const coloradoForm = document.getElementById("checkout-colorado-form");
   const coloradoSummary = document.getElementById("checkout-colorado-summary");
   const coloradoResult = document.getElementById("checkout-colorado-result");
+  const coloradoVerifyWrap = document.getElementById("co-verify-wrap");
+  const coloradoVerifyCheckbox = document.getElementById("co-verify-checkbox");
   const resultItemEl = document.getElementById("co-result-item");
   const resultShippingEl = document.getElementById("co-result-shipping");
   const resultTaxEl = document.getElementById("co-result-tax");
   const resultTotalEl = document.getElementById("co-result-total");
   const coloradoCompleteBtn = document.getElementById("co-complete-button");
-  const calcButton = document.getElementById("co-calc-button");
 
-  if (!status || !container || !itemAmountEl || !shippingAmountEl || !taxAmountEl || !totalAmountEl || !totalLabelEl || !totalLineEl || !coloradoCard || !coloradoForm || !coloradoSummary || !coloradoResult || !resultItemEl || !resultShippingEl || !resultTaxEl || !resultTotalEl || !coloradoCompleteBtn || !calcButton) return;
+  if (!status || !container || !itemAmountEl || !shippingAmountEl || !taxAmountEl || !totalAmountEl || !totalLabelEl || !totalLineEl || !coloradoCard || !coloradoForm || !coloradoSummary || !coloradoResult || !coloradoVerifyWrap || !coloradoVerifyCheckbox || !resultItemEl || !resultShippingEl || !resultTaxEl || !resultTotalEl || !coloradoCompleteBtn) return;
 
   const fields = {
     fullName: document.getElementById("co-full-name"),
@@ -62,6 +63,10 @@
     totalLineEl.classList.remove("is-final");
     coloradoSummary.classList.add("is-hidden");
     coloradoResult.classList.add("is-hidden");
+    coloradoVerifyWrap.classList.add("is-hidden");
+    coloradoVerifyCheckbox.checked = false;
+    coloradoCompleteBtn.classList.add("is-hidden");
+    coloradoCompleteBtn.disabled = true;
     resultItemEl.textContent = formatMoney(PRICE);
     resultShippingEl.textContent = formatMoney(SHIPPING);
     resultTaxEl.textContent = formatMoney(0);
@@ -106,10 +111,9 @@
     });
   }
 
-  function showColoradoFallback(details) {
+  async function showColoradoFallback(details) {
     coloradoCard.classList.remove("is-hidden");
     resetBaseSummary();
-    coloradoCompleteBtn.classList.add("is-hidden");
     state.pendingQuote = null;
 
     fields.fullName.value = details.fullName || "";
@@ -119,7 +123,8 @@
     fields.state.value = details.state || "CO";
     fields.postalCode.value = details.postalCode || "";
 
-    setStatus("Colorado address detected. Confirm the full street address below so we can finalize the exact tax before payment is captured.");
+    setStatus("Colorado address detected. Reviewing the address and calculating the final total now.");
+    await calculateColoradoQuote();
   }
 
   function updateSummaryFromQuote(quote) {
@@ -172,12 +177,35 @@
     state.pendingOrderDetails = shippingAddress;
 
     if ((shippingAddress.state || "").toUpperCase() === "CO") {
-      showColoradoFallback(shippingAddress);
+      await showColoradoFallback(shippingAddress);
       return;
     }
 
     setStatus("Shipping address confirmed. Finalizing payment now.");
     await captureOrder(orderID);
+  }
+
+
+  async function calculateColoradoQuote() {
+    try {
+      const quote = await fetchJson("/api/tax/quote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(currentColoradoAddress())
+      });
+      state.pendingQuote = quote;
+      updateSummaryFromQuote(quote);
+      coloradoVerifyWrap.classList.remove("is-hidden");
+      coloradoCompleteBtn.classList.remove("is-hidden");
+      coloradoCompleteBtn.disabled = !coloradoVerifyCheckbox.checked;
+      setStatus("Colorado tax calculated. Verify the shipping address, then complete the order.");
+    } catch (error) {
+      console.error(error);
+      coloradoVerifyWrap.classList.add("is-hidden");
+      coloradoCompleteBtn.classList.add("is-hidden");
+      state.pendingQuote = null;
+      setStatus(error && error.message ? error.message : "Could not calculate the Colorado total.", true);
+    }
   }
 
   async function renderButtonsIfNeeded() {
@@ -220,30 +248,8 @@
     setStatus("PayPal is ready. PayPal opens first, and Colorado orders may return here for one final address confirmation step.");
   }
 
-  coloradoForm.addEventListener("submit", async function (event) {
-    event.preventDefault();
-    if (!state.pendingOrderId) {
-      setStatus("Start PayPal first so we can tie the Colorado address to the right order.", true);
-      return;
-    }
-
-    calcButton.disabled = true;
-    try {
-      const quote = await fetchJson("/api/tax/quote", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(currentColoradoAddress())
-      });
-      state.pendingQuote = quote;
-      updateSummaryFromQuote(quote);
-      coloradoCompleteBtn.classList.remove("is-hidden");
-      setStatus("Colorado tax calculated. Review the updated total, then complete the order.");
-    } catch (error) {
-      console.error(error);
-      setStatus(error && error.message ? error.message : "Could not calculate the Colorado total.", true);
-    } finally {
-      calcButton.disabled = false;
-    }
+  coloradoVerifyCheckbox.addEventListener("change", function () {
+    coloradoCompleteBtn.disabled = !coloradoVerifyCheckbox.checked || !state.pendingQuote;
   });
 
   coloradoCompleteBtn.addEventListener("click", async function () {
@@ -252,7 +258,11 @@
       return;
     }
     if (!state.pendingQuote) {
-      setStatus("Calculate the Colorado total before completing the order.", true);
+      setStatus("Colorado tax must be calculated before completing the order.", true);
+      return;
+    }
+    if (!coloradoVerifyCheckbox.checked) {
+      setStatus("Verify the shipping address before completing the order.", true);
       return;
     }
 

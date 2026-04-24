@@ -2765,3 +2765,27 @@ html[data-theme="dark"] .forum-topic-list-static .forum-topic:focus-within{
   font-size:1.24rem;
   color:#f7d66e;
 }
+
+.checkout-field input[readonly]{
+  color:var(--text);
+  background:rgba(17, 29, 56, 0.82);
+  cursor:default;
+}
+.checkout-verify-row{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  margin-top:14px;
+  padding:12px 14px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:var(--surface);
+  color:var(--text);
+  font-weight:600;
+}
+.checkout-verify-row input{
+  margin-top:2px;
+  width:18px;
+  height:18px;
+  accent-color:#d4a017;
+}
