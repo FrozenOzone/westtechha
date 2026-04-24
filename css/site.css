@@ -2843,3 +2843,46 @@ html[data-theme="dark"] .forum-topic-list-static .forum-topic:focus-within{
 .checkout-address-card .checkout-field input[readonly]:disabled::placeholder{
   color:var(--muted);
 }
+
+
+/* Phase 3 polish: PayPal-returned address should sit inside its own display box */
+.checkout-address-display{
+  padding:16px 18px;
+  border-radius:16px;
+  border:1px solid rgba(118, 145, 192, 0.22);
+  background:linear-gradient(180deg, rgba(20,34,63,0.72) 0%, rgba(11,18,32,0.78) 100%);
+  box-shadow:0 10px 24px rgba(2, 6, 23, 0.18);
+}
+
+.checkout-address-display-title{
+  font-size:0.82rem;
+  font-weight:800;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:14px;
+}
+
+.checkout-address-card .checkout-address-display .checkout-field-grid{
+  gap:16px 18px;
+}
+
+.checkout-address-card .checkout-address-display .checkout-field{
+  gap:4px;
+  align-content:start;
+}
+
+.checkout-address-card .checkout-address-display .checkout-field span{
+  margin:0;
+}
+
+.checkout-address-card .checkout-address-display .checkout-field input[readonly],
+.checkout-address-card .checkout-address-display .checkout-field input[readonly]:disabled{
+  display:block;
+  margin:0;
+  line-height:1.25;
+}
+
+.checkout-address-card .checkout-address-display .checkout-field:nth-last-child(-n+3){
+  align-self:start;
+}
