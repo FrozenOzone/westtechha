@@ -235,6 +235,26 @@
     };
   }
 
+
+  function clearVerifyPrompt() {
+    coloradoVerifyWrap.classList.remove("is-attention");
+    coloradoCompleteNote.classList.remove("is-warning");
+    if (state.pendingQuote) {
+      coloradoCompleteNote.textContent = "Colorado tax is calculated. Verify the shipping address above, then click Complete Order.";
+    }
+  }
+
+  function showVerifyPrompt() {
+    coloradoVerifyWrap.classList.add("is-attention");
+    coloradoCompleteNote.textContent = "Please check the box above to verify this shipping address before completing the order.";
+    coloradoCompleteNote.classList.add("is-warning");
+    coloradoCompleteNote.classList.remove("is-hidden");
+    try {
+      coloradoVerifyWrap.scrollIntoView({ behavior: "smooth", block: "center" });
+    } catch (error) {}
+    coloradoVerifyCheckbox.focus({ preventScroll: true });
+  }
+
   async function calculateColoradoQuote() {
     try {
       const quote = await fetchJson("/api/tax/quote", {
@@ -247,8 +267,9 @@
       coloradoChangeNote.classList.remove("is-hidden");
       coloradoVerifyWrap.classList.remove("is-hidden");
       coloradoCompleteBtn.classList.remove("is-hidden");
-      coloradoCompleteBtn.disabled = !coloradoVerifyCheckbox.checked;
+      coloradoCompleteBtn.disabled = !state.pendingQuote;
       coloradoCompleteNote.textContent = "Colorado tax is calculated. Verify the shipping address above, then click Complete Order.";
+      coloradoCompleteNote.classList.remove("is-warning");
       coloradoCompleteNote.classList.remove("is-hidden");
       setStatus("PayPal is ready if you need to select a different shipping address.");
     } catch (error) {
@@ -295,13 +316,19 @@
   }
 
   coloradoVerifyCheckbox.addEventListener("change", function () {
-    coloradoCompleteBtn.disabled = !coloradoVerifyCheckbox.checked || !state.pendingQuote;
+    coloradoCompleteBtn.disabled = !state.pendingQuote;
+    if (coloradoVerifyCheckbox.checked) {
+      clearVerifyPrompt();
+    }
   });
 
   coloradoCompleteBtn.addEventListener("click", async function () {
     if (!state.pendingOrderId) return setStatus("Start PayPal first so we can finalize the correct order.", true);
     if (!state.pendingQuote) return setStatus("Colorado tax must be calculated before completing the order.", true);
-    if (!coloradoVerifyCheckbox.checked) return setStatus("Verify the shipping address before completing the order.", true);
+    if (!coloradoVerifyCheckbox.checked) {
+      showVerifyPrompt();
+      return setStatus("Please verify the shipping address before completing the order.", true);
+    }
     coloradoCompleteBtn.disabled = true;
     try {
       const prepareEndpoint = PREPARE_COLORADO_ENDPOINT.replace("{orderID}", encodeURIComponent(state.pendingOrderId));

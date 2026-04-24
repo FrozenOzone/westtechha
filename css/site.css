@@ -2934,3 +2934,26 @@ html[data-theme="dark"] .checkout-security-pill{
 .checkout-complete-note.is-hidden{
   display:none;
 }
+
+
+/* Colorado verification prompt + Complete Order button affordance */
+.checkout-tax-button-primary:not(:disabled){
+  cursor:pointer;
+}
+
+.checkout-tax-button-primary:disabled{
+  cursor:not-allowed;
+  opacity:0.72;
+}
+
+.checkout-verify-row.is-attention{
+  border-color:rgba(255, 214, 102, 0.72);
+  background:rgba(217,165,31,0.16);
+  box-shadow:0 0 0 3px rgba(217,165,31,0.12);
+}
+
+.checkout-complete-note.is-warning{
+  border-color:rgba(255, 214, 102, 0.62);
+  background:rgba(217,165,31,0.16);
+  color:#f7d66e;
+}
