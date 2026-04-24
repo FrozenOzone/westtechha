@@ -2812,3 +2812,34 @@ html[data-theme="dark"] .forum-topic-list-static .forum-topic:focus-within{
   pointer-events:none;
   user-select:none;
 }
+
+/* Phase 3 Colorado confirmation: make PayPal-returned address read as locked display text, not editable fields */
+.checkout-address-card .checkout-field{
+  gap:10px;
+}
+
+.checkout-address-card .checkout-field input[readonly],
+.checkout-address-card .checkout-field input[readonly]:disabled{
+  -webkit-appearance:none;
+  appearance:none;
+  width:100%;
+  background:transparent !important;
+  border:none !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  padding:0 !important;
+  min-height:0 !important;
+  height:auto !important;
+  color:var(--text) !important;
+  -webkit-text-fill-color:var(--text);
+  font-size:1.05rem;
+  font-weight:700;
+  line-height:1.35;
+  cursor:default;
+  pointer-events:none;
+}
+
+.checkout-address-card .checkout-field input[readonly]::placeholder,
+.checkout-address-card .checkout-field input[readonly]:disabled::placeholder{
+  color:var(--muted);
+}
