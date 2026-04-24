@@ -1,3 +1,7 @@
+// EDIT PRODUCT PRICES HERE.
+// This file is the single source of truth for checkout prices, shipping, item names, and PayPal product metadata.
+// Change itemAmount/shippingAmount here, then redeploy Cloudflare Pages.
+
 export const PRODUCTS = Object.freeze({
   "scout-30-unloaded": Object.freeze({
     sku: "scout-30-unloaded",
@@ -55,6 +59,10 @@ export function getProduct(sku) {
 
 export function getProductOrDefault(sku) {
   return getProduct(sku) || PRODUCT;
+}
+
+export function allPublicProducts() {
+  return Object.fromEntries(Object.entries(PRODUCTS).map(([sku, product]) => [sku, publicProduct(product)]));
 }
 
 export function publicProduct(product) {

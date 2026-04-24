@@ -1,5 +1,6 @@
 (function () {
   const CONFIG_ENDPOINT = "/api/paypal/config";
+  const PRODUCT_ENDPOINT = "/api/products/{sku}";
   const CREATE_ORDER_ENDPOINT = "/api/paypal/orders";
   const ORDER_DETAILS_ENDPOINT = "/api/paypal/orders/{orderID}/details";
   const PREPARE_COLORADO_ENDPOINT = "/api/paypal/orders/{orderID}/prepare-colorado";
@@ -7,13 +8,13 @@
   const SUCCESS_URL = "order-thank-you.html";
 
   const checkoutConfig = window.WESTTECH_CHECKOUT || {};
-  const PRODUCT = {
+  let PRODUCT = {
     sku: checkoutConfig.sku || "scout-30-unloaded",
-    name: checkoutConfig.name || "Scout 30 - Unloaded",
-    layout: checkoutConfig.layout || "30-pin unloaded layout",
-    family: checkoutConfig.family || "Scout",
-    itemAmount: Number(checkoutConfig.itemAmount || 35.00),
-    shippingAmount: Number(checkoutConfig.shippingAmount || 8.95)
+    name: checkoutConfig.name || "Loading product…",
+    layout: checkoutConfig.layout || "",
+    family: checkoutConfig.family || "",
+    itemAmount: 0,
+    shippingAmount: 0
   };
 
   const status = document.getElementById("paypal-status");
@@ -96,6 +97,33 @@
       if (!response.ok) throw new Error(data.message || "Request failed.");
       return data;
     });
+  }
+
+  function normalizeProduct(product) {
+    return {
+      sku: product.sku || PRODUCT.sku,
+      name: product.name || PRODUCT.name,
+      layout: product.layout || PRODUCT.layout,
+      family: product.family || PRODUCT.family,
+      itemAmount: Number(product.itemAmount || 0),
+      shippingAmount: Number(product.shippingAmount || 0)
+    };
+  }
+
+  function applyProductToPage() {
+    itemAmountEl.textContent = formatMoney(PRODUCT.itemAmount);
+    shippingAmountEl.textContent = formatMoney(PRODUCT.shippingAmount);
+    const itemNameEls = document.querySelectorAll("[data-checkout-product-name]");
+    itemNameEls.forEach((el) => { el.textContent = PRODUCT.name; });
+    if (resultItemNameEl) resultItemNameEl.textContent = PRODUCT.name;
+  }
+
+  async function loadProductConfig() {
+    const endpoint = PRODUCT_ENDPOINT.replace("{sku}", encodeURIComponent(PRODUCT.sku));
+    const data = await fetchJson(endpoint, { method: "GET", headers: { "Content-Type": "application/json" } });
+    if (!data.product) throw new Error("Could not load product pricing.");
+    PRODUCT = normalizeProduct(data.product);
+    applyProductToPage();
   }
 
   function loadPayPalSdk(clientId, currency) {
@@ -193,7 +221,7 @@
       const quote = await fetchJson("/api/tax/quote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...currentColoradoAddress(), taxableAmount: PRODUCT.itemAmount, shippingAmount: PRODUCT.shippingAmount })
+        body: JSON.stringify(currentColoradoAddress())
       });
       state.pendingQuote = quote;
       updateSummaryFromQuote(quote);
@@ -268,13 +296,15 @@
     }
   });
 
-  itemAmountEl.textContent = formatMoney(PRODUCT.itemAmount);
-  shippingAmountEl.textContent = formatMoney(PRODUCT.shippingAmount);
-  const itemNameEls = document.querySelectorAll("[data-checkout-product-name]");
-  itemNameEls.forEach((el) => { el.textContent = PRODUCT.name; });
-  resetBaseSummary();
-  renderButtonsIfNeeded().catch(function (error) {
+  async function initializeCheckout() {
+    setStatus("Loading product pricing…");
+    await loadProductConfig();
+    resetBaseSummary();
+    await renderButtonsIfNeeded();
+  }
+
+  initializeCheckout().catch(function (error) {
     console.error(error);
-    setStatus(error && error.message ? error.message : "PayPal checkout could not be loaded.", true);
+    setStatus(error && error.message ? error.message : "Checkout could not be loaded.", true);
   });
 })();

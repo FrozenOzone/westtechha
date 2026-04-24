@@ -2,17 +2,12 @@ import { getProduct, PRODUCT } from "../../_lib/product.js";
 import { jsonResponse } from "../../_lib/shared.js";
 import { buildTaxQuote } from "../../_lib/tax.js";
 
-function amountOrDefault(value, fallback) {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) && parsed >= 0 ? parsed.toFixed(2) : fallback;
-}
-
 export async function onRequestPost(context) {
   try {
     const body = await context.request.json();
     const product = getProduct(body?.sku) || PRODUCT;
-    const taxableAmount = amountOrDefault(body?.taxableAmount, product.itemAmount);
-    const shippingAmount = amountOrDefault(body?.shippingAmount, product.shippingAmount);
+    const taxableAmount = product.itemAmount;
+    const shippingAmount = product.shippingAmount;
 
     console.log("[tax.quote] incoming", JSON.stringify({
       ...body,
