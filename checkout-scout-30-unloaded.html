@@ -76,8 +76,8 @@
       </div>
 
       <div id="checkout-colorado-card" class="checkout-mini-card checkout-address-card is-hidden">
-        <div class="product-label">Colorado address confirmation</div>
-        <p class="checkout-mini-note">The PayPal step identified a Colorado shipping address. Review the shipping address below, then verify it so we can finalize the exact Colorado tax before the order is captured.</p>
+        <div class="product-label">Confirm your shipping address</div>
+        <p class="checkout-mini-note">This shipping address was provided by PayPal. Please make sure it is correct before completing your order.</p>
         <form id="checkout-colorado-form" class="checkout-address-form">
           <div class="checkout-field-grid">
             <label class="checkout-field checkout-field-full">
@@ -106,13 +106,14 @@
             </label>
           </div>
         </form>
+        <p id="co-change-note" class="checkout-mini-note checkout-change-note is-hidden">Need to make a change? Click the PayPal button again to select a different shipping address, then continue checkout here.</p>
         <label id="co-verify-wrap" class="checkout-verify-row is-hidden">
           <input id="co-verify-checkbox" type="checkbox"/>
-          <span>I verify this is the correct shipping address for this order.</span>
+          <span>I confirm this is my correct shipping address.</span>
         </label>
         <div id="checkout-colorado-summary" class="checkout-mini-note is-hidden"></div>
         <div id="checkout-colorado-result" class="checkout-colorado-result is-hidden">
-          <div class="checkout-colorado-result-title">Updated Colorado total</div>
+          <div class="checkout-colorado-result-title">Updated order total</div>
           <div class="checkout-colorado-result-lines">
             <div class="checkout-line"><span>Scout 30 - Unloaded</span><strong id="co-result-item">$35.00</strong></div>
             <div class="checkout-line"><span>Flat shipping</span><strong id="co-result-shipping">$8.95</strong></div>

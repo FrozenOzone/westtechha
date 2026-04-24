@@ -2771,6 +2771,11 @@ html[data-theme="dark"] .forum-topic-list-static .forum-topic:focus-within{
   background:rgba(17, 29, 56, 0.82);
   cursor:default;
 }
+
+.checkout-change-note{
+  margin-top:14px;
+  margin-bottom:0;
+}
 .checkout-verify-row{
   display:flex;
   align-items:flex-start;

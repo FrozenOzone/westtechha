@@ -22,6 +22,7 @@
   const coloradoSummary = document.getElementById("checkout-colorado-summary");
   const coloradoResult = document.getElementById("checkout-colorado-result");
   const coloradoVerifyWrap = document.getElementById("co-verify-wrap");
+  const coloradoChangeNote = document.getElementById("co-change-note");
   const coloradoVerifyCheckbox = document.getElementById("co-verify-checkbox");
   const resultItemEl = document.getElementById("co-result-item");
   const resultShippingEl = document.getElementById("co-result-shipping");
@@ -29,7 +30,7 @@
   const resultTotalEl = document.getElementById("co-result-total");
   const coloradoCompleteBtn = document.getElementById("co-complete-button");
 
-  if (!status || !container || !itemAmountEl || !shippingAmountEl || !taxAmountEl || !totalAmountEl || !totalLabelEl || !totalLineEl || !coloradoCard || !coloradoForm || !coloradoSummary || !coloradoResult || !coloradoVerifyWrap || !coloradoVerifyCheckbox || !resultItemEl || !resultShippingEl || !resultTaxEl || !resultTotalEl || !coloradoCompleteBtn) return;
+  if (!status || !container || !itemAmountEl || !shippingAmountEl || !taxAmountEl || !totalAmountEl || !totalLabelEl || !totalLineEl || !coloradoCard || !coloradoForm || !coloradoSummary || !coloradoResult || !coloradoVerifyWrap || !coloradoChangeNote || !coloradoVerifyCheckbox || !resultItemEl || !resultShippingEl || !resultTaxEl || !resultTotalEl || !coloradoCompleteBtn) return;
 
   const fields = {
     fullName: document.getElementById("co-full-name"),
@@ -63,6 +64,7 @@
     totalLineEl.classList.remove("is-final");
     coloradoSummary.classList.add("is-hidden");
     coloradoResult.classList.add("is-hidden");
+    coloradoChangeNote.classList.add("is-hidden");
     coloradoVerifyWrap.classList.add("is-hidden");
     coloradoVerifyCheckbox.checked = false;
     coloradoCompleteBtn.classList.add("is-hidden");
@@ -195,12 +197,14 @@
       });
       state.pendingQuote = quote;
       updateSummaryFromQuote(quote);
+      coloradoChangeNote.classList.remove("is-hidden");
       coloradoVerifyWrap.classList.remove("is-hidden");
       coloradoCompleteBtn.classList.remove("is-hidden");
       coloradoCompleteBtn.disabled = !coloradoVerifyCheckbox.checked;
       setStatus("Colorado tax calculated. Verify the shipping address, then complete the order.");
     } catch (error) {
       console.error(error);
+      coloradoChangeNote.classList.add("is-hidden");
       coloradoVerifyWrap.classList.add("is-hidden");
       coloradoCompleteBtn.classList.add("is-hidden");
       state.pendingQuote = null;
