@@ -1,5 +1,6 @@
 import { generateAccessToken, paypalBaseUrl } from "../../../../_lib/paypal.js";
 import { jsonResponse, readJsonSafe } from "../../../../_lib/shared.js";
+import { markOrderCaptured, requireOrdersDb } from "../../../../_lib/orders.js";
 
 export async function onRequestPost(context) {
   const orderID = context.params.orderID;
@@ -33,10 +34,16 @@ export async function onRequestPost(context) {
       }, response.status || 500);
     }
 
+    const ordersDb = requireOrdersDb(context.env);
+    const orderRecord = await markOrderCaptured(ordersDb, { paypalOrderId: orderID, captureData: data });
+
     return jsonResponse({
       ok: true,
       id: data.id,
       status: data.status || null,
+      invoiceId: orderRecord?.invoiceId || null,
+      customId: orderRecord?.customId || null,
+      captureId: orderRecord?.captureId || null,
       payer: data.payer || null,
       purchase_units: data.purchase_units || null
     });

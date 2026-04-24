@@ -1,5 +1,6 @@
 import { generateAccessToken, paypalBaseUrl } from "../../../_lib/paypal.js";
 import { getProduct, PRODUCT } from "../../../_lib/product.js";
+import { allocateInvoiceId, createInitialOrderRecord, requireOrdersDb, setPayPalCreateFailed, setPayPalOrderCreated } from "../../../_lib/orders.js";
 import { jsonResponse, readJsonSafe, sanitizeEnvValue } from "../../../_lib/shared.js";
 
 function baseAmountBreakdown(product, currency) {
@@ -23,7 +24,7 @@ function baseAmountBreakdown(product, currency) {
   };
 }
 
-function buildOrderPayload(context, product) {
+function buildOrderPayload(context, product, orderMeta) {
   const currency = sanitizeEnvValue(context.env.PAYPAL_CURRENCY) || product.currency || PRODUCT.currency;
 
   return {
@@ -32,6 +33,8 @@ function buildOrderPayload(context, product) {
       {
         reference_id: product.sku,
         description: product.description,
+        custom_id: product.sku,
+        invoice_id: orderMeta.invoiceId,
         amount: baseAmountBreakdown(product, currency),
         items: [
           {
@@ -79,7 +82,16 @@ export async function onRequestPost(context) {
       return jsonResponse({ ok: false, message: `Unknown product SKU: ${requestedSku}` }, 400);
     }
 
-    const payload = buildOrderPayload(context, product);
+    const ordersDb = requireOrdersDb(context.env);
+    const orderMeta = await allocateInvoiceId(ordersDb);
+    await createInitialOrderRecord(ordersDb, {
+      ...orderMeta,
+      customId: product.sku,
+      product,
+      status: "CREATING"
+    });
+
+    const payload = buildOrderPayload(context, product, orderMeta);
     payload.payment_source.paypal.experience_context.cancel_url = new URL(checkoutPathForProduct(product), context.request.url).toString();
 
     console.log("[paypal.orders.create] start", JSON.stringify({
@@ -90,6 +102,8 @@ export async function onRequestPost(context) {
       shippingPreference: payload.payment_source?.paypal?.experience_context?.shipping_preference || null,
       userAction: payload.payment_source?.paypal?.experience_context?.user_action || null,
       sku: product.sku,
+      invoiceId: orderMeta.invoiceId,
+      customId: product.sku,
       baseValue: payload.purchase_units?.[0]?.amount?.value || null
     }));
 
@@ -116,6 +130,7 @@ export async function onRequestPost(context) {
     }));
 
     if (!response.ok || !data.id) {
+      await setPayPalCreateFailed(ordersDb, { invoiceId: orderMeta.invoiceId }).catch((error) => console.log("[paypal.orders.create] d1-failed-status-error", JSON.stringify({ message: error.message })));
       return jsonResponse({
         ok: false,
         message: data.message || data.details?.[0]?.description || data.raw || "Could not create the PayPal order.",
@@ -124,11 +139,15 @@ export async function onRequestPost(context) {
       }, response.status || 500);
     }
 
+    await setPayPalOrderCreated(ordersDb, { invoiceId: orderMeta.invoiceId, paypalOrderId: data.id });
+
     return jsonResponse({
       ok: true,
       id: data.id,
       status: data.status || null,
-      sku: product.sku
+      sku: product.sku,
+      invoiceId: orderMeta.invoiceId,
+      customId: product.sku
     });
   } catch (error) {
     console.log("[paypal.orders.create] error", JSON.stringify({ message: error.message || "Unknown error" }));

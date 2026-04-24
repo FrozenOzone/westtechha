@@ -1,5 +1,6 @@
 import { generateAccessToken, paypalBaseUrl } from "../../../../_lib/paypal.js";
 import { getProduct, PRODUCT } from "../../../../_lib/product.js";
+import { requireOrdersDb, updateOrderForColorado } from "../../../../_lib/orders.js";
 import { buildTaxQuote, validateShippingAddress } from "../../../../_lib/tax.js";
 import { jsonResponse, readJsonSafe, sanitizeEnvValue } from "../../../../_lib/shared.js";
 
@@ -126,6 +127,9 @@ export async function onRequestPost(context) {
         debug_id: data.debug_id || null
       }, response.status || 500);
     }
+
+    const ordersDb = requireOrdersDb(context.env);
+    await updateOrderForColorado(ordersDb, { paypalOrderId: orderID, quote, shippingAddress });
 
     return jsonResponse({ ok: true, quote, shippingAddress, sku: product.sku });
   } catch (error) {
