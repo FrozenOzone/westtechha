@@ -41,6 +41,14 @@
 
   if (!status || !container || !itemAmountEl || !shippingAmountEl || !taxAmountEl || !totalAmountEl || !totalLabelEl || !totalLineEl || !coloradoCard || !coloradoForm || !coloradoSummary || !coloradoResult || !coloradoVerifyWrap || !coloradoChangeNote || !coloradoVerifyCheckbox || !resultItemEl || !resultShippingEl || !resultTaxEl || !resultTotalEl || !coloradoCompleteBtn) return;
 
+  let coloradoCompleteNote = document.getElementById("co-complete-note");
+  if (!coloradoCompleteNote) {
+    coloradoCompleteNote = document.createElement("p");
+    coloradoCompleteNote.id = "co-complete-note";
+    coloradoCompleteNote.className = "checkout-complete-note is-hidden";
+    coloradoCompleteBtn.parentNode.insertBefore(coloradoCompleteNote, coloradoCompleteBtn);
+  }
+
   const fields = {
     fullName: document.getElementById("co-full-name"),
     address1: document.getElementById("co-address1"),
@@ -79,6 +87,8 @@
     coloradoVerifyCheckbox.checked = false;
     coloradoCompleteBtn.classList.add("is-hidden");
     coloradoCompleteBtn.disabled = true;
+    coloradoCompleteNote.classList.add("is-hidden");
+    coloradoCompleteNote.textContent = "";
     resultItemEl.textContent = formatMoney(PRODUCT.itemAmount);
     resultShippingEl.textContent = formatMoney(PRODUCT.shippingAmount);
     resultTaxEl.textContent = formatMoney(0);
@@ -238,12 +248,16 @@
       coloradoVerifyWrap.classList.remove("is-hidden");
       coloradoCompleteBtn.classList.remove("is-hidden");
       coloradoCompleteBtn.disabled = !coloradoVerifyCheckbox.checked;
-      setStatus("Colorado tax calculated. Verify the shipping address, then complete the order.");
+      coloradoCompleteNote.textContent = "Colorado tax is calculated. Verify the shipping address above, then click Complete Order.";
+      coloradoCompleteNote.classList.remove("is-hidden");
+      setStatus("PayPal is ready if you need to select a different shipping address.");
     } catch (error) {
       console.error(error);
       coloradoChangeNote.classList.add("is-hidden");
       coloradoVerifyWrap.classList.add("is-hidden");
       coloradoCompleteBtn.classList.add("is-hidden");
+      coloradoCompleteNote.classList.add("is-hidden");
+      coloradoCompleteNote.textContent = "";
       state.pendingQuote = null;
       setStatus(error && error.message ? error.message : "Could not calculate the Colorado total.", true);
     }

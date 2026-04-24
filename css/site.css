@@ -2918,3 +2918,19 @@ html[data-theme="dark"] .checkout-security-pill{
     border:1px solid rgba(147,197,253,0.22);
   }
 }
+
+
+/* Colorado final action note belongs with Complete Order, not the PayPal button */
+.checkout-complete-note{
+  margin:14px 0 0;
+  padding:12px 14px;
+  border-radius:14px;
+  border:1px solid rgba(255, 214, 102, 0.24);
+  background:rgba(217,165,31,0.10);
+  color:var(--text);
+  font-weight:700;
+  line-height:1.45;
+}
+.checkout-complete-note.is-hidden{
+  display:none;
+}
