@@ -2693,3 +2693,18 @@ html[data-theme="dark"] .forum-topic-list-static .forum-topic:focus-within{
     grid-template-columns:1fr;
   }
 }
+
+.checkout-address-card.is-hidden,
+#checkout-colorado-summary.is-hidden,
+#co-complete-button.is-hidden{
+  display:none;
+}
+.checkout-colorado-summary{
+  margin-top:14px;
+  padding:12px 14px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:var(--surface);
+  color:var(--text);
+  font-weight:700;
+}

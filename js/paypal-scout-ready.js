@@ -1,6 +1,8 @@
 (function () {
   const CONFIG_ENDPOINT = "/api/paypal/config";
   const CREATE_ORDER_ENDPOINT = "/api/paypal/orders";
+  const ORDER_DETAILS_ENDPOINT = "/api/paypal/orders/{orderID}/details";
+  const PREPARE_COLORADO_ENDPOINT = "/api/paypal/orders/{orderID}/prepare-colorado";
   const CAPTURE_ORDER_ENDPOINT = "/api/paypal/orders/{orderID}/capture";
   const SUCCESS_URL = "order-thank-you.html";
 
@@ -13,13 +15,30 @@
   const shippingAmountEl = document.getElementById("checkout-shipping-amount");
   const taxAmountEl = document.getElementById("checkout-tax-amount");
   const totalAmountEl = document.getElementById("checkout-total-amount");
+  const coloradoCard = document.getElementById("checkout-colorado-card");
+  const coloradoForm = document.getElementById("checkout-colorado-form");
+  const coloradoSummary = document.getElementById("checkout-colorado-summary");
+  const coloradoCompleteBtn = document.getElementById("co-complete-button");
+  const calcButton = document.getElementById("co-calc-button");
 
-  if (!status || !container || !itemAmountEl || !shippingAmountEl || !taxAmountEl || !totalAmountEl) return;
+  if (!status || !container || !itemAmountEl || !shippingAmountEl || !taxAmountEl || !totalAmountEl || !coloradoCard || !coloradoForm || !coloradoSummary || !coloradoCompleteBtn || !calcButton) return;
+
+  const fields = {
+    fullName: document.getElementById("co-full-name"),
+    address1: document.getElementById("co-address1"),
+    address2: document.getElementById("co-address2"),
+    city: document.getElementById("co-city"),
+    state: document.getElementById("co-state"),
+    postalCode: document.getElementById("co-postal")
+  };
 
   const state = {
     config: null,
     paypalLoaded: false,
-    buttonsRendered: false
+    buttonsRendered: false,
+    pendingOrderId: null,
+    pendingOrderDetails: null,
+    pendingQuote: null
   };
 
   function formatMoney(value) {
@@ -34,17 +53,14 @@
     status.classList.toggle("is-error", Boolean(isError));
   }
 
-  async function fetchJson(url, options) {
-    const response = await fetch(url, options);
-    const data = await response.json().catch(function () {
-      return {};
+  function fetchJson(url, options) {
+    return fetch(url, options).then(async function (response) {
+      const data = await response.json().catch(function () { return {}; });
+      if (!response.ok) {
+        throw new Error(data.message || "Request failed.");
+      }
+      return data;
     });
-
-    if (!response.ok) {
-      throw new Error(data.message || "Request failed.");
-    }
-
-    return data;
   }
 
   function loadPayPalSdk(clientId, currency) {
@@ -61,7 +77,7 @@
       }
 
       const script = document.createElement("script");
-      script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&components=buttons&currency=${encodeURIComponent(currency)}&intent=capture`;
+      script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&components=buttons&currency=${encodeURIComponent(currency)}&intent=capture&commit=false`;
       script.async = true;
       script.dataset.paypalSdk = "scout-ready";
       script.onload = resolve;
@@ -70,28 +86,75 @@
     });
   }
 
+  function showColoradoFallback(details) {
+    coloradoCard.classList.remove("is-hidden");
+    coloradoSummary.classList.add("is-hidden");
+    coloradoCompleteBtn.classList.add("is-hidden");
+    state.pendingQuote = null;
+
+    fields.fullName.value = details.fullName || "";
+    fields.address1.value = details.address1 || "";
+    fields.address2.value = details.address2 || "";
+    fields.city.value = details.city || "";
+    fields.state.value = details.state || "CO";
+    fields.postalCode.value = details.postalCode || "";
+
+    setStatus("Colorado address detected. Confirm the full street address below so we can finalize the exact tax before payment is captured.");
+  }
+
+  function updateSummaryFromQuote(quote) {
+    taxAmountEl.textContent = formatMoney(quote.taxAmount);
+    totalAmountEl.textContent = formatMoney(quote.totalAmount);
+    coloradoSummary.classList.remove("is-hidden");
+    coloradoSummary.textContent = `Colorado tax: ${formatMoney(quote.taxAmount)} • Final total: ${formatMoney(quote.totalAmount)}`;
+  }
+
+  function currentColoradoAddress() {
+    return {
+      fullName: fields.fullName.value.trim(),
+      address1: fields.address1.value.trim(),
+      address2: fields.address2.value.trim(),
+      city: fields.city.value.trim(),
+      state: fields.state.value.trim(),
+      postalCode: fields.postalCode.value.trim(),
+      countryCode: "US"
+    };
+  }
+
   async function ensurePayPalReady() {
     if (state.paypalLoaded) return;
-
-    state.config = state.config || await fetchJson(CONFIG_ENDPOINT, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
-
+    state.config = state.config || await fetchJson(CONFIG_ENDPOINT, { method: "GET", headers: { "Content-Type": "application/json" } });
     await loadPayPalSdk(state.config.clientId, state.config.currency || "USD");
-
     if (!window.paypal || !window.paypal.Buttons) {
       throw new Error("PayPal loaded, but the Buttons component was not available.");
     }
-
     state.paypalLoaded = true;
+  }
+
+  async function captureOrder(orderID) {
+    const endpoint = CAPTURE_ORDER_ENDPOINT.replace("{orderID}", encodeURIComponent(orderID));
+    await fetchJson(endpoint, { method: "POST", headers: { "Content-Type": "application/json" } });
+    window.location.href = SUCCESS_URL;
+  }
+
+  async function handleApproval(orderID) {
+    const detailsEndpoint = ORDER_DETAILS_ENDPOINT.replace("{orderID}", encodeURIComponent(orderID));
+    const details = await fetchJson(detailsEndpoint, { method: "GET", headers: { "Content-Type": "application/json" } });
+    const shippingAddress = details.shippingAddress || {};
+    state.pendingOrderId = orderID;
+    state.pendingOrderDetails = shippingAddress;
+
+    if ((shippingAddress.state || "").toUpperCase() === "CO") {
+      showColoradoFallback(shippingAddress);
+      return;
+    }
+
+    setStatus("Shipping address confirmed. Finalizing payment now.");
+    await captureOrder(orderID);
   }
 
   async function renderButtonsIfNeeded() {
     await ensurePayPalReady();
-
     if (state.buttonsRendered) {
       container.classList.remove("is-hidden");
       return;
@@ -104,35 +167,17 @@
         label: "paypal"
       },
       async createOrder() {
-        setStatus("Opening PayPal. Confirm the shipping address there so the final total can be calculated before payment.");
-
+        setStatus("Opening PayPal. Choose the shipping address there first. Colorado orders may return here for one final address confirmation step before payment is captured.");
         const orderData = await fetchJson(CREATE_ORDER_ENDPOINT, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            sku: "scout-30-unloaded",
-            quantity: 1
-          })
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sku: "scout-30-unloaded", quantity: 1 })
         });
-
-        if (!orderData.id) {
-          throw new Error("Could not create the PayPal order.");
-        }
-
+        if (!orderData.id) throw new Error("Could not create the PayPal order.");
         return orderData.id;
       },
       async onApprove(data) {
-        const endpoint = CAPTURE_ORDER_ENDPOINT.replace("{orderID}", encodeURIComponent(data.orderID));
-        await fetchJson(endpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          }
-        });
-
-        window.location.href = SUCCESS_URL;
+        await handleApproval(data.orderID);
       },
       onCancel() {
         setStatus("Checkout was cancelled before payment was completed.", true);
@@ -145,12 +190,66 @@
 
     state.buttonsRendered = true;
     container.classList.remove("is-hidden");
-    setStatus("PayPal is ready. The buyer should confirm the shipping address inside PayPal before completing payment.");
+    setStatus("PayPal is ready. PayPal opens first, and Colorado orders may return here for one final address confirmation step.");
   }
+
+  coloradoForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    if (!state.pendingOrderId) {
+      setStatus("Start PayPal first so we can tie the Colorado address to the right order.", true);
+      return;
+    }
+
+    calcButton.disabled = true;
+    try {
+      const quote = await fetchJson("/api/tax/quote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(currentColoradoAddress())
+      });
+      state.pendingQuote = quote;
+      updateSummaryFromQuote(quote);
+      coloradoCompleteBtn.classList.remove("is-hidden");
+      setStatus("Colorado tax calculated. Review the updated total, then complete the order.");
+    } catch (error) {
+      console.error(error);
+      setStatus(error && error.message ? error.message : "Could not calculate the Colorado total.", true);
+    } finally {
+      calcButton.disabled = false;
+    }
+  });
+
+  coloradoCompleteBtn.addEventListener("click", async function () {
+    if (!state.pendingOrderId) {
+      setStatus("Start PayPal first so we can finalize the correct order.", true);
+      return;
+    }
+    if (!state.pendingQuote) {
+      setStatus("Calculate the Colorado total before completing the order.", true);
+      return;
+    }
+
+    coloradoCompleteBtn.disabled = true;
+    try {
+      const prepareEndpoint = PREPARE_COLORADO_ENDPOINT.replace("{orderID}", encodeURIComponent(state.pendingOrderId));
+      await fetchJson(prepareEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(currentColoradoAddress())
+      });
+      setStatus("Colorado address confirmed. Finalizing payment now.");
+      await captureOrder(state.pendingOrderId);
+    } catch (error) {
+      console.error(error);
+      setStatus(error && error.message ? error.message : "Could not finalize the Colorado order.", true);
+    } finally {
+      coloradoCompleteBtn.disabled = false;
+    }
+  });
 
   itemAmountEl.textContent = formatMoney(PRICE);
   shippingAmountEl.textContent = formatMoney(SHIPPING);
-  taxAmountEl.textContent = "Calculated in PayPal";
+  taxAmountEl.textContent = "Finalized during checkout";
   totalAmountEl.textContent = formatMoney(PRICE + SHIPPING);
 
   renderButtonsIfNeeded().catch(function (error) {

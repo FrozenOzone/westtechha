@@ -25,7 +25,6 @@ function baseAmountBreakdown(currency) {
 
 function buildOrderPayload(context) {
   const currency = sanitizeEnvValue(context.env.PAYPAL_CURRENCY) || PRODUCT.currency;
-  const callbackUrl = new URL("/api/paypal/orders/update-callback", context.request.url).toString();
 
   return {
     intent: "CAPTURE",
@@ -57,11 +56,9 @@ function buildOrderPayload(context) {
       paypal: {
         experience_context: {
           shipping_preference: "GET_FROM_FILE",
-          user_action: "PAY_NOW",
-          order_update_callback_config: {
-            callback_events: ["SHIPPING_ADDRESS"],
-            callback_url: callbackUrl
-          }
+          user_action: "CONTINUE",
+          return_url: new URL("/order-thank-you.html", context.request.url).toString(),
+          cancel_url: new URL("/checkout-scout-30-unloaded.html", context.request.url).toString()
         }
       }
     }
@@ -76,9 +73,8 @@ export async function onRequestPost(context) {
       currency: sanitizeEnvValue(context.env.PAYPAL_CURRENCY) || PRODUCT.currency,
       hasClientId: Boolean(sanitizeEnvValue(context.env.PAYPAL_CLIENT_ID)),
       hasClientSecret: Boolean(sanitizeEnvValue(context.env.PAYPAL_CLIENT_SECRET)),
-      callbackUrl: payload.payment_source?.paypal?.experience_context?.order_update_callback_config?.callback_url || null,
-      callbackEvents: payload.payment_source?.paypal?.experience_context?.order_update_callback_config?.callback_events || [],
       shippingPreference: payload.payment_source?.paypal?.experience_context?.shipping_preference || null,
+      userAction: payload.payment_source?.paypal?.experience_context?.user_action || null,
       sku: PRODUCT.sku,
       baseValue: payload.purchase_units?.[0]?.amount?.value || null
     }));
@@ -120,9 +116,7 @@ export async function onRequestPost(context) {
       status: data.status || null
     });
   } catch (error) {
-    console.log("[paypal.orders.create] error", JSON.stringify({
-      message: error.message || "Unexpected error while creating the PayPal order."
-    }));
+    console.log("[paypal.orders.create] error", JSON.stringify({ message: error.message || "Unknown error" }));
     return jsonResponse({
       ok: false,
       message: error.message || "Unexpected error while creating the PayPal order."
