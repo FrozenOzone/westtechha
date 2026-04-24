@@ -2683,7 +2683,17 @@ html[data-theme="dark"] .forum-topic-list-static .forum-topic:focus-within{
 }
 .checkout-tax-button{
   width:100%;
+  min-height:52px;
+  padding:0 20px;
   justify-content:center;
+  font-size:1rem;
+  font-weight:800;
+}
+.checkout-tax-button-secondary{
+  margin-top:2px;
+}
+.checkout-tax-button-primary{
+  margin-top:14px;
 }
 .paypal-button-container.is-hidden{
   display:none;
@@ -2707,4 +2717,51 @@ html[data-theme="dark"] .forum-topic-list-static .forum-topic:focus-within{
   background:var(--surface);
   color:var(--text);
   font-weight:700;
+}
+.checkout-total-line.is-final{
+  margin-top:18px;
+  padding:14px 16px;
+  border-radius:16px;
+  border:1px solid rgba(255, 214, 102, 0.28);
+  background:linear-gradient(180deg, rgba(217,165,31,0.10) 0%, rgba(191,136,16,0.06) 100%);
+}
+.checkout-total-line.is-final strong{
+  font-size:1.32rem;
+  color:#f7d66e;
+}
+.checkout-colorado-result{
+  margin-top:14px;
+  padding:16px;
+  border-radius:16px;
+  border:1px solid rgba(255, 214, 102, 0.24);
+  background:linear-gradient(180deg, rgba(20,34,63,0.92) 0%, rgba(11,18,32,0.98) 100%);
+  box-shadow:0 14px 28px rgba(2, 6, 23, 0.28);
+}
+.checkout-colorado-result-title{
+  font-size:0.86rem;
+  font-weight:800;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:12px;
+}
+.checkout-colorado-result-lines{
+  display:grid;
+  gap:10px;
+}
+.checkout-colorado-result-total{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-top:4px;
+  padding-top:12px;
+  border-top:1px solid var(--border);
+  font-size:1.04rem;
+  font-weight:800;
+}
+.checkout-colorado-result-total strong{
+  white-space:nowrap;
+  font-size:1.24rem;
+  color:#f7d66e;
 }

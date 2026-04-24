@@ -15,13 +15,20 @@
   const shippingAmountEl = document.getElementById("checkout-shipping-amount");
   const taxAmountEl = document.getElementById("checkout-tax-amount");
   const totalAmountEl = document.getElementById("checkout-total-amount");
+  const totalLabelEl = document.getElementById("checkout-total-label");
+  const totalLineEl = document.getElementById("checkout-total-line");
   const coloradoCard = document.getElementById("checkout-colorado-card");
   const coloradoForm = document.getElementById("checkout-colorado-form");
   const coloradoSummary = document.getElementById("checkout-colorado-summary");
+  const coloradoResult = document.getElementById("checkout-colorado-result");
+  const resultItemEl = document.getElementById("co-result-item");
+  const resultShippingEl = document.getElementById("co-result-shipping");
+  const resultTaxEl = document.getElementById("co-result-tax");
+  const resultTotalEl = document.getElementById("co-result-total");
   const coloradoCompleteBtn = document.getElementById("co-complete-button");
   const calcButton = document.getElementById("co-calc-button");
 
-  if (!status || !container || !itemAmountEl || !shippingAmountEl || !taxAmountEl || !totalAmountEl || !coloradoCard || !coloradoForm || !coloradoSummary || !coloradoCompleteBtn || !calcButton) return;
+  if (!status || !container || !itemAmountEl || !shippingAmountEl || !taxAmountEl || !totalAmountEl || !totalLabelEl || !totalLineEl || !coloradoCard || !coloradoForm || !coloradoSummary || !coloradoResult || !resultItemEl || !resultShippingEl || !resultTaxEl || !resultTotalEl || !coloradoCompleteBtn || !calcButton) return;
 
   const fields = {
     fullName: document.getElementById("co-full-name"),
@@ -46,6 +53,19 @@
       style: "currency",
       currency: "USD"
     }).format(Number(value || 0));
+  }
+
+  function resetBaseSummary() {
+    taxAmountEl.textContent = "Finalized during checkout";
+    totalLabelEl.textContent = "Base total before any applicable tax";
+    totalAmountEl.textContent = formatMoney(PRICE + SHIPPING);
+    totalLineEl.classList.remove("is-final");
+    coloradoSummary.classList.add("is-hidden");
+    coloradoResult.classList.add("is-hidden");
+    resultItemEl.textContent = formatMoney(PRICE);
+    resultShippingEl.textContent = formatMoney(SHIPPING);
+    resultTaxEl.textContent = formatMoney(0);
+    resultTotalEl.textContent = formatMoney(PRICE + SHIPPING);
   }
 
   function setStatus(message, isError) {
@@ -88,7 +108,7 @@
 
   function showColoradoFallback(details) {
     coloradoCard.classList.remove("is-hidden");
-    coloradoSummary.classList.add("is-hidden");
+    resetBaseSummary();
     coloradoCompleteBtn.classList.add("is-hidden");
     state.pendingQuote = null;
 
@@ -104,9 +124,16 @@
 
   function updateSummaryFromQuote(quote) {
     taxAmountEl.textContent = formatMoney(quote.taxAmount);
+    totalLabelEl.textContent = "Final total including Colorado tax";
     totalAmountEl.textContent = formatMoney(quote.totalAmount);
+    totalLineEl.classList.add("is-final");
     coloradoSummary.classList.remove("is-hidden");
     coloradoSummary.textContent = `Colorado tax: ${formatMoney(quote.taxAmount)} • Final total: ${formatMoney(quote.totalAmount)}`;
+    coloradoResult.classList.remove("is-hidden");
+    resultItemEl.textContent = formatMoney(PRICE);
+    resultShippingEl.textContent = formatMoney(SHIPPING);
+    resultTaxEl.textContent = formatMoney(quote.taxAmount);
+    resultTotalEl.textContent = formatMoney(quote.totalAmount);
   }
 
   function currentColoradoAddress() {
@@ -249,8 +276,7 @@
 
   itemAmountEl.textContent = formatMoney(PRICE);
   shippingAmountEl.textContent = formatMoney(SHIPPING);
-  taxAmountEl.textContent = "Finalized during checkout";
-  totalAmountEl.textContent = formatMoney(PRICE + SHIPPING);
+  resetBaseSummary();
 
   renderButtonsIfNeeded().catch(function (error) {
     console.error(error);
