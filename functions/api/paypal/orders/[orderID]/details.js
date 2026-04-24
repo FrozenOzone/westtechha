@@ -1,5 +1,6 @@
 import { generateAccessToken, paypalBaseUrl } from "../../../../_lib/paypal.js";
 import { jsonResponse, readJsonSafe } from "../../../../_lib/shared.js";
+import { getOrderByPayPalOrderId, requireOrdersDb } from "../../../../_lib/orders.js";
 
 function extractAddress(data) {
   const shipping = data?.purchase_units?.[0]?.shipping || {};
@@ -39,14 +40,18 @@ export async function onRequestGet(context) {
       }
     });
     const data = await readJsonSafe(response);
+    const purchaseMeta = extractPurchaseMeta(data);
+    const ordersDb = requireOrdersDb(context.env);
+    const dbOrder = await getOrderByPayPalOrderId(ordersDb, orderID);
     console.log("[paypal.orders.details] paypal-response", JSON.stringify({
       status: response.status,
       ok: response.ok,
       id: data.id || null,
       orderStatus: data.status || null,
       shipping: extractAddress(data),
-      invoiceId: extractPurchaseMeta(data).invoiceId || null,
-      customId: extractPurchaseMeta(data).customId || null
+      paypalInvoiceId: purchaseMeta.invoiceId || null,
+      dbInvoiceId: dbOrder?.invoiceId || null,
+      customId: purchaseMeta.customId || dbOrder?.customId || null
     }));
 
     if (!response.ok) {
@@ -63,8 +68,8 @@ export async function onRequestGet(context) {
       id: data.id,
       status: data.status || null,
       shippingAddress: extractAddress(data),
-      invoiceId: extractPurchaseMeta(data).invoiceId || null,
-      customId: extractPurchaseMeta(data).customId || null,
+      invoiceId: purchaseMeta.invoiceId || dbOrder?.invoiceId || null,
+      customId: purchaseMeta.customId || dbOrder?.customId || null,
       payer: data.payer || null
     });
   } catch (error) {

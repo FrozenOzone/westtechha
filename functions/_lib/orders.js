@@ -88,6 +88,23 @@ export async function setPayPalCreateFailed(db, { invoiceId }) {
   `).bind(invoiceId).run();
 }
 
+export async function getOrderByPayPalOrderId(db, paypalOrderId) {
+  if (!paypalOrderId) return null;
+  const row = await db.prepare(`
+    SELECT
+      invoice_id AS invoiceId,
+      custom_id AS customId,
+      paypal_order_id AS paypalOrderId,
+      paypal_capture_id AS captureId,
+      status,
+      total_amount AS totalAmount
+    FROM orders
+    WHERE paypal_order_id = ?
+    LIMIT 1
+  `).bind(paypalOrderId).first();
+  return row || null;
+}
+
 export async function updateOrderForColorado(db, { paypalOrderId, quote, shippingAddress }) {
   if (!paypalOrderId) return;
   await db.prepare(`
