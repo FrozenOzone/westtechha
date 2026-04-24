@@ -216,18 +216,12 @@
     await captureOrder(orderID);
   }
 
-  function isDarkCheckoutTheme() {
-    const explicitTheme = document.documentElement.getAttribute("data-theme");
-    if (explicitTheme) return explicitTheme === "dark";
-    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-  }
-
   function paypalButtonStyle() {
     return {
       shape: "rect",
       layout: "vertical",
       label: "paypal",
-      color: isDarkCheckoutTheme() ? "silver" : "gold"
+      color: "gold"
     };
   }
 
