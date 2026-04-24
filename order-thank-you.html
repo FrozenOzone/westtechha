@@ -11,6 +11,15 @@
 <body><div class="page"><div id="site-header"></div>
 <header class="page-header"><div class="eyebrow"><span class="dot"></span>Order Received</div><h1>Thank you for your order.</h1><p class="tagline">We’ve received your order, and your payment has been successfully submitted. We truly appreciate your business and your support of <strong>WestTech Home Automation, LLC</strong>.</p></header>
 
+<section class="section order-confirmation-summary">
+  <article class="product-card order-number-card">
+    <div class="product-label">WestTech Order #</div>
+    <div id="westtech-order-number" class="product-name">Loading order number…</div>
+    <span class="product-status">Payment received</span>
+    <p class="product-body">Please keep this order number with your PayPal receipt for your records.</p>
+  </article>
+</section>
+
 <section class="section"><div class="section-header"><div><div class="section-tag">What happens next</div><div class="section-title">Here’s what to expect after checkout.</div></div><p>Your order is in our queue and will move through review, handling, packaging, and shipment preparation before it ships.</p></div>
 <div class="product-grid">
 <article class="product-card"><div class="product-label">Step 1</div><div class="product-name">Order review</div><span class="product-status">Payment received</span><p class="product-body">Your order will now move into our review and processing queue. We will verify the order details, prepare your items, and get your shipment ready as quickly as possible.</p></article>
@@ -28,4 +37,19 @@
 </section>
 
 <div id="site-footer"></div></div>
-<script src="js/site-shell.js"></script><script src="js/theme.js" defer></script></body></html>
+<script src="js/site-shell.js"></script><script src="js/theme.js" defer></script>
+<script>
+(function () {
+  const el = document.getElementById("westtech-order-number");
+  if (!el) return;
+  const params = new URLSearchParams(window.location.search);
+  const invoiceId = params.get("order") || params.get("invoice") || (function () {
+    try { return sessionStorage.getItem("westtechInvoiceId"); } catch (error) { return ""; }
+  })();
+  if (invoiceId) {
+    el.textContent = invoiceId;
+  } else {
+    el.textContent = "See your PayPal receipt";
+  }
+})();
+</script></body></html>

@@ -2957,3 +2957,37 @@ html[data-theme="dark"] .checkout-security-pill{
   background:rgba(217,165,31,0.16);
   color:#f7d66e;
 }
+
+/* WestTech order number display inside Colorado confirmation */
+.checkout-address-card .checkout-address-display .checkout-static-field{
+  gap:4px;
+  align-content:start;
+}
+
+.checkout-address-card .checkout-address-display .checkout-static-value{
+  display:block;
+  margin:0;
+  line-height:1.25;
+  font-size:1.05rem;
+  font-weight:800;
+  color:var(--text);
+}
+
+
+/* Order thank-you page order number display */
+.order-confirmation-summary{
+  padding-top:0;
+}
+
+.order-confirmation-summary .order-number-card{
+  max-width:720px;
+  margin:0 auto;
+  border-color:rgba(255, 214, 102, 0.28);
+  background:linear-gradient(180deg, rgba(217,165,31,0.10) 0%, rgba(20,34,63,0.12) 100%);
+}
+
+.order-confirmation-summary #westtech-order-number{
+  color:#f7d66e;
+  font-size:clamp(1.45rem, 3vw, 2.1rem);
+  letter-spacing:0.03em;
+}

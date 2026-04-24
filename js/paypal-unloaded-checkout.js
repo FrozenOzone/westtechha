@@ -38,6 +38,7 @@
   const resultTaxEl = document.getElementById("co-result-tax");
   const resultTotalEl = document.getElementById("co-result-total");
   const coloradoCompleteBtn = document.getElementById("co-complete-button");
+  const invoiceIdEl = document.getElementById("co-invoice-id");
 
   if (!status || !container || !itemAmountEl || !shippingAmountEl || !taxAmountEl || !totalAmountEl || !totalLabelEl || !totalLineEl || !coloradoCard || !coloradoForm || !coloradoSummary || !coloradoResult || !coloradoVerifyWrap || !coloradoChangeNote || !coloradoVerifyCheckbox || !resultItemEl || !resultShippingEl || !resultTaxEl || !resultTotalEl || !coloradoCompleteBtn) return;
 
@@ -64,7 +65,8 @@
     buttonsRendered: false,
     pendingOrderId: null,
     pendingOrderDetails: null,
-    pendingQuote: null
+    pendingQuote: null,
+    pendingInvoiceId: null
   };
 
   function formatMoney(value) {
@@ -73,6 +75,11 @@
 
   function baseTotal() {
     return PRODUCT.itemAmount + PRODUCT.shippingAmount;
+  }
+
+  function updateInvoiceIdDisplay() {
+    if (!invoiceIdEl) return;
+    invoiceIdEl.textContent = state.pendingInvoiceId || "Pending…";
   }
 
   function resetBaseSummary() {
@@ -94,6 +101,7 @@
     resultTaxEl.textContent = formatMoney(0);
     resultTotalEl.textContent = formatMoney(baseTotal());
     if (resultItemNameEl) resultItemNameEl.textContent = PRODUCT.name;
+    updateInvoiceIdDisplay();
   }
 
   function setStatus(message, isError) {
@@ -126,6 +134,7 @@
     const itemNameEls = document.querySelectorAll("[data-checkout-product-name]");
     itemNameEls.forEach((el) => { el.textContent = PRODUCT.name; });
     if (resultItemNameEl) resultItemNameEl.textContent = PRODUCT.name;
+    updateInvoiceIdDisplay();
   }
 
   async function loadProductConfig() {
@@ -182,6 +191,7 @@
     resultTaxEl.textContent = formatMoney(quote.taxAmount);
     resultTotalEl.textContent = formatMoney(quote.totalAmount);
     if (resultItemNameEl) resultItemNameEl.textContent = PRODUCT.name;
+    updateInvoiceIdDisplay();
   }
 
   function currentColoradoAddress() {
@@ -207,7 +217,13 @@
 
   async function captureOrder(orderID) {
     const endpoint = CAPTURE_ORDER_ENDPOINT.replace("{orderID}", encodeURIComponent(orderID));
-    await fetchJson(endpoint, { method: "POST", headers: { "Content-Type": "application/json" } });
+    const captureData = await fetchJson(endpoint, { method: "POST", headers: { "Content-Type": "application/json" } });
+    const invoiceId = captureData.invoiceId || state.pendingInvoiceId || "";
+    if (invoiceId) {
+      try { sessionStorage.setItem("westtechInvoiceId", invoiceId); } catch (error) {}
+      window.location.href = `${SUCCESS_URL}?order=${encodeURIComponent(invoiceId)}`;
+      return;
+    }
     window.location.href = SUCCESS_URL;
   }
 
@@ -301,6 +317,8 @@
           body: JSON.stringify({ sku: PRODUCT.sku, quantity: 1 })
         });
         if (!orderData.id) throw new Error("Could not create the PayPal order.");
+        state.pendingInvoiceId = orderData.invoiceId || null;
+        updateInvoiceIdDisplay();
         return orderData.id;
       },
       async onApprove(data) { await handleApproval(data.orderID); },

@@ -82,10 +82,11 @@
           <div class="checkout-address-display">
             <div class="checkout-address-display-title">Address from PayPal</div>
             <div class="checkout-field-grid">
-            <label class="checkout-field checkout-field-full">
-              <span>Full name <em>(from PayPal shipping details)</em></span>
-              <input id="co-full-name" autocomplete="name" readonly disabled type="text"/>
-            </label>
+            <div class="checkout-field checkout-field-full checkout-static-field">
+              <span>WestTech Order #</span>
+              <strong id="co-invoice-id" class="checkout-static-value">Pending…</strong>
+              <input id="co-full-name" type="hidden"/>
+            </div>
             <label class="checkout-field checkout-field-full">
               <span>Address line 1</span>
               <input id="co-address1" autocomplete="shipping address-line1" readonly disabled required type="text"/>
