@@ -136,7 +136,7 @@
         return;
       }
       const script = document.createElement("script");
-      script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&components=buttons&currency=${encodeURIComponent(currency)}&intent=capture&commit=false`;
+      script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&components=buttons&currency=${encodeURIComponent(currency)}&intent=capture&commit=false&disable-funding=card,paylater,credit`;
       script.async = true;
       script.dataset.paypalSdk = "unloaded-checkout";
       script.onload = resolve;
@@ -216,6 +216,21 @@
     await captureOrder(orderID);
   }
 
+  function isDarkCheckoutTheme() {
+    const explicitTheme = document.documentElement.getAttribute("data-theme");
+    if (explicitTheme) return explicitTheme === "dark";
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+
+  function paypalButtonStyle() {
+    return {
+      shape: "rect",
+      layout: "vertical",
+      label: "paypal",
+      color: isDarkCheckoutTheme() ? "silver" : "gold"
+    };
+  }
+
   async function calculateColoradoQuote() {
     try {
       const quote = await fetchJson("/api/tax/quote", {
@@ -247,7 +262,8 @@
       return;
     }
     await window.paypal.Buttons({
-      style: { shape: "rect", layout: "vertical", label: "paypal" },
+      fundingSource: window.paypal.FUNDING.PAYPAL,
+      style: paypalButtonStyle(),
       async createOrder() {
         setStatus("Opening PayPal. Choose the shipping address there first. Colorado orders may return here for one final address confirmation step before payment is captured.");
         const orderData = await fetchJson(CREATE_ORDER_ENDPOINT, {
