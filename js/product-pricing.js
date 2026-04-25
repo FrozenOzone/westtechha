@@ -18,6 +18,18 @@
     return product.shippingTierSummary || `Shipping tiers: 1 unit ${formatMoney(product.shippingAmount)} • 2 units $10.95 • 3-4 units $14.95 • 5+ units custom / email order`;
   }
 
+  function familyMinPrice(products, family) {
+    const familyProducts = Object.values(products).filter(function (product) {
+      return product.family === family;
+    });
+
+    if (!familyProducts.length) return null;
+
+    return Math.min.apply(null, familyProducts.map(function (product) {
+      return Number(product.unitAmount || product.itemAmount || 0);
+    }));
+  }
+
   function updateProductPrice(products) {
     document.querySelectorAll("[data-product-price]").forEach(function (el) {
       const product = products[el.getAttribute("data-product-price")];
@@ -31,15 +43,26 @@
 
     document.querySelectorAll("[data-product-from]").forEach(function (el) {
       const family = el.getAttribute("data-product-from");
-      const suffix = el.getAttribute("data-product-from-suffix") || "";
-      const familyProducts = Object.values(products).filter(function (product) {
-        return product.family === family;
-      });
-      if (!familyProducts.length) return;
-      const minPrice = Math.min.apply(null, familyProducts.map(function (product) {
-        return Number(product.unitAmount || product.itemAmount || 0);
-      }));
-      el.textContent = `From ${formatMoney(minPrice)}${suffix}`;
+      const minPrice = familyMinPrice(products, family);
+
+      if (minPrice === null) return;
+
+      const amount = formatMoney(minPrice);
+      const format = el.getAttribute("data-product-from-format") || "";
+      const prefix = el.getAttribute("data-product-from-prefix");
+      const suffix = el.getAttribute("data-product-from-suffix");
+
+      if (format === "amount-only") {
+        el.textContent = amount;
+        return;
+      }
+
+      if (prefix !== null || suffix !== null) {
+        el.textContent = `${prefix || ""}${amount}${suffix || ""}`;
+        return;
+      }
+
+      el.textContent = `From ${amount}`;
     });
   }
 
