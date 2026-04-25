@@ -3061,3 +3061,68 @@ html[data-theme="dark"] .checkout-security-pill{
     text-align:center;
   }
 }
+
+
+/* ===== Home page desktop headline width fix =====
+   Keeps the home page headlines from stacking too vertically on PC screens.
+   Scoped to index.html only through home-* classes. */
+@media (min-width: 981px){
+  .home-page-header h1{
+    max-width: 920px;
+  }
+
+  .home-page-header .tagline{
+    max-width: 900px;
+  }
+
+  .home-hero-panel .section-title{
+    max-width: 760px;
+  }
+}
+
+
+/* ===== Home page full-width family product line =====
+   Removes the side ladder column and lets the Family-Based Product Line panel use the full content width. */
+@media (min-width: 981px){
+  .home-hero-band{
+    grid-template-columns: 1fr;
+  }
+
+  .home-hero-panel{
+    width: 100%;
+  }
+
+  .home-hero-panel .section-title{
+    max-width: 920px;
+  }
+
+  .home-hero-panel .lead{
+    max-width: 980px;
+  }
+}
+
+
+/* ===== Products page desktop headline width fix =====
+   Keeps the Products page headline from stacking too vertically on PC screens. */
+@media (min-width: 981px){
+  .products-page-header h1{
+    max-width: 920px;
+  }
+
+  .products-page-header .tagline{
+    max-width: 980px;
+  }
+}
+
+
+/* ===== Site-wide desktop page-header width standard =====
+   Keeps top page headlines more horizontal and consistent on PC screens. */
+@media (min-width: 981px){
+  .page-header h1{
+    max-width: 920px;
+  }
+
+  .page-header .tagline{
+    max-width: 980px;
+  }
+}
