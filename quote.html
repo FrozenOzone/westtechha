@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Quote &amp; Custom Orders – WestTech Home Automation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Request a quote, Loaded enclosure, custom quantity, compatibility review, or special request from WestTech Home Automation."/>
+  <link href="icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="css/site.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="page">
+  <div id="site-header"></div>
+
+  <header class="page-header">
+    <div class="eyebrow"><span class="dot"></span>Quote • Loaded • Custom Request</div>
+    <h1>Request a quote or custom order.</h1>
+    <p class="tagline">Use this page when your request does not fit the simple Buy button path: Loaded products, custom quantities, compatibility questions, Command discussions, or a special project that needs review.</p>
+  </header>
+
+  <section class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-tag">Quote Path</div>
+        <div class="section-title">When to use this page</div>
+      </div>
+      <p>Standard Scout and Ranger Unloaded purchases should start from the product pages. Use the quote path when you need help deciding, need more than a standard order, or want WestTechHA to review the project first.</p>
+    </div>
+    <div class="product-grid">
+      <article class="product-card">
+        <div class="product-label">Loaded Products</div>
+        <div class="product-name">Pre-loaded for the selected family</div>
+        <p class="product-body">Use this path when you want the enclosure prepared with hardware appropriate for the selected Scout or Ranger family.</p>
+      </article>
+      <article class="product-card">
+        <div class="product-label">Quantity / Custom</div>
+        <div class="product-name">Quantity or special order review</div>
+        <p class="product-body">Use this path for 5+ units, repeatable installer work, quantity discussion, or requests that need a custom quote before purchase.</p>
+      </article>
+      <article class="product-card">
+        <div class="product-label">Compatibility</div>
+        <div class="product-name">Fit, board, or layout questions</div>
+        <p class="product-body">Use this path when you are not sure whether Scout or Ranger is the right fit, or whether you need a 30-pin or 38-pin layout.</p>
+      </article>
+      <article class="product-card">
+        <div class="product-label">Special Requests</div>
+        <div class="product-name">Projects that need review</div>
+        <p class="product-body">Use this path for unusual hardware, lid/display questions, Command discussions, or anything that should be reviewed before quoting.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-tag">Quote Form</div>
+        <div class="section-title">Send the request details</div>
+      </div>
+      <p>The more detail you provide, the easier it is to confirm the right family, layout, and quote path. This form sends directly to <strong>orders@westtechha.com</strong>.</p>
+    </div>
+
+    <form class="wt-order" id="quote-form" action="https://formsubmit.co/orders@westtechha.com" method="POST">
+      <input id="quote-subject" type="hidden" name="_subject" value="WestTech Home Automation Quote Request"/>
+      <input id="quote-next" type="hidden" name="_next" value=""/>
+      <input type="hidden" name="_captcha" value="true"/>
+      <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off"/>
+
+      <fieldset class="wt-fieldset">
+        <legend>Contact Details</legend>
+        <div class="wt-grid">
+          <div>
+            <label for="name">Name</label>
+            <input id="name" name="name" placeholder="Your name" type="text"/>
+          </div>
+          <div>
+            <label for="email">Email</label>
+            <input id="email" name="email" placeholder="you@example.com" type="email"/>
+          </div>
+          <div>
+            <label for="phone">Phone (optional)</label>
+            <input id="phone" name="phone" placeholder="(555) 555-5555" type="tel"/>
+          </div>
+          <div>
+            <label for="timeline">Timing</label>
+            <select id="timeline" name="timeline">
+              <option value="">Select…</option>
+              <option value="asap">ASAP</option>
+              <option value="2w">~2 weeks</option>
+              <option value="month">~1 month</option>
+              <option value="flex">Flexible</option>
+            </select>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="wt-fieldset">
+        <legend>Request Details</legend>
+        <div class="wt-grid">
+          <div>
+            <label for="requestType">Request Type</label>
+            <select id="requestType" name="requestType">
+              <option value="">Select…</option>
+              <option value="loaded">Loaded product quote</option>
+              <option value="quantity">Quantity / 5+ units</option>
+              <option value="compatibility">Compatibility / fit review</option>
+              <option value="special">Special request</option>
+              <option value="command">Command / larger-family discussion</option>
+              <option value="unsure">Not sure yet</option>
+            </select>
+          </div>
+          <div>
+            <label for="family">Product Family</label>
+            <select id="family" name="family">
+              <option value="">Select…</option>
+              <option value="scout">Scout</option>
+              <option value="ranger">Ranger</option>
+              <option value="command">Command / coming soon</option>
+              <option value="unsure">Not sure yet</option>
+            </select>
+          </div>
+          <div>
+            <label for="offerLevel">Offer Level</label>
+            <select id="offerLevel" name="offerLevel">
+              <option value="">Select…</option>
+              <option value="unloaded">Unloaded</option>
+              <option value="loaded">Loaded</option>
+              <option value="unsure">Not sure yet</option>
+            </select>
+          </div>
+          <div>
+            <label for="boardLayout">Board Layout</label>
+            <select id="boardLayout" name="boardLayout">
+              <option value="">Select…</option>
+              <option value="30-pin">30-pin</option>
+              <option value="38-pin">38-pin</option>
+              <option value="unsure">Not sure yet</option>
+            </select>
+          </div>
+          <div>
+            <label for="quantity">Quantity</label>
+            <input id="quantity" name="quantity" placeholder="1, 2, 5..." type="text"/>
+          </div>
+          <div>
+            <label for="projectType">Project Type</label>
+            <select id="projectType" name="projectType">
+              <option value="">Select…</option>
+              <option value="diy">DIY / personal project</option>
+              <option value="installer">Installer / repeatable project</option>
+              <option value="fit-help">Need fit / compatibility help</option>
+              <option value="unsure">Not sure yet</option>
+            </select>
+          </div>
+          <div>
+            <label for="display">Display / Lid Preference (optional)</label>
+            <select id="display" name="display">
+              <option value="">Select…</option>
+              <option value="blank">Blank / no display opening</option>
+              <option value="oled">OLED-style lid</option>
+              <option value="lcd">LCD-style lid</option>
+              <option value="unsure">Not sure</option>
+            </select>
+          </div>
+          <div>
+            <label for="shippingState">Shipping State / Region (optional)</label>
+            <input id="shippingState" name="shippingState" placeholder="e.g., Colorado" type="text"/>
+          </div>
+          <div class="wt-full">
+            <label for="hardwareNotes">Board / Hardware Notes</label>
+            <input id="hardwareNotes" name="hardwareNotes" placeholder="Breakout board, relay board, sensors, spacing notes, etc." type="text"/>
+          </div>
+          <div class="wt-full">
+            <label for="details">Project Details</label>
+            <textarea id="details" name="details" placeholder="Tell us what you are building, which family you are considering, whether you want Unloaded or Loaded, which board layout you need, and any fit or quantity questions you want reviewed."></textarea>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="wt-fieldset">
+        <legend>Acknowledgement</legend>
+        <div class="wt-check">
+          <input id="ack" type="checkbox" name="acknowledgement" value="I understand this starts a quote or custom request"/>
+          <label for="ack">I understand this starts a quote or custom request and does not guarantee immediate availability.</label>
+        </div>
+      </fieldset>
+
+      <button class="btn-submit" type="submit">Send Quote Request</button>
+      <p class="form-note">This form sends the request to <strong>orders@westtechha.com</strong> and then returns the visitor to the WestTechHA thank-you page.</p>
+    </form>
+  </section>
+
+  <section class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-tag">Standard Purchases</div>
+        <div class="section-title">Buying standard Unloaded products?</div>
+      </div>
+      <p>If you are ready to purchase a standard Scout or Ranger Unloaded product, start from the product family page instead of this quote form.</p>
+    </div>
+    <div class="product-cta-row">
+      <a class="btn btn-buy-pop" href="product-scout.html">View Scout</a>
+      <a class="btn btn-buy-pop" href="product-ranger.html">View Ranger</a>
+      <a class="btn btn-outline" href="products.html">View All Products</a>
+    </div>
+  </section>
+
+  <div id="site-footer"></div>
+</div>
+
+<script src="js/site-shell.js"></script>
+<script src="js/theme.js" defer></script>
+<script>
+(function () {
+  const form = document.getElementById('quote-form');
+  const requestType = document.getElementById('requestType');
+  const family = document.getElementById('family');
+  const offerLevel = document.getElementById('offerLevel');
+  const subject = document.getElementById('quote-subject');
+  const next = document.getElementById('quote-next');
+
+  if (!form || !subject || !next) return;
+
+  function selectedText(el) {
+    if (!el || el.selectedIndex < 0) return '';
+    return el.options[el.selectedIndex].text || '';
+  }
+
+  function applyQuoteMeta() {
+    let subjectLine = 'WestTech Home Automation Quote Request';
+    const parts = [];
+
+    if (requestType && requestType.value) parts.push(selectedText(requestType));
+    if (family && family.value) parts.push(selectedText(family));
+    if (offerLevel && offerLevel.value) parts.push(selectedText(offerLevel));
+
+    if (parts.length) subjectLine += ': ' + parts.join(' - ');
+    subject.value = subjectLine;
+  }
+
+  next.value = new URL('thank-you.html', window.location.href).href;
+  applyQuoteMeta();
+
+  [requestType, family, offerLevel].forEach(function (el) {
+    if (el) el.addEventListener('change', applyQuoteMeta);
+  });
+
+  form.addEventListener('submit', applyQuoteMeta);
+})();
+</script>
+</body>
+</html>

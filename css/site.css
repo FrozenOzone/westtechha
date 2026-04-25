@@ -3102,27 +3102,62 @@ html[data-theme="dark"] .checkout-security-pill{
 }
 
 
-/* ===== Products page desktop headline width fix =====
-   Keeps the Products page headline from stacking too vertically on PC screens. */
-@media (min-width: 981px){
-  .products-page-header h1{
-    max-width: 920px;
-  }
+/* ===== Home hero pill style match v3 - theme aware =====
+   Matches the top header capsule style without breaking light mode. */
+.home-hero-panel .hero-pills{
+  gap: 10px;
+}
 
-  .products-page-header .tagline{
-    max-width: 980px;
+.home-hero-panel .hero-pills .pill{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--subcard-border);
+  background: var(--subcard-surface);
+  color: var(--muted);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 8px 13px;
+  border-radius: 999px;
+  box-shadow: none;
+}
+
+.home-hero-panel .hero-pills .pill::before{
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #4f78c2, #8fb2e1);
+  flex: 0 0 auto;
+}
+
+html[data-theme="dark"] .home-hero-panel .hero-pills .pill{
+  color: var(--muted-strong);
+}
+
+
+/* ===== Home hero pill Auto-dark match =====
+   Auto mode removes data-theme, so this makes Auto-dark match explicit Dark. */
+@media (prefers-color-scheme: dark){
+  html:not([data-theme]) .home-hero-panel .hero-pills .pill{
+    color: var(--muted-strong);
   }
 }
 
 
-/* ===== Site-wide desktop page-header width standard =====
-   Keeps top page headlines more horizontal and consistent on PC screens. */
+/* ===== Site-wide desktop page-header width standard v2 =====
+   Makes top page headlines use a wider desktop line length across Products, Services,
+   Order, Support, Contact, and product-family pages. */
 @media (min-width: 981px){
-  .page-header h1{
-    max-width: 920px;
+  .page-header h1,
+  .forum-hero h1{
+    max-width: 980px;
   }
 
-  .page-header .tagline{
+  .page-header .tagline,
+  .forum-hero p{
     max-width: 980px;
   }
 }

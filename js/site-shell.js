@@ -6,7 +6,7 @@
     { href: 'index.html',    label: 'Home' },
     { href: 'products.html', label: 'Products' },
     { href: 'services.html', label: 'Services' },
-    { href: 'order.html',    label: 'Order' },
+    { href: 'quote.html',    label: 'Quote' },
     { href: 'support.html',  label: 'Support' },
     { href: 'contact.html',  label: 'Contact' }
   ];
