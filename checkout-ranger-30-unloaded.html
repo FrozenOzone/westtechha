@@ -65,6 +65,18 @@
     <aside class="checkout-card checkout-summary-card">
       <div class="product-label">Order Summary</div>
       <h2>Review your purchase</h2>
+      <div class="checkout-mini-card checkout-color-card">
+        <div class="product-label">Color</div>
+        <label class="checkout-quantity-label" for="checkout-color">
+          <span>Choose color</span>
+          <select id="checkout-color" class="checkout-quantity-select">
+            <option value="White" selected>White</option>
+            <option value="Black">Black</option>
+          </select>
+        </label>
+        <p class="checkout-mini-note">Available colors: White or Black.</p>
+      </div>
+
       <div class="checkout-mini-card checkout-quantity-card">
         <div class="product-label">Quantity & Shipping</div>
         <div class="checkout-quantity-row">
@@ -84,6 +96,7 @@
       </div>
       <div class="checkout-summary-lines">
         <div class="checkout-line"><span>Quantity</span><strong id="checkout-quantity-display">1</strong></div>
+        <div class="checkout-line"><span>Color</span><strong id="checkout-color-display">White</strong></div>
         <div class="checkout-line"><span>Unit price</span><strong id="checkout-unit-amount">$35.00</strong></div>
         <div class="checkout-line"><span data-checkout-product-name>Ranger 30 - Unloaded</span><strong id="checkout-item-amount">$35.00</strong></div>
         <div class="checkout-line"><span>Flat shipping</span><strong id="checkout-shipping-amount">$8.95</strong></div>

@@ -33,6 +33,8 @@
   const totalLineEl = document.getElementById("checkout-total-line");
   const unitAmountEl = document.getElementById("checkout-unit-amount");
   const quantityDisplayEl = document.getElementById("checkout-quantity-display");
+  const colorDisplayEl = document.getElementById("checkout-color-display");
+  const colorSelect = document.getElementById("checkout-color");
   const quantitySelect = document.getElementById("checkout-quantity");
   const shippingTierNoteEl = document.getElementById("checkout-shipping-tier-note");
   const customCard = document.getElementById("checkout-custom-order-card");
@@ -80,7 +82,8 @@
     pendingOrderDetails: null,
     pendingQuote: null,
     pendingInvoiceId: null,
-    quantity: 1
+    quantity: 1,
+    color: "White"
   };
 
   function formatMoney(value) {
@@ -92,6 +95,11 @@
     if (raw === "5+") return 5;
     const parsed = Number.parseInt(raw, 10);
     return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+  }
+
+  function currentColor() {
+    const raw = colorSelect ? colorSelect.value : String(state.color || "White");
+    return raw === "Black" ? "Black" : "White";
   }
 
   function isCustomQuantity(quantity) {
@@ -189,6 +197,8 @@
 
     applyProductToPage();
     if (quantityDisplayEl) quantityDisplayEl.textContent = custom ? "5+" : String(quantity);
+    state.color = currentColor();
+    if (colorDisplayEl) colorDisplayEl.textContent = state.color;
     itemAmountEl.textContent = formatMoney(itemTotal);
 
     if (custom) {
@@ -205,7 +215,7 @@
         const subject = encodeURIComponent(`${PRODUCT.name} - ${quantity}+ unit custom order`);
         const body = encodeURIComponent(`Hi WestTech Home Automation,
 
-I would like to order ${quantity}+ units of ${PRODUCT.name}. Please send me a shipping quote and next steps.
+I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: ${currentColor()}\nPlease send me a shipping quote and next steps.
 `);
         customEmailLink.href = `mailto:orders@westtechha.com?subject=${subject}&body=${body}`;
       }
@@ -301,7 +311,8 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}. Please send me a sh
       postalCode: fields.postalCode.value.trim(),
       countryCode: "US",
       sku: PRODUCT.sku,
-      quantity: String(currentQuantity())
+      quantity: String(currentQuantity()),
+      color: currentColor()
     };
   }
 
@@ -388,7 +399,7 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}. Please send me a sh
         const orderData = await fetchJson(CREATE_ORDER_ENDPOINT, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sku: PRODUCT.sku, quantity })
+          body: JSON.stringify({ sku: PRODUCT.sku, quantity, color: currentColor() })
         });
         if (!orderData.id) throw new Error("Could not create the PayPal order.");
         state.pendingInvoiceId = orderData.invoiceId || null;
@@ -411,6 +422,13 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}. Please send me a sh
     resetPendingOrderState();
     updateSummaryFromQuantity();
   });
+
+  if (colorSelect) {
+    colorSelect.addEventListener("change", function () {
+      resetPendingOrderState();
+      updateSummaryFromQuantity();
+    });
+  }
 
   coloradoVerifyCheckbox.addEventListener("change", function () {
     coloradoCompleteBtn.disabled = !state.pendingQuote;
