@@ -7,13 +7,14 @@
   <meta name="description" content="WestTechHA Ranger family enclosure for compatible 30-pin and 38-pin breakout-board layouts, available in Unloaded and Loaded versions."/>
   <link href="icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
   <link href="css/site.css" rel="stylesheet"/>
+  <link href="css/product-photo-toggle.css" rel="stylesheet"/>
 </head>
 <body>
-<div class="page">
+<div class="page" data-product-photo-toggle-root data-default-photo-set="ranger-38-black">
   <div id="site-header"></div>
   <header class="page-header">
     <div class="eyebrow"><span class="dot"></span>Ranger Product Family • 30-pin / 38-pin</div>
-    <h1>Ranger Product Family</h1>
+    <h1>Ranger Product Family - Unloaded</h1>
     <p class="tagline">A mid-size enclosure family for compatible breakout-board layouts, built for customers who need more internal room and more flexibility than Scout while keeping a clean indoor install path.</p>
   </header>
 
@@ -23,21 +24,30 @@
         <div class="product-label">Ranger Family</div>
         <div class="product-name">Balanced, flexible, and built for cleaner indoor installs.</div>
         <p class="product-body">Ranger is the middle-ground family in the WestTechHA line. It gives projects more internal room than Scout while still keeping the enclosure practical for indoor automation builds, relay-oriented layouts, and cleaner finished project work.</p>
+        <div class="product-photo-toggle-row" aria-label="Ranger photo examples">
+          <button class="product-photo-toggle" type="button" data-photo-set-target="ranger-30-white" aria-pressed="false">Ranger 30 White</button>
+          <button class="product-photo-toggle is-active" type="button" data-photo-set-target="ranger-38-black" aria-pressed="true">Ranger 38 Black</button>
+        </div>
         <div class="product-kicker-row">
           <span class="product-chip">Balanced footprint</span>
           <span class="product-chip">Unloaded or Loaded</span>
           <span class="product-chip">More internal room</span>
-          <span class="product-chip">Photos shown: 38-pin layout</span>
+          <span class="product-chip" data-product-layout-chip>Photos shown: 38-pin layout</span>
         </div>
         <p class="product-mini-note product-shipping-tier-note"><strong data-product-from="Ranger" data-product-from-prefix="From " data-product-from-suffix=" + shipping.">From $40.00 + shipping.</strong></p>
+        <p class="product-mini-note" data-product-photo-note>Photo example: Ranger 38 Black. Color and layout are selected during checkout.</p>
         <p class="product-mini-note">Ranger 30 - Unloaded and Ranger 38 - Unloaded are standard purchase paths. Detailed shipping is reviewed on the checkout page.</p>
       </article>
       <article class="product-card">
         <div class="product-label">Ranger Family</div>
-        <div class="product-name">Ranger 38 shown</div>
+        <div class="product-name" data-product-hero-title>Ranger 38 Black shown</div>
         <figure class="product-gallery" style="margin: 0;">
-          <img src="images/products/med/med-hero-45deg-lid-on-black-38pin.jpg" alt="WestTechHA Ranger family enclosure shown at a 45 degree angle with lid installed"/>
+          <img data-product-hero-image src="images/products/med/med-hero-45deg-lid-on-black-38pin.jpg" alt="Ranger 38 Black unloaded enclosure shown with lid and inserts installed"/>
         </figure>
+        <div class="product-hero-spec" data-product-hero-spec>
+          <p class="product-mini-note"><strong>Ranger 38 Black — Unloaded version shown.</strong></p>
+          <p class="product-mini-note">Approx. overall dimensions: 5.75&quot; × 4.49&quot; × 1.77&quot; <span class="muted">(146 × 114 × 45 mm)</span>. Includes lid installed, width with lid overhang, and 14 mm mounting tabs per side.</p>
+        </div>
       </article>
     </div>
   </section>
@@ -135,16 +145,16 @@
       </div>
       <p>These views show the Ranger enclosure family assembled, open, and from the key sides and hardware angles.</p>
     </div>
-    <div class="product-gallery product-gallery-grid">
-      <figure><img loading="lazy" src="images/products/med/med-assembled-lid-on-angle-b.jpg" alt="Ranger family enclosure with lid installed, shown at an angle"/><figcaption>Assembled Ranger family enclosure with lid installed.</figcaption></figure>
+    <div class="product-gallery product-gallery-grid" data-product-gallery>
+      <figure><img loading="lazy" src="images/products/med/med-assembled-lid-on-angle-b.jpg" alt="Ranger family enclosure with lid and inserts installed, shown at an angle"/><figcaption>Assembled Ranger family enclosure with lid and inserts installed.</figcaption></figure>
       <figure><img loading="lazy" src="images/products/med/med-empty-interior.jpg" alt="Ranger family enclosure empty interior showing installed screws and standoffs"/><figcaption>Empty interior showing the enclosure cavity, installed screws, and standoff layout.</figcaption></figure>
-      <figure><img loading="lazy" src="images/products/med/med-board-relay-installed-top-down.jpg" alt="Ranger family enclosure with board and relay installed viewed from above"/><figcaption>Open top-down view with breakout-board adapter and relay hardware installed.</figcaption></figure>
+      <figure><img loading="lazy" src="images/products/med/med-board-relay-installed-top-down.jpg" alt="Ranger family enclosure with breakout-board adapter and relay hardware installed viewed from above"/><figcaption>Open top-down view with a breakout-board adapter and relay hardware installed. (Not included)</figcaption></figure>
       <figure><img loading="lazy" src="images/products/med/med-front-uart-usb-pwr-detail.jpg" alt="Front detail of the Ranger family enclosure showing UART, USB, and power openings"/><figcaption>Front opening detail with UART, USB, PWR, and wire positions.</figcaption></figure>
       <figure><img loading="lazy" src="images/products/med/med-side-3v3-to-5v-detail.jpg" alt="Side detail of the Ranger family enclosure showing 3V3 to 5V side"/><figcaption>Side opening detail for the 3V3 to 5V side.</figcaption></figure>
-      <figure><img loading="lazy" src="images/products/med/med-rear-clk-to-gnd-detail.jpg" alt="Rear detail of the Ranger family enclosure showing CLK to GND side"/><figcaption>Rear opening detail for the CLK to GND side.</figcaption></figure>
-      <figure><img loading="lazy" src="images/products/med/med-opposite-side-wire-detail.jpg" alt="Opposite side detail of the Ranger family enclosure showing wire openings"/><figcaption>Opposite side detail showing the alternate wire-opening face.</figcaption></figure>
+      <figure><img loading="lazy" src="images/products/med/med-rear-clk-to-gnd-detail.jpg" alt="Other side detail of the Ranger family enclosure showing CLK to GND side"/><figcaption>Other side opening detail for the CLK to GND side.</figcaption></figure>
+      <figure><img loading="lazy" src="images/products/med/med-opposite-side-wire-detail.jpg" alt="Rear side detail of the Ranger family enclosure showing alternate wire openings"/><figcaption>Rear side detail showing the alternate wire-opening face.</figcaption></figure>
       <figure><img loading="lazy" src="images/products/med/med-bottom-magnets.jpg" alt="Bottom view of the Ranger family enclosure showing magnets and mounting tabs"/><figcaption>Bottom view showing the flush-mounted magnets and mounting tab layout.</figcaption></figure>
-      <figure><img loading="lazy" src="images/products/med/med-open-45deg-board-installed.jpg" alt="Open angled view of the Ranger family enclosure with board installed"/><figcaption>Open angled view of the Ranger family with board installed.</figcaption></figure>
+      <figure><img loading="lazy" src="images/products/med/med-open-45deg-board-installed.jpg" alt="Front angled view of the Ranger family enclosure with board installed"/><figcaption>Front angled view of the Ranger family with board installed.</figcaption></figure>
     </div>
     <div class="product-note">
       <div class="product-label">Material & Compatibility</div>
@@ -228,6 +238,125 @@
 <script src="js/theme.js" defer></script>
 <script src="js/product-pricing.js" defer></script>
 <script src="js/email-chooser.js"></script>
+<script type="application/json" data-photo-set="ranger-30-white">
+{
+  "hero": {
+    "src": "images/products/ranger/ranger-30-white-assembled-lid-on-angle-b.jpg",
+    "alt": "Ranger 30 White assembled enclosure with lid and inserts installed",
+    "title": "Ranger 30 White shown",
+    "specHtml": "<p class=\"product-mini-note\"><strong>Ranger 30 White \u2014 Unloaded version shown.</strong></p><p class=\"product-mini-note\">Approx. overall dimensions: 5.24&quot; \u00d7 4.49&quot; \u00d7 1.77&quot; <span class=\"muted\">(133 \u00d7 114 \u00d7 45 mm)</span>. Includes lid installed, width with lid overhang, and 14 mm mounting tabs per side.</p>"
+  },
+  "note": "Photo example: Ranger 30 White. Color and layout are selected during checkout.",
+  "layoutChip": "Photos shown: 30-pin layout",
+  "gallery": [
+    {
+      "src": "images/products/ranger/ranger-30-white-hero-top-down-lid-inserts.jpg",
+      "alt": "Ranger 30 White unloaded enclosure shown with lid and inserts installed",
+      "caption": "Assembled Ranger family enclosure with lid and inserts installed."
+    },
+    {
+      "src": "images/products/ranger/ranger-30-white-empty-interior.jpg",
+      "alt": "Ranger 30 White empty interior showing installed screws and standoffs",
+      "caption": "Empty interior showing the enclosure cavity, installed screws, and standoff layout."
+    },
+    {
+      "src": "images/products/ranger/ranger-30-white-board-relay-installed-top-down.jpg",
+      "alt": "Ranger 30 White open top-down view with breakout-board adapter installed",
+      "caption": "Open top-down view with a breakout-board adapter installed. (Not included)"
+    },
+    {
+      "src": "images/products/ranger/ranger-30-white-front-uart-usb-pwr-detail.jpg",
+      "alt": "Ranger 30 White front opening detail with UART USB PWR and wire positions",
+      "caption": "Front opening detail with UART/USB/PWR cutout and wire positions."
+    },
+    {
+      "src": "images/products/ranger/ranger-30-white-side-3v3-to-d23-detail.jpg",
+      "alt": "Ranger 30 White side opening detail for the 3V3 to D23 side",
+      "caption": "Side opening detail for the 3V3 to D23 side."
+    },
+    {
+      "src": "images/products/ranger/ranger-30-white-rear-en-to-vin-detail.jpg",
+      "alt": "Ranger 30 White other side opening detail for the EN to VIN side",
+      "caption": "Other side opening detail for the EN to VIN side."
+    },
+    {
+      "src": "images/products/ranger/ranger-30-white-opposite-side-wire-detail.jpg",
+      "alt": "Ranger 30 White rear side detail showing alternate wire openings",
+      "caption": "Rear side detail showing the alternate wire-opening face."
+    },
+    {
+      "src": "images/products/ranger/ranger-30-white-bottom-magnets.jpg",
+      "alt": "Ranger 30 White bottom view showing flush-mounted magnets and mounting tab layout",
+      "caption": "Bottom view showing the flush-mounted magnets and mounting tab layout."
+    },
+    {
+      "src": "images/products/ranger/ranger-30-white-front-angle-replacement-v2.jpg",
+      "alt": "Ranger 30 White front angled view with board installed",
+      "caption": "Front angled view of the Ranger family with board installed."
+    }
+  ]
+}
+</script>
+<script type="application/json" data-photo-set="ranger-38-black">
+{
+  "hero": {
+    "src": "images/products/med/med-hero-45deg-lid-on-black-38pin.jpg",
+    "alt": "Ranger 38 Black unloaded enclosure shown with lid and inserts installed",
+    "title": "Ranger 38 Black shown",
+    "specHtml": "<p class=\"product-mini-note\"><strong>Ranger 38 Black \u2014 Unloaded version shown.</strong></p><p class=\"product-mini-note\">Approx. overall dimensions: 5.75&quot; \u00d7 4.49&quot; \u00d7 1.77&quot; <span class=\"muted\">(146 \u00d7 114 \u00d7 45 mm)</span>. Includes lid installed, width with lid overhang, and 14 mm mounting tabs per side.</p>"
+  },
+  "note": "Photo example: Ranger 38 Black. Color and layout are selected during checkout.",
+  "layoutChip": "Photos shown: 38-pin layout",
+  "gallery": [
+    {
+      "src": "images/products/ranger/ranger-38-black-gallery-01-replacement.jpg",
+      "alt": "Ranger 38 Black assembled enclosure with lid and inserts installed",
+      "caption": "Assembled Ranger family enclosure with lid and inserts installed."
+    },
+    {
+      "src": "images/products/med/med-empty-interior.jpg",
+      "alt": "Ranger 38 Black empty interior showing installed screws and standoffs",
+      "caption": "Empty interior showing the enclosure cavity, installed screws, and standoff layout."
+    },
+    {
+      "src": "images/products/med/med-board-relay-installed-top-down.jpg",
+      "alt": "Ranger 38 Black open top-down view with breakout-board adapter and relay hardware installed",
+      "caption": "Open top-down view with a breakout-board adapter and relay hardware installed. (Not included)"
+    },
+    {
+      "src": "images/products/med/med-front-uart-usb-pwr-detail.jpg",
+      "alt": "Ranger 38 Black front opening detail with UART USB PWR and wire positions",
+      "caption": "Front opening detail with UART/USB/PWR cutout and wire positions."
+    },
+    {
+      "src": "images/products/med/med-side-3v3-to-5v-detail.jpg",
+      "alt": "Ranger 38 Black side opening detail for the 3V3 to 5V side",
+      "caption": "Side opening detail for the 3V3 to 5V side."
+    },
+    {
+      "src": "images/products/med/med-rear-clk-to-gnd-detail.jpg",
+      "alt": "Ranger 38 Black other side opening detail for the CLK to GND side",
+      "caption": "Other side opening detail for the CLK to GND side."
+    },
+    {
+      "src": "images/products/med/med-opposite-side-wire-detail.jpg",
+      "alt": "Ranger 38 Black rear side detail showing alternate wire openings",
+      "caption": "Rear side detail showing the alternate wire-opening face."
+    },
+    {
+      "src": "images/products/med/med-bottom-magnets.jpg",
+      "alt": "Ranger 38 Black bottom view showing flush-mounted magnets and mounting tab layout",
+      "caption": "Bottom view showing the flush-mounted magnets and mounting tab layout."
+    },
+    {
+      "src": "images/products/med/med-open-45deg-board-installed.jpg",
+      "alt": "Ranger 38 Black front angled view with board installed",
+      "caption": "Front angled view of the Ranger family with board installed."
+    }
+  ]
+}
+</script>
 <script src="js/gallery-lightbox.js" defer></script>
+<script src="js/product-photo-toggle.js?v=2" defer></script>
 </body>
 </html>

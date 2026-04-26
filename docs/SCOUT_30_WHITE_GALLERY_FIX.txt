@@ -1,0 +1,24 @@
+Scout 30 White gallery fix
+==========================
+
+Local-only replacement files. No GitHub changes.
+
+Files included:
+- product-scout.html
+- images/products/small/small-open-45deg-board-installed.JPEG
+- js/product-photo-toggle.js
+
+Change made on product-scout.html:
+1. Scout 30 White gallery top-left tile now uses:
+   images/products/small/small-assembled-lid-on-angle-b.jpeg
+
+2. Scout 30 White gallery bottom-right tile now uses:
+   images/products/small/small-open-45deg-board-installed.JPEG
+
+3. Bottom-right caption now reads:
+   Open angled view of the Scout family with board installed.
+
+4. Scout 30 White hero is left in place and not deleted.
+
+Install:
+Extract the westtechha folder over your local site root and allow overwrite.

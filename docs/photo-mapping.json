@@ -1,0 +1,158 @@
+[
+  {
+    "family": "Scout 38 Black",
+    "original": "IMG_3908.JPG",
+    "target": "images/products/scout/scout-38-black-hero-top-down-lid-inserts.jpg",
+    "use": "Hero: top-down/full product view with lid and inserts"
+  },
+  {
+    "family": "Scout 38 Black",
+    "original": "IMG_3897.JPG",
+    "target": "images/products/scout/scout-38-black-assembled-lid-on-angle-a.jpg",
+    "use": "Gallery: assembled enclosure with lid installed"
+  },
+  {
+    "family": "Scout 38 Black",
+    "original": "IMG_3757.JPG",
+    "target": "images/products/scout/scout-38-black-empty-interior.jpg",
+    "use": "Gallery: empty interior / screws / standoffs"
+  },
+  {
+    "family": "Scout 38 Black",
+    "original": "IMG_3965.JPG",
+    "target": "images/products/scout/scout-38-black-board-installed-top-down.jpg",
+    "use": "Gallery: open top-down board installed"
+  },
+  {
+    "family": "Scout 38 Black",
+    "original": "IMG_3735.JPG",
+    "target": "images/products/scout/scout-38-black-front-uart-usb-pwr-detail.jpg",
+    "use": "Gallery: front UART/USB/PWR detail"
+  },
+  {
+    "family": "Scout 38 Black",
+    "original": "IMG_3706.JPG",
+    "target": "images/products/scout/scout-38-black-side-3v3-to-5v-detail.jpg",
+    "use": "Gallery: side 3V3 to 5V detail"
+  },
+  {
+    "family": "Scout 38 Black",
+    "original": "IMG_3723.JPG",
+    "target": "images/products/scout/scout-38-black-rear-clk-to-gnd-detail.jpg",
+    "use": "Gallery: rear CLK to GND detail"
+  },
+  {
+    "family": "Scout 38 Black",
+    "original": "IMG_3711.JPG",
+    "target": "images/products/scout/scout-38-black-opposite-side-wire-detail.jpg",
+    "use": "Gallery: opposite side wire detail"
+  },
+  {
+    "family": "Scout 38 Black",
+    "original": "IMG_3763.JPG",
+    "target": "images/products/scout/scout-38-black-bottom-magnets.jpg",
+    "use": "Gallery: bottom magnets / mounting tabs"
+  },
+  {
+    "family": "Scout 38 Black",
+    "original": "IMG_3772.JPEG",
+    "target": "images/products/scout/scout-38-black-assembled-lid-on-angle-b.jpg",
+    "use": "Gallery: alternate assembled view"
+  },
+  {
+    "family": "Scout 38 Black",
+    "original": "IMG_3695.JPG",
+    "target": "images/products/scout/extras/scout-38-black-open-empty-angle-a.jpg",
+    "use": "Extra: open empty angle"
+  },
+  {
+    "family": "Scout 38 Black",
+    "original": "IMG_3742.JPG",
+    "target": "images/products/scout/extras/scout-38-black-open-empty-angle-b.jpg",
+    "use": "Extra: open empty angle alternate"
+  },
+  {
+    "family": "Scout 38 Black",
+    "original": "IMG_3749.JPEG",
+    "target": "images/products/scout/extras/scout-38-black-empty-interior-small.jpg",
+    "use": "Extra: small empty interior image"
+  },
+  {
+    "family": "Scout 38 Black",
+    "original": "IMG_3771.JPEG",
+    "target": "images/products/scout/extras/scout-38-black-board-installed-top-down-small.jpg",
+    "use": "Extra: small board installed image"
+  },
+  {
+    "family": "Scout 38 Black",
+    "original": "IMG_3958.JPG",
+    "target": "images/products/scout/extras/scout-38-black-board-installed-top-down-alt.jpg",
+    "use": "Extra: board installed alternate"
+  },
+  {
+    "family": "Ranger 30 White",
+    "original": "IMG_3878.JPG",
+    "target": "images/products/ranger/ranger-30-white-hero-top-down-lid-inserts.jpg",
+    "use": "Hero: top-down/full product view with lid and inserts"
+  },
+  {
+    "family": "Ranger 30 White",
+    "original": "IMG_3865.JPG",
+    "target": "images/products/ranger/ranger-30-white-assembled-lid-on-angle-b.jpg",
+    "use": "Gallery: assembled enclosure with lid installed"
+  },
+  {
+    "family": "Ranger 30 White",
+    "original": "IMG_3830.JPG",
+    "target": "images/products/ranger/ranger-30-white-empty-interior.jpg",
+    "use": "Gallery: empty interior / screws / standoffs"
+  },
+  {
+    "family": "Ranger 30 White",
+    "original": "IMG_3921.JPG",
+    "target": "images/products/ranger/ranger-30-white-board-relay-installed-top-down.jpg",
+    "use": "Gallery: open top-down board/relay installed"
+  },
+  {
+    "family": "Ranger 30 White",
+    "original": "IMG_3789.JPG",
+    "target": "images/products/ranger/ranger-30-white-front-uart-usb-pwr-detail.jpg",
+    "use": "Gallery: front openings / wire positions"
+  },
+  {
+    "family": "Ranger 30 White",
+    "original": "IMG_3799.JPG",
+    "target": "images/products/ranger/ranger-30-white-side-3v3-to-d23-detail.jpg",
+    "use": "Gallery: side 3V3 to D23 detail"
+  },
+  {
+    "family": "Ranger 30 White",
+    "original": "IMG_3816.JPG",
+    "target": "images/products/ranger/ranger-30-white-rear-en-to-vin-detail.jpg",
+    "use": "Gallery: rear EN to VIN detail"
+  },
+  {
+    "family": "Ranger 30 White",
+    "original": "IMG_3808.JPG",
+    "target": "images/products/ranger/ranger-30-white-opposite-side-wire-detail.jpg",
+    "use": "Gallery: opposite side wire detail"
+  },
+  {
+    "family": "Ranger 30 White",
+    "original": "IMG_3858.JPG",
+    "target": "images/products/ranger/ranger-30-white-bottom-magnets.jpg",
+    "use": "Gallery: bottom magnets / mounting tabs"
+  },
+  {
+    "family": "Ranger 30 White",
+    "original": "IMG_3913.JPEG",
+    "target": "images/products/ranger/ranger-30-white-open-board-installed-top-down-small.jpg",
+    "use": "Gallery: open board installed alternate (no angled board photo in set)"
+  },
+  {
+    "family": "Ranger 30 White",
+    "original": "IMG_3776.JPG",
+    "target": "images/products/ranger/extras/ranger-30-white-rear-en-to-vin-detail-alt.jpg",
+    "use": "Extra: rear EN to VIN alternate"
+  }
+]

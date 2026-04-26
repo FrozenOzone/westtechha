@@ -1,0 +1,14 @@
+Scout 30 White caption-only fix
+
+Updated product-scout.html gallery captions:
+1 - Rear assembled Scout family enclosure with lid and inserts installed.
+2 - unchanged
+3 - Open top-down view with a breakout-board adapter installed. (Not included)
+4 - unchanged
+5 - unchanged
+6 - Other side opening detail for the EN to VIN side.
+7 - Rear side detail showing the alternate wire-opening face.
+8 - unchanged
+9 - Front angled view of the Scout family with board installed.
+
+No GitHub changes. Local replacement files only.
