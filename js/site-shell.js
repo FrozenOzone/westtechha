@@ -12,10 +12,11 @@
   ];
 
   const footerLinks = [
-    { href: 'shipping.html', label: 'Shipping Policy' },
-    { href: 'returns.html',  label: 'Returns & Warranty' },
-    { href: 'about.html',    label: 'About' },
-    { href: 'forum.html',    label: 'Forum' }
+    { href: 'shipping.html',      label: 'Shipping Policy' },
+    { href: 'returns.html',       label: 'Returns & Warranty' },
+    { href: 'legal-notice.html',  label: 'Legal Notice' },
+    { href: 'about.html',         label: 'About' },
+    { href: 'forum.html',         label: 'Forum' }
   ];
 
   const PIN_HEADER_ON_SCROLL = true;
@@ -79,6 +80,7 @@
             ${footerLinks.map(link => linkHtml(link, 'footer-link')).join('')}
           </div>
         </div>
+        <p class="footer-legal">WestTech Home Automation, LLC enclosure designs, digital files, product photos, and website content are original proprietary works. Unauthorized copying or redistribution is strictly prohibited!</p>
         <p class="footer-meta footer-meta-pro">© 2026 WestTech Home Automation, LLC · Veteran Owned · Built for Installers and DIYers</p>
       </div>
     </footer>

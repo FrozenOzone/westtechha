@@ -3161,3 +3161,14 @@ html[data-theme="dark"] .home-hero-panel .hero-pills .pill{
     max-width: 980px;
   }
 }
+
+
+/* ===== Site-wide footer legal notice ===== */
+.footer-legal{
+  margin: 14px auto 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  max-width: 960px;
+  text-align: center;
+}
