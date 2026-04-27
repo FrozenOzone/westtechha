@@ -1612,14 +1612,14 @@ html[data-theme="dark"] #site-header{
 .footer-shell-pro{
   width: min(var(--maxw), calc(100% - 32px));
   margin-inline: auto;
-  padding: 0 0 22px;
+  padding: 0 0 16px;
   border-top: 0;
 }
 .footer-top-pro{
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 22px 0 8px;
+  padding: 12px 0 4px;
 }
 .footer-links-pro{
   display: flex;
@@ -1628,10 +1628,11 @@ html[data-theme="dark"] #site-header{
   gap: 8px;
 }
 .footer-meta-pro{
-  margin: 12px 0 0;
+  margin: 8px 0 0;
   text-align: center;
   color: var(--muted);
   font-size: 0.9rem;
+  line-height: 1.35;
 }
 
 .footer-links-pro .footer-link{
@@ -3165,10 +3166,10 @@ html[data-theme="dark"] .home-hero-panel .hero-pills .pill{
 
 /* ===== Site-wide footer legal notice ===== */
 .footer-legal{
-  margin: 14px auto 0;
+  margin: 8px auto 0;
   color: var(--muted);
   font-size: 0.82rem;
-  line-height: 1.55;
+  line-height: 1.4;
   max-width: 960px;
   text-align: center;
 }
