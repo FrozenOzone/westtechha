@@ -22,7 +22,7 @@
     <article class="checkout-card checkout-product-card">
       <a class="product-products-link" href="product-ranger.html">Back to Ranger Family</a>
       <div class="checkout-product-top">
-        <img src="images/products/ranger/ranger-30-white-hero-top-down-lid-inserts.jpg" alt="Ranger 30 - Unloaded enclosure shown with lid and inserts installed"/>
+        <img data-checkout-product-image src="images/products/ranger/30/ranger-30-white-hero-top-down-lid-inserts.jpg" alt="Ranger 30 - Unloaded shown in White with lid and inserts installed"/>
         <div>
           <div class="product-label">Standard Product</div>
           <h2>Ranger 30 - Unloaded</h2>
@@ -201,7 +201,17 @@ window.WESTTECH_CHECKOUT = {
   sku: "ranger-30-unloaded",
   name: "Ranger 30 - Unloaded",
   family: "Ranger",
-  layout: "30-pin unloaded layout"
+  layout: "30-pin unloaded layout",
+  images: {
+    White: {
+      src: "images/products/ranger/30/ranger-30-white-hero-top-down-lid-inserts.jpg",
+      alt: "Ranger 30 - Unloaded shown in White with lid and inserts installed"
+    },
+    Black: {
+      src: "images/products/ranger/38/ranger-38-black-hero-top-down-lid-inserts.jpg",
+      alt: "Ranger 30 - Unloaded shown in Black with lid and inserts installed"
+    }
+  }
 };
 </script>
 <script src="js/paypal-unloaded-checkout.js" defer></script>

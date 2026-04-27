@@ -54,6 +54,7 @@
   const resultTotalEl = document.getElementById("co-result-total");
   const coloradoCompleteBtn = document.getElementById("co-complete-button");
   const invoiceIdEl = document.getElementById("co-invoice-id");
+  const checkoutProductImage = document.querySelector("[data-checkout-product-image]");
 
   if (!status || !container || !itemAmountEl || !shippingAmountEl || !taxAmountEl || !totalAmountEl || !totalLabelEl || !totalLineEl || !coloradoCard || !coloradoForm || !coloradoSummary || !coloradoResult || !coloradoVerifyWrap || !coloradoChangeNote || !coloradoVerifyCheckbox || !resultItemEl || !resultShippingEl || !resultTaxEl || !resultTotalEl || !coloradoCompleteBtn || !quantitySelect || !customCard) return;
 
@@ -147,6 +148,22 @@
     });
   }
 
+  function updateCheckoutProductImage() {
+    if (!checkoutProductImage || !checkoutConfig.images) return;
+    const color = currentColor();
+    const imageConfig = checkoutConfig.images[color];
+    if (!imageConfig) return;
+
+    if (typeof imageConfig === "string") {
+      checkoutProductImage.src = imageConfig;
+      checkoutProductImage.alt = `${PRODUCT.name} shown in ${color}`;
+      return;
+    }
+
+    if (imageConfig.src) checkoutProductImage.src = imageConfig.src;
+    checkoutProductImage.alt = imageConfig.alt || `${PRODUCT.name} shown in ${color}`;
+  }
+
   function applyProductToPage() {
     const itemNameEls = document.querySelectorAll("[data-checkout-product-name]");
     itemNameEls.forEach((el) => { el.textContent = orderDisplayName(currentQuantity()); });
@@ -199,6 +216,7 @@
     if (quantityDisplayEl) quantityDisplayEl.textContent = custom ? "5+" : String(quantity);
     state.color = currentColor();
     if (colorDisplayEl) colorDisplayEl.textContent = state.color;
+    updateCheckoutProductImage();
     itemAmountEl.textContent = formatMoney(itemTotal);
 
     if (custom) {
