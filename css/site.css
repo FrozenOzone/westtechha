@@ -3173,3 +3173,125 @@ html[data-theme="dark"] .home-hero-panel .hero-pills .pill{
   max-width: 960px;
   text-align: center;
 }
+
+/* ===== Footer spacing tighten pass - 2026-04-27 =====
+   Pulls the footer link/legal/copyright area closer to the final CTA section. */
+#site-footer,
+#site-footer.footer-pro{
+  margin-top: 24px;
+  padding-bottom: 16px;
+}
+
+.footer-shell,
+.footer-shell-pro{
+  margin-top: 0;
+  padding-top: 0;
+  padding-bottom: 10px;
+  border-top: 0;
+}
+
+.footer-top,
+.footer-top-pro{
+  justify-content: center;
+  padding: 6px 0 2px;
+}
+
+.footer-links,
+.footer-links-pro{
+  justify-content: center;
+  gap: 6px 18px;
+  margin-bottom: 6px;
+}
+
+#site-footer .footer-link,
+.footer-links-pro .footer-link{
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.footer-legal{
+  margin: 4px auto 0;
+  line-height: 1.35;
+}
+
+.footer-meta,
+.footer-meta-pro{
+  margin-top: 6px;
+  line-height: 1.35;
+}
+
+@media (max-width: 700px){
+  #site-footer,
+  #site-footer.footer-pro{
+    margin-top: 20px;
+  }
+
+  .footer-shell,
+  .footer-shell-pro{
+    padding-bottom: 14px;
+  }
+
+  .footer-links,
+  .footer-links-pro{
+    gap: 6px 10px;
+  }
+}
+
+/* ===== Footer spacing tighten pass 2 - 2026-04-27 =====
+   Removes the remaining gap created by the injected .footer-pro wrapper. */
+#site-footer{
+  margin-top: 6px !important;
+  padding-top: 0 !important;
+  padding-bottom: 12px !important;
+}
+
+#site-footer .footer-pro,
+.footer-pro{
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+#site-footer .footer-shell,
+#site-footer .footer-shell-pro,
+.footer-shell-pro{
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 8px !important;
+  border-top: 0 !important;
+}
+
+#site-footer .footer-top,
+#site-footer .footer-top-pro,
+.footer-top-pro{
+  margin: 0 !important;
+  padding: 0 0 2px !important;
+}
+
+#site-footer .footer-links,
+#site-footer .footer-links-pro,
+.footer-links-pro{
+  margin-top: 0 !important;
+  margin-bottom: 4px !important;
+  gap: 4px 18px !important;
+}
+
+#site-footer .footer-link,
+.footer-links-pro .footer-link{
+  min-height: auto !important;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+
+#site-footer .footer-legal,
+.footer-legal{
+  margin-top: 2px !important;
+  margin-bottom: 0 !important;
+  line-height: 1.3 !important;
+}
+
+#site-footer .footer-meta,
+#site-footer .footer-meta-pro,
+.footer-meta-pro{
+  margin-top: 4px !important;
+  line-height: 1.3 !important;
+}
