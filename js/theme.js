@@ -35,7 +35,7 @@
     return "auto";
   }
 
-  // Create a small floating toggle button
+  // Create a small floating theme toggle button
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = "theme-fab";
@@ -48,6 +48,27 @@
   icon.setAttribute("aria-hidden", "true");
   const label = document.createElement("span");
   btn.append(icon, label);
+
+  // Create a quiet Back to Top button for longer pages
+  const topBtn = document.createElement("button");
+  topBtn.type = "button";
+  topBtn.className = "back-to-top-fab";
+  topBtn.id = "backToTop";
+  topBtn.setAttribute("aria-label", "Back to top");
+  topBtn.setAttribute("aria-hidden", "true");
+  topBtn.setAttribute("title", "Back to top");
+  topBtn.tabIndex = -1;
+
+  const topIcon = document.createElement("span");
+  topIcon.setAttribute("aria-hidden", "true");
+  topIcon.textContent = "↑";
+  const topLabel = document.createElement("span");
+  topLabel.textContent = "Top";
+  topBtn.append(topIcon, topLabel);
+
+  topBtn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
 
   function updateButton(mode) {
     let effective = mode;
@@ -80,9 +101,20 @@
 
   // Mount after DOM is ready
   const mount = () => {
-    document.body.appendChild(btn);
+    document.body.append(btn, topBtn);
 
-    // ---- Polish: keep the button clear of footer/watermark content ----
+    const syncTopButton = () => {
+      const showTop = (window.scrollY || window.pageYOffset || 0) > 520;
+      topBtn.classList.toggle("is-visible", showTop);
+      topBtn.setAttribute("aria-hidden", showTop ? "false" : "true");
+      topBtn.tabIndex = showTop ? 0 : -1;
+    };
+
+    syncTopButton();
+    window.addEventListener("scroll", syncTopButton, { passive: true });
+    window.addEventListener("load", syncTopButton);
+
+    // ---- Polish: keep the buttons clear of footer/watermark content ----
     // Some layouts put a small footer watermark at the bottom; we "lift" the button
     // when the footer (or watermark) enters the viewport so it never sits on top.
     const liftVar = "--theme-fab-lift";
@@ -107,7 +139,9 @@
 
     // Compact mode on very small screens: icon-only
     const setCompact = () => {
-      btn.classList.toggle("is-compact", window.innerWidth <= 420);
+      const isCompact = window.innerWidth <= 420;
+      btn.classList.toggle("is-compact", isCompact);
+      topBtn.classList.toggle("is-compact", isCompact);
     };
     setCompact();
     window.addEventListener("resize", setCompact, { passive: true });

@@ -35,3 +35,34 @@
 .product-photo-toggle:active{
   transform: translateY(0);
 }
+
+/* Gallery-level photo-set toggle so customers do not have to scroll back to the top */
+.product-gallery-heading-tools{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px 14px;
+}
+
+.product-photo-toggle-row.product-photo-toggle-row-inline{
+  margin:0;
+  gap:8px;
+}
+
+.product-photo-toggle-row-inline .product-photo-toggle{
+  padding:7px 12px;
+  font-size:0.78rem;
+  line-height:1.1;
+}
+
+@media (max-width: 760px){
+  .product-gallery-heading-tools{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .product-photo-toggle-row.product-photo-toggle-row-inline{
+    width:100%;
+  }
+}
