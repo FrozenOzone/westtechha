@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="index,follow">
+  <title>Ranger Unloaded Enclosure Documentation</title>
+  <meta name="description" content="Tindie documentation page for Ranger Unloaded Enclosure Documentation.">
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png">
+  <style>
+
+  :root{
+    --bg:#f5f7fb;
+    --paper:#ffffff;
+    --text:#162033;
+    --muted:#5b687c;
+    --line:#d9e1ec;
+    --soft:#eef3f9;
+    --accent:#1f4f9a;
+    --warn:#fff7e6;
+    --warn-line:#e8c77a;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    line-height:1.65;
+  }
+  main{
+    width:min(960px,calc(100% - 32px));
+    margin:28px auto 42px;
+  }
+  .doc{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:0 14px 34px rgba(15,23,42,.07);
+    overflow:hidden;
+  }
+  .doc-head{
+    padding:30px 32px 24px;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#ffffff,#f8fafc);
+  }
+  .doc-label{
+    margin:0 0 10px;
+    color:var(--muted);
+    font-size:.78rem;
+    font-weight:800;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+  }
+  h1{margin:0;font-size:clamp(2rem,5vw,3.1rem);line-height:1.05;letter-spacing:-.04em;}
+  .lead{margin:14px 0 0;max-width:760px;color:var(--muted);font-size:1.05rem;}
+  section{padding:26px 32px;border-bottom:1px solid var(--line);}
+  section:last-child{border-bottom:0;}
+  h2{margin:0 0 14px;font-size:1.35rem;line-height:1.25;letter-spacing:-.02em;}
+  h3{margin:0 0 8px;font-size:1.02rem;line-height:1.3;}
+  p{margin:0 0 12px;}
+  p:last-child{margin-bottom:0;}
+  ul{margin:8px 0 0;padding-left:22px;}
+  li{margin:4px 0;}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+  .card{
+    background:var(--soft);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:18px;
+  }
+  .notice{
+    background:var(--warn);
+    border:1px solid var(--warn-line);
+    border-radius:14px;
+    padding:16px 18px;
+  }
+  .muted{color:var(--muted);}
+  table{width:100%;border-collapse:collapse;margin-top:10px;overflow:hidden;border-radius:12px;}
+  th,td{padding:12px 14px;border:1px solid var(--line);text-align:left;vertical-align:top;}
+  th{background:#eef3f9;font-size:.86rem;text-transform:uppercase;letter-spacing:.06em;color:#334155;}
+  td{background:#fff;}
+  .photo-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px;}
+  figure{margin:0;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+  figure img{display:block;width:100%;height:150px;object-fit:cover;background:#eef3f9;}
+  figcaption{padding:10px 12px;color:var(--muted);font-size:.86rem;line-height:1.45;}
+  .footer-note{font-size:.92rem;color:var(--muted);}
+  a{color:var(--accent);}
+  @media (max-width:760px){
+    main{width:min(100% - 20px,960px);margin-top:16px;}
+    .doc-head,section{padding:22px;}
+    .grid,.photo-grid{grid-template-columns:1fr;}
+    figure img{height:auto;max-height:260px;}
+    th,td{display:block;width:100%;}
+    th{border-bottom:0;}
+  }
+
+  </style>
+</head>
+<body>
+<main>
+  <article class="doc">
+    <header class="doc-head">
+      <p class="doc-label">WestTech Home Automation • Tindie documentation</p>
+      <h1>Ranger Unloaded Enclosure Documentation</h1>
+      <p class="lead">Reference information for Ranger 30 and Ranger 38 unloaded ESP32 automation enclosures listed on Tindie.</p>
+    </header>
+
+    <section>
+      <h2>Overview</h2>
+      <div class="grid">
+
+        <article class="card">
+          <h3>What it is</h3>
+          <p>Ranger is the mid-size WestTech Home Automation enclosure family for ESP32, ESPHome, Home Assistant, relay-ready, sensor, and IoT projects.</p>
+        </article>
+
+        <article class="card">
+          <h3>What unloaded means</h3>
+          <p>The unloaded version is for customers who already have their own ESP32 board, wiring, relays, sensors, or automation hardware.</p>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>Models covered</h2>
+      <table aria-label="Models covered by this documentation page">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Board layout</th>
+            <th>Approx. overall size</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td><strong>Ranger 30 Unloaded</strong><br><span class="muted">RANGER-30-UNLOADED</span></td>
+            <td>Compatible 30-pin ESP32 breakout-board layouts</td>
+            <td>5.24 in × 4.49 in × 1.77 in (133 × 114 × 45 mm)</td>
+            <td>Mid-size Ranger footprint with more room than Scout.</td>
+          </tr>
+
+          <tr>
+            <td><strong>Ranger 38 Unloaded</strong><br><span class="muted">RANGER-38-UNLOADED</span></td>
+            <td>Compatible 38-pin ESP32 breakout-board layouts</td>
+            <td>5.75 in × 4.49 in × 1.77 in (146 × 114 × 45 mm)</td>
+            <td>Mid-size Ranger footprint for larger 38-pin layouts and cleaner internal spacing.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="muted">Dimensions include the installed lid, lid width overhang, and mounting tabs.</p>
+    </section>
+
+    <section>
+      <h2>What is included</h2>
+      <div class="grid">
+        <article class="card">
+          <h3>Included</h3>
+          <ul>
+            <li>Ranger enclosure body</li>
+            <li>Matching lid</li>
+            <li>Standard insert set</li>
+            <li>Installed hardware</li>
+            <li>Standard mounting hardware</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Not included</h3>
+          <ul>
+            <li>ESP32 board or breakout board</li>
+            <li>Electronics, wiring, sensors, relays, or power supply</li>
+            <li>Firmware, programming, or installation labor</li>
+            <li>Source code, CAD files, or design files</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>Use and environment notes</h2>
+      <div class="grid">
+
+        <article class="card">
+          <h3>Best fit</h3>
+          <p>ESP32 projects that need more room for wiring paths, accessories, relay-ready layouts, or cleaner spacing than the compact Scout family.</p>
+        </article>
+
+        <article class="card">
+          <h3>Common uses</h3>
+          <p>ESPHome nodes, Home Assistant sensors, relay-ready low-voltage automation projects, IoT builds, and cleaner indoor prototype-to-install projects.</p>
+        </article>
+      </div>
+      <div class="notice" style="margin-top:16px;">
+        <strong>Indoor use only.</strong> Printed parts are not IP-rated and are not intended for wet, outdoor, high-heat, or direct-sunlight locations.
+      </div>
+    </section>
+
+    <section>
+      <h2>Reference photos</h2>
+      <p class="muted">Photos are representative of the family and may show either 30-pin or 38-pin layouts. Electronics shown in example fitment photos are not included.</p>
+      <div class="photo-grid">
+
+        <figure>
+          <img loading="lazy" src="../images/products/ranger/30/ranger-30-white-assembled-lid-on-angle-b.jpg" alt="Ranger 30 assembled enclosure with lid installed">
+          <figcaption>Ranger 30 assembled enclosure with lid installed.</figcaption>
+        </figure>
+
+        <figure>
+          <img loading="lazy" src="../images/products/ranger/30/ranger-30-white-empty-interior.jpg" alt="Ranger 30 empty interior">
+          <figcaption>Ranger 30 empty interior and standoff layout.</figcaption>
+        </figure>
+
+        <figure>
+          <img loading="lazy" src="../images/products/ranger/38/ranger-38-black-hero-top-down-lid-inserts.jpg" alt="Ranger 38 enclosure with lid and inserts">
+          <figcaption>Ranger 38 with lid and inserts.</figcaption>
+        </figure>
+
+        <figure>
+          <img loading="lazy" src="../images/products/ranger/38/ranger-38-black-board-relay-installed-top-down.jpg" alt="Ranger 38 board and relay fitment example">
+          <figcaption>Ranger 38 board and relay fitment example. Electronics not included.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section>
+      <h2>Tindie checkout note</h2>
+      <p>For product questions, use the Tindie message system or contact WestTech Home Automation support through the official website.</p>
+      <p class="footer-note">This page is documentation only. Availability, checkout, payment, order status, and shipping are handled through the matching Tindie product listing.</p>
+    </section>
+  </article>
+</main>
+</body>
+</html>
