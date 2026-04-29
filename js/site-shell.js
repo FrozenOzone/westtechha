@@ -19,7 +19,7 @@
     { href: 'forum.html',         label: 'Forum' }
   ];
 
-  const PIN_HEADER_ON_SCROLL = true;
+  const ENABLE_SCROLL_HEADER_STATE = true;
 
   function normalizePageName(value) {
     let v = String(value || '').trim();
@@ -48,7 +48,7 @@
   }
 
   const headerHtml = `
-    <nav class="nav nav-stack">
+    <nav class="nav nav-stack" aria-label="Primary navigation">
       <div class="nav-brand-wrap">
         <a class="nav-brand" href="index.html" aria-label="WestTech Home Automation home">
           <img
@@ -59,7 +59,19 @@
         </a>
       </div>
 
-      <div class="nav-menu">
+      <button
+        class="nav-mobile-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="site-primary-menu"
+      >
+        <span class="nav-mobile-toggle-text">Menu</span>
+        <span class="nav-mobile-toggle-icon" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+      </button>
+
+      <div class="nav-menu" id="site-primary-menu">
         <div class="badge badge-nav">
           <span></span>
           SCOUT • RANGER • COMMAND
@@ -89,7 +101,7 @@
   const headerHost = document.getElementById('site-header');
 
   function syncFixedHeaderOffset() {
-    if (!headerHost || !PIN_HEADER_ON_SCROLL) return;
+    if (!headerHost || !ENABLE_SCROLL_HEADER_STATE) return;
 
     const bodyWasScrolled = document.body.classList.contains('header-scrolled');
     const headerWasScrolled = headerHost.classList.contains('is-scrolled');
@@ -105,7 +117,7 @@
   }
 
   function syncScrolledHeaderState() {
-    if (!headerHost || !PIN_HEADER_ON_SCROLL) return;
+    if (!headerHost || !ENABLE_SCROLL_HEADER_STATE) return;
     const isScrolled = (window.scrollY || window.pageYOffset || 0) > 18;
     document.body.classList.toggle('header-scrolled', isScrolled);
     headerHost.classList.toggle('is-scrolled', isScrolled);
@@ -114,18 +126,62 @@
   if (headerHost) {
     headerHost.innerHTML = headerHtml;
 
-    if (PIN_HEADER_ON_SCROLL) {
+    const mobileToggle = headerHost.querySelector('.nav-mobile-toggle');
+    const mobileMenu = headerHost.querySelector('#site-primary-menu');
+    const mobileBreakpoint = window.matchMedia('(max-width: 700px)');
+
+    function setMobileMenuOpen(isOpen) {
+      if (!mobileToggle || !mobileMenu) return;
+      const shouldOpen = Boolean(isOpen && mobileBreakpoint.matches);
+      headerHost.classList.toggle('nav-open', shouldOpen);
+      mobileToggle.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+    }
+
+    if (mobileToggle && mobileMenu) {
+      mobileToggle.addEventListener('click', () => {
+        const isOpen = headerHost.classList.contains('nav-open');
+        setMobileMenuOpen(!isOpen);
+      });
+
+      mobileMenu.addEventListener('click', (event) => {
+        if (event.target.closest('a')) setMobileMenuOpen(false);
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!headerHost.contains(event.target)) setMobileMenuOpen(false);
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') setMobileMenuOpen(false);
+      });
+
+      if (mobileBreakpoint.addEventListener) {
+        mobileBreakpoint.addEventListener('change', () => setMobileMenuOpen(false));
+      } else if (mobileBreakpoint.addListener) {
+        mobileBreakpoint.addListener(() => setMobileMenuOpen(false));
+      }
+    }
+
+    if (ENABLE_SCROLL_HEADER_STATE) {
       document.body.classList.add('header-fixed');
-      syncFixedHeaderOffset();
-      syncScrolledHeaderState();
-      window.addEventListener('resize', syncFixedHeaderOffset);
+
+      const refreshHeaderLayout = () => {
+        syncFixedHeaderOffset();
+        syncScrolledHeaderState();
+      };
+
+      refreshHeaderLayout();
       window.addEventListener('scroll', syncScrolledHeaderState, { passive: true });
-      window.addEventListener('load', syncScrolledHeaderState);
+      window.addEventListener('resize', refreshHeaderLayout, { passive: true });
+      window.addEventListener('load', refreshHeaderLayout);
+
+      if (window.ResizeObserver) {
+        const headerObserver = new ResizeObserver(refreshHeaderLayout);
+        headerObserver.observe(headerHost);
+      }
+
       if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(() => {
-          syncFixedHeaderOffset();
-          syncScrolledHeaderState();
-        }).catch(() => {});
+        document.fonts.ready.then(refreshHeaderLayout).catch(() => {});
       }
     }
   }
