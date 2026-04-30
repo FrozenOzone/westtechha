@@ -19,7 +19,8 @@
     { href: 'forum.html',         label: 'Forum' }
   ];
 
-  const ENABLE_SCROLL_HEADER_STATE = true;
+  const ENABLE_FIXED_HEADER = true;
+  const ENABLE_SCROLL_HEADER_STATE = false;
 
   function normalizePageName(value) {
     let v = String(value || '').trim();
@@ -101,23 +102,25 @@
   const headerHost = document.getElementById('site-header');
 
   function syncFixedHeaderOffset() {
-    if (!headerHost || !ENABLE_SCROLL_HEADER_STATE) return;
+    if (!headerHost || !ENABLE_FIXED_HEADER) return;
 
-    const bodyWasScrolled = document.body.classList.contains('header-scrolled');
-    const headerWasScrolled = headerHost.classList.contains('is-scrolled');
-
+    // Keep the header locked, but do not shrink/compress it on scroll.
     document.body.classList.remove('header-scrolled');
     headerHost.classList.remove('is-scrolled');
 
     const height = Math.ceil(headerHost.getBoundingClientRect().height);
     document.documentElement.style.setProperty('--site-header-offset', `${height}px`);
-
-    if (bodyWasScrolled) document.body.classList.add('header-scrolled');
-    if (headerWasScrolled) headerHost.classList.add('is-scrolled');
   }
 
   function syncScrolledHeaderState() {
-    if (!headerHost || !ENABLE_SCROLL_HEADER_STATE) return;
+    if (!headerHost) return;
+
+    if (!ENABLE_SCROLL_HEADER_STATE) {
+      document.body.classList.remove('header-scrolled');
+      headerHost.classList.remove('is-scrolled');
+      return;
+    }
+
     const isScrolled = (window.scrollY || window.pageYOffset || 0) > 18;
     document.body.classList.toggle('header-scrolled', isScrolled);
     headerHost.classList.toggle('is-scrolled', isScrolled);
@@ -162,7 +165,7 @@
       }
     }
 
-    if (ENABLE_SCROLL_HEADER_STATE) {
+    if (ENABLE_FIXED_HEADER) {
       document.body.classList.add('header-fixed');
 
       const refreshHeaderLayout = () => {

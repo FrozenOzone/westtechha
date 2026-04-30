@@ -3449,3 +3449,73 @@ html[data-theme="dark"] .back-to-top-fab{
 #site-header{
   isolation: isolate;
 }
+
+
+/* ===== Header behavior update: keep locked size while scrolling =====
+   The header remains fixed/sticky, but no longer compresses/shrinks after scroll. */
+body.header-scrolled .nav-stack{
+  gap: 18px 28px;
+  padding: 14px 0 10px;
+}
+
+body.header-scrolled .nav-logo-full{
+  width: clamp(300px, 31vw, 500px);
+}
+
+body.header-scrolled .nav-menu{
+  gap: 14px;
+}
+
+body.header-scrolled .badge-nav{
+  padding: 8px 14px;
+  font-size: 0.76rem;
+  letter-spacing: 0.16em;
+}
+
+body.header-scrolled .nav-primary .nav-link,
+body.header-scrolled #site-header .nav-link{
+  padding: 10px 14px;
+  font-size: 0.94rem;
+}
+
+@media (max-width: 980px) and (min-width: 700px){
+  body.header-scrolled .nav-stack{
+    gap: 18px 28px;
+    padding: 14px 0 10px;
+  }
+
+  body.header-scrolled .nav-logo-full{
+    width: min(92vw, 500px);
+  }
+
+  body.header-scrolled .nav-menu{
+    gap: 14px;
+  }
+}
+
+@media (max-width: 700px){
+  body.header-scrolled .nav-stack{
+    gap: 10px;
+    padding: 7px 0;
+  }
+
+  body.header-scrolled .nav-logo-full{
+    width: min(58vw, 235px);
+  }
+
+  body.header-scrolled .nav-menu{
+    gap: 8px;
+  }
+
+  body.header-scrolled .nav-primary .nav-link,
+  body.header-scrolled #site-header .nav-link{
+    padding: 10px 12px;
+    font-size: 0.94rem;
+  }
+}
+
+@media (max-width: 420px){
+  body.header-scrolled .nav-logo-full{
+    width: min(54vw, 205px);
+  }
+}
