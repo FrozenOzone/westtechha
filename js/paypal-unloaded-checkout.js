@@ -248,7 +248,7 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
     if (paypalShell) paypalShell.classList.remove("is-hidden");
     customCard.classList.add("is-hidden");
     resetColoradoState();
-    setStatus("PayPal is ready. Quantity-based shipping is now applied to this order.");
+    setStatus("Quantity-based shipping is calculated before checkout.");
   }
 
   function loadPayPalSdk(clientId, currency) {
@@ -433,7 +433,7 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
     }).render("#paypal-button-container");
     state.buttonsRendered = true;
     container.classList.remove("is-hidden");
-    setStatus("PayPal is ready. Quantity-based shipping is now applied to this order.");
+    setStatus("Quantity-based shipping is calculated before checkout.");
   }
 
   quantitySelect.addEventListener("change", function () {
