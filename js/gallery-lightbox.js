@@ -22,6 +22,10 @@
   function isProductImage(img){
     if(!img || img.tagName !== 'IMG') return false;
 
+    // Do not count the lightbox's own preview image as another gallery item.
+    // Without this, opening/navigating the viewer can add one extra image to the count.
+    if(img.closest('.product-lightbox')) return false;
+
     if(img.hasAttribute('data-product-hero-image')) return true;
 
     const src = imageSrc(img);
