@@ -3519,3 +3519,144 @@ body.header-scrolled #site-header .nav-link{
     width: min(54vw, 205px);
   }
 }
+
+
+/* ===== ESP32 Quick Start page ===== */
+.quick-start-page .quickstart-hero h1{
+  max-width: 13ch;
+}
+
+.quickstart-alert,
+.quickstart-success{
+  margin-top: 18px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-soft);
+  line-height: 1.75;
+}
+
+.quickstart-card-grid,
+.quickstart-info-grid,
+.quickstart-recovery-grid{
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.quickstart-card,
+.quickstart-info,
+.quickstart-recovery-card{
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  padding: 18px;
+}
+
+.quickstart-card h3,
+.quickstart-recovery-card h3{
+  margin: 0 0 8px;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+}
+
+.quickstart-card p,
+.quickstart-recovery-card p{
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.quickstart-info span{
+  display: block;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.quickstart-info strong{
+  display: block;
+  line-height: 1.45;
+}
+
+.quickstart-steps{
+  counter-reset: quickstep;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.quickstart-steps li{
+  counter-increment: quickstep;
+  position: relative;
+  padding: 18px 18px 18px 62px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  line-height: 1.75;
+}
+
+.quickstart-steps li::before{
+  content: counter(quickstep);
+  position: absolute;
+  left: 18px;
+  top: 18px;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-weight: 900;
+}
+
+.quickstart-qr-card{
+  text-align: center;
+}
+
+.quickstart-qr{
+  display: block;
+  width: min(230px, 70vw);
+  height: auto;
+  margin: 16px auto 12px;
+  padding: 10px;
+  border-radius: var(--radius-md);
+  background: #ffffff;
+  border: 1px solid var(--border);
+}
+
+@media (max-width: 980px){
+  .quickstart-card-grid,
+  .quickstart-info-grid,
+  .quickstart-recovery-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px){
+  .quickstart-card-grid,
+  .quickstart-info-grid,
+  .quickstart-recovery-grid{
+    grid-template-columns: 1fr;
+  }
+
+  .quickstart-steps li{
+    padding: 16px 16px 16px 56px;
+  }
+
+  .quickstart-steps li::before{
+    left: 16px;
+    top: 16px;
+  }
+}

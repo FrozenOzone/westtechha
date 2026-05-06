@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>ESP32 Quick Start &amp; Recovery – WestTech Home Automation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="WestTech ESP32 Quick Start and recovery steps for setup Wi-Fi, 2.4 GHz Wi-Fi, web portal access, and firmware upload."/>
+  <link href="icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="css/site.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="page quick-start-page">
+  <div id="site-header"></div>
+
+  <header class="page-header quickstart-hero">
+    <div class="eyebrow"><span class="dot"></span>ESP32 Setup • Quick Start • Recovery</div>
+    <h1>ESP32 Quick Start &amp; Recovery</h1>
+    <p class="tagline">Use this page when the ESP32 is running WestTech ESP32 verification firmware. It walks through setup Wi-Fi, basic verification, optional firmware upload, and simple recovery steps if setup does not go as expected.</p>
+    <div class="quickstart-alert" role="note">
+      <strong>Important:</strong> This is for the WestTech ESP32 verification image. It is not the final GP/MP product firmware. GP/MP firmware is installed only when the customer ordered or needs the default firmware for that panel family.
+    </div>
+  </header>
+
+  <main>
+    <section class="section quickstart-section">
+      <div class="section-header">
+        <div>
+          <div class="section-tag">Before You Start</div>
+          <div class="section-title">Use the right Wi-Fi and power.</div>
+        </div>
+        <p>These items prevent most setup problems.</p>
+      </div>
+      <div class="quickstart-card-grid">
+        <article class="quickstart-card"><h3>2.4 GHz Wi-Fi</h3><p>Use a 2.4 GHz Wi-Fi network. ESP32 devices do not join 5 GHz-only Wi-Fi networks.</p></article>
+        <article class="quickstart-card"><h3>Stable USB power</h3><p>Use a stable 5 V USB power source and a known-good USB cable.</p></article>
+        <article class="quickstart-card"><h3>Setup device</h3><p>Have a phone, tablet, or laptop with Wi-Fi available.</p></article>
+        <article class="quickstart-card"><h3>Firmware file</h3><p>If installing default firmware, have the correct GP/MP ESPHome firmware .bin file ready.</p></article>
+      </div>
+    </section>
+
+    <section class="section quickstart-section">
+      <div class="section-header">
+        <div>
+          <div class="section-tag">Setup Info</div>
+          <div class="section-title">Connect to the setup portal.</div>
+        </div>
+        <p>Use these values during initial setup.</p>
+      </div>
+      <div class="quickstart-info-grid">
+        <div class="quickstart-info"><span>Setup Wi-Fi</span><strong>WestTech Setup</strong></div>
+        <div class="quickstart-info"><span>Setup password</span><strong>Leave blank unless device label says otherwise</strong></div>
+        <div class="quickstart-info"><span>Manual setup page</span><strong><a class="doc-link" href="http://192.168.4.1">http://192.168.4.1</a></strong></div>
+        <div class="quickstart-info"><span>Web login</span><strong>Use device label / support-provided login if prompted</strong></div>
+      </div>
+    </section>
+
+    <section class="section quickstart-section">
+      <div class="section-header">
+        <div>
+          <div class="section-tag">Quick Steps</div>
+          <div class="section-title">Setup and verify the ESP32.</div>
+        </div>
+        <p>Follow these in order.</p>
+      </div>
+      <ol class="quickstart-steps">
+        <li><strong>Power up:</strong> Plug in the ESP32 and wait 30-60 seconds.</li>
+        <li><strong>Connect to setup Wi-Fi:</strong> Connect your phone or laptop to <strong>WestTech Setup</strong>. If no page opens, browse to <a class="doc-link" href="http://192.168.4.1">http://192.168.4.1</a>.</li>
+        <li><strong>Enter Wi-Fi details:</strong> Select or type the 2.4 GHz Wi-Fi name, enter the password, then tap <strong>Save / Connect</strong>.</li>
+        <li><strong>Confirm success:</strong> The setup Wi-Fi should disappear. Check the router, ESPHome, or Home Assistant for the device. The web portal may show the WestTech ESP32 status page.</li>
+        <li><strong>Optional - upload final firmware:</strong> If installing default GP/MP firmware, open the device web page by IP and upload the correct ESPHome .bin / OTA .bin file. Do not unplug power during upload.</li>
+      </ol>
+      <div class="quickstart-success" role="note"><strong>Internal verification checkpoint:</strong> If flashing completes and the WestTech web/setup page appears, the ESP32 passes basic flash/boot/web verification.</div>
+    </section>
+
+    <section class="section quickstart-section quickstart-recovery" id="recovery">
+      <div class="section-header">
+        <div>
+          <div class="section-tag">Recovery</div>
+          <div class="section-title">If something fails.</div>
+        </div>
+        <p>Use the matching recovery step below.</p>
+      </div>
+      <div class="quickstart-recovery-grid">
+        <article class="quickstart-recovery-card"><h3>No setup Wi-Fi</h3><p>Wait 60 seconds, power-cycle once, try a different USB cable or power supply, then re-flash by USB if needed.</p></article>
+        <article class="quickstart-recovery-card"><h3>Portal does not open</h3><p>Stay connected to <strong>WestTech Setup</strong> and manually open <a class="doc-link" href="http://192.168.4.1">http://192.168.4.1</a>. Temporarily disable mobile data if needed.</p></article>
+        <article class="quickstart-recovery-card"><h3>Wi-Fi will not join</h3><p>Confirm 2.4 GHz Wi-Fi, re-check the case-sensitive password, and move closer to the router.</p></article>
+        <article class="quickstart-recovery-card"><h3>Firmware upload fails</h3><p>Confirm you selected the correct .bin / OTA .bin file, retry once, then recover by USB if the device does not return.</p></article>
+      </div>
+    </section>
+
+    <section class="spotlight quickstart-help">
+      <article class="spotlight-card">
+        <div class="section-tag">Need Help?</div>
+        <h3>Contact WestTech Home Automation support.</h3>
+        <p>Include your order number, panel model, and the step that failed so support can help you faster.</p>
+        <div class="hero-actions"><a class="btn btn-primary" href="support.html">Support Page</a><a class="btn btn-outline" href="contact.html">Contact Support</a></div>
+      </article>
+      <article class="spotlight-card quickstart-qr-card">
+        <div class="section-tag">QR Target</div>
+        <h3>Scan for this setup page.</h3>
+        <img src="images/qr-esp32-quick-start.png" alt="QR code for the WestTech ESP32 Quick Start page" class="quickstart-qr"/>
+        <p class="support-note"><strong>URL:</strong> https://westtechha.com/quick-start.html</p>
+      </article>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+</div>
+<script src="js/site-shell.js"></script>
+<script src="js/theme.js" defer></script>
+</body>
+</html>

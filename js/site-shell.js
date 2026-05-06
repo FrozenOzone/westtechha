@@ -12,6 +12,7 @@
   ];
 
   const footerLinks = [
+    { href: 'quick-start.html',   label: 'ESP32 Quick Start' },
     { href: 'shipping.html',      label: 'Shipping Policy' },
     { href: 'returns.html',       label: 'Returns & Warranty' },
     { href: 'legal-notice.html',  label: 'Legal Notice' },
