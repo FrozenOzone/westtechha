@@ -3680,8 +3680,7 @@ body.header-scrolled #site-header .nav-link{
 .product-family-thumb img{
   display:block;
   width:100%;
-  aspect-ratio:16 / 9;
-  max-height:150px;
+  aspect-ratio:4 / 3;
   object-fit:cover;
 }
 
@@ -3724,7 +3723,7 @@ body.header-scrolled #site-header .nav-link{
     margin-top:14px;
   }
   .home-family-grid .product-family-thumb img{
-    max-height:135px;
+    aspect-ratio:4 / 3;
   }
   .home-family-grid .product-footer{
     margin-top:12px;
@@ -3781,3 +3780,8 @@ html[data-theme="dark"] .hardware-example-card figure{
     grid-template-columns:1fr;
   }
 }
+
+
+/* ===== Product family thumbnail fit update v11 =====
+   Keeps Scout/Ranger thumbnails the same card width, but uses the native
+   4:3 photo shape so the full enclosure photo is visible instead of cropped. */
