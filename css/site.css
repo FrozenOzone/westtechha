@@ -3685,4 +3685,67 @@ body.header-scrolled #site-header .nav-link{
   object-fit:cover;
 }
 
+/* ===== Home page intro cleanup v5 =====
+   Moves the stronger product-line message directly under the main home headline
+   and removes the duplicate top hero card/buttons. */
+.home-intro-copy{
+  margin-top: 26px;
+  max-width: 980px;
+}
+.home-intro-copy .eyebrow{
+  margin-bottom: 18px;
+}
+.home-intro-copy h2{
+  margin: 0;
+  max-width: 920px;
+  color: var(--text);
+  font-size: clamp(1.55rem, 3vw, 2.25rem);
+  line-height: 1.25;
+  letter-spacing: -0.035em;
+}
+.home-intro-copy .lead{
+  max-width: 980px;
+}
+.home-intro-pills{
+  gap: 10px;
+}
+.home-intro-pills .pill{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--subcard-border);
+  background: var(--subcard-surface);
+  color: var(--muted);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 8px 13px;
+  border-radius: 999px;
+  box-shadow: none;
+}
+.home-intro-pills .pill::before{
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #4f78c2, #8fb2e1);
+  flex: 0 0 auto;
+}
+html[data-theme="dark"] .home-intro-pills .pill{
+  color: var(--muted-strong);
+}
+@media (prefers-color-scheme: dark){
+  html:not([data-theme]) .home-intro-pills .pill{
+    color: var(--muted-strong);
+  }
+}
+@media (max-width: 700px){
+  .home-intro-copy{
+    margin-top: 22px;
+  }
+  .home-intro-copy h2{
+    font-size: clamp(1.35rem, 7vw, 1.8rem);
+  }
+}
 
