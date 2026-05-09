@@ -3730,3 +3730,54 @@ body.header-scrolled #site-header .nav-link{
     margin-top:12px;
   }
 }
+
+
+/* ===== Product hardware example photo cards v8 =====
+   Used on Scout and Ranger product pages for the Example hardware views sections. */
+.hardware-example-grid{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:18px;
+}
+.hardware-example-card{
+  padding:0;
+  overflow:hidden;
+}
+.hardware-example-card figure{
+  margin:0;
+  border-bottom:1px solid var(--subcard-border);
+  background:rgba(255,255,255,0.82);
+}
+html[data-theme="dark"] .hardware-example-card figure{
+  background:rgba(15,23,42,0.82);
+}
+@media (prefers-color-scheme: dark){
+  html:not([data-theme]) .hardware-example-card figure{
+    background:rgba(15,23,42,0.82);
+  }
+}
+.hardware-example-card img{
+  display:block;
+  width:100%;
+  aspect-ratio:4 / 3;
+  object-fit:cover;
+}
+.hardware-example-body{
+  padding:18px;
+}
+.hardware-example-body h3{
+  margin:10px 0 0;
+}
+.hardware-example-body p{
+  margin:10px 0 0;
+}
+@media (max-width: 980px){
+  .hardware-example-grid{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px){
+  .hardware-example-grid{
+    grid-template-columns:1fr;
+  }
+}
