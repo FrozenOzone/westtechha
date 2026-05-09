@@ -3695,3 +3695,38 @@ body.header-scrolled #site-header .nav-link{
     max-width: 980px;
   }
 }
+
+
+/* ===== Home mobile family card cleanup v7 =====
+   Keeps the home-page family cards from stretching tall on phone screens.
+   Product page cards are unchanged. */
+.home-family-grid{
+  align-items:start;
+}
+.home-family-grid .product-card{
+  align-self:start;
+  min-height:auto;
+  height:auto;
+}
+.home-family-grid .product-footer{
+  margin-top:14px;
+}
+@media (max-width: 700px){
+  .home-family-grid{
+    align-items:start;
+  }
+  .home-family-grid .product-card{
+    align-self:start;
+    min-height:auto;
+    height:auto;
+  }
+  .home-family-grid .product-family-thumb{
+    margin-top:14px;
+  }
+  .home-family-grid .product-family-thumb img{
+    max-height:135px;
+  }
+  .home-family-grid .product-footer{
+    margin-top:12px;
+  }
+}
