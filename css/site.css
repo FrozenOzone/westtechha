@@ -3785,3 +3785,41 @@ html[data-theme="dark"] .hardware-example-card figure{
 /* ===== Product family thumbnail fit update v11 =====
    Keeps Scout/Ranger thumbnails the same card width, but uses the native
    4:3 photo shape so the full enclosure photo is visible instead of cropped. */
+
+
+/* ===== Up-front pricing visibility v13 =====
+   Keeps product pricing visible before customers click deeper into the site. */
+.product-family-price{
+  margin:14px 0 0;
+  padding:12px 14px;
+  border:1px solid var(--subcard-border);
+  border-radius:16px;
+  background:rgba(91, 151, 218, 0.10);
+  display:grid;
+  gap:5px;
+  line-height:1.45;
+}
+.product-family-price strong{
+  color:var(--text);
+  font-size:0.86rem;
+  letter-spacing:0.02em;
+}
+.product-family-price span{
+  color:var(--muted);
+  font-size:0.94rem;
+}
+.product-family-price b{
+  color:var(--text);
+  font-weight:800;
+}
+.product-family-price-hero{
+  margin:16px 0 0;
+}
+.product-family-price + .product-footer{
+  margin-top:14px;
+}
+@media (max-width:700px){
+  .product-family-price{
+    padding:11px 12px;
+  }
+}

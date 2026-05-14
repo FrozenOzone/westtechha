@@ -26,7 +26,7 @@
         <div>
           <div class="product-label">Standard Product</div>
           <h2>Ranger 38 - Unloaded</h2>
-          <p>Ranger 38 - Unloaded is the first standard launch product in the Scout family. It is built for the 30-pin unloaded configuration and is intended for customers who want the enclosure path handled cleanly while bringing their own hardware plan.</p>
+          <p>Ranger 38 - Unloaded is built for the 38-pin unloaded layout. Unloaded is the bring-your-own-hardware path. Use the quote page if you need a non-standard configuration.</p>
           <div class="product-kicker-row">
             <span class="product-chip">38-pin unloaded layout</span>
             <span class="product-chip">Indoor use</span>
@@ -42,8 +42,8 @@
             <li><strong>Ranger enclosure</strong></li>
             <li><strong>Ranger lid</strong></li>
             <li><strong>Standard enclosure hardware</strong></li>
-            <li><strong>Buzzer-ready location</strong> (internal enclosure location) for many 10–12 mm buzzers; buzzer hardware not included</li>
             <li><strong>Matched enclosure inserts</strong></li>
+            <li><strong>Electronics are not included</strong> unless specifically stated at checkout</li>
           </ul>
         </article>
         <article class="checkout-mini-card">
@@ -52,14 +52,14 @@
             <li><strong>Shipping tiers:</strong> 1 unit $8.95 • 2 units $10.95 • 3-4 units $14.95 • 5+ custom / email order</li>
             <li><strong>Tax:</strong> any applicable sales tax is finalized before the order is captured</li>
             <li><strong>Support:</strong> support@westtechha.com</li>
-            <li><strong>Loaded / custom:</strong> use the quote page instead of this checkout path</li>
+            <li><strong>Custom:</strong> use the quote page for non-standard requests</li>
           </ul>
         </article>
       </div>
 
       <div class="checkout-mini-card">
         <div class="product-label">What happens next</div>
-        <p>Click PayPal to begin. Most buyers can complete the checkout immediately. Colorado buyers will return to this page for one quick address verification step before the payment is finalized.</p>
+        <p>Click PayPal to begin. Most buyers can complete checkout immediately. Colorado buyers will return to this page for one quick address verification step before payment is finalized.</p>
       </div>
     </article>
 
@@ -98,14 +98,14 @@
       <div class="checkout-summary-lines">
         <div class="checkout-line"><span>Quantity</span><strong id="checkout-quantity-display">1</strong></div>
         <div class="checkout-line"><span>Color</span><strong id="checkout-color-display">White</strong></div>
-        <div class="checkout-line"><span>Unit price</span><strong id="checkout-unit-amount">$35.00</strong></div>
-        <div class="checkout-line"><span data-checkout-product-name>Ranger 38 - Unloaded</span><strong id="checkout-item-amount">$35.00</strong></div>
+        <div class="checkout-line"><span>Unit price</span><strong id="checkout-unit-amount">$29.99</strong></div>
+        <div class="checkout-line"><span data-checkout-product-name>Ranger 38 - Unloaded</span><strong id="checkout-item-amount">$29.99</strong></div>
         <div class="checkout-line"><span>Flat shipping</span><strong id="checkout-shipping-amount">$8.95</strong></div>
         <div class="checkout-line checkout-line-note"><span>Tax</span><strong id="checkout-tax-amount">Finalized during checkout</strong></div>
       </div>
       <div id="checkout-total-line" class="checkout-total-line">
         <span id="checkout-total-label">Base total before any applicable tax</span>
-        <strong id="checkout-total-amount">$43.95</strong>
+        <strong id="checkout-total-amount">$38.94</strong>
       </div>
 
       <div id="checkout-colorado-card" class="checkout-mini-card checkout-address-card is-hidden">
@@ -120,47 +120,28 @@
               <strong id="co-invoice-id" class="checkout-static-value">Pending…</strong>
               <input id="co-full-name" type="hidden"/>
             </div>
-            <label class="checkout-field checkout-field-full">
-              <span>Address line 1</span>
-              <input id="co-address1" autocomplete="shipping address-line1" readonly disabled required type="text"/>
-            </label>
-            <label class="checkout-field checkout-field-full">
-              <span>Address line 2 <em>(optional)</em></span>
-              <input id="co-address2" autocomplete="shipping address-line2" readonly disabled type="text"/>
-            </label>
-            <label class="checkout-field">
-              <span>City</span>
-              <input id="co-city" autocomplete="shipping address-level2" readonly disabled required type="text"/>
-            </label>
-            <label class="checkout-field">
-              <span>State</span>
-              <input id="co-state" autocomplete="shipping address-level1" maxlength="2" readonly disabled required type="text" value="CO"/>
-            </label>
-            <label class="checkout-field">
-              <span>ZIP code</span>
-              <input id="co-postal" autocomplete="shipping postal-code" readonly disabled required type="text"/>
-            </label>
+            <label class="checkout-field checkout-field-full"><span>Address line 1</span><input id="co-address1" autocomplete="shipping address-line1" readonly disabled required type="text"/></label>
+            <label class="checkout-field checkout-field-full"><span>Address line 2 <em>(optional)</em></span><input id="co-address2" autocomplete="shipping address-line2" readonly disabled type="text"/></label>
+            <label class="checkout-field"><span>City</span><input id="co-city" autocomplete="shipping address-level2" readonly disabled required type="text"/></label>
+            <label class="checkout-field"><span>State</span><input id="co-state" autocomplete="shipping address-level1" maxlength="2" readonly disabled required type="text" value="CO"/></label>
+            <label class="checkout-field"><span>ZIP code</span><input id="co-postal" autocomplete="shipping postal-code" readonly disabled required type="text"/></label>
             </div>
           </div>
         </form>
         <p id="co-change-note" class="checkout-mini-note checkout-change-note is-hidden">Need to change the address? Click the PayPal button below again, then select a different shipping address to continue checkout.</p>
-        <label id="co-verify-wrap" class="checkout-verify-row is-hidden">
-          <input id="co-verify-checkbox" type="checkbox"/>
-          <span>I confirm this is my correct shipping address.</span>
-        </label>
+        <label id="co-verify-wrap" class="checkout-verify-row is-hidden"><input id="co-verify-checkbox" type="checkbox"/><span>I confirm this is my correct shipping address.</span></label>
         <div id="checkout-colorado-summary" class="checkout-mini-note is-hidden"></div>
         <div id="checkout-colorado-result" class="checkout-colorado-result is-hidden">
           <div class="checkout-colorado-result-title">Updated order total</div>
           <div class="checkout-colorado-result-lines">
-            <div class="checkout-line"><span id="co-result-item-name">Ranger 38 - Unloaded</span><strong id="co-result-item">$35.00</strong></div>
+            <div class="checkout-line"><span id="co-result-item-name">Ranger 38 - Unloaded</span><strong id="co-result-item">$29.99</strong></div>
             <div class="checkout-line"><span>Flat shipping</span><strong id="co-result-shipping">$8.95</strong></div>
             <div class="checkout-line"><span>Colorado tax</span><strong id="co-result-tax">$0.00</strong></div>
-            <div class="checkout-colorado-result-total"><span>Final total</span><strong id="co-result-total">$43.95</strong></div>
+            <div class="checkout-colorado-result-total"><span>Final total</span><strong id="co-result-total">$38.94</strong></div>
           </div>
         </div>
         <button id="co-complete-button" class="btn-buy-pop checkout-tax-button checkout-tax-button-primary is-hidden" type="button">Complete Order</button>
       </div>
-
 
       <div id="checkout-custom-order-card" class="checkout-mini-card checkout-custom-order-card is-hidden">
         <div class="product-label">5+ Units</div>
@@ -174,13 +155,10 @@
 
       <div class="checkout-paypal-shell">
         <div class="checkout-paypal-head">
-          <div>
-            <div class="product-label">Secure Payment</div>
-            <h3>PayPal Checkout</h3>
-          </div>
+          <div><div class="product-label">Secure Payment</div><h3>PayPal Checkout</h3></div>
           <span class="checkout-security-pill">PayPal</span>
         </div>
-<div id="paypal-button-container" class="paypal-button-container is-hidden"></div>
+        <div id="paypal-button-container" class="paypal-button-container is-hidden"></div>
         <p id="paypal-status" class="checkout-status">Loading checkout…</p>
       </div>
 
@@ -188,7 +166,7 @@
         <p><strong>Shipping:</strong> Quantity-based shipping applies to 1 through 4 units. Orders for 5+ units use the custom / email order path.</p>
         <p><strong>Sales tax:</strong> Any applicable sales tax is finalized before the order is captured.</p>
         <p><strong>Questions before ordering?</strong> <a href="support.html">Visit Support</a> or <a href="contact.html">Contact us</a>.</p>
-        <p><strong>Need Loaded or custom instead?</strong> <a href="order.html">Request a quote</a>.</p>
+        <p><strong>Need custom instead?</strong> <a href="order.html">Request a quote</a>.</p>
       </div>
     </aside>
   </section>
