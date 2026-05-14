@@ -3823,3 +3823,66 @@ html[data-theme="dark"] .hardware-example-card figure{
     padding:11px 12px;
   }
 }
+
+/* ===== Pricing and new info-card responsive containment v20 =====
+   Keeps the price/info boxes visible inside product cards on narrower screens. */
+.product-family-price,
+.product-offer-meta,
+.product-card,
+.product-spec-card,
+.product-feature-card,
+.product-cta-card,
+.product-compat-card,
+.hardware-example-card{
+  box-sizing:border-box;
+  min-width:0;
+  max-width:100%;
+}
+
+.product-family-price{
+  width:100%;
+  align-self:stretch;
+  overflow:hidden;
+}
+
+.product-family-price strong,
+.product-family-price span,
+.product-offer-meta,
+.product-spec-card h3,
+.product-spec-card p,
+.product-feature-card h3,
+.product-feature-card p,
+.hardware-example-card h3,
+.hardware-example-card p{
+  max-width:100%;
+  overflow-wrap:anywhere;
+}
+
+.product-family-price span{
+  display:block;
+}
+
+.product-family-price b,
+.product-offer-meta span{
+  white-space:nowrap;
+}
+
+@media (max-width:1180px){
+  .product-family-price{
+    padding:12px;
+    border-radius:14px;
+  }
+  .product-family-price span{
+    font-size:0.9rem;
+    line-height:1.55;
+  }
+}
+
+@media (max-width:700px){
+  .product-family-price{
+    margin-top:12px;
+  }
+  .product-family-price span + span{
+    margin-top:2px;
+  }
+}
