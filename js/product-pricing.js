@@ -1,4 +1,11 @@
 (function () {
+  const STATUS_CLASS_PREFIX = "availability-";
+  const DEFAULT_AVAILABILITY = {
+    status: "unknown",
+    label: "Availability pending",
+    canFulfill: true
+  };
+
   function formatMoney(value) {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -28,6 +35,60 @@
     return Math.min.apply(null, familyProducts.map(function (product) {
       return Number(product.unitAmount || product.itemAmount || 0);
     }));
+  }
+
+  function statusScore(status) {
+    if (status === "temporarily-unavailable") return 0;
+    if (status === "low-stock") return 1;
+    if (status === "in-stock") return 2;
+    return 1;
+  }
+
+  function statusLabel(status) {
+    if (status === "temporarily-unavailable") return "Temporarily unavailable";
+    if (status === "low-stock") return "Low stock";
+    if (status === "in-stock") return "In stock";
+    return "Availability pending";
+  }
+
+  function clearAvailabilityClasses(el) {
+    Array.from(el.classList).forEach(function (className) {
+      if (className.indexOf(STATUS_CLASS_PREFIX) === 0) el.classList.remove(className);
+    });
+  }
+
+  function applyAvailability(el, availability) {
+    const inv = availability || DEFAULT_AVAILABILITY;
+    const status = inv.status || "unknown";
+    const prefix = el.getAttribute("data-product-availability-prefix") || "Availability: ";
+    el.textContent = `${prefix}${inv.label || statusLabel(status)}`;
+    clearAvailabilityClasses(el);
+    el.classList.add("product-availability-badge", `${STATUS_CLASS_PREFIX}${status}`);
+  }
+
+  function groupAvailability(products, skus) {
+    const availability = skus.map(function (sku) {
+      return products[sku] && products[sku].availability ? products[sku].availability : null;
+    }).filter(Boolean);
+
+    if (!availability.length) return null;
+
+    const availableCount = availability.filter(function (item) { return item.status !== "temporarily-unavailable"; }).length;
+    let status;
+
+    if (availableCount === 0) {
+      status = "temporarily-unavailable";
+    } else if (availableCount < availability.length || availability.some(function (item) { return statusScore(item.status) <= 1; })) {
+      status = "low-stock";
+    } else {
+      status = "in-stock";
+    }
+
+    return {
+      status,
+      label: statusLabel(status),
+      canFulfill: status !== "temporarily-unavailable"
+    };
   }
 
   function updateProductPrice(products) {
@@ -63,6 +124,21 @@
       }
 
       el.textContent = `From ${amount}`;
+    });
+
+    document.querySelectorAll("[data-product-availability]").forEach(function (el) {
+      const sku = el.getAttribute("data-product-availability");
+      const product = products[sku];
+      if (product && product.availability) applyAvailability(el, product.availability);
+    });
+
+    document.querySelectorAll("[data-product-availability-group]").forEach(function (el) {
+      const skus = (el.getAttribute("data-product-availability-group") || "")
+        .split(",")
+        .map(function (sku) { return sku.trim(); })
+        .filter(Boolean);
+      const availability = groupAvailability(products, skus);
+      if (availability) applyAvailability(el, availability);
     });
   }
 

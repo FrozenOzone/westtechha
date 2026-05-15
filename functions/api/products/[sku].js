@@ -1,4 +1,5 @@
 import { buildCheckoutProduct, publicProduct } from "../../_lib/product.js";
+import { availabilityForProduct } from "../../_lib/inventory.js";
 import { jsonResponse, sanitizeEnvValue } from "../../_lib/shared.js";
 
 export async function onRequestGet(context) {
@@ -13,6 +14,13 @@ export async function onRequestGet(context) {
     }, 404);
   }
 
+  let availability = null;
+  try {
+    availability = await availabilityForProduct(context.env, product.sku, product.quantity);
+  } catch (error) {
+    console.warn("[products.sku] inventory unavailable", error && error.message ? error.message : error);
+  }
+
   return jsonResponse({
     ok: true,
     product: {
@@ -20,7 +28,8 @@ export async function onRequestGet(context) {
       quantity: product.quantity,
       itemAmount: product.itemAmount,
       shippingAmount: product.shippingAmount,
-      customQuoteOnly: product.customQuoteOnly
+      customQuoteOnly: product.customQuoteOnly,
+      availability
     }
   });
 }

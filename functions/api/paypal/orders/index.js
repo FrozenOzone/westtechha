@@ -2,6 +2,7 @@ import { generateAccessToken, paypalBaseUrl } from "../../../_lib/paypal.js";
 import { buildCheckoutProduct, PRODUCT } from "../../../_lib/product.js";
 import { allocateInvoiceId, createInitialOrderRecord, requireOrdersDb, setPayPalCreateFailed, setPayPalOrderCreated } from "../../../_lib/orders.js";
 import { jsonResponse, readJsonSafe, sanitizeEnvValue } from "../../../_lib/shared.js";
+import { attachPayPalOrderToInventoryHold, releaseInventoryHold, reserveInventoryForProduct } from "../../../_lib/inventory.js";
 
 function baseAmountBreakdown(product, currency) {
   return {
@@ -92,6 +93,12 @@ export async function onRequestPost(context) {
       status: "CREATING"
     });
 
+    const inventoryHold = await reserveInventoryForProduct(context.env, product, { invoiceId: orderMeta.invoiceId });
+    if (inventoryHold && inventoryHold.reserved === false && inventoryHold.skipped === false) {
+      await setPayPalCreateFailed(ordersDb, { invoiceId: orderMeta.invoiceId }).catch(() => {});
+      return jsonResponse({ ok: false, message: inventoryHold.message || "This product is temporarily unavailable." }, 409);
+    }
+
     const payload = buildOrderPayload(context, product, orderMeta);
     payload.payment_source.paypal.experience_context.cancel_url = new URL(checkoutPathForProduct(product), context.request.url).toString();
 
@@ -110,6 +117,7 @@ export async function onRequestPost(context) {
 
     if (!response.ok || !data.id) {
       await setPayPalCreateFailed(ordersDb, { invoiceId: orderMeta.invoiceId }).catch(() => {});
+      await releaseInventoryHold(context.env, { invoiceId: orderMeta.invoiceId, status: "PAYPAL_CREATE_FAILED", note: "Released inventory hold because PayPal order creation failed." }).catch(() => {});
       return jsonResponse({
         ok: false,
         message: data.message || data.details?.[0]?.description || data.raw || "Could not create the PayPal order.",
@@ -119,6 +127,7 @@ export async function onRequestPost(context) {
     }
 
     await setPayPalOrderCreated(ordersDb, { invoiceId: orderMeta.invoiceId, paypalOrderId: data.id });
+    await attachPayPalOrderToInventoryHold(context.env, { invoiceId: orderMeta.invoiceId, paypalOrderId: data.id }).catch(() => {});
 
     return jsonResponse({
       ok: true,

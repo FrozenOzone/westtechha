@@ -19,7 +19,8 @@
     shippingAmount: 0,
     shippingTierSummary: "",
     customQuoteOnly: false,
-    customQuoteMinQuantity: CUSTOM_QUOTE_MIN_QUANTITY
+    customQuoteMinQuantity: CUSTOM_QUOTE_MIN_QUANTITY,
+    availability: null
   };
 
   const status = document.getElementById("paypal-status");
@@ -55,6 +56,7 @@
   const coloradoCompleteBtn = document.getElementById("co-complete-button");
   const invoiceIdEl = document.getElementById("co-invoice-id");
   const checkoutProductImage = document.querySelector("[data-checkout-product-image]");
+  const inventoryStatusEl = document.getElementById("checkout-inventory-status");
 
   if (!status || !container || !itemAmountEl || !shippingAmountEl || !taxAmountEl || !totalAmountEl || !totalLabelEl || !totalLineEl || !coloradoCard || !coloradoForm || !coloradoSummary || !coloradoResult || !coloradoVerifyWrap || !coloradoChangeNote || !coloradoVerifyCheckbox || !resultItemEl || !resultShippingEl || !resultTaxEl || !resultTotalEl || !coloradoCompleteBtn || !quantitySelect || !customCard) return;
 
@@ -186,7 +188,8 @@
       shippingAmount: Number(data.product.shippingAmount || 0),
       shippingTierSummary: data.product.shippingTierSummary || "",
       customQuoteOnly: Boolean(data.product.customQuoteOnly),
-      customQuoteMinQuantity: Number(data.product.customQuoteMinQuantity || CUSTOM_QUOTE_MIN_QUANTITY)
+      customQuoteMinQuantity: Number(data.product.customQuoteMinQuantity || CUSTOM_QUOTE_MIN_QUANTITY),
+      availability: data.product.availability || null
     };
     applyProductToPage();
   }
@@ -205,6 +208,25 @@
     coloradoCompleteNote.textContent = "";
   }
 
+
+  function availabilityLabel() {
+    const availability = PRODUCT.availability || {};
+    return availability.label || "Availability pending";
+  }
+
+  function canFulfillCurrentQuantity() {
+    const availability = PRODUCT.availability || {};
+    if (!availability.enforced) return true;
+    return availability.canFulfill !== false && availability.status !== "temporarily-unavailable";
+  }
+
+  function updateInventoryStatus() {
+    const availability = PRODUCT.availability || {};
+    if (!inventoryStatusEl) return;
+    inventoryStatusEl.textContent = `Availability: ${availabilityLabel()}`;
+    inventoryStatusEl.className = `checkout-inventory-status availability-${availability.status || "unknown"}`;
+  }
+
   function updateSummaryFromQuantity() {
     const quantity = currentQuantity();
     state.quantity = quantity;
@@ -218,6 +240,7 @@
     if (colorDisplayEl) colorDisplayEl.textContent = state.color;
     updateCheckoutProductImage();
     itemAmountEl.textContent = formatMoney(itemTotal);
+    updateInventoryStatus();
 
     if (custom) {
       shippingAmountEl.textContent = "Custom quote required";
@@ -237,6 +260,19 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
 `);
         customEmailLink.href = `mailto:orders@westtechha.com?subject=${subject}&body=${body}`;
       }
+      return;
+    }
+
+    if (!canFulfillCurrentQuantity()) {
+      shippingAmountEl.textContent = "Unavailable";
+      taxAmountEl.textContent = "Unavailable";
+      totalLabelEl.textContent = "This option is not available for direct checkout right now";
+      totalAmountEl.textContent = availabilityLabel();
+      totalLineEl.classList.remove("is-final");
+      if (paypalShell) paypalShell.classList.add("is-hidden");
+      customCard.classList.add("is-hidden");
+      resetColoradoState();
+      setStatus("This product is temporarily unavailable or there is not enough stock for the selected quantity.", true);
       return;
     }
 
@@ -436,9 +472,15 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
     setStatus("Quantity-based shipping is calculated before checkout.");
   }
 
-  quantitySelect.addEventListener("change", function () {
+  quantitySelect.addEventListener("change", async function () {
     resetPendingOrderState();
-    updateSummaryFromQuantity();
+    try {
+      await loadProductConfig();
+      updateSummaryFromQuantity();
+    } catch (error) {
+      console.error(error);
+      setStatus(error && error.message ? error.message : "Could not update product availability.", true);
+    }
   });
 
   if (colorSelect) {
