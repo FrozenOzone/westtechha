@@ -3962,3 +3962,48 @@ html[data-theme="dark"] .hardware-example-card figure{
 .product-family-price .product-availability-badge{
   white-space:normal;
 }
+
+/* Home family heading and product-card CTA polish */
+.home-family-overview .section-title{
+  max-width: none;
+}
+
+.home-family-overview .section-title .home-family-title-line{
+  display: block;
+  white-space: nowrap;
+}
+
+.product-card .product-footer .btn-primary,
+.product-card .product-footer .btn{
+  min-height: 42px;
+  padding: 0 18px;
+  min-width: 122px;
+  border-radius: 999px;
+  background: var(--subcard-surface);
+  border: 1px solid rgba(196, 137, 45, .65);
+  color: var(--text);
+  box-shadow: 0 0 0 3px rgba(196, 137, 45, .14);
+}
+
+.product-card .product-footer .btn-primary:hover,
+.product-card .product-footer .btn:hover,
+.product-card .product-footer .btn-primary:focus-visible,
+.product-card .product-footer .btn:focus-visible{
+  background: var(--subcard-surface-strong);
+  border-color: rgba(214, 157, 52, .78);
+  color: var(--text);
+  box-shadow: 0 0 0 4px rgba(196, 137, 45, .20), 0 12px 24px rgba(15, 23, 42, .16);
+}
+
+.product-card .product-footer .btn-primary:focus-visible,
+.product-card .product-footer .btn:focus-visible{
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px){
+  .home-family-overview .section-title .home-family-title-line{
+    white-space: normal;
+  }
+}
+
