@@ -12,6 +12,7 @@
   ];
 
   const footerLinks = [
+    { href: 'what-is-esp32.html', label: 'What is an ESP32?' },
     { href: 'materials-serviceability.html', label: 'Materials & Serviceability' },
     { href: 'hardware-reference.html', label: 'Hardware Reference' },
     { href: 'quick-start.html',   label: 'ESP32 Quick Start' },
