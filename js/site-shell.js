@@ -12,6 +12,8 @@
   ];
 
   const footerLinks = [
+    { href: 'materials-serviceability.html', label: 'Materials & Serviceability' },
+    { href: 'hardware-reference.html', label: 'Hardware Reference' },
     { href: 'quick-start.html',   label: 'ESP32 Quick Start' },
     { href: 'shipping.html',      label: 'Shipping Policy' },
     { href: 'returns.html',       label: 'Returns & Warranty' },
