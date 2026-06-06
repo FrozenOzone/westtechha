@@ -4007,3 +4007,19 @@ html[data-theme="dark"] .hardware-example-card figure{
   }
 }
 
+/* Controlled two-line headings */
+.section-title .home-family-title-line,
+.page-header h1 .home-family-title-line{
+  display:block;
+}
+
+.section-title .home-family-title-line{
+  white-space:nowrap;
+}
+
+@media (max-width:640px){
+  .section-title .home-family-title-line{
+    white-space:normal;
+  }
+}
+
