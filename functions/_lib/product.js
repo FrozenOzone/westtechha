@@ -93,6 +93,34 @@ export const PRODUCTS = Object.freeze({
     offerType: "Unloaded",
     variant: "38"
   }),
+  "ranger-30-bucks-unloaded": Object.freeze({
+    sku: "ranger-30-bucks-unloaded",
+    name: "Ranger Bucks 30 - Unloaded",
+    description: "Ranger Bucks child option with 30-pin unloaded layout.",
+    quantity: "1",
+    unitAmount: "29.99",
+    itemAmount: "29.99",
+    shippingAmount: "8.95",
+    currency: "USD",
+    family: "Ranger",
+    layout: "Ranger Bucks 30-pin unloaded layout",
+    offerType: "Unloaded",
+    variant: "Ranger Bucks 30"
+  }),
+  "ranger-38-bucks-unloaded": Object.freeze({
+    sku: "ranger-38-bucks-unloaded",
+    name: "Ranger Bucks 38 - Unloaded",
+    description: "Ranger Bucks child option with 38-pin unloaded layout.",
+    quantity: "1",
+    unitAmount: "29.99",
+    itemAmount: "29.99",
+    shippingAmount: "8.95",
+    currency: "USD",
+    family: "Ranger",
+    layout: "Ranger Bucks 38-pin unloaded layout",
+    offerType: "Unloaded",
+    variant: "Ranger Bucks 38"
+  }),
   "command-30-unloaded": Object.freeze({
     sku: "command-30-unloaded",
     name: "Command Core 30 - Unloaded",
@@ -204,6 +232,34 @@ export const PRODUCTS = Object.freeze({
     layout: "38-pin loaded layout",
     offerType: "Loaded",
     variant: "38"
+  }),
+  "ranger-30-bucks-loaded": Object.freeze({
+    sku: "ranger-30-bucks-loaded",
+    name: "Ranger Bucks 30 - Loaded",
+    description: "Ranger Bucks child option with 30-pin loaded layout.",
+    quantity: "1",
+    unitAmount: "49.99",
+    itemAmount: "49.99",
+    shippingAmount: "8.95",
+    currency: "USD",
+    family: "Ranger",
+    layout: "Ranger Bucks 30-pin loaded layout",
+    offerType: "Loaded",
+    variant: "Ranger Bucks 30"
+  }),
+  "ranger-38-bucks-loaded": Object.freeze({
+    sku: "ranger-38-bucks-loaded",
+    name: "Ranger Bucks 38 - Loaded",
+    description: "Ranger Bucks child option with 38-pin loaded layout.",
+    quantity: "1",
+    unitAmount: "49.99",
+    itemAmount: "49.99",
+    shippingAmount: "8.95",
+    currency: "USD",
+    family: "Ranger",
+    layout: "Ranger Bucks 38-pin loaded layout",
+    offerType: "Loaded",
+    variant: "Ranger Bucks 38"
   }),
   "command-30-loaded": Object.freeze({
     sku: "command-30-loaded",
