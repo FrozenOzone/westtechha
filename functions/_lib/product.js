@@ -95,59 +95,59 @@ export const PRODUCTS = Object.freeze({
   }),
   "command-30-unloaded": Object.freeze({
     sku: "command-30-unloaded",
-    name: "Command 30 - Unloaded",
-    description: "Command family standard product with 30-pin unloaded layout.",
+    name: "Command Core 30 - Unloaded",
+    description: "Command Core child option with 30-pin unloaded layout.",
     quantity: "1",
     unitAmount: "32.99",
     itemAmount: "32.99",
     shippingAmount: "8.95",
     currency: "USD",
     family: "Command",
-    layout: "30-pin unloaded layout",
+    layout: "Command Core 30-pin unloaded layout",
     offerType: "Unloaded",
-    variant: "30"
+    variant: "Command Core 30"
   }),
   "command-30-gp-unloaded": Object.freeze({
     sku: "command-30-gp-unloaded",
-    name: "Command 30 Garage Panel - Unloaded",
-    description: "Command family Garage Panel product with 30-pin unloaded layout.",
+    name: "Command-GP 30 - Unloaded",
+    description: "Command-GP Garage Panel child option with 30-pin unloaded layout.",
     quantity: "1",
     unitAmount: "32.99",
     itemAmount: "32.99",
     shippingAmount: "8.95",
     currency: "USD",
     family: "Command",
-    layout: "30-pin Garage Panel unloaded layout",
+    layout: "Command-GP 30-pin unloaded layout",
     offerType: "Unloaded",
-    variant: "30 Garage Panel"
+    variant: "Command-GP 30"
   }),
   "command-38-unloaded": Object.freeze({
     sku: "command-38-unloaded",
-    name: "Command 38 - Unloaded",
-    description: "Command family standard product with 38-pin unloaded layout.",
+    name: "Command Core 38 - Unloaded",
+    description: "Command Core child option with 38-pin unloaded layout.",
     quantity: "1",
     unitAmount: "34.99",
     itemAmount: "34.99",
     shippingAmount: "8.95",
     currency: "USD",
     family: "Command",
-    layout: "38-pin unloaded layout",
+    layout: "Command Core 38-pin unloaded layout",
     offerType: "Unloaded",
-    variant: "38"
+    variant: "Command Core 38"
   }),
   "command-38-gp-unloaded": Object.freeze({
     sku: "command-38-gp-unloaded",
-    name: "Command 38 Garage Panel - Unloaded",
-    description: "Command family Garage Panel product with 38-pin unloaded layout.",
+    name: "Command-GP 38 - Unloaded",
+    description: "Command-GP Garage Panel child option with 38-pin unloaded layout.",
     quantity: "1",
     unitAmount: "34.99",
     itemAmount: "34.99",
     shippingAmount: "8.95",
     currency: "USD",
     family: "Command",
-    layout: "38-pin Garage Panel unloaded layout",
+    layout: "Command-GP 38-pin unloaded layout",
     offerType: "Unloaded",
-    variant: "38 Garage Panel"
+    variant: "Command-GP 38"
   }),
   "scout-30-loaded": Object.freeze({
     sku: "scout-30-loaded",
@@ -207,59 +207,59 @@ export const PRODUCTS = Object.freeze({
   }),
   "command-30-loaded": Object.freeze({
     sku: "command-30-loaded",
-    name: "Command 30 - Loaded",
-    description: "Command family loaded product with 30-pin layout.",
+    name: "Command Core 30 - Loaded",
+    description: "Command Core child option with 30-pin loaded layout.",
     quantity: "1",
     unitAmount: "54.99",
     itemAmount: "54.99",
     shippingAmount: "8.95",
     currency: "USD",
     family: "Command",
-    layout: "30-pin loaded layout",
+    layout: "Command Core 30-pin loaded layout",
     offerType: "Loaded",
-    variant: "30"
+    variant: "Command Core 30"
   }),
   "command-30-gp-loaded": Object.freeze({
     sku: "command-30-gp-loaded",
-    name: "Command 30 Garage Panel - Loaded",
-    description: "Command family Garage Panel loaded product with 30-pin layout.",
+    name: "Command-GP 30 - Loaded",
+    description: "Command-GP Garage Panel child option with 30-pin loaded layout.",
     quantity: "1",
     unitAmount: "54.99",
     itemAmount: "54.99",
     shippingAmount: "8.95",
     currency: "USD",
     family: "Command",
-    layout: "30-pin Garage Panel loaded layout",
+    layout: "Command-GP 30-pin loaded layout",
     offerType: "Loaded",
-    variant: "30 Garage Panel"
+    variant: "Command-GP 30"
   }),
   "command-38-loaded": Object.freeze({
     sku: "command-38-loaded",
-    name: "Command 38 - Loaded",
-    description: "Command family loaded product with 38-pin layout.",
+    name: "Command Core 38 - Loaded",
+    description: "Command Core child option with 38-pin loaded layout.",
     quantity: "1",
     unitAmount: "59.99",
     itemAmount: "59.99",
     shippingAmount: "8.95",
     currency: "USD",
     family: "Command",
-    layout: "38-pin loaded layout",
+    layout: "Command Core 38-pin loaded layout",
     offerType: "Loaded",
-    variant: "38"
+    variant: "Command Core 38"
   }),
   "command-38-gp-loaded": Object.freeze({
     sku: "command-38-gp-loaded",
-    name: "Command 38 Garage Panel - Loaded",
-    description: "Command family Garage Panel loaded product with 38-pin layout.",
+    name: "Command-GP 38 - Loaded",
+    description: "Command-GP Garage Panel child option with 38-pin loaded layout.",
     quantity: "1",
     unitAmount: "59.99",
     itemAmount: "59.99",
     shippingAmount: "8.95",
     currency: "USD",
     family: "Command",
-    layout: "38-pin Garage Panel loaded layout",
+    layout: "Command-GP 38-pin loaded layout",
     offerType: "Loaded",
-    variant: "38 Garage Panel"
+    variant: "Command-GP 38"
   })
 });
 
