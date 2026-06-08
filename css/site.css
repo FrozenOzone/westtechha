@@ -4190,3 +4190,55 @@ html[data-theme="light"] .product-nav-menu a:focus-visible{
     text-align: left;
   }
 }
+
+
+/* Product dropdown family overview / child staggering */
+.product-nav-menu a.product-nav-overview{
+  font-weight: 900;
+}
+
+.product-nav-menu a.product-nav-child{
+  margin-left: 14px;
+  padding-left: 16px;
+  position: relative;
+  border-left: 1px solid rgba(92, 147, 207, 0.26);
+}
+
+.product-nav-menu a.product-nav-child::before{
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 50%;
+  width: 9px;
+  height: 1px;
+  background: rgba(92, 147, 207, 0.34);
+}
+
+.product-nav-menu a.product-nav-child span{
+  font-weight: 760;
+}
+
+.product-nav-menu a.product-nav-overview + a.product-nav-child{
+  margin-top: 2px;
+}
+
+.product-nav-menu a.product-nav-child + a.product-nav-overview{
+  margin-top: 8px;
+  padding-top: 12px;
+}
+
+.product-nav-menu a.product-nav-child + a.product-nav-overview::after{
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 3px;
+  height: 1px;
+  background: rgba(92, 147, 207, 0.18);
+}
+
+@media (max-width: 700px){
+  .product-nav-menu a.product-nav-child{
+    margin-left: 10px;
+  }
+}

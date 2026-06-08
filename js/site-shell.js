@@ -12,13 +12,13 @@
   ];
 
   const productLinks = [
-    { href: 'product-scout.html', label: 'Scout', note: 'Compact enclosure family' },
-    { href: 'product-ranger.html', label: 'Ranger', note: 'Medium enclosure family' },
-    { href: 'product-ranger-relay.html', label: 'Ranger Relay', note: 'Relay-ready Ranger option' },
-    { href: 'product-ranger-bucks.html', label: 'Ranger Bucks', note: 'Ranger with buck support' },
-    { href: 'product-command.html', label: 'Command', note: 'Large enclosure family' },
-    { href: 'product-command-core.html', label: 'Command Core', note: 'Command base platform' },
-    { href: 'product-command-gp.html', label: 'Command-GP', note: 'Garage Panel path' }
+    { href: 'product-scout.html', label: 'Scout', note: 'Compact enclosure family', type: 'overview' },
+    { href: 'product-ranger.html', label: 'Ranger Overview', note: 'Compare Ranger options', type: 'overview' },
+    { href: 'product-ranger-relay.html', label: 'Ranger Relay', note: 'Relay-ready Ranger option', type: 'child' },
+    { href: 'product-ranger-bucks.html', label: 'Ranger Bucks', note: 'Ranger with buck support', type: 'child' },
+    { href: 'product-command.html', label: 'Command Overview', note: 'Compare Command options', type: 'overview' },
+    { href: 'product-command-core.html', label: 'Command Core', note: 'Command base platform', type: 'child' },
+    { href: 'product-command-gp.html', label: 'Command-GP', note: 'Garage Panel path', type: 'child' }
   ];
 
   const footerLinks = [
@@ -64,11 +64,14 @@
     const isActive = isProductSectionPage();
     const classes = className + ' product-menu-trigger' + (isActive ? ' active' : '');
     const aria = isActive ? ' aria-current="page"' : '';
-    const items = productLinks.map(item => `
-            <a href="${item.href}">
+    const items = productLinks.map(item => {
+      const itemType = item.type === 'child' ? 'product-nav-child' : 'product-nav-overview';
+      return `
+            <a class="${itemType}" href="${item.href}">
               <span>${item.label}</span>
               <small>${item.note}</small>
-            </a>`).join('');
+            </a>`;
+    }).join('');
 
     return `
           <div class="nav-product-menu-wrap has-product-menu">
