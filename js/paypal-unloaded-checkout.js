@@ -142,6 +142,18 @@
     status.classList.toggle("is-error", Boolean(isError));
   }
 
+
+  function hidePayPalForFinalReview() {
+    if (paypalShell) paypalShell.classList.add("is-hidden");
+    if (container) container.classList.add("is-hidden");
+  }
+
+  function showPayPalBeforeApproval() {
+    if (state.pendingOrderId || !canFulfillCurrentQuantity()) return;
+    if (paypalShell) paypalShell.classList.remove("is-hidden");
+    if (container && state.buttonsRendered) container.classList.remove("is-hidden");
+  }
+
   function fetchJson(url, options) {
     return fetch(url, options).then(async function (response) {
       const data = await response.json().catch(function () { return {}; });
@@ -281,9 +293,9 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
     totalLabelEl.textContent = "Base total before any applicable tax";
     totalAmountEl.textContent = formatMoney(itemTotal + shipping);
     totalLineEl.classList.remove("is-final");
-    if (paypalShell) paypalShell.classList.remove("is-hidden");
     customCard.classList.add("is-hidden");
     resetColoradoState();
+    showPayPalBeforeApproval();
     setStatus("Quantity-based shipping is calculated before checkout.");
   }
 
@@ -327,6 +339,7 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
   }
 
   async function showColoradoFallback(details) {
+    hidePayPalForFinalReview();
     coloradoCard.classList.remove("is-hidden");
     state.pendingQuote = null;
     fields.fullName.value = details.fullName || "";
@@ -421,10 +434,11 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
       coloradoVerifyWrap.classList.remove("is-hidden");
       coloradoCompleteBtn.classList.remove("is-hidden");
       coloradoCompleteBtn.disabled = !state.pendingQuote;
+      hidePayPalForFinalReview();
       coloradoCompleteNote.textContent = "Colorado tax is calculated. Verify the shipping address above, then click Complete Order.";
       coloradoCompleteNote.classList.remove("is-warning");
       coloradoCompleteNote.classList.remove("is-hidden");
-      setStatus("PayPal is ready if you need to select a different shipping address.");
+      setStatus("Review the shipping address and final total, then click Complete Order.");
     } catch (error) {
       console.error(error);
       coloradoChangeNote.classList.add("is-hidden");
@@ -440,7 +454,7 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
   async function renderButtonsIfNeeded() {
     await ensurePayPalReady();
     if (state.buttonsRendered) {
-      container.classList.remove("is-hidden");
+      showPayPalBeforeApproval();
       return;
     }
     await window.paypal.Buttons({
@@ -468,7 +482,7 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
       }
     }).render("#paypal-button-container");
     state.buttonsRendered = true;
-    container.classList.remove("is-hidden");
+    showPayPalBeforeApproval();
     setStatus("Quantity-based shipping is calculated before checkout.");
   }
 
