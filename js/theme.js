@@ -66,7 +66,115 @@
   topLabel.textContent = "Top";
   topBtn.append(topIcon, topLabel);
 
-  topBtn.addEventListener("click", () => {
+  let productFabMode = false;
+  let productJumpShouldShow = () => false;
+  let productJumpMenu = null;
+
+  function setupProductFabJumpPicker() {
+    const topJump = document.querySelector(".product-jump-nav");
+    if (!topJump || productFabMode) return false;
+
+    const sourceLinks = Array.from(topJump.querySelectorAll('a[href^="#"]'));
+    if (!sourceLinks.length) return false;
+
+    productFabMode = true;
+    document.body.classList.add("has-product-jump-nav");
+
+    topIcon.textContent = "↕";
+    topLabel.textContent = "Jump To";
+    topBtn.setAttribute("aria-label", "Jump to product section");
+    topBtn.setAttribute("title", "Jump to product section");
+    topBtn.setAttribute("aria-expanded", "false");
+
+    productJumpMenu = document.createElement("div");
+    productJumpMenu.className = "product-fab-jump-menu";
+    productJumpMenu.setAttribute("aria-label", "Jump to product page sections");
+    productJumpMenu.innerHTML = sourceLinks.map((link) => {
+      const href = link.getAttribute("href");
+      const labelText = link.textContent.trim();
+      return `<a href="${href}">${labelText}</a>`;
+    }).join("");
+    document.body.appendChild(productJumpMenu);
+
+    const menuLinks = Array.from(productJumpMenu.querySelectorAll('a[href^="#"]'));
+
+    const getHeaderHeight = () => {
+      const headerHost = document.getElementById("site-header");
+      const header = headerHost ? (headerHost.querySelector(".site-header") || headerHost) : document.querySelector(".site-header, header");
+      return header ? Math.ceil(header.getBoundingClientRect().height) : 0;
+    };
+
+    const getHeaderOffset = () => getHeaderHeight() + 48;
+
+    productJumpShouldShow = () => {
+      const rect = topJump.getBoundingClientRect();
+      const headerHeight = getHeaderHeight();
+
+      // Show compact Jump only after the inline Jump bar has scrolled behind/above the fixed header.
+      return rect.bottom <= (headerHeight + 8);
+    };
+
+    const closeMenu = () => {
+      document.body.classList.remove("jump-menu-open");
+      topBtn.setAttribute("aria-expanded", "false");
+    };
+
+    const setActive = (hash) => {
+      [...sourceLinks, ...menuLinks].forEach((link) => {
+        const active = link.getAttribute("href") === hash;
+        link.classList.toggle("active", active);
+        if (active) {
+          link.setAttribute("aria-current", "true");
+        } else {
+          link.removeAttribute("aria-current");
+        }
+      });
+    };
+
+    const jumpToHash = (hash) => {
+      const target = document.querySelector(hash);
+      if (!target) return;
+
+      const targetTop = target.getBoundingClientRect().top + window.scrollY;
+      const destination = Math.max(0, targetTop - getHeaderOffset());
+
+      window.history.pushState(null, "", hash);
+      window.scrollTo({ top: destination, behavior: "smooth" });
+      setActive(hash);
+      closeMenu();
+    };
+
+    [...sourceLinks, ...menuLinks].forEach((link) => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        jumpToHash(link.getAttribute("href"));
+      });
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!productJumpMenu.contains(event.target) && !topBtn.contains(event.target)) closeMenu();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeMenu();
+    });
+
+    if (window.location.hash) {
+      window.setTimeout(() => jumpToHash(window.location.hash), 140);
+    }
+
+    return true;
+  }
+
+  topBtn.addEventListener("click", (event) => {
+    if (productFabMode) {
+      event.preventDefault();
+      event.stopPropagation();
+      const open = document.body.classList.toggle("jump-menu-open");
+      topBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      return;
+    }
+
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
@@ -102,9 +210,19 @@
   // Mount after DOM is ready
   const mount = () => {
     document.body.append(btn, topBtn);
+    setupProductFabJumpPicker();
 
     const syncTopButton = () => {
-      const showTop = (window.scrollY || window.pageYOffset || 0) > 520;
+      let showTop = (window.scrollY || window.pageYOffset || 0) > 520;
+
+      if (productFabMode) {
+        showTop = productJumpShouldShow();
+        if (!showTop) {
+          document.body.classList.remove("jump-menu-open");
+          topBtn.setAttribute("aria-expanded", "false");
+        }
+      }
+
       topBtn.classList.toggle("is-visible", showTop);
       topBtn.setAttribute("aria-hidden", showTop ? "false" : "true");
       topBtn.tabIndex = showTop ? 0 : -1;
@@ -113,6 +231,7 @@
     syncTopButton();
     window.addEventListener("scroll", syncTopButton, { passive: true });
     window.addEventListener("load", syncTopButton);
+    window.addEventListener("resize", syncTopButton);
 
     // ---- Polish: keep the buttons clear of footer/watermark content ----
     // Some layouts put a small footer watermark at the bottom; we "lift" the button

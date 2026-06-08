@@ -273,7 +273,50 @@ ${items}
       }
 
       if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(refreshHeaderLayout).catch(() => {});
+        document.fonts.ready.then(refreshHeaderLayout).catch(() => {
+
+  // Product page jump navigation active state.
+  function setupProductJumpNav() {
+    const nav = document.querySelector('.product-jump-nav');
+    if (!nav) return;
+
+    const links = Array.from(nav.querySelectorAll('a[href^="#"]'));
+    const targets = links
+      .map((link) => document.querySelector(link.getAttribute('href')))
+      .filter(Boolean);
+
+    if (!links.length || !targets.length || !('IntersectionObserver' in window)) return;
+
+    const setActive = (id) => {
+      links.forEach((link) => {
+        const active = link.getAttribute('href') === `#${id}`;
+        link.classList.toggle('active', active);
+        if (active) {
+          link.setAttribute('aria-current', 'true');
+        } else {
+          link.removeAttribute('aria-current');
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+      if (visible && visible.target.id) {
+        setActive(visible.target.id);
+      }
+    }, {
+      rootMargin: '-30% 0px -55% 0px',
+      threshold: [0.1, 0.25, 0.5]
+    });
+
+    targets.forEach((target) => observer.observe(target));
+  }
+
+  setupProductJumpNav();
+});
       }
     }
   }
