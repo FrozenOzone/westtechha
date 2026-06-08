@@ -203,7 +203,7 @@ html[data-theme="dark"] .theme-fab,
 }
 
 .theme-fab:hover{
-  transform: translateY(-1px);
+  transform: none;
   box-shadow: 0 20px 45px rgba(15, 23, 42, 0.14);
 }
 
@@ -360,7 +360,7 @@ a:hover{ text-decoration:underline; }
   display:inline-flex; align-items:center; justify-content:center; gap:10px; min-height:46px; padding:0 18px; border-radius:999px; border:1px solid transparent;
   text-decoration:none; cursor:pointer; font-size:0.96rem; font-weight:700; transition:transform .16s ease, box-shadow .16s ease, background .16s ease, color .16s ease, border-color .16s ease;
 }
-.btn:hover,.btn-primary:hover,.btn-outline:hover,.btn-secondary:hover,.btn-submit:hover,.forum-btn:hover{ transform: translateY(-1px); text-decoration:none; }
+.btn:hover,.btn-primary:hover,.btn-outline:hover,.btn-secondary:hover,.btn-submit:hover,.forum-btn:hover{ transform: none; text-decoration:none; }
 .btn,.btn-primary,.btn-submit,.forum-btn-primary{
   background: var(--button-primary-bg);
   border-color: var(--button-primary-border);
@@ -416,7 +416,7 @@ legend{ padding:0 10px; font-weight:700; color:var(--text); }
 .forum-topic-action:hover,
 .forum-topic-action:focus-visible{
   text-decoration:none;
-  transform: translateY(-1px);
+  transform: none;
 }
 .forum-section-head h2{ margin:0; font-size:1.4rem; letter-spacing:-0.03em; }
 .forum-eyebrow{ margin:0; color:var(--muted); letter-spacing:0.16em; text-transform:uppercase; font-size:0.78rem; font-weight:700; }
@@ -475,7 +475,7 @@ legend{ padding:0 10px; font-weight:700; color:var(--text); }
 
 .forum-topic:hover,
 .forum-topic:focus-within{
-  transform: translateY(-1px);
+  transform: none;
   border-color: var(--accent);
   background: var(--subcard-surface-hover);
 }
@@ -2536,7 +2536,7 @@ html[data-theme="light"] .forum-topic:hover,
 html[data-theme="light"] .forum-topic:focus-within{
   border-color: var(--action-link-border-hover);
   background: rgba(255,255,255,0.96);
-  transform: translateY(-1px);
+  transform: none;
 }
 
 @media (prefers-color-scheme: light){
@@ -2633,7 +2633,7 @@ html[data-theme="light"] .forum-topic:focus-within{
   html:not([data-theme]) .forum-topic:focus-within{
     border-color: var(--action-link-border-hover);
     background: rgba(255,255,255,0.96);
-    transform: translateY(-1px);
+    transform: none;
   }
 }
 
@@ -2690,7 +2690,7 @@ html[data-theme="dark"]{
   border-color: var(--inline-link-border-hover);
   color: var(--inline-link-text);
   text-decoration: none;
-  transform: translateY(-1px);
+  transform: none;
 }
 
 html[data-theme="dark"] .forum-topic-action:hover,
@@ -3391,7 +3391,7 @@ html[data-theme="dark"] .home-hero-panel .hero-pills .pill{
 
 .back-to-top-fab:hover,
 .back-to-top-fab:focus-visible{
-  transform: translateY(-1px);
+  transform: none;
   background: var(--button-secondary-bg-hover);
   border-color: var(--accent);
   box-shadow: 0 14px 26px rgba(15, 23, 42, 0.12);
@@ -4299,7 +4299,7 @@ html[data-theme="light"] .product-nav-menu a:focus-visible{
 
 .product-family-switcher .btn.active::before,
 .product-family-switcher .btn[aria-current="page"]::before{
-  content: "•";
+  content: "✓";
   margin-right: 0.45rem;
   color: #9ccfff;
   font-size: 1.1em;
@@ -4388,7 +4388,7 @@ html[data-theme="light"] .product-family-switcher .btn[aria-current="page"]{
 .product-jump-links a:focus-visible{
   background: rgba(22, 119, 196, 0.22);
   border-color: rgba(96, 165, 250, 0.62);
-  transform: translateY(-1px);
+  transform: none;
   outline: none;
 }
 
@@ -4739,4 +4739,24 @@ body.has-product-jump-nav .back-to-top-fab{
     right: 14px;
     bottom: calc(68px + var(--theme-fab-lift, 0px));
   }
+}
+
+
+/* Product Jump bar links: keep hover/focus static, no upward shift */
+.product-jump-links a,
+.product-jump-links a:hover,
+.product-jump-links a:focus-visible,
+.product-jump-links a.active,
+.product-jump-links a[aria-current="true"]{
+  transform: none;
+}
+
+
+/* Product family switcher active state: use check mark instead of dot */
+.product-family-switcher .btn.active::before,
+.product-family-switcher .btn[aria-current="page"]::before{
+  content: "✓";
+  margin-right: 0.45rem;
+  color: #9ccfff;
+  font-weight: 900;
 }
