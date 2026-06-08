@@ -4,11 +4,21 @@
   // Edit navigation here once, and every page updates.
   const primaryLinks = [
     { href: 'index.html',    label: 'Home' },
-    { href: 'products.html', label: 'Products' },
+    { href: 'products.html', label: 'Products', productMenu: true },
     { href: 'services.html', label: 'Services' },
     { href: 'quote.html',    label: 'Quote' },
     { href: 'support.html',  label: 'Support' },
     { href: 'contact.html',  label: 'Contact' }
+  ];
+
+  const productLinks = [
+    { href: 'product-scout.html', label: 'Scout', note: 'Compact enclosure family' },
+    { href: 'product-ranger.html', label: 'Ranger', note: 'Medium enclosure family' },
+    { href: 'product-ranger-relay.html', label: 'Ranger Relay', note: 'Relay-ready Ranger option' },
+    { href: 'product-ranger-bucks.html', label: 'Ranger Bucks', note: 'Ranger with buck support' },
+    { href: 'product-command.html', label: 'Command', note: 'Large enclosure family' },
+    { href: 'product-command-core.html', label: 'Command Core', note: 'Command base platform' },
+    { href: 'product-command-gp.html', label: 'Command-GP', note: 'Garage Panel path' }
   ];
 
   const footerLinks = [
@@ -44,7 +54,36 @@
 
   const currentPage = normalizePageName(window.location.pathname || '');
 
+  function isProductSectionPage() {
+    return currentPage === 'products' ||
+      currentPage.startsWith('product-') ||
+      currentPage.startsWith('checkout-');
+  }
+
+  function productMenuHtml(className = 'nav-link') {
+    const isActive = isProductSectionPage();
+    const classes = className + ' product-menu-trigger' + (isActive ? ' active' : '');
+    const aria = isActive ? ' aria-current="page"' : '';
+    const items = productLinks.map(item => `
+            <a href="${item.href}">
+              <span>${item.label}</span>
+              <small>${item.note}</small>
+            </a>`).join('');
+
+    return `
+          <div class="nav-product-menu-wrap has-product-menu">
+            <a class="${classes}" href="products.html" aria-haspopup="true" aria-expanded="false"${aria}>Products</a>
+            <div class="product-nav-menu" aria-label="Product navigation">
+${items}
+            </div>
+          </div>`;
+  }
+
   function linkHtml(link, className = 'nav-link') {
+    if (link.productMenu && className === 'nav-link') {
+      return productMenuHtml(className);
+    }
+
     const linkPage = normalizePageName(link.href);
     const isActive = currentPage === linkPage;
     const classes = className + (isActive ? ' active' : '');
@@ -133,6 +172,36 @@
   if (headerHost) {
     headerHost.innerHTML = headerHtml;
 
+    const productMenuItems = Array.from(headerHost.querySelectorAll('.has-product-menu'));
+
+    function closeProductMenus() {
+      productMenuItems.forEach((item) => {
+        item.classList.remove('product-menu-open');
+        const trigger = item.querySelector('.product-menu-trigger');
+        if (trigger) trigger.setAttribute('aria-expanded', 'false');
+      });
+    }
+
+    productMenuItems.forEach((item) => {
+      const trigger = item.querySelector('.product-menu-trigger');
+      if (!trigger) return;
+
+      trigger.addEventListener('click', (event) => {
+        const isMobileOrTouch = window.matchMedia('(hover: none)').matches || window.innerWidth <= 700;
+        if (!isMobileOrTouch) return;
+
+        const isOpen = item.classList.contains('product-menu-open');
+        if (!isOpen) {
+          event.preventDefault();
+          closeProductMenus();
+          item.classList.add('product-menu-open');
+          trigger.setAttribute('aria-expanded', 'true');
+          syncFixedHeaderOffset();
+        }
+      });
+    });
+
+
     const mobileToggle = headerHost.querySelector('.nav-mobile-toggle');
     const mobileMenu = headerHost.querySelector('#site-primary-menu');
     const mobileBreakpoint = window.matchMedia('(max-width: 700px)');
@@ -151,15 +220,28 @@
       });
 
       mobileMenu.addEventListener('click', (event) => {
+        const productTrigger = event.target.closest('.product-menu-trigger');
+        const isMobileOrTouch = mobileBreakpoint.matches || window.matchMedia('(hover: none)').matches;
+
+        if (productTrigger && isMobileOrTouch) {
+          return;
+        }
+
         if (event.target.closest('a')) setMobileMenuOpen(false);
       });
 
       document.addEventListener('click', (event) => {
-        if (!headerHost.contains(event.target)) setMobileMenuOpen(false);
+        if (!headerHost.contains(event.target)) {
+          setMobileMenuOpen(false);
+          closeProductMenus();
+        }
       });
 
       document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') setMobileMenuOpen(false);
+        if (event.key === 'Escape') {
+          setMobileMenuOpen(false);
+          closeProductMenus();
+        }
       });
 
       if (mobileBreakpoint.addEventListener) {
