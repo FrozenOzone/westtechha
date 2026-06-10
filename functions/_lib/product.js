@@ -67,31 +67,31 @@ export const PRODUCTS = Object.freeze({
   }),
   "ranger-30-unloaded": Object.freeze({
     sku: "ranger-30-unloaded",
-    name: "Ranger 30 - Unloaded",
-    description: "Ranger family standard product with 30-pin unloaded layout.",
+    name: "Ranger Relay 30 - Unloaded",
+    description: "Ranger Relay family standard product with 30-pin unloaded layout.",
     quantity: "1",
     unitAmount: "29.99",
     itemAmount: "29.99",
     shippingAmount: "8.95",
     currency: "USD",
     family: "Ranger",
-    layout: "30-pin unloaded layout",
+    layout: "Ranger Relay 30-pin unloaded layout",
     offerType: "Unloaded",
-    variant: "30"
+    variant: "Ranger Relay 30"
   }),
   "ranger-38-unloaded": Object.freeze({
     sku: "ranger-38-unloaded",
-    name: "Ranger 38 - Unloaded",
-    description: "Ranger family standard product with 38-pin unloaded layout.",
+    name: "Ranger Relay 38 - Unloaded",
+    description: "Ranger Relay family standard product with 38-pin unloaded layout.",
     quantity: "1",
     unitAmount: "29.99",
     itemAmount: "29.99",
     shippingAmount: "8.95",
     currency: "USD",
     family: "Ranger",
-    layout: "38-pin unloaded layout",
+    layout: "Ranger Relay 38-pin unloaded layout",
     offerType: "Unloaded",
-    variant: "38"
+    variant: "Ranger Relay 38"
   }),
   "ranger-30-bucks-unloaded": Object.freeze({
     sku: "ranger-30-bucks-unloaded",
@@ -207,31 +207,31 @@ export const PRODUCTS = Object.freeze({
   }),
   "ranger-30-loaded": Object.freeze({
     sku: "ranger-30-loaded",
-    name: "Ranger 30 - Loaded",
-    description: "Ranger family loaded product with 30-pin layout.",
+    name: "Ranger Relay 30 - Loaded",
+    description: "Ranger Relay family loaded product with 30-pin layout.",
     quantity: "1",
     unitAmount: "46.99",
     itemAmount: "46.99",
     shippingAmount: "8.95",
     currency: "USD",
     family: "Ranger",
-    layout: "30-pin loaded layout",
+    layout: "Ranger Relay 30-pin loaded layout",
     offerType: "Loaded",
-    variant: "30"
+    variant: "Ranger Relay 30"
   }),
   "ranger-38-loaded": Object.freeze({
     sku: "ranger-38-loaded",
-    name: "Ranger 38 - Loaded",
-    description: "Ranger family loaded product with 38-pin layout.",
+    name: "Ranger Relay 38 - Loaded",
+    description: "Ranger Relay family loaded product with 38-pin layout.",
     quantity: "1",
     unitAmount: "46.99",
     itemAmount: "46.99",
     shippingAmount: "8.95",
     currency: "USD",
     family: "Ranger",
-    layout: "38-pin loaded layout",
+    layout: "Ranger Relay 38-pin loaded layout",
     offerType: "Loaded",
-    variant: "38"
+    variant: "Ranger Relay 38"
   }),
   "ranger-30-bucks-loaded": Object.freeze({
     sku: "ranger-30-bucks-loaded",

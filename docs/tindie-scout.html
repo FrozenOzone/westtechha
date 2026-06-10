@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="index,follow">
-  <title>Scout Unloaded Enclosure Documentation</title>
-  <meta name="description" content="Tindie documentation page for Scout Unloaded Enclosure Documentation.">
+  <title>Scout Enclosure Documentation for Tindie</title>
+  <meta name="description" content="Tindie documentation page for WestTech Home Automation Scout 30 and Scout 38 enclosure listings.">
   <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png">
   <style>
 
@@ -16,9 +16,12 @@
     --muted:#5b687c;
     --line:#d9e1ec;
     --soft:#eef3f9;
-    --accent:#1f4f9a;
+    --accent:#1677C4;
+    --accent-dark:#0E5F9F;
     --warn:#fff7e6;
     --warn-line:#e8c77a;
+    --good:#e9f7ef;
+    --good-line:#9bd4b0;
     --radius:16px;
   }
   *{box-sizing:border-box;}
@@ -29,32 +32,12 @@
     font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
     line-height:1.65;
   }
-  main{
-    width:min(960px,calc(100% - 32px));
-    margin:28px auto 42px;
-  }
-  .doc{
-    background:var(--paper);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    box-shadow:0 14px 34px rgba(15,23,42,.07);
-    overflow:hidden;
-  }
-  .doc-head{
-    padding:30px 32px 24px;
-    border-bottom:1px solid var(--line);
-    background:linear-gradient(180deg,#ffffff,#f8fafc);
-  }
-  .doc-label{
-    margin:0 0 10px;
-    color:var(--muted);
-    font-size:.78rem;
-    font-weight:800;
-    letter-spacing:.14em;
-    text-transform:uppercase;
-  }
+  main{width:min(1080px,calc(100% - 32px));margin:28px auto 42px;}
+  .doc{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 14px 34px rgba(15,23,42,.07);overflow:hidden;}
+  .doc-head{padding:30px 32px 24px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#ffffff,#f8fafc);}
+  .doc-label{margin:0 0 10px;color:var(--accent-dark);font-size:.78rem;font-weight:850;letter-spacing:.14em;text-transform:uppercase;}
   h1{margin:0;font-size:clamp(2rem,5vw,3.1rem);line-height:1.05;letter-spacing:-.04em;}
-  .lead{margin:14px 0 0;max-width:760px;color:var(--muted);font-size:1.05rem;}
+  .lead{margin:14px 0 0;max-width:850px;color:var(--muted);font-size:1.05rem;}
   section{padding:26px 32px;border-bottom:1px solid var(--line);}
   section:last-child{border-bottom:0;}
   h2{margin:0 0 14px;font-size:1.35rem;line-height:1.25;letter-spacing:-.02em;}
@@ -64,19 +47,14 @@
   ul{margin:8px 0 0;padding-left:22px;}
   li{margin:4px 0;}
   .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
-  .card{
-    background:var(--soft);
-    border:1px solid var(--line);
-    border-radius:14px;
-    padding:18px;
-  }
-  .notice{
-    background:var(--warn);
-    border:1px solid var(--warn-line);
-    border-radius:14px;
-    padding:16px 18px;
-  }
+  .grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
+  .card{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:18px;}
+  .notice{background:var(--warn);border:1px solid var(--warn-line);border-radius:14px;padding:16px 18px;}
+  .service-note{background:var(--good);border:1px solid var(--good-line);border-radius:14px;padding:16px 18px;}
   .muted{color:var(--muted);}
+  .pill-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+  .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;color:#334155;font-weight:750;font-size:.82rem;}
+  .pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent);}
   table{width:100%;border-collapse:collapse;margin-top:10px;overflow:hidden;border-radius:12px;}
   th,td{padding:12px 14px;border:1px solid var(--line);text-align:left;vertical-align:top;}
   th{background:#eef3f9;font-size:.86rem;text-transform:uppercase;letter-spacing:.06em;color:#334155;}
@@ -86,12 +64,15 @@
   figure img{display:block;width:100%;height:150px;object-fit:cover;background:#eef3f9;}
   figcaption{padding:10px 12px;color:var(--muted);font-size:.86rem;line-height:1.45;}
   .footer-note{font-size:.92rem;color:var(--muted);}
-  a{color:var(--accent);}
-  @media (max-width:760px){
-    main{width:min(100% - 20px,960px);margin-top:16px;}
+  a{color:var(--accent);font-weight:700;}
+  .doc-links{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px;}
+  .doc-links a{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 12px;text-decoration:none;}
+  @media (max-width:860px){.grid,.grid-3,.photo-grid{grid-template-columns:1fr 1fr;}}
+  @media (max-width:640px){
+    main{width:min(100% - 20px,1080px);margin-top:16px;}
     .doc-head,section{padding:22px;}
-    .grid,.photo-grid{grid-template-columns:1fr;}
-    figure img{height:auto;max-height:260px;}
+    .grid,.grid-3,.photo-grid{grid-template-columns:1fr;}
+    figure img{height:auto;max-height:280px;}
     th,td{display:block;width:100%;}
     th{border-bottom:0;}
   }
@@ -103,22 +84,26 @@
   <article class="doc">
     <header class="doc-head">
       <p class="doc-label">WestTech Home Automation • Tindie documentation</p>
-      <h1>Scout Unloaded Enclosure Documentation</h1>
-      <p class="lead">Reference information for Scout 30 and Scout 38 unloaded ESP32 automation enclosures listed on Tindie.</p>
+      <h1>Scout Enclosure Documentation</h1>
+      <p class="lead">Reference information for Scout 30 and Scout 38 ESP32 enclosure listings on Tindie, updated to match the current WestTech Home Automation product wording and photo set.</p>
+      <div class="pill-row" aria-label="Page highlights">
+        <span class="pill">Scout 30 / Scout 38</span>
+        <span class="pill">Unloaded / Loaded</span>
+        <span class="pill">PLA+ 2.0</span>
+        <span class="pill">Brass threaded inserts</span>
+      </div>
     </header>
 
     <section>
       <h2>Overview</h2>
       <div class="grid">
-
         <article class="card">
-          <h3>What it is</h3>
-          <p>Scout is the compact WestTech Home Automation enclosure family for ESP32, ESPHome, Home Assistant, sensor, and small IoT projects.</p>
+          <h3>What Scout is</h3>
+          <p>Scout is the compact WestTech Home Automation enclosure family for smaller indoor ESP32 and automation projects where a clean, serviceable enclosure matters more than extra internal room.</p>
         </article>
-
         <article class="card">
-          <h3>What unloaded means</h3>
-          <p>The unloaded version is for customers who already have their own ESP32 board and electronics. It provides the printed enclosure, lid, inserts, and hardware only.</p>
+          <h3>Best fit</h3>
+          <p>Scout is a strong fit for DIY projects, compact control applications, sensor nodes, and customers who want a clean enclosure they can use almost anywhere they have power.</p>
         </article>
       </div>
     </section>
@@ -129,108 +114,131 @@
         <thead>
           <tr>
             <th>Model</th>
-            <th>Board layout</th>
+            <th>Board / layout</th>
             <th>Approx. overall size</th>
             <th>Notes</th>
           </tr>
         </thead>
         <tbody>
-
           <tr>
-            <td><strong>Scout 30 Unloaded</strong><br><span class="muted">SCOUT-30-UNLOADED</span></td>
+            <td><strong>Scout 30</strong><br><span class="muted">SCOUT-30</span></td>
             <td>Compatible 30-pin ESP32 breakout-board layouts</td>
             <td>4.25 in × 4.49 in × 1.77 in (108 × 114 × 45 mm)</td>
             <td>Compact Scout footprint for smaller indoor builds.</td>
           </tr>
 
           <tr>
-            <td><strong>Scout 38 Unloaded</strong><br><span class="muted">SCOUT-38-UNLOADED</span></td>
+            <td><strong>Scout 38</strong><br><span class="muted">SCOUT-38</span></td>
             <td>Compatible 38-pin ESP32 breakout-board layouts</td>
             <td>4.65 in × 4.49 in × 1.77 in (118 × 114 × 45 mm)</td>
             <td>Compact Scout footprint with support for the larger 38-pin board format.</td>
           </tr>
         </tbody>
       </table>
-      <p class="muted">Dimensions include the installed lid, lid width overhang, and mounting tabs.</p>
+      <p class="muted">Dimensions include the installed lid, lid overhang, and mounting tabs. Exact listing options may vary by active Tindie product listing.</p>
     </section>
 
     <section>
-      <h2>What is included</h2>
+      <h2>Unloaded and Loaded wording</h2>
       <div class="grid">
         <article class="card">
-          <h3>Included</h3>
-          <ul>
-            <li>Scout enclosure body</li>
-            <li>Matching lid</li>
-            <li>Standard insert set</li>
-            <li>Installed hardware</li>
-            <li>Standard mounting hardware</li>
-            <li>Centered inside-lid buzzer location for many 10–12 mm buzzers</li>
-          </ul>
+          <h3>Unloaded for your hardware plan</h3>
+          <p>Unloaded is the bring-your-own-hardware path for customers who already know their electronics plan and need the printed enclosure family that fits the project.</p>
+          <ul><li>Includes the printed enclosure, lid, brass threaded inserts, standard enclosure hardware, and matched insert layout.</li><li>Electronics and firmware are not included unless specifically stated in the Tindie listing.</li></ul>
         </article>
         <article class="card">
-          <h3>Not included</h3>
-          <ul>
-            <li>ESP32 board or breakout board</li>
-            <li>Electronics, wiring, sensors, relays, buzzers, or power supply</li>
-            <li>10–12 mm buzzer hardware</li>
-            <li>Firmware, programming, or installation labor</li>
-            <li>Source code, CAD files, or design files</li>
-          </ul>
-        </article>
-      </div>
-    </section>
-
-    <section>
-      <h2>Use and environment notes</h2>
-      <div class="grid">
-
-        <article class="card">
-          <h3>Best fit</h3>
-          <p>Small ESP32 projects where a compact finished enclosure is more important than extra internal room.</p>
-        </article>
-
-        <article class="card">
-          <h3>Common uses</h3>
-          <p>ESPHome nodes, Home Assistant sensors, compact IoT projects, low-voltage automation ideas, and cleaner prototype-to-install builds.</p>
+          <h3>Loaded with Quick Start firmware</h3>
+          <p>Loaded is the pre-assembled path for customers who want the selected ESP32 and breakout-board hardware path handled before shipment.</p>
+          <ul><li>Basic diagnostics are completed before shipment.</li><li>WestTech Home Automation ESP32 Quick Start firmware helps customers find, connect, verify, and prepare the device before uploading their own project firmware.</li></ul><ul><li>OLED displays, buzzers, sensors, wiring, and power supplies are optional/reference hardware unless the listing specifically includes them.</li></ul>
         </article>
       </div>
       <div class="notice" style="margin-top:16px;">
+        <strong>Tindie listing note:</strong> The individual Tindie product listing controls price, checkout, availability, order status, and shipping. This page is product documentation and reference information.
+      </div>
+    </section>
+
+    <section>
+      <h2>Printed material and serviceability</h2>
+      <div class="grid">
+        <article class="card">
+          <h3>PLA+ 2.0 printed parts</h3>
+          <p>Scout enclosures are printed in PLA+ 2.0 and are intended for indoor use. The material choice keeps the enclosure practical for clean indoor automation builds without presenting it as outdoor, wet-location, or high-heat rated.</p>
+        </article>
+        <article class="card">
+          <h3>Brass threaded inserts</h3>
+          <p>Current WestTech Home Automation enclosures use brass threaded inserts at key mounting points. The inserts make the enclosure easier to assemble, reopen, service, and reuse during future hardware changes without wearing out printed plastic screw holes.</p>
+        </article>
+      </div>
+      <div class="service-note" style="margin-top:16px;">
         <strong>Indoor use only.</strong> Printed parts are not IP-rated and are not intended for wet, outdoor, high-heat, or direct-sunlight locations.
       </div>
     </section>
 
     <section>
-      <h2>Reference photos</h2>
-      <p class="muted">Photos are representative of the family and may show either 30-pin or 38-pin layouts. Electronics shown in example fitment photos are not included.</p>
+      <h2>Current family photos</h2>
+      <p class="muted">Photos show current WestTech Home Automation product examples. Finish color, child layout, and included electronics depend on the exact Tindie listing selected.</p>
       <div class="photo-grid">
-
         <figure>
-          <img loading="lazy" src="../images/products/scout/30/scout-30-white-assembled-lid-on-angle-b.jpg" alt="Scout 30 assembled enclosure with lid installed">
-          <figcaption>Scout 30 assembled enclosure with lid installed.</figcaption>
+          <img loading="lazy" src="../images/products/scout/30/30-Scout-angled-side1-inserts-hero.jpg" alt="Scout 30 White enclosure with lid and inserts installed">
+          <figcaption>Scout 30 White assembled with lid and inserts installed.</figcaption>
         </figure>
-
         <figure>
-          <img loading="lazy" src="../images/products/scout/30/scout-30-white-empty-interior.jpg" alt="Scout 30 empty interior">
-          <figcaption>Scout 30 empty interior and standoff layout.</figcaption>
+          <img loading="lazy" src="../images/products/scout/30/30-Scout-Front.jpg" alt="Scout 30 White front opening face">
+          <figcaption>Scout 30 front face and opening layout.</figcaption>
         </figure>
-
         <figure>
-          <img loading="lazy" src="../images/products/scout/38/scout-38-black-hero-top-down-lid-inserts.jpg" alt="Scout 38 enclosure with lid and inserts">
-          <figcaption>Scout 38 with lid and inserts.</figcaption>
+          <img loading="lazy" src="../images/products/scout/38/38-Scout-angled-side1-inserts-hero.jpg" alt="Scout 38 Black enclosure with lid and inserts installed">
+          <figcaption>Scout 38 Black assembled with lid and inserts installed.</figcaption>
         </figure>
-
         <figure>
-          <img loading="lazy" src="../images/products/scout/38/scout-38-black-board-installed-top-down.jpg" alt="Scout 38 board fitment example">
-          <figcaption>Scout 38 board fitment example. Electronics not included.</figcaption>
+          <img loading="lazy" src="../images/products/scout/38/38-Scout-board-layout-HSI.jpg" alt="Scout 38 Black board layout and brass insert mounting example">
+          <figcaption>Scout 38 interior board layout with serviceable mounting points.</figcaption>
         </figure>
       </div>
     </section>
 
     <section>
-      <h2>Tindie checkout note</h2>
-      <p>For product questions, use the Tindie message system or contact WestTech Home Automation support through the official website.</p>
-      <p class="footer-note">This page is documentation only. Availability, checkout, payment, order status, and shipping are handled through the matching Tindie product listing.</p>
+      <h2>Compatible hardware examples</h2>
+      <p class="muted">These photos show example hardware that can go inside compatible builds. Optional hardware such as OLED displays or buzzers is only included when the listing specifically says it is included.</p>
+      <div class="photo-grid">
+        <figure>
+          <img loading="lazy" src="../images/products/hardware/esp32-30-pin-breakout-board-example.jpg" alt="30-pin ESP32 breakout-board example">
+          <figcaption>Compatible 30-pin breakout-board example.</figcaption>
+        </figure>
+        <figure>
+          <img loading="lazy" src="../images/products/hardware/esp32-38-pin-breakout-board-example.jpg" alt="38-pin ESP32 breakout-board example">
+          <figcaption>Compatible 38-pin breakout-board example.</figcaption>
+        </figure>
+        <figure>
+          <img loading="lazy" src="../images/products/hardware/esp32-30-pin-wroom-board-example.jpg" alt="30-pin ESP32 WROOM board example">
+          <figcaption>30-pin ESP32-WROOM board example.</figcaption>
+        </figure>
+        <figure>
+          <img loading="lazy" src="../images/products/hardware/esp32-38-pin-wroom-board-example.jpg" alt="38-pin ESP32 WROOM board example">
+          <figcaption>38-pin ESP32-WROOM board example.</figcaption>
+        </figure>
+        <figure>
+          <img loading="lazy" src="../images/products/hardware/scout-30-38-buzzer-lid-location.jpg" alt="Scout buzzer-ready lid location">
+          <figcaption>Buzzer-ready lid location reference. Buzzer hardware is optional unless listed.</figcaption>
+        </figure>
+        <figure>
+          <img loading="lazy" src="../images/products/hardware/buzzer-example.jpg" alt="Small buzzer example">
+          <figcaption>Small buzzer hardware example. Optional unless the Tindie listing includes it.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section>
+      <h2>Support and reference links</h2>
+      <p>Use the Tindie message system for questions tied to a Tindie order. General documentation and support are also available from the official WestTech Home Automation website.</p>
+      <div class="doc-links">
+        <a href="../product-scout.html">View matching product page</a>
+        <a href="../materials-serviceability.html">Materials &amp; Serviceability</a>
+        <a href="../hardware-reference.html">Hardware Reference</a>
+        <a href="../quick-start.html">ESP32 Quick Start</a>
+        <a href="../support.html">Support</a>
+      </div>
+      <p class="footer-note" style="margin-top:14px;">This page is documentation only. Availability, checkout, payment, order status, and shipping are handled through the matching Tindie product listing.</p>
     </section>
   </article>
 </main>
