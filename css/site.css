@@ -2195,6 +2195,17 @@ html[data-theme="dark"] .checkout-product-top img{
 .checkout-total-line strong{
   white-space:nowrap;
 }
+
+.checkout-line-label{
+  display:block;
+  color:var(--muted);
+  font-size:0.92rem;
+  font-weight:700;
+  margin-bottom:2px;
+}
+.checkout-product-line{
+  align-items:flex-start;
+}
 .checkout-line-note{
   font-size:0.95rem;
 }
