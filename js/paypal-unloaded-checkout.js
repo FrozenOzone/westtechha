@@ -38,6 +38,8 @@
   const colorDisplayEl = document.getElementById("checkout-color-display");
   const colorSelect = document.getElementById("checkout-color");
   const quantitySelect = document.getElementById("checkout-quantity");
+  let cartAddButton = null;
+  let cartAddStatus = null;
   const shippingTierNoteEl = document.getElementById("checkout-shipping-tier-note");
   const customCard = document.getElementById("checkout-custom-order-card");
   const customEmailLink = document.getElementById("checkout-custom-email-link");
@@ -293,6 +295,7 @@
       totalLineEl.classList.remove("is-final");
       if (paypalShell) paypalShell.classList.add("is-hidden");
       customCard.classList.remove("is-hidden");
+      updateCartControlState();
       resetColoradoState();
       setStatus("For 5+ units, use the custom / email order path so we can quote shipping correctly.");
       if (customEmailLink) {
@@ -314,6 +317,7 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
       totalLineEl.classList.remove("is-final");
       if (paypalShell) paypalShell.classList.add("is-hidden");
       customCard.classList.add("is-hidden");
+      updateCartControlState();
       resetColoradoState();
       setStatus("This product is temporarily unavailable or there is not enough stock for the selected quantity.", true);
       return;
@@ -326,8 +330,63 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
     totalLineEl.classList.remove("is-final");
     customCard.classList.add("is-hidden");
     resetColoradoState();
+    updateCartControlState();
     showPayPalBeforeApproval();
     setStatus("PayPal is ready. Website checkout currently supports U.S. shipping addresses only.");
+  }
+
+
+  function ensureCartControls() {
+    if (cartAddButton || !customCard) return;
+    const targetCard = document.querySelector(".checkout-quantity-card") || document.querySelector(".checkout-summary-card");
+    if (!targetCard) return;
+
+    cartAddButton = document.createElement("button");
+    cartAddButton.type = "button";
+    cartAddButton.className = "btn btn-outline cart-add-button";
+    cartAddButton.textContent = "Add to Cart";
+
+    cartAddStatus = document.createElement("p");
+    cartAddStatus.className = "cart-add-status";
+    cartAddStatus.setAttribute("aria-live", "polite");
+
+    targetCard.appendChild(cartAddButton);
+    targetCard.appendChild(cartAddStatus);
+
+    cartAddButton.addEventListener("click", function () {
+      try {
+        const quantity = currentQuantity();
+        if (isCustomQuantity(quantity)) {
+          throw new Error("Website cart checkout supports up to 4 total units. Use the quote page for 5+ units.");
+        }
+        if (!canFulfillCurrentQuantity()) {
+          throw new Error("This product is not available for the selected quantity right now.");
+        }
+        if (!window.WESTTECH_CART || typeof window.WESTTECH_CART.add !== "function") {
+          throw new Error("The cart is not ready. Please refresh and try again.");
+        }
+        window.WESTTECH_CART.add({
+          sku: PRODUCT.sku,
+          name: PRODUCT.name,
+          color: currentColor(),
+          quantity
+        });
+        cartAddStatus.classList.remove("is-error");
+        cartAddStatus.innerHTML = `${PRODUCT.name} (${currentColor()}) added to cart. <a href="cart.html">View cart</a>`;
+      } catch (error) {
+        cartAddStatus.classList.add("is-error");
+        cartAddStatus.textContent = error && error.message ? error.message : "Could not add this item to the cart.";
+      }
+    });
+  }
+
+  function updateCartControlState() {
+    ensureCartControls();
+    if (!cartAddButton) return;
+    const quantity = currentQuantity();
+    const disabled = isCustomQuantity(quantity) || !canFulfillCurrentQuantity();
+    cartAddButton.disabled = disabled;
+    cartAddButton.textContent = disabled ? "Use Custom Order" : "Add to Cart";
   }
 
   function loadPayPalSdk(clientId, currency) {
@@ -575,6 +634,7 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
   });
 
   async function initializeCheckout() {
+    ensureCartControls();
     setStatus("Loading product pricing…");
     await loadProductConfig();
     updateSummaryFromQuantity();

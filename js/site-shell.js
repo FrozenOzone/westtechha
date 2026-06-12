@@ -8,6 +8,7 @@
     { href: 'services.html', label: 'Services' },
     { href: 'quote.html',    label: 'Quote' },
     { href: 'support.html',  label: 'Support' },
+    { href: 'cart.html',     label: 'Cart', cartLink: true },
     { href: 'contact.html',  label: 'Contact' }
   ];
 
@@ -91,6 +92,9 @@ ${items}
     const isActive = currentPage === linkPage;
     const classes = className + (isActive ? ' active' : '');
     const aria = isActive ? ' aria-current="page"' : '';
+    if (link.cartLink && className === 'nav-link') {
+      return `<a class="${classes} nav-cart-link" href="${link.href}"${aria}>${link.label}<span class="nav-cart-count" data-cart-count hidden>0</span></a>`;
+    }
     return `<a class="${classes}" href="${link.href}"${aria}>${link.label}</a>`;
   }
 
@@ -320,6 +324,99 @@ ${items}
       }
     }
   }
+
+
+  const CART_STORAGE_KEY = 'westtechSessionCart';
+
+  function readCartItems() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function writeCartItems(items) {
+    const cleanItems = Array.isArray(items) ? items : [];
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cleanItems));
+    } catch (error) {}
+    updateCartCount();
+    window.dispatchEvent(new CustomEvent('westtech-cart-updated', { detail: { items: cleanItems } }));
+  }
+
+  function normalizeCartColor(color) {
+    return String(color || 'White').trim().toLowerCase() === 'black' ? 'Black' : 'White';
+  }
+
+  function normalizeCartQuantity(quantity) {
+    const parsed = Number.parseInt(quantity, 10);
+    if (!Number.isFinite(parsed) || parsed < 1) return 1;
+    return parsed;
+  }
+
+  function cartTotalQuantity(items) {
+    return (Array.isArray(items) ? items : readCartItems()).reduce((sum, item) => sum + normalizeCartQuantity(item.quantity), 0);
+  }
+
+  function addCartItem(item) {
+    const nextItem = {
+      sku: String(item?.sku || '').trim().toLowerCase(),
+      name: String(item?.name || '').trim(),
+      color: normalizeCartColor(item?.color),
+      quantity: normalizeCartQuantity(item?.quantity)
+    };
+
+    if (!nextItem.sku || !nextItem.name) {
+      throw new Error('This item could not be added to the cart.');
+    }
+
+    const items = readCartItems();
+    const existing = items.find((entry) => entry.sku === nextItem.sku && normalizeCartColor(entry.color) === nextItem.color);
+    const newTotal = cartTotalQuantity(items) + nextItem.quantity;
+    if (newTotal > 4) {
+      throw new Error('Website cart checkout supports up to 4 total units. Use the quote page for 5+ units.');
+    }
+
+    if (existing) {
+      existing.quantity = normalizeCartQuantity(existing.quantity) + nextItem.quantity;
+      existing.name = nextItem.name;
+    } else {
+      items.push(nextItem);
+    }
+
+    writeCartItems(items);
+    return items;
+  }
+
+  function clearCartItems() {
+    writeCartItems([]);
+  }
+
+  function updateCartCount() {
+    const count = cartTotalQuantity(readCartItems());
+    document.querySelectorAll('[data-cart-count]').forEach((el) => {
+      el.textContent = String(count);
+      el.hidden = count <= 0;
+      el.setAttribute('aria-label', `${count} item${count === 1 ? '' : 's'} in cart`);
+    });
+  }
+
+  window.WESTTECH_CART = {
+    read: readCartItems,
+    write: writeCartItems,
+    add: addCartItem,
+    clear: clearCartItems,
+    totalQuantity: cartTotalQuantity,
+    updateCount: updateCartCount,
+    storageKey: CART_STORAGE_KEY
+  };
+
+  updateCartCount();
+  window.addEventListener('storage', (event) => {
+    if (event.key === CART_STORAGE_KEY) updateCartCount();
+  });
 
   const footerHost = document.getElementById('site-footer');
   if (footerHost) {

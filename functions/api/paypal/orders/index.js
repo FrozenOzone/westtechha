@@ -1,21 +1,32 @@
 import { generateAccessToken, paypalBaseUrl } from "../../../_lib/paypal.js";
-import { buildCheckoutProduct, PRODUCT } from "../../../_lib/product.js";
+import { buildCartCheckout, buildCheckoutProduct, PRODUCT } from "../../../_lib/product.js";
 import { allocateInvoiceId, createInitialOrderRecord, requireOrdersDb, setPayPalCreateFailed, setPayPalOrderCreated } from "../../../_lib/orders.js";
 import { jsonResponse, readJsonSafe, sanitizeEnvValue } from "../../../_lib/shared.js";
 import { attachPayPalOrderToInventoryHold, releaseInventoryHold, reserveInventoryForProduct } from "../../../_lib/inventory.js";
 
-function baseAmountBreakdown(product, currency) {
+function isCartRequest(body) {
+  return Array.isArray(body?.items) && body.items.length > 0;
+}
+
+function checkoutForBody(body) {
+  if (isCartRequest(body)) return buildCartCheckout(body.items);
+  const requestedSku = sanitizeEnvValue(body?.sku) || PRODUCT.sku;
+  const requestedQuantity = sanitizeEnvValue(body?.quantity) || "1";
+  return buildCheckoutProduct(requestedSku, requestedQuantity);
+}
+
+function baseAmountBreakdown(checkout, currency) {
   return {
     currency_code: currency,
-    value: (Number(product.itemAmount) + Number(product.shippingAmount)).toFixed(2),
+    value: (Number(checkout.itemAmount) + Number(checkout.shippingAmount)).toFixed(2),
     breakdown: {
       item_total: {
         currency_code: currency,
-        value: product.itemAmount
+        value: checkout.itemAmount
       },
       shipping: {
         currency_code: currency,
-        value: product.shippingAmount
+        value: checkout.shippingAmount
       },
       tax_total: {
         currency_code: currency,
@@ -25,31 +36,39 @@ function baseAmountBreakdown(product, currency) {
   };
 }
 
-function buildOrderPayload(context, product, orderMeta) {
-  const currency = sanitizeEnvValue(context.env.PAYPAL_CURRENCY) || product.currency || PRODUCT.currency;
+function paypalItems(checkout, currency) {
+  const lines = Array.isArray(checkout.items) && checkout.items.length ? checkout.items : [checkout];
+  return lines.map((line) => ({
+    name: line.color ? `${line.name} (${line.color})` : line.name,
+    sku: line.sku,
+    description: line.description,
+    quantity: String(line.quantity || "1"),
+    unit_amount: {
+      currency_code: currency,
+      value: line.unitAmount
+    },
+    category: "PHYSICAL_GOODS"
+  }));
+}
+
+function checkoutPathForCheckout(checkout) {
+  return checkout?.sku === "cart" ? "/cart.html" : `/checkout-${checkout.sku}.html`;
+}
+
+function buildOrderPayload(context, checkout, orderMeta) {
+  const currency = sanitizeEnvValue(context.env.PAYPAL_CURRENCY) || checkout.currency || PRODUCT.currency;
+  const referenceId = checkout.sku || "cart";
 
   return {
     intent: "CAPTURE",
     purchase_units: [
       {
-        reference_id: product.sku,
-        description: product.description,
-        custom_id: product.sku,
+        reference_id: referenceId,
+        description: checkout.description,
+        custom_id: referenceId,
         invoice_id: orderMeta.invoiceId,
-        amount: baseAmountBreakdown(product, currency),
-        items: [
-          {
-            name: product.name,
-            sku: product.sku,
-            description: product.description,
-            quantity: product.quantity,
-            unit_amount: {
-              currency_code: currency,
-              value: product.unitAmount
-            },
-            category: "PHYSICAL_GOODS"
-          }
-        ]
+        amount: baseAmountBreakdown(checkout, currency),
+        items: paypalItems(checkout, currency)
       }
     ],
     payment_source: {
@@ -58,49 +77,68 @@ function buildOrderPayload(context, product, orderMeta) {
           shipping_preference: "GET_FROM_FILE",
           user_action: "CONTINUE",
           return_url: new URL("/order-thank-you.html", context.request.url).toString(),
-          cancel_url: new URL(checkoutPathForProduct(product), context.request.url).toString()
+          cancel_url: new URL(checkoutPathForCheckout(checkout), context.request.url).toString()
         }
       }
     }
   };
 }
 
-function checkoutPathForProduct(product) {
-  return `/checkout-${product.sku}.html`;
+async function reserveInventoryForCheckout(context, checkout, invoiceId) {
+  const lines = Array.isArray(checkout.items) && checkout.items.length ? checkout.items : [checkout];
+  const reservations = [];
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    const result = await reserveInventoryForProduct(context.env, line, {
+      invoiceId,
+      holdId: `hold-${invoiceId}-${index + 1}`
+    });
+
+    if (result && result.reserved === false && result.skipped === false) {
+      await releaseInventoryHold(context.env, {
+        invoiceId,
+        status: "RESERVE_FAILED",
+        note: "Released cart inventory holds because one cart item could not be reserved."
+      }).catch(() => {});
+      return result;
+    }
+    reservations.push(result);
+  }
+
+  return { reserved: true, reservations };
 }
 
 export async function onRequestPost(context) {
+  let orderMeta = null;
   try {
     const body = await context.request.json().catch(() => ({}));
-    const requestedSku = sanitizeEnvValue(body?.sku) || PRODUCT.sku;
-    const requestedQuantity = sanitizeEnvValue(body?.quantity) || "1";
-    const product = buildCheckoutProduct(requestedSku, requestedQuantity);
+    const checkout = checkoutForBody(body);
 
-    if (!product || !product.sku) {
-      return jsonResponse({ ok: false, message: `Unknown product SKU: ${requestedSku}` }, 400);
+    if (!checkout || !checkout.sku) {
+      return jsonResponse({ ok: false, message: "Unknown product or cart contents." }, 400);
     }
 
-    if (product.customQuoteOnly) {
+    if (checkout.customQuoteOnly) {
       return jsonResponse({ ok: false, message: "Direct checkout is available for quantities 1 through 4 only. Please use the custom / email order path for 5+ units." }, 400);
     }
 
     const ordersDb = requireOrdersDb(context.env);
-    const orderMeta = await allocateInvoiceId(ordersDb);
+    orderMeta = await allocateInvoiceId(ordersDb);
     await createInitialOrderRecord(ordersDb, {
       ...orderMeta,
-      customId: product.sku,
-      product,
+      customId: checkout.sku,
+      product: checkout,
       status: "CREATING"
     });
 
-    const inventoryHold = await reserveInventoryForProduct(context.env, product, { invoiceId: orderMeta.invoiceId });
+    const inventoryHold = await reserveInventoryForCheckout(context, checkout, orderMeta.invoiceId);
     if (inventoryHold && inventoryHold.reserved === false && inventoryHold.skipped === false) {
       await setPayPalCreateFailed(ordersDb, { invoiceId: orderMeta.invoiceId }).catch(() => {});
-      return jsonResponse({ ok: false, message: inventoryHold.message || "This product is temporarily unavailable." }, 409);
+      return jsonResponse({ ok: false, message: inventoryHold.message || "One or more items are temporarily unavailable." }, 409);
     }
 
-    const payload = buildOrderPayload(context, product, orderMeta);
-    payload.payment_source.paypal.experience_context.cancel_url = new URL(checkoutPathForProduct(product), context.request.url).toString();
+    const payload = buildOrderPayload(context, checkout, orderMeta);
 
     const accessToken = await generateAccessToken(context.env);
     const response = await fetch(`${paypalBaseUrl(context.env.PAYPAL_ENV)}/v2/checkout/orders`, {
@@ -133,12 +171,16 @@ export async function onRequestPost(context) {
       ok: true,
       id: data.id,
       status: data.status || null,
-      sku: product.sku,
-      quantity: product.quantity,
+      sku: checkout.sku,
+      quantity: checkout.quantity,
       invoiceId: orderMeta.invoiceId,
-      customId: product.sku
+      customId: checkout.sku,
+      isCart: checkout.sku === "cart"
     });
   } catch (error) {
+    if (orderMeta?.invoiceId) {
+      await releaseInventoryHold(context.env, { invoiceId: orderMeta.invoiceId, status: "CREATE_ERROR", note: "Released inventory holds after order creation error." }).catch(() => {});
+    }
     return jsonResponse({ ok: false, message: error.message || "Unexpected error while creating the PayPal order." }, 500);
   }
 }

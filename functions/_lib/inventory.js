@@ -267,78 +267,89 @@ export async function releaseInventoryHold(envOrDb, { invoiceId, paypalOrderId, 
   const db = typeof envOrDb?.prepare === "function" ? envOrDb : getInventoryDb(envOrDb);
   if (!db) return { released: false, skipped: true };
 
-  let hold = null;
+  let holds = [];
   if (invoiceId) {
-    hold = await db.prepare(`
+    const result = await db.prepare(`
       SELECT hold_id AS holdId, invoice_id AS invoiceId, paypal_order_id AS paypalOrderId,
              product_sku AS productSku, quantity AS quantity
       FROM inventory_holds
       WHERE invoice_id = ? AND status = 'ACTIVE'
-      LIMIT 1
-    `).bind(invoiceId).first();
+    `).bind(invoiceId).all();
+    holds = Array.isArray(result?.results) ? result.results : [];
   }
 
-  if (!hold && paypalOrderId) {
-    hold = await db.prepare(`
+  if (!holds.length && paypalOrderId) {
+    const result = await db.prepare(`
       SELECT hold_id AS holdId, invoice_id AS invoiceId, paypal_order_id AS paypalOrderId,
              product_sku AS productSku, quantity AS quantity
       FROM inventory_holds
       WHERE paypal_order_id = ? AND status = 'ACTIVE'
-      LIMIT 1
-    `).bind(paypalOrderId).first();
+    `).bind(paypalOrderId).all();
+    holds = Array.isArray(result?.results) ? result.results : [];
   }
 
-  if (!hold) return { released: false, skipped: false };
+  if (!holds.length) return { released: false, skipped: false };
 
-  const requirements = await loadRequirements(db, hold.productSku);
-  const quantity = normalizeQuantity(hold.quantity);
+  const released = [];
+  for (const hold of holds) {
+    const requirements = await loadRequirements(db, hold.productSku);
+    const quantity = normalizeQuantity(hold.quantity);
 
-  for (const requirement of requirements) {
-    const restoreQty = Number(requirement.qtyRequired || 0) * quantity;
-    if (restoreQty <= 0) continue;
-    await updateComponentStock(db, requirement.componentSku, restoreQty);
+    for (const requirement of requirements) {
+      const restoreQty = Number(requirement.qtyRequired || 0) * quantity;
+      if (restoreQty <= 0) continue;
+      await updateComponentStock(db, requirement.componentSku, restoreQty);
+      await db.prepare(`
+        INSERT INTO inventory_movements (
+          movement_type, component_sku, product_sku, quantity_delta,
+          invoice_id, paypal_order_id, note
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        status,
+        requirement.componentSku,
+        hold.productSku,
+        restoreQty,
+        hold.invoiceId,
+        hold.payPalOrderId || hold.paypalOrderId || paypalOrderId || null,
+        note
+      ).run();
+    }
+
     await db.prepare(`
-      INSERT INTO inventory_movements (
-        movement_type, component_sku, product_sku, quantity_delta,
-        invoice_id, paypal_order_id, note
-      ) VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).bind(
-      status,
-      requirement.componentSku,
-      hold.productSku,
-      restoreQty,
-      hold.invoiceId,
-      hold.paypalOrderId || paypalOrderId || null,
-      note
-    ).run();
+      UPDATE inventory_holds
+      SET status = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE hold_id = ?
+    `).bind(status, hold.holdId).run();
+
+    released.push(hold.holdId);
   }
 
-  await db.prepare(`
-    UPDATE inventory_holds
-    SET status = ?, updated_at = CURRENT_TIMESTAMP
-    WHERE hold_id = ?
-  `).bind(status, hold.holdId).run();
-
-  return { released: true, holdId: hold.holdId, status };
+  return { released: true, holdIds: released, status };
 }
 
 export async function captureInventoryHold(envOrDb, { paypalOrderId, invoiceId }) {
   const db = typeof envOrDb?.prepare === "function" ? envOrDb : getInventoryDb(envOrDb);
   if (!db) return { captured: false, skipped: true };
 
-  const hold = paypalOrderId
-    ? await db.prepare("SELECT hold_id AS holdId FROM inventory_holds WHERE paypal_order_id = ? AND status = 'ACTIVE' LIMIT 1").bind(paypalOrderId).first()
-    : invoiceId
-      ? await db.prepare("SELECT hold_id AS holdId FROM inventory_holds WHERE invoice_id = ? AND status = 'ACTIVE' LIMIT 1").bind(invoiceId).first()
-      : null;
+  let holds = [];
+  if (paypalOrderId) {
+    const result = await db.prepare("SELECT hold_id AS holdId FROM inventory_holds WHERE paypal_order_id = ? AND status = 'ACTIVE'").bind(paypalOrderId).all();
+    holds = Array.isArray(result?.results) ? result.results : [];
+  } else if (invoiceId) {
+    const result = await db.prepare("SELECT hold_id AS holdId FROM inventory_holds WHERE invoice_id = ? AND status = 'ACTIVE'").bind(invoiceId).all();
+    holds = Array.isArray(result?.results) ? result.results : [];
+  }
 
-  if (!hold) return { captured: false, skipped: false };
+  if (!holds.length) return { captured: false, skipped: false };
 
-  await db.prepare(`
-    UPDATE inventory_holds
-    SET status = 'CAPTURED', updated_at = CURRENT_TIMESTAMP
-    WHERE hold_id = ?
-  `).bind(hold.holdId).run();
+  for (const hold of holds) {
+    await db.prepare(`
+      UPDATE inventory_holds
+      SET status = 'CAPTURED', updated_at = CURRENT_TIMESTAMP
+      WHERE hold_id = ?
+    `).bind(hold.holdId).run();
+  }
 
-  return { captured: true, holdId: hold.holdId };
+  return { captured: true, holdIds: holds.map((hold) => hold.holdId) };
 }
+

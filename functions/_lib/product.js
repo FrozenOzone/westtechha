@@ -350,6 +350,85 @@ export function buildCheckoutProduct(sku, quantity) {
   };
 }
 
+
+export function normalizeCartItems(rawItems) {
+  if (!Array.isArray(rawItems)) return [];
+
+  const combined = new Map();
+  for (const entry of rawItems) {
+    const sku = typeof entry?.sku === "string" ? entry.sku.trim().toLowerCase() : "";
+    const product = getProduct(sku);
+    if (!product) continue;
+
+    const qty = normalizeQuantity(entry?.quantity || 1);
+    const color = String(entry?.color || "White").trim().toLowerCase() === "black" ? "Black" : "White";
+    const key = `${sku}::${color}`;
+    const existing = combined.get(key) || { sku, color, quantity: 0 };
+    existing.quantity += qty;
+    combined.set(key, existing);
+  }
+
+  return Array.from(combined.values()).map((item) => ({
+    sku: item.sku,
+    color: item.color,
+    quantity: normalizeQuantity(item.quantity)
+  }));
+}
+
+export function buildCartCheckout(rawItems) {
+  const items = normalizeCartItems(rawItems);
+  if (!items.length) {
+    throw new Error("Your cart is empty.");
+  }
+
+  const totalQuantity = items.reduce((sum, item) => sum + normalizeQuantity(item.quantity), 0);
+  const shippingAmount = shippingAmountForQuantity(totalQuantity);
+  const customQuoteOnly = isCustomQuoteQuantity(totalQuantity) || shippingAmount === null;
+
+  const lines = items.map((item) => {
+    const product = buildCheckoutProduct(item.sku, item.quantity);
+    return {
+      sku: product.sku,
+      name: product.name,
+      description: product.description,
+      color: item.color,
+      quantity: String(normalizeQuantity(item.quantity)),
+      unitAmount: product.unitAmount,
+      itemAmount: product.itemAmount,
+      currency: product.currency,
+      family: product.family,
+      layout: product.layout,
+      offerType: product.offerType,
+      variant: product.variant
+    };
+  });
+
+  const itemAmount = money(lines.reduce((sum, line) => sum + Number(line.itemAmount || 0), 0));
+  const currency = lines[0]?.currency || PRODUCT.currency || "USD";
+  const description = lines.length === 1
+    ? `${lines[0].name} (${lines[0].color})`
+    : `Mixed WestTech enclosure order (${totalQuantity} items)`;
+
+  return {
+    sku: "cart",
+    name: lines.length === 1 ? lines[0].name : "WestTech Enclosure Cart",
+    description,
+    quantity: String(totalQuantity),
+    unitAmount: itemAmount,
+    itemAmount,
+    shippingAmount: customQuoteOnly ? null : shippingAmount,
+    currency,
+    family: "Mixed",
+    layout: "Mixed cart order",
+    offerType: "Cart",
+    variant: "Cart",
+    customQuoteOnly,
+    customQuoteMinQuantity: CUSTOM_QUOTE_MIN_QUANTITY,
+    shippingTierSummary: shippingTiersSummary(),
+    items: lines
+  };
+}
+
 export function allPublicProducts() {
   return Object.fromEntries(Object.entries(PRODUCTS).map(([sku, product]) => [sku, publicProduct(product)]));
 }
