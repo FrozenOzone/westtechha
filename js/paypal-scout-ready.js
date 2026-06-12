@@ -5,6 +5,7 @@
   const PREPARE_COLORADO_ENDPOINT = "/api/paypal/orders/{orderID}/prepare-colorado";
   const CAPTURE_ORDER_ENDPOINT = "/api/paypal/orders/{orderID}/capture";
   const SUCCESS_URL = "order-thank-you.html";
+  const US_ONLY_SHIPPING_MESSAGE = "Website checkout currently supports U.S. shipping addresses only.";
 
   const PRICE = 35.00;
   const SHIPPING = 8.95;
@@ -78,6 +79,35 @@
   function setStatus(message, isError) {
     status.textContent = message;
     status.classList.toggle("is-error", Boolean(isError));
+  }
+
+  function normalizeCountryCode(value) {
+    return String(value || "").trim().toUpperCase();
+  }
+
+  function payPalShippingCountryCode(data) {
+    return normalizeCountryCode(
+      data?.shippingAddress?.countryCode ||
+      data?.shippingAddress?.country_code ||
+      data?.shipping_address?.country_code ||
+      data?.shipping_address?.countryCode ||
+      ""
+    );
+  }
+
+  function isUsShippingAddress(address) {
+    return normalizeCountryCode(address?.countryCode || address?.country_code || "") === "US";
+  }
+
+  function rejectNonUsPayPalShipping(data, actions) {
+    const countryCode = payPalShippingCountryCode(data);
+    if (!countryCode || countryCode === "US") {
+      if (actions && typeof actions.resolve === "function") return actions.resolve();
+      return undefined;
+    }
+    setStatus(`${US_ONLY_SHIPPING_MESSAGE} Please choose a U.S. shipping address in PayPal.`, true);
+    if (actions && typeof actions.reject === "function") return actions.reject();
+    return Promise.reject(new Error(US_ONLY_SHIPPING_MESSAGE));
   }
 
   function fetchJson(url, options) {
@@ -178,12 +208,17 @@
     state.pendingOrderId = orderID;
     state.pendingOrderDetails = shippingAddress;
 
+    if (!isUsShippingAddress(shippingAddress)) {
+      setStatus(`${US_ONLY_SHIPPING_MESSAGE} Please choose a U.S. shipping address and try checkout again.`, true);
+      return;
+    }
+
     if ((shippingAddress.state || "").toUpperCase() === "CO") {
       await showColoradoFallback(shippingAddress);
       return;
     }
 
-    setStatus("Shipping address confirmed. Finalizing payment now.");
+    setStatus("U.S. shipping address confirmed. Finalizing payment now.");
     await captureOrder(orderID);
   }
 
@@ -226,7 +261,7 @@
         label: "paypal"
       },
       async createOrder() {
-        setStatus("Opening PayPal. Choose the shipping address there first. Colorado orders may return here for one final address confirmation step before payment is captured.");
+        setStatus("Opening PayPal. Website checkout currently supports U.S. shipping addresses only. Colorado orders may return here for one final address confirmation step before payment is captured.");
         const orderData = await fetchJson(CREATE_ORDER_ENDPOINT, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -238,6 +273,8 @@
       async onApprove(data) {
         await handleApproval(data.orderID);
       },
+      onShippingAddressChange(data, actions) { return rejectNonUsPayPalShipping(data, actions); },
+      onShippingChange(data, actions) { return rejectNonUsPayPalShipping(data, actions); },
       onCancel() {
         setStatus("Checkout was cancelled before payment was completed.", true);
       },
@@ -249,7 +286,7 @@
 
     state.buttonsRendered = true;
     container.classList.remove("is-hidden");
-    setStatus("PayPal is ready. PayPal opens first, and Colorado orders may return here for one final address confirmation step.");
+    setStatus("PayPal is ready. Website checkout currently supports U.S. shipping addresses only.");
   }
 
   coloradoVerifyCheckbox.addEventListener("change", function () {

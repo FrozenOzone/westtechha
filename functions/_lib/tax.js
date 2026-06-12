@@ -58,14 +58,14 @@ export function validateShippingAddress(input) {
   if (!address.city) {
     throw new Error("Enter the city.");
   }
+  if (address.countryCode !== "US") {
+    throw new Error("Website checkout currently supports U.S. shipping addresses only.");
+  }
   if (!address.state) {
     throw new Error("Select a state.");
   }
   if (!address.postalCode) {
     throw new Error("Enter the ZIP code.");
-  }
-  if (address.countryCode !== "US") {
-    throw new Error("Shipping is currently available only within the United States.");
   }
   if (!CONTIGUOUS_STATES.has(address.state)) {
     throw new Error("Shipping is currently limited to the 48 contiguous U.S. states and Washington, DC.");

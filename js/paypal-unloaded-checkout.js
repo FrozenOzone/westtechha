@@ -7,6 +7,7 @@
   const CAPTURE_ORDER_ENDPOINT = "/api/paypal/orders/{orderID}/capture";
   const SUCCESS_URL = "order-thank-you.html";
   const CUSTOM_QUOTE_MIN_QUANTITY = 5;
+  const US_ONLY_SHIPPING_MESSAGE = "Website checkout currently supports U.S. shipping addresses only.";
 
   const checkoutConfig = window.WESTTECH_CHECKOUT || {};
   let PRODUCT = {
@@ -140,6 +141,36 @@
   function setStatus(message, isError) {
     status.textContent = message;
     status.classList.toggle("is-error", Boolean(isError));
+  }
+
+  function normalizeCountryCode(value) {
+    return String(value || "").trim().toUpperCase();
+  }
+
+  function payPalShippingCountryCode(data) {
+    return normalizeCountryCode(
+      data?.shippingAddress?.countryCode ||
+      data?.shippingAddress?.country_code ||
+      data?.shipping_address?.country_code ||
+      data?.shipping_address?.countryCode ||
+      data?.selected_shipping_option?.country_code ||
+      ""
+    );
+  }
+
+  function isUsShippingAddress(address) {
+    return normalizeCountryCode(address?.countryCode || address?.country_code || "") === "US";
+  }
+
+  function rejectNonUsPayPalShipping(data, actions) {
+    const countryCode = payPalShippingCountryCode(data);
+    if (!countryCode || countryCode === "US") {
+      if (actions && typeof actions.resolve === "function") return actions.resolve();
+      return undefined;
+    }
+    setStatus(`${US_ONLY_SHIPPING_MESSAGE} Please choose a U.S. shipping address in PayPal.`, true);
+    if (actions && typeof actions.reject === "function") return actions.reject();
+    return Promise.reject(new Error(US_ONLY_SHIPPING_MESSAGE));
   }
 
 
@@ -296,7 +327,7 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
     customCard.classList.add("is-hidden");
     resetColoradoState();
     showPayPalBeforeApproval();
-    setStatus("Quantity-based shipping is calculated before checkout.");
+    setStatus("PayPal is ready. Website checkout currently supports U.S. shipping addresses only.");
   }
 
   function loadPayPalSdk(clientId, currency) {
@@ -392,11 +423,18 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
     state.pendingInvoiceId = details.invoiceId || state.pendingInvoiceId || null;
     updateInvoiceIdDisplay();
 
+    if (!isUsShippingAddress(shippingAddress)) {
+      resetPendingOrderState();
+      showPayPalBeforeApproval();
+      setStatus(`${US_ONLY_SHIPPING_MESSAGE} Please choose a U.S. shipping address and try checkout again.`, true);
+      return;
+    }
+
     if ((shippingAddress.state || "").toUpperCase() === "CO") {
       await showColoradoFallback(shippingAddress);
       return;
     }
-    setStatus("Shipping address confirmed. Finalizing payment now.");
+    setStatus("U.S. shipping address confirmed. Finalizing payment now.");
     await captureOrder(orderID);
   }
 
@@ -463,7 +501,7 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
       async createOrder() {
         const quantity = currentQuantity();
         if (isCustomQuantity(quantity)) throw new Error("Use the custom / email order path for 5+ units.");
-        setStatus("Opening PayPal. Choose the shipping address there first. Colorado orders may return here for one final address confirmation step before payment is captured.");
+        setStatus("Opening PayPal. Website checkout currently supports U.S. shipping addresses only. Colorado orders may return here for one final address confirmation step before payment is captured.");
         const orderData = await fetchJson(CREATE_ORDER_ENDPOINT, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -475,6 +513,8 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
         return orderData.id;
       },
       async onApprove(data) { await handleApproval(data.orderID); },
+      onShippingAddressChange(data, actions) { return rejectNonUsPayPalShipping(data, actions); },
+      onShippingChange(data, actions) { return rejectNonUsPayPalShipping(data, actions); },
       onCancel() { setStatus("Checkout was cancelled before payment was completed.", true); },
       onError(err) {
         console.error(err);
@@ -483,7 +523,7 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
     }).render("#paypal-button-container");
     state.buttonsRendered = true;
     showPayPalBeforeApproval();
-    setStatus("Quantity-based shipping is calculated before checkout.");
+    setStatus("PayPal is ready. Website checkout currently supports U.S. shipping addresses only.");
   }
 
   quantitySelect.addEventListener("change", async function () {

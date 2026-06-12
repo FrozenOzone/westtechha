@@ -12,7 +12,7 @@ function extractAddress(data) {
     city: shipping?.address?.admin_area_2 || "",
     state: shipping?.address?.admin_area_1 || "",
     postalCode: shipping?.address?.postal_code || "",
-    countryCode: shipping?.address?.country_code || "US"
+    countryCode: shipping?.address?.country_code || ""
   };
 }
 
