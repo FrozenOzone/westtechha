@@ -34,6 +34,10 @@
     verifyCheckbox: document.getElementById('cart-verify-checkbox'),
     completeButton: document.getElementById('cart-complete-button'),
     invoice: document.getElementById('cart-invoice-id'),
+    displayName: document.getElementById('cart-display-name'),
+    displayAddress1: document.getElementById('cart-display-address1'),
+    displayAddress2: document.getElementById('cart-display-address2'),
+    displayCityStateZip: document.getElementById('cart-display-citystatezip'),
     resultItem: document.getElementById('cart-result-item'),
     resultShipping: document.getElementById('cart-result-shipping'),
     resultTax: document.getElementById('cart-result-tax'),
@@ -155,6 +159,28 @@
 
   function updateInvoice() {
     if (els.invoice) els.invoice.textContent = state.pendingInvoiceId || 'Pending…';
+  }
+
+  function updateAddressPreview() {
+    if (els.displayName) {
+      els.displayName.textContent = fields.fullName.value.trim() || 'Pending…';
+    }
+    if (els.displayAddress1) {
+      els.displayAddress1.textContent = fields.address1.value.trim() || '—';
+    }
+    if (els.displayAddress2) {
+      const line2 = fields.address2.value.trim();
+      els.displayAddress2.textContent = line2;
+      els.displayAddress2.classList.toggle('is-hidden', !line2);
+    }
+    if (els.displayCityStateZip) {
+      const city = fields.city.value.trim();
+      const stateCode = fields.state.value.trim();
+      const postal = fields.postalCode.value.trim();
+      const cityState = city && stateCode ? `${city}, ${stateCode}` : (city || stateCode || '');
+      const combined = [cityState, postal].filter(Boolean).join(' ');
+      els.displayCityStateZip.textContent = combined || '—';
+    }
   }
 
   async function loadProductForItem(item) {
@@ -424,6 +450,7 @@
     fields.city.value = details.city || '';
     fields.state.value = details.state || 'CO';
     fields.postalCode.value = details.postalCode || '';
+    updateAddressPreview();
     setStatus('Colorado address detected. Reviewing the address and calculating the final total now.');
     await calculateColoradoQuote();
   }

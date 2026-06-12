@@ -8,17 +8,17 @@
   <link href="icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
   <link href="css/site.css" rel="stylesheet"/>
 </head>
-<body>
+<body class="cart-page">
 <div class="page">
   <div id="site-header"></div>
 
-  <header class="page-header">
+  <header class="page-header cart-page-header">
     <div class="eyebrow"><span class="dot"></span>Session Cart • U.S. Shipping Only</div>
     <h1>Review your cart.</h1>
     <p class="tagline">Add different enclosure versions, colors, and quantities to one session cart. Website checkout currently supports U.S. shipping addresses only and direct checkout supports 1 through 4 total units.</p>
   </header>
 
-  <section class="section cart-layout">
+  <section class="section cart-layout cart-section">
     <article class="checkout-card">
       <div class="product-label">Cart Items</div>
       <h2>Your selected enclosures</h2>
@@ -49,23 +49,29 @@
       <div id="cart-colorado-card" class="checkout-mini-card checkout-address-card is-hidden">
         <div class="product-label">Confirm your shipping address</div>
         <p class="checkout-mini-note">The address below was provided by PayPal. Please review it and make sure it looks correct before completing your order.</p>
-        <form id="cart-colorado-form" class="checkout-address-form">
-          <div class="checkout-address-display">
-            <div class="checkout-address-display-title">Address from PayPal</div>
-            <div class="checkout-field-grid">
-              <div class="checkout-field checkout-field-full checkout-static-field">
-                <span>WestTech Order #</span>
-                <strong id="cart-invoice-id" class="checkout-static-value">Pending…</strong>
-                <input id="cart-full-name" type="hidden"/>
-              </div>
-              <label class="checkout-field checkout-field-full"><span>Address line 1</span><input id="cart-address1" autocomplete="shipping address-line1" readonly disabled required type="text"/></label>
-              <label class="checkout-field checkout-field-full"><span>Address line 2 <em>(optional)</em></span><input id="cart-address2" autocomplete="shipping address-line2" readonly disabled type="text"/></label>
-              <label class="checkout-field"><span>City</span><input id="cart-city" autocomplete="shipping address-level2" readonly disabled required type="text"/></label>
-              <label class="checkout-field"><span>State</span><input id="cart-state" autocomplete="shipping address-level1" maxlength="2" readonly disabled required type="text" value="CO"/></label>
-              <label class="checkout-field"><span>ZIP code</span><input id="cart-postal" autocomplete="shipping postal-code" readonly disabled required type="text"/></label>
-            </div>
+
+        <div class="checkout-address-compact">
+          <div class="checkout-address-compact-head">
+            <div class="checkout-address-display-title">Ship to</div>
+            <div class="checkout-address-invoice">WestTech Order # <strong id="cart-invoice-id" class="checkout-static-value">Pending…</strong></div>
           </div>
+          <div class="checkout-address-recipient" id="cart-display-name">Pending…</div>
+          <div class="checkout-address-lines">
+            <div id="cart-display-address1">—</div>
+            <div id="cart-display-address2" class="is-hidden"></div>
+            <div id="cart-display-citystatezip">—</div>
+          </div>
+        </div>
+
+        <form id="cart-colorado-form" class="checkout-address-form checkout-address-form-hidden" aria-hidden="true">
+          <input id="cart-full-name" type="hidden"/>
+          <input id="cart-address1" autocomplete="shipping address-line1" readonly disabled required type="text"/>
+          <input id="cart-address2" autocomplete="shipping address-line2" readonly disabled type="text"/>
+          <input id="cart-city" autocomplete="shipping address-level2" readonly disabled required type="text"/>
+          <input id="cart-state" autocomplete="shipping address-level1" maxlength="2" readonly disabled required type="text" value="CO"/>
+          <input id="cart-postal" autocomplete="shipping postal-code" readonly disabled required type="text"/>
         </form>
+
         <p id="cart-change-note" class="checkout-mini-note checkout-change-note is-hidden">Need to change the address? Click the PayPal button below again, then select a different shipping address to continue checkout.</p>
         <label id="cart-verify-wrap" class="checkout-verify-row is-hidden"><input id="cart-verify-checkbox" type="checkbox"/><span>I confirm this is my correct shipping address.</span></label>
         <div id="cart-colorado-summary" class="checkout-mini-note is-hidden"></div>
