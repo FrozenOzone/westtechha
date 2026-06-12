@@ -234,10 +234,7 @@
                 <option value="4"${item.quantity === 4 ? ' selected' : ''}>4</option>
               </select>
             </label>
-            <button class="cart-item-remove" type="button" data-cart-remove="${index}" aria-label="Remove ${product.name || item.name} from cart">
-              <span class="cart-item-remove-icon" aria-hidden="true">×</span>
-              <span>Remove</span>
-            </button>
+            <button class="cart-item-remove" type="button" data-cart-remove="${index}" aria-label="Remove ${product.name || item.name} from cart">Remove</button>
           </div>
         </div>
         <div class="cart-item-price">${formatMoney(lineTotal)}</div>
@@ -303,7 +300,9 @@
   });
 
   els.items.addEventListener('click', async function (event) {
-    const removeIndex = event.target.getAttribute('data-cart-remove');
+    const removeButton = event.target.closest('[data-cart-remove]');
+    if (!removeButton || !els.items.contains(removeButton)) return;
+    const removeIndex = removeButton.getAttribute('data-cart-remove');
     if (removeIndex === null) return;
     const items = checkoutItems();
     items.splice(Number(removeIndex), 1);
