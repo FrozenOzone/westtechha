@@ -234,7 +234,10 @@
                 <option value="4"${item.quantity === 4 ? ' selected' : ''}>4</option>
               </select>
             </label>
-            <button class="cart-item-remove" type="button" data-cart-remove="${index}">Remove</button>
+            <button class="cart-item-remove" type="button" data-cart-remove="${index}" aria-label="Remove ${product.name || item.name} from cart">
+              <span class="cart-item-remove-icon" aria-hidden="true">×</span>
+              <span>Remove</span>
+            </button>
           </div>
         </div>
         <div class="cart-item-price">${formatMoney(lineTotal)}</div>
