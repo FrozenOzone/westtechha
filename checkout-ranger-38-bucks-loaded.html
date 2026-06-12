@@ -65,36 +65,40 @@
     <aside class="checkout-card checkout-summary-card">
       <div class="product-label">Order Summary</div>
       <h2>Select options</h2>
-      <div class="checkout-mini-card checkout-color-card">
-        <div class="product-label">Color</div>
-        <label class="checkout-quantity-label" for="checkout-color">
-          <span>Choose color</span>
-          <select id="checkout-color" class="checkout-quantity-select">
-            <option value="White" selected>White</option>
-            <option value="Black">Black</option>
-          </select>
-        </label>
-        <p class="checkout-mini-note">Available colors: White or Black.</p>
-      </div>
 
-      <div class="checkout-mini-card checkout-quantity-card">
-        <div class="product-label">Quantity & Shipping</div>
-        <div class="checkout-quantity-row">
-          <label class="checkout-quantity-label" for="checkout-quantity">
-            <span>Choose quantity</span>
-            <select id="checkout-quantity" class="checkout-quantity-select">
-              <option value="1" selected>1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5+">5+</option>
+      <div class="checkout-mini-card checkout-options-card">
+        <div class="checkout-option-section">
+          <div class="product-label">Color</div>
+          <label class="checkout-quantity-label" for="checkout-color">
+            <span>Choose color</span>
+            <select id="checkout-color" class="checkout-quantity-select">
+              <option value="White" selected>White</option>
+              <option value="Black">Black</option>
             </select>
           </label>
-          <a class="btn btn-outline checkout-continue-shopping" href="products.html">Continue Shopping</a>
+          <p class="checkout-mini-note">Available colors: White or Black.</p>
         </div>
-        <p id="checkout-shipping-tier-note" class="checkout-mini-note">1 unit: $8.95 • 2 units: $10.95 • 3-4 units: $14.95 • 5+ units: custom / email order</p>
+
+        <div class="checkout-option-section">
+          <div class="product-label">Quantity & Shipping</div>
+          <div class="checkout-quantity-row">
+            <label class="checkout-quantity-label" for="checkout-quantity">
+              <span>Choose quantity</span>
+              <select id="checkout-quantity" class="checkout-quantity-select">
+                <option value="1" selected>1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5+">5+</option>
+              </select>
+            </label>
+            <a class="btn btn-outline checkout-continue-shopping" href="products.html">Continue Shopping</a>
+          </div>
+          <p id="checkout-shipping-tier-note" class="checkout-mini-note">1 unit: $8.95 • 2 units: $10.95 • 3-4 units: $14.95 • 5+ units: custom / email order</p>
+        </div>
       </div>
       <div class="checkout-summary-lines">
+
         <div class="checkout-line"><span>Quantity</span><strong id="checkout-quantity-display">1</strong></div>
         <div class="checkout-line"><span>Color</span><strong id="checkout-color-display">White</strong></div>
         <div class="checkout-product-summary"><span class="checkout-line-label">Product</span><span data-checkout-product-name>Ranger Bucks 38 - Loaded</span></div>
