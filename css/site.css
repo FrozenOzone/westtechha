@@ -4818,3 +4818,31 @@ html[data-theme="dark"] .cart-add-status.is-error{color:#fecaca;}
 @media (prefers-color-scheme: dark){html:not([data-theme]) .cart-add-status.is-error{color:#fecaca;}}
 .cart-mini-note{color:var(--muted);font-size:0.92rem;line-height:1.6;}
 @media (max-width:980px){.cart-layout{grid-template-columns:1fr}.cart-item{grid-template-columns:1fr}.cart-item-price{text-align:left}.cart-item-controls{align-items:start}}
+
+/* Session cart product-page actions */
+.checkout-cart-actions{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+.checkout-cart-actions .cart-add-button{
+  flex:1 1 180px;
+  width:auto;
+  margin-top:0;
+}
+.checkout-cart-actions .btn-outline{
+  flex:0 0 auto;
+}
+.checkout-cart-shell.is-hidden{
+  display:none;
+}
+@media (max-width: 640px){
+  .checkout-cart-actions .cart-add-button,
+  .checkout-cart-actions .btn-outline{
+    width:100%;
+    flex-basis:100%;
+    text-align:center;
+  }
+}

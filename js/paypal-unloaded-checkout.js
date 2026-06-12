@@ -8,6 +8,7 @@
   const SUCCESS_URL = "order-thank-you.html";
   const CUSTOM_QUOTE_MIN_QUANTITY = 5;
   const US_ONLY_SHIPPING_MESSAGE = "Website checkout currently supports U.S. shipping addresses only.";
+  const DIRECT_PAYPAL_ON_PRODUCT_PAGE = false;
 
   const checkoutConfig = window.WESTTECH_CHECKOUT || {};
   let PRODUCT = {
@@ -331,8 +332,13 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
     customCard.classList.add("is-hidden");
     resetColoradoState();
     updateCartControlState();
-    showPayPalBeforeApproval();
-    setStatus("PayPal is ready. Website checkout currently supports U.S. shipping addresses only.");
+    if (DIRECT_PAYPAL_ON_PRODUCT_PAGE) {
+      showPayPalBeforeApproval();
+      setStatus("PayPal is ready. Website checkout currently supports U.S. shipping addresses only.");
+    } else {
+      hidePayPalForFinalReview();
+      setStatus("Choose color and quantity, then add this item to your cart. You can check out from the cart when ready.");
+    }
   }
 
 
@@ -341,17 +347,25 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
     const targetCard = document.querySelector(".checkout-quantity-card") || document.querySelector(".checkout-summary-card");
     if (!targetCard) return;
 
-    cartAddButton = document.createElement("button");
-    cartAddButton.type = "button";
-    cartAddButton.className = "btn btn-outline cart-add-button";
-    cartAddButton.textContent = "Add to Cart";
+    cartAddButton = document.getElementById("checkout-add-to-cart");
+    cartAddStatus = document.getElementById("checkout-add-to-cart-status");
 
-    cartAddStatus = document.createElement("p");
-    cartAddStatus.className = "cart-add-status";
-    cartAddStatus.setAttribute("aria-live", "polite");
+    if (!cartAddButton) {
+      cartAddButton = document.createElement("button");
+      cartAddButton.type = "button";
+      cartAddButton.id = "checkout-add-to-cart";
+      cartAddButton.className = "btn btn-buy-pop cart-add-button";
+      cartAddButton.textContent = "Add to Cart";
+      targetCard.appendChild(cartAddButton);
+    }
 
-    targetCard.appendChild(cartAddButton);
-    targetCard.appendChild(cartAddStatus);
+    if (!cartAddStatus) {
+      cartAddStatus = document.createElement("p");
+      cartAddStatus.id = "checkout-add-to-cart-status";
+      cartAddStatus.className = "cart-add-status";
+      cartAddStatus.setAttribute("aria-live", "polite");
+      targetCard.appendChild(cartAddStatus);
+    }
 
     cartAddButton.addEventListener("click", function () {
       try {
@@ -372,7 +386,8 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
           quantity
         });
         cartAddStatus.classList.remove("is-error");
-        cartAddStatus.innerHTML = `${PRODUCT.name} (${currentColor()}) added to cart. <a href="cart.html">View cart</a>`;
+        cartAddStatus.textContent = `${PRODUCT.name} (${currentColor()}) added to cart. Taking you to the cart…`;
+        window.location.href = "cart.html";
       } catch (error) {
         cartAddStatus.classList.add("is-error");
         cartAddStatus.textContent = error && error.message ? error.message : "Could not add this item to the cart.";
@@ -581,8 +596,13 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
       }
     }).render("#paypal-button-container");
     state.buttonsRendered = true;
-    showPayPalBeforeApproval();
-    setStatus("PayPal is ready. Website checkout currently supports U.S. shipping addresses only.");
+    if (DIRECT_PAYPAL_ON_PRODUCT_PAGE) {
+      showPayPalBeforeApproval();
+      setStatus("PayPal is ready. Website checkout currently supports U.S. shipping addresses only.");
+    } else {
+      hidePayPalForFinalReview();
+      setStatus("Choose color and quantity, then add this item to your cart. You can check out from the cart when ready.");
+    }
   }
 
   quantitySelect.addEventListener("change", async function () {
@@ -638,7 +658,12 @@ I would like to order ${quantity}+ units of ${PRODUCT.name}.\nPreferred color: $
     setStatus("Loading product pricing…");
     await loadProductConfig();
     updateSummaryFromQuantity();
-    await renderButtonsIfNeeded();
+    if (DIRECT_PAYPAL_ON_PRODUCT_PAGE) {
+      await renderButtonsIfNeeded();
+    } else {
+      hidePayPalForFinalReview();
+      setStatus("Choose color and quantity, then add this item to your cart. You can check out from the cart when ready.");
+    }
   }
 
   initializeCheckout().catch(function (error) {
