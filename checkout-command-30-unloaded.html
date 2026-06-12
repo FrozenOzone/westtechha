@@ -96,11 +96,6 @@
           <a class="btn btn-outline checkout-continue-shopping" href="products.html">Continue Shopping</a>
         </div>
         <p id="checkout-shipping-tier-note" class="checkout-mini-note">1 unit: $8.95 • 2 units: $10.95 • 3-4 units: $14.95 • 5+ units: custom / email order</p>
-        <div class="checkout-cart-actions">
-          <button id="checkout-add-to-cart" class="btn btn-buy-pop cart-add-button" type="button">Add to Cart</button>
-          <a class="btn btn-outline" href="cart.html">View Cart</a>
-        </div>
-        <p id="checkout-add-to-cart-status" class="cart-add-status" aria-live="polite"></p>
       </div>
       <div class="checkout-summary-lines">
         <div class="checkout-line"><span>Quantity</span><strong id="checkout-quantity-display">1</strong></div>
@@ -115,6 +110,11 @@
         <strong id="checkout-total-amount">$41.94</strong>
       </div>
       <div id="checkout-inventory-status" class="checkout-inventory-status availability-unknown">Availability: checking…</div>
+      <div class="checkout-cart-actions checkout-summary-actions">
+        <button id="checkout-add-to-cart" class="btn btn-buy-pop cart-add-button" type="button">Add to Cart</button>
+        <a class="btn btn-outline" href="cart.html">View Cart</a>
+      </div>
+      <p id="checkout-add-to-cart-status" class="cart-add-status" aria-live="polite"></p>
 
       <div id="checkout-colorado-card" class="checkout-mini-card checkout-address-card is-hidden">
         <div class="product-label">Confirm your shipping address</div>

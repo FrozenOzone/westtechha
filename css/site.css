@@ -4846,3 +4846,13 @@ html[data-theme="dark"] .cart-add-status.is-error{color:#fecaca;}
     text-align:center;
   }
 }
+
+/* Cart-first product page: keep Add to Cart below the selected product summary */
+.checkout-summary-actions{
+  margin-top:16px;
+  padding-top:14px;
+  border-top:1px solid var(--border);
+}
+.checkout-summary-actions .cart-add-button{
+  min-height:44px;
+}
