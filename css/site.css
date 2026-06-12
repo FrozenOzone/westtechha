@@ -2206,6 +2206,16 @@ html[data-theme="dark"] .checkout-product-top img{
 .checkout-product-line{
   align-items:flex-start;
 }
+
+.checkout-product-detail{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  min-width:0;
+}
+.checkout-product-detail [data-checkout-product-name]{
+  display:block;
+}
 .checkout-line-note{
   font-size:0.95rem;
 }
