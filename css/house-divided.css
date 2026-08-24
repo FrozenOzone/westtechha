@@ -1199,3 +1199,32 @@ html[data-theme="light"] .house-divided-builder-page .hd-integrated-preview .hd-
 html:not([data-theme]) .house-divided-builder-page .hd-integrated-preview .hd-preview-svg{
   filter:drop-shadow(0 26px 42px rgba(15,23,42,.22));
 }
+
+/* Placeholder hero artwork while logo-specific product photography is being refreshed. */
+.hd-hero-placeholder{
+  display:grid;
+  place-items:center;
+  align-content:center;
+  padding:44px;
+  background:
+    radial-gradient(circle at 25% 20%,rgba(255,255,255,.12),transparent 26%),
+    radial-gradient(circle at 78% 78%,rgba(22,119,196,.18),transparent 24%),
+    linear-gradient(145deg,#121b2b,#0f1724);
+}
+.hd-preview-disc-sample{
+  width:min(82%,470px);
+  margin:0 auto;
+  z-index:2;
+}
+.hd-hero-placeholder .hd-preview-art-note{
+  max-width:420px;
+  margin:18px auto 66px;
+  color:rgba(255,255,255,.68);
+  z-index:2;
+}
+.hd-hero-placeholder figcaption{z-index:3}
+@media(max-width:700px){
+  .hd-hero-placeholder{padding:24px}
+  .hd-preview-disc-sample{width:min(92%,390px)}
+  .hd-hero-placeholder .hd-preview-art-note{margin:14px auto 58px;font-size:.62rem}
+}

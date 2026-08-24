@@ -1,9 +1,8 @@
 (function(){
   'use strict';
 
-  // Storefront default: approved WestTech House Divided custom icons.
-  // Local-only comparison: add ?logos=real-test to this page URL to load the real/test set.
-  const STANDARD_LOGO_SET = new URLSearchParams(window.location.search).get('logos') === 'real-test' ? 'real-test' : 'custom';
+  // Storefront uses the approved WestTech custom icon set only.
+  const STANDARD_LOGO_SET = 'custom';
 
   const nflTeams = [
     {id:'ARI',city:'Arizona',name:'Cardinals',primary:'#97233f',secondary:'#ffb612'},
