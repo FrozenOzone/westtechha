@@ -150,7 +150,9 @@ ${items}
         <a class="nav-brand" href="${siteHref('index.html')}" aria-label="WestTech Home Automation home">
           <img
             class="nav-logo nav-logo-full"
-            src="${siteHref('images/WestTech_Logo_BuiltSmart_MadeCustom.svg')}"
+            src="${siteHref('images/WestTech_Logo_BuiltSmart_MadeCustom.png')}"
+            width="2048"
+            height="655"
             alt="WestTech Home Automation – Built Smart, Made Custom"
           />
         </a>
