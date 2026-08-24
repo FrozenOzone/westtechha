@@ -1,0 +1,2 @@
+WestTechHA mobile header hardening v2 - 2026-08-24
+Unique site-shell, site CSS, and logo asset URLs added to defeat stale mobile/browser caches.
