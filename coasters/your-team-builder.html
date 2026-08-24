@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" data-site-root="../" data-site-section="coasters">
+<head>
+  <meta charset="utf-8"/>
+  <title>Build a Your Team Coaster – WestTech Home Automation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Build a WestTech single-team coaster by choosing a sport and one team, with a custom-team option."/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="../css/site.css" rel="stylesheet"/>
+  <link href="../css/coasters.css" rel="stylesheet"/>
+  <link href="../css/single-team.css" rel="stylesheet"/>
+</head>
+<body class="coaster-page single-team-page single-team-builder-page">
+<div class="page">
+  <div id="site-header"></div>
+
+  <main class="st-main st-builder-page-main">
+    <div class="st-builder-page-back-wrap">
+      <a class="st-builder-back" href="your-team.html"><span aria-hidden="true">←</span> Your Team overview</a>
+    </div>
+    <section class="st-builder" id="build-team" aria-label="Your Team coaster builder" data-reveal>
+      <div class="st-builder-head">
+        <div>
+          <div class="coaster-section-tag coaster-section-tag-light">BUILD YOURS</div>
+          <h2>Your team. Your coaster.</h2>
+        </div>
+        <p>Start with the finished Denver example and change only the team that belongs to you.</p>
+      </div>
+
+      <div class="st-sport-row" aria-labelledby="st-sport-heading">
+        <div class="st-step-label"><b>01</b><span><small>SPORT</small><strong id="st-sport-heading">NFL</strong></span></div>
+        <div class="st-sport-grid" role="radiogroup" aria-label="Single-team sport">
+          <button class="st-sport-option is-selected" type="button" role="radio" aria-checked="true" data-sport="NFL"><span>NFL</span><strong>Football</strong></button>
+          <button class="st-sport-option is-planned" type="button" role="radio" aria-checked="false" data-sport="NHL"><span>NHL</span><strong>Hockey</strong></button>
+          <button class="st-sport-option is-planned" type="button" role="radio" aria-checked="false" data-sport="MLB"><span>MLB</span><strong>Baseball</strong></button>
+          <button class="st-sport-option is-planned" type="button" role="radio" aria-checked="false" data-sport="NBA"><span>NBA</span><strong>Basketball</strong></button>
+          <button class="st-sport-option is-planned" type="button" role="radio" aria-checked="false" data-sport="WNBA"><span>WNBA</span><strong>Women’s Basketball</strong></button>
+          <button class="st-sport-option is-planned" type="button" role="radio" aria-checked="false" data-sport="MLS"><span>MLS</span><strong>Soccer</strong></button>
+        </div>
+      </div>
+
+      <div class="st-builder-body">
+        <div class="st-live-preview">
+          <div class="st-preview-label"><span>YOUR SINGLE-TEAM COASTER</span><b id="st-preview-sport">NFL</b></div>
+          <svg class="st-coaster" id="st-coaster" viewBox="0 0 1000 1000" role="img" aria-labelledby="st-preview-title st-preview-desc">
+            <title id="st-preview-title">Denver Broncos single-team coaster preview</title>
+            <desc id="st-preview-desc">Circular single-team coaster with Denver on the top name ring, Broncos on the bottom name ring, and the WestTech Broncos artwork in the center.</desc>
+            <circle class="st-svg-outer" cx="500" cy="500" r="470"/>
+            <circle class="st-svg-rim" cx="500" cy="500" r="445"/>
+            <circle class="st-svg-field" cx="500" cy="500" r="350"/>
+            <circle class="st-svg-inner-line" cx="500" cy="500" r="355"/>
+            <g class="st-ring-letters st-ring-letters-top" id="st-top-text" aria-label="DENVER"></g>
+            <g class="st-ring-letters st-ring-letters-bottom" id="st-bottom-text" aria-label="BRONCOS"></g>
+            <image id="st-team-logo" x="245" y="270" width="510" height="460" preserveAspectRatio="xMidYMid meet"/>
+            <text id="st-logo-fallback" x="500" y="550" text-anchor="middle">DEN</text>
+          </svg>
+        </div>
+
+        <div class="st-team-control" aria-labelledby="st-team-heading">
+          <div class="st-team-control-head">
+            <div class="st-step-label"><b>02</b><span><small>TEAM</small><strong id="st-team-heading">Your team</strong></span></div>
+          </div>
+
+          <article class="st-selected-team" id="st-selected-team">
+            <div class="st-selected-art" id="st-selected-art"><img id="st-selected-logo" alt=""/><span id="st-selected-fallback">DEN</span></div>
+            <div class="st-selected-copy"><small>SELECTED TEAM</small><h3 id="st-selected-name">Denver Broncos</h3><p id="st-selected-kind">Standard NFL team</p></div>
+            <button class="st-change-team" id="st-open-picker" type="button">Change team</button>
+          </article>
+
+          <div class="st-summary">
+            <span>SINGLE TEAM</span>
+            <h3 id="st-summary-name">Denver Broncos</h3>
+            <p id="st-summary-detail">Standard NFL team · WestTech artwork + managed print colors</p>
+          </div>
+          <div class="st-actions">
+            <button class="coaster-btn coaster-btn-primary" id="st-continue" type="button">Continue with this team</button>
+            <button class="st-text-button" id="st-reset" type="button">Reset example</button>
+          </div>
+          <div class="st-message" id="st-message" role="status" aria-live="polite" hidden></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="st-picker-overlay" id="st-picker-overlay" hidden>
+      <section class="st-picker" id="st-team-picker" role="dialog" aria-modal="true" aria-labelledby="st-picker-title">
+        <div class="st-picker-head">
+          <div><span>TEAM</span><h2 id="st-picker-title">Choose your team</h2></div>
+          <button id="st-picker-close" type="button" aria-label="Close team selector">×</button>
+        </div>
+
+        <div class="st-standard-picker" id="st-standard-picker">
+          <label class="st-team-search"><span>Find a team</span><input id="st-team-search" type="search" placeholder="Search city or team name" autocomplete="off"/></label>
+          <div class="st-team-grid" id="st-team-grid"></div>
+        </div>
+
+        <div class="st-custom-panel" id="st-custom-panel" hidden>
+          <div class="st-custom-head"><div><span>CUSTOM TEAM</span><h3>Make this coaster yours.</h3></div><small>DESIGN REVIEW</small></div>
+          <p>Use this for a school, club, local team, organization, or other identity that is not in the standard list. WestTech reviews the artwork and final printable colors.</p>
+          <div class="st-custom-form">
+            <label><span>Top ring text</span><input id="st-custom-top" type="text" maxlength="24" placeholder="Example: WEST HIGH"/></label>
+            <label><span>Bottom ring text</span><input id="st-custom-bottom" type="text" maxlength="24" placeholder="Example: WILDCATS"/></label>
+            <label class="st-custom-artwork"><span>Artwork / logo</span><input id="st-custom-artwork" type="file" accept="image/*,.svg"/></label>
+            <label class="st-custom-notes"><span>Notes <small>(optional)</small></span><textarea id="st-custom-notes" rows="3" maxlength="300" placeholder="Anything WestTech should know about this design."></textarea></label>
+          </div>
+          <div class="st-custom-actions"><button class="coaster-btn coaster-btn-primary" id="st-apply-custom" type="button">Use this custom team</button><button class="st-text-button" id="st-back-teams" type="button">Back to team list</button></div>
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <div id="site-footer"></div>
+</div>
+<script src="../js/theme.js"></script>
+<script src="../js/site-shell.js"></script>
+<script src="../js/coasters.js"></script>
+<script src="../js/nfl-single-team-color-baseline.js"></script>
+<script src="../js/single-team.js"></script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+
+:root{--blue:#1677c4;--ink:#111827;--muted:#5d6878;--line:#d9e0e8;--paper:#f4f6f8;--card:#fff;--dark:#0b1422}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--ink);background:#e9edf2}.lab-header{display:flex;gap:34px;align-items:center;padding:26px max(28px,calc((100vw - 1500px)/2));background:#0a1424;color:#fff;border-bottom:1px solid #22314a}.lab-header img{width:330px;max-width:32vw}.lab-header span,.eyebrow,.editor-head span{font-size:.7rem;font-weight:900;letter-spacing:.16em;color:#79b9ee}.lab-header h1{margin:7px 0 3px;font-size:2rem}.lab-header p{margin:0;color:#aebbd0}.lab-shell{max-width:1500px;margin:0 auto;padding:28px}.lab-toolbar{display:flex;justify-content:space-between;gap:20px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px 18px}.lab-status{display:grid;gap:3px}.lab-status b{font-size:1rem}.lab-status span{font-size:.8rem;color:var(--muted)}.lab-actions{display:flex;gap:8px;flex-wrap:wrap}button,.buttonlike{appearance:none;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);padding:10px 13px;font:inherit;font-size:.8rem;font-weight:800;cursor:pointer}.primary{background:var(--blue);border-color:var(--blue);color:#fff}.lab-intro{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;margin-top:18px}.lab-intro>div{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px}.lab-intro h2{margin:0 0 8px;font-size:1.3rem}.lab-intro p{margin:0;color:var(--muted);line-height:1.65}.mapping-note{line-height:1.65;color:#39465a}.lab-workspace{display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:22px;margin-top:22px;align-items:start}.team-editor{background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px}.editor-head{display:flex;justify-content:space-between;gap:20px;align-items:end;padding:2px 2px 18px;border-bottom:1px solid var(--line)}.editor-head h2{margin:5px 0 0}.editor-head label{font-size:.72rem;font-weight:800;color:var(--muted);display:grid;gap:6px}.editor-head input{width:250px;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font:inherit}.team-list{display:grid;gap:12px;margin-top:16px}.team-card{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fafbfc}.team-card.is-approved{border-color:#6bb58a;background:#f6fbf8}.team-top{display:grid;grid-template-columns:64px minmax(180px,1fr) auto;gap:13px;align-items:center}.team-icon{width:60px;height:60px;border-radius:50%;background:#eef2f6;border:1px solid var(--line);display:grid;place-items:center;overflow:hidden}.team-icon img{width:88%;height:88%;object-fit:contain}.team-name strong{display:block;font-size:1rem}.team-name span{font-size:.72rem;color:var(--muted);font-weight:800;letter-spacing:.08em}.approve{display:flex;align-items:center;gap:7px;font-size:.75rem;font-weight:900;color:#445165}.approve input{width:18px;height:18px;accent-color:#25824f}.role-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:13px}.role{display:grid;gap:6px}.role label{font-size:.67rem;font-weight:900;letter-spacing:.06em;color:#566278;text-transform:uppercase}.select-wrap{display:grid;grid-template-columns:22px minmax(0,1fr);gap:6px;align-items:center}.swatch{width:20px;height:20px;border-radius:50%;border:1px solid rgba(0,0,0,.18);box-shadow:0 0 0 2px #fff}.role select{width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 8px;background:#fff;font:inherit;font-size:.76rem}.team-foot{display:flex;justify-content:flex-end;margin-top:9px}.team-foot button{padding:6px 9px;font-size:.7rem;color:#68758a}.preview-sticky{position:sticky;top:20px;background:#0d1829;color:#fff;border-radius:22px;padding:20px;box-shadow:0 25px 60px rgba(15,23,42,.24)}.preview-selects{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.preview-selects label{display:grid;gap:5px;font-size:.66rem;font-weight:900;color:#aebbd0;text-transform:uppercase}.preview-selects select{width:100%;border:1px solid #34455e;background:#13223a;color:#fff;border-radius:9px;padding:8px;font:inherit;font-size:.74rem}.coaster{--one-field:#f26a21;--two-field:#f5f5f2;--one-band:#15294d;--two-band:#8d949b;--one-text:#fff;--two-text:#fff;--one-house:#f26a21;--two-house:#2447b8;width:min(100%,380px);aspect-ratio:1;border-radius:50%;margin:20px auto;position:relative;overflow:hidden;background:#111317;border:8px solid #111317;box-shadow:0 0 0 3px #fff,0 25px 45px rgba(0,0,0,.4)}.rim{position:absolute;border-radius:50%;z-index:8;pointer-events:none}.r1{inset:2%;border:4px solid #f5f5f2}.r2{inset:5%;border:2px solid #111317;box-shadow:0 0 0 2px rgba(255,255,255,.8)}.field{position:absolute;left:5.6%;right:5.6%;z-index:1}.field-one{top:5.6%;height:44.4%;background:var(--one-field)}.field-two{bottom:5.6%;height:44.4%;background:var(--two-field)}.logo{position:absolute;z-index:4;left:50%;transform:translateX(-50%);width:58%;height:27%;object-fit:contain}.logo-one{top:9%}.logo-two{bottom:8%}.center-band{position:absolute;left:5.4%;right:5.4%;top:50%;transform:translateY(-50%);height:24%;z-index:7;display:grid;grid-template-columns:minmax(0,1fr) 18% minmax(0,1fr);border-top:4px solid #111317;border-bottom:4px solid #111317}.band-side{display:grid;place-items:center;font-size:1.45rem;font-weight:1000;letter-spacing:.02em}.band-left{background:var(--two-band);color:var(--two-text)}.band-right{background:var(--one-band);color:var(--one-text)}.split-house{position:relative;background:linear-gradient(90deg,var(--two-band) 0 50%,var(--one-band) 50% 100%);overflow:visible}.split-house:before{content:"";position:absolute;left:11%;right:11%;top:15%;bottom:16%;background:#111317;clip-path:polygon(50% 0,100% 36%,100% 100%,0 100%,0 36%);z-index:1}.split-house span{position:absolute;left:15%;right:15%;top:20%;bottom:21%;background:linear-gradient(90deg,var(--two-house) 0 50%,var(--one-house) 50% 100%);clip-path:polygon(50% 0,100% 36%,100% 100%,0 100%,0 36%);z-index:2}.split-house i{position:absolute;left:50%;top:20%;bottom:21%;width:3px;transform:translateX(-50%);background:#111317;z-index:3}.preview-sticky h3{margin:8px 0 0;font-size:1.15rem}.preview-help{font-size:.73rem;line-height:1.55;color:#aebbd0}.palette-key{margin-top:17px;padding-top:14px;border-top:1px solid #2b3a51}.palette-key>span{font-size:.66rem;font-weight:900;letter-spacing:.1em;color:#8797ae;text-transform:uppercase}.palette-key>div{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.key-chip{width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,.25)}
+@media(max-width:1100px){.lab-workspace{grid-template-columns:1fr}.preview-sticky{position:relative;top:auto}.lab-intro{grid-template-columns:1fr}}@media(max-width:760px){.lab-header{display:grid}.lab-header img{max-width:80vw}.lab-toolbar,.editor-head{align-items:stretch;display:grid}.lab-actions{display:grid}.editor-head input{width:100%}.role-grid{grid-template-columns:1fr 1fr}.team-top{grid-template-columns:54px 1fr}.approve{grid-column:2}.lab-shell{padding:14px}.preview-selects{grid-template-columns:1fr}}
+
+/* v2.13 — keep the live matchup preview alongside the full 32-team editor. */
+.preview-panel{
+  align-self:stretch;
+  position:relative;
+  min-width:0;
+}
+.preview-sticky{
+  position:sticky;
+  top:20px;
+}
+@media(max-width:1100px){
+  .preview-panel{align-self:auto}
+  .preview-sticky{position:relative;top:auto}
+}
+
+
+/* v2.14 — active team editors inside the sticky preview so Ed can work without scrolling to the full list. */
+.active-editors-wrap{margin-top:14px;padding:14px 14px 12px;border:1px solid #24364f;border-radius:16px;background:rgba(255,255,255,.04)}
+.active-editors-head span{display:block;font-size:.66rem;font-weight:900;letter-spacing:.1em;color:#8da9c7;text-transform:uppercase}
+.active-editors-head p{margin:6px 0 0;color:#b5c2d5;font-size:.73rem;line-height:1.45}
+.active-team-editors{display:grid;gap:12px;margin-top:12px}
+.active-team-card{border:1px solid #2b3a51;border-radius:14px;background:#102035;padding:12px}
+.active-team-top{display:grid;grid-template-columns:46px minmax(0,1fr) auto;gap:10px;align-items:center}
+.active-team-top .team-icon{width:44px;height:44px;background:#0b182a;border-color:#304666}
+.active-side-badge{display:inline-flex;align-items:center;gap:6px;font-size:.64rem;font-weight:900;letter-spacing:.08em;color:#8ab7f0;text-transform:uppercase}
+.active-side-badge i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#8ab7f0}
+.active-team-name strong{display:block;font-size:.95rem;color:#fff}
+.active-team-name span{display:block;font-size:.7rem;color:#9eb0c8;font-weight:800;letter-spacing:.08em}
+.active-approve{justify-self:end;display:flex;align-items:center;gap:6px;font-size:.72rem;font-weight:900;color:#d7e1ee}
+.active-approve input{width:17px;height:17px;accent-color:#25824f}
+.active-role-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.active-role-grid .role label{color:#9cb0c8}
+.active-role-grid .role select{border-color:#31465f;background:#0f1d31;color:#fff}
+.active-role-grid .swatch{box-shadow:0 0 0 2px #0f1d31}
+.active-team-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px}
+.active-team-foot button{padding:6px 9px;font-size:.7rem;color:#d6dfec;background:#0e1b2d;border-color:#31465f}
+.jump-note{font-size:.68rem;color:#9eb0c8}
+@media(max-width:760px){.active-team-top{grid-template-columns:44px 1fr}.active-approve{grid-column:2;justify-self:start}.active-role-grid{grid-template-columns:1fr}}
+
+/* v2.15 — compact two-team Color Lab. The 32-card editor is retired. */
+.approval-overview{margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px 20px}
+.approval-overview-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.9fr);gap:24px;align-items:end}
+.approval-overview-head span,.active-editor-heading>span{font-size:.68rem;font-weight:900;letter-spacing:.15em;color:#559edb;text-transform:uppercase}
+.approval-overview-head h2,.active-editor-heading h2{margin:5px 0 0;font-size:1.3rem}
+.approval-overview-head p,.active-editor-heading p{margin:0;color:var(--muted);font-size:.82rem;line-height:1.55}
+.approval-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:15px}
+.approval-chip{display:inline-flex;align-items:center;justify-content:space-between;gap:6px;min-width:58px;padding:6px 8px;border:1px solid #d8e0e9;border-radius:999px;background:#f4f6f8;color:#607086;font-size:.69rem}
+.approval-chip b{font-size:.7rem;letter-spacing:.04em;color:#3d4b5d}
+.approval-chip i{font-style:normal;font-weight:900;color:#9aa7b7}
+.approval-chip.approved{background:#edf8f1;border-color:#8bc3a0;color:#28744a}
+.approval-chip.approved b,.approval-chip.approved i{color:#28744a}
+.compact-workspace{grid-template-columns:minmax(0,1fr) 430px}
+.active-editor-panel{background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px}
+.active-editor-heading{display:grid;gap:5px;padding:2px 2px 17px;border-bottom:1px solid var(--line)}
+.main-team-selects{margin-top:16px}
+.main-team-selects label{color:#566278}
+.main-team-selects select{background:#fff;color:var(--ink);border-color:var(--line);padding:10px}
+.main-active-editors{margin-top:14px;gap:14px}
+.main-active-editors .active-team-card{background:#fafbfc;border-color:var(--line);padding:15px}
+.main-active-editors .active-team-top .team-icon{background:#eef2f6;border-color:var(--line)}
+.main-active-editors .active-side-badge{color:#4d91cf}
+.main-active-editors .active-side-badge i{background:#4d91cf}
+.main-active-editors .active-team-name strong{color:var(--ink);font-size:1rem}
+.main-active-editors .active-team-name span{color:var(--muted)}
+.main-active-editors .active-approve{color:#445165}
+.main-active-editors .active-role-grid .role label{color:#566278}
+.main-active-editors .active-role-grid .role select{background:#fff;color:var(--ink);border-color:var(--line)}
+.main-active-editors .active-role-grid .swatch{box-shadow:0 0 0 2px #fff}
+.main-active-editors .active-team-card.is-approved{border-color:#6bb58a;background:#f6fbf8}
+.main-active-editors .active-team-foot{justify-content:space-between;align-items:center;flex-wrap:wrap}
+.main-active-editors .active-team-foot>button{color:#68758a;background:#fff;border-color:var(--line)}
+.step-buttons{display:flex;gap:7px;flex-wrap:wrap}
+.step-buttons button{padding:7px 9px;font-size:.69rem;color:#2f6fa8;background:#f2f7fc;border-color:#cfe0ef}
+.preview-panel{min-width:0}
+.preview-sticky{top:20px}
+@media(max-width:1100px){.compact-workspace{grid-template-columns:1fr}.approval-overview-head{grid-template-columns:1fr}.preview-sticky{position:relative;top:auto}}
+@media(max-width:760px){.approval-overview-head{display:grid}.approval-chip{min-width:54px}.main-active-editors .active-role-grid{grid-template-columns:1fr 1fr}.step-buttons{width:100%}.step-buttons button{flex:1}}
+
+/* v2.37 — match physical coaster lettering. */
+.band-side{font-family:"Copperplate Gothic Bold","Copperplate Gothic",Copperplate,serif;font-weight:400}
+
+
+/* v2.45 — keep the local House Divided Color Lab geometrically identical
+   to the customer-facing House Divided builder preview. */
+.coaster{
+  border:10px solid #c7c9cc;
+  background:#111317;
+  box-shadow:0 0 0 2px rgba(17,19,23,.7),0 25px 45px rgba(0,0,0,.4);
+}
+.r1{inset:3.9%;border:2px solid #34383e}
+.r2{display:none}
+.field{left:4.9%;right:4.9%}
+.field-one{top:4.9%;height:45.1%}
+.field-two{bottom:4.9%;height:45.1%}
+.logo{width:68%;height:31%}
+.logo-one{top:5.7%}
+.logo-two{bottom:4.8%}
+.center-band{
+  left:4.8%;right:4.8%;height:18.4%;
+  grid-template-columns:minmax(0,1fr) 16% minmax(0,1fr);
+  border-top:3px solid #111317;border-bottom:3px solid #111317;
+}
+.band-side{
+  padding-inline:3px;
+  font-family:"Copperplate Gothic Bold","Copperplate Gothic",Copperplate,serif;
+  font-size:2.05rem;
+  font-weight:700;
+  line-height:.92;
+  letter-spacing:.01em;
+  -webkit-text-stroke:.28px currentColor;
+  paint-order:stroke fill;
+}
+.split-house:before{left:9%;right:9%;top:10%;bottom:11%}
+.split-house span{left:13%;right:13%;top:15%;bottom:16%}
+.split-house i{top:15%;bottom:16%;width:3px}
+
+
+/* v2.47 — House Divided Color Lab becomes the canonical calibration sandbox.
+   Use the same SVG/physical-region renderer as the customer builder; once approved,
+   this geometry and exported JSON can be promoted to the storefront. */
+.preview-matchup{margin:7px 0 0;font-size:1.08rem}
+.lab-hd-coaster{
+  --one-field:#f26a21;--two-field:#2447b8;
+  --one-band:#2447b8;--two-band:#8d949b;
+  --one-text:#f5f5f2;--two-text:#f5f5f2;
+  --one-house:#f26a21;--two-house:#2447b8;
+  --frame-outer:#f5f5f2;--frame-inner:#111317;
+  width:min(100%,405px);display:block;margin:18px auto;
+  filter:drop-shadow(0 24px 30px rgba(0,0,0,.42));
+}
+.lab-hd-outer{fill:var(--frame-outer);stroke:none}
+.lab-hd-rim{fill:none;stroke:var(--frame-inner);stroke-width:22}
+.lab-hd-top-field{fill:var(--one-field)}
+.lab-hd-bottom-field{fill:var(--two-field)}
+.lab-hd-band-left{fill:var(--two-band)}
+.lab-hd-band-right{fill:var(--one-band)}
+.lab-hd-divider{stroke:#111317;stroke-width:5}
+#logo-one,#logo-two{pointer-events:none}
+.lab-hd-band-text{
+  dominant-baseline:middle;
+  font-family:"Copperplate Gothic Bold","Copperplate Gothic",Copperplate,serif;
+  font-size:82px;font-weight:700;letter-spacing:.2px;
+  paint-order:stroke fill;stroke-width:.8px;
+}
+.lab-hd-band-text-left{fill:var(--two-text);stroke:var(--two-text)}
+.lab-hd-band-text-right{fill:var(--one-text);stroke:var(--one-text)}
+.lab-hd-house-left{fill:var(--two-house);stroke:#111317;stroke-width:3;stroke-linejoin:round}
+.lab-hd-house-right{fill:var(--one-house);stroke:#111317;stroke-width:3;stroke-linejoin:round}
+.lab-hd-band-center-line{stroke:#111317;stroke-width:6;stroke-linecap:butt}
+@media(max-width:760px){.lab-hd-coaster{width:min(100%,390px)}.lab-hd-band-text{font-size:66px}}
+
+
+/* v2.51 — global structural ring controls for the House Divided Color Lab. */
+.frame-controls{
+  margin-top:18px;
+  display:grid;
+  grid-template-columns:minmax(0,1.2fr) minmax(420px,.8fr);
+  gap:28px;
+  align-items:center;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:18px 20px;
+}
+.frame-controls-copy>span{display:block;font-size:.68rem;font-weight:900;letter-spacing:.15em;color:#559edb;text-transform:uppercase}
+.frame-controls-copy h2{margin:5px 0 0;font-size:1.3rem}
+.frame-controls-copy p{margin:7px 0 0;color:var(--muted);font-size:.82rem;line-height:1.55;max-width:720px}
+.frame-control-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.frame-role{align-content:start}
+.frame-role label{color:#566278}
+.frame-select-wrap{margin-bottom:4px}
+.frame-role select{background:#fff;color:var(--ink);border-color:var(--line)}
+.frame-role .swatch{box-shadow:0 0 0 2px #fff}
+.frame-current{font-size:.74rem;font-weight:800;color:#5b6a7f}
+.frame-chip-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:4px}
+.frame-chip{display:flex;align-items:center;gap:8px;justify-content:flex-start;width:100%;padding:8px 9px;border:1px solid var(--line);border-radius:10px;background:#f7f9fb;color:#22314a;font:inherit;font-size:.74rem;font-weight:700;line-height:1.1;cursor:pointer;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease,transform .05s ease}
+.frame-chip:hover{border-color:#7aaee0;background:#fff}
+.frame-chip:active{transform:translateY(1px)}
+.frame-chip.is-active{border-color:#1677c4;background:#eef6ff;box-shadow:0 0 0 2px rgba(22,119,196,.12)}
+.frame-chip-dot{width:16px;height:16px;border-radius:50%;border:1px solid rgba(0,0,0,.2);flex:0 0 16px}
+.frame-chip-name{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:1180px){.frame-chip-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:900px){.frame-controls{grid-template-columns:1fr}.frame-control-grid{max-width:680px}}
+@media(max-width:560px){.frame-control-grid{grid-template-columns:1fr}}
+
+/* v2.56 — physical filament reference shown under internal color controls. */
+.filament-ref{margin-top:2px;font-size:.62rem;line-height:1.25;color:#607087;font-weight:750}
+.filament-ref.ordered{color:#8a6200}
+.filament-ref.missing{color:#a33b3b}
+.filament-ref.substitute{color:#7b5b22}
+
+
+/* v2.58 — optional whole-logo silhouette outline for House Divided production matching. */
+.logo-outline-role{border:1px dashed #b9c5d3;border-radius:12px;padding:10px;background:#f5f7fa;grid-column:1/-1}
+.logo-outline-role.is-enabled{border-style:solid;border-color:#7fa9ce;background:#f2f8fd}
+.outline-toggle{display:flex!important;align-items:center;gap:7px;text-transform:none!important;letter-spacing:0!important;font-size:.72rem!important;color:#3f5067!important}
+.outline-toggle input{width:17px;height:17px;accent-color:#1677c4}
+.logo-outline-role select:disabled{opacity:.52;cursor:not-allowed}
+.main-active-editors .logo-outline-role{background:#f5f7fa;border-color:#d5dde7}
+.main-active-editors .logo-outline-role.is-enabled{background:#f2f8fd;border-color:#7fa9ce}
+.lab-hd-team-logo-outline{opacity:0;pointer-events:none}
+.lab-hd-team-logo-outline.is-visible{opacity:1}

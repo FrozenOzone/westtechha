@@ -2,9 +2,15 @@
   'use strict';
 
   // Edit navigation here once, and every page updates.
+  // Nested sections can set data-site-root on <html> (for example ../ from /coasters/).
+  const siteRoot = document.documentElement.dataset.siteRoot || '';
+  const siteSection = document.documentElement.dataset.siteSection || '';
+  const siteHref = (href) => `${siteRoot}${href}`;
+
   const primaryLinks = [
     { href: 'index.html',    label: 'Home' },
-    { href: 'products.html', label: 'Products', productMenu: true },
+    { href: 'products.html', label: 'Enclosures', productMenu: true },
+    { href: 'coasters/index.html', label: 'Coasters', section: 'coasters', coasterMenu: true },
     { href: 'services.html', label: 'Services' },
     { href: 'quote.html',    label: 'Quote' },
     { href: 'support.html',  label: 'Support' },
@@ -20,6 +26,14 @@
     { href: 'product-command.html', label: 'Command Overview', note: 'Compare Command options', type: 'overview' },
     { href: 'product-command-core.html', label: 'Command Core', note: 'Command base platform', type: 'child' },
     { href: 'product-command-gp.html', label: 'Command-GP', note: 'Garage Panel path', type: 'child' }
+  ];
+
+  const coasterLinks = [
+    { href: 'coasters/index.html', label: 'Coasters Home', note: 'Explore the coaster collection', type: 'overview' },
+    { href: 'coasters/house-divided.html', label: 'House Divided', note: 'Two teams. One coaster.', type: 'child' },
+    { href: 'coasters/index.html#team', label: 'Your Team', note: 'Single-team designs', type: 'child' },
+    { href: 'coasters/index.html#custom', label: 'Custom', note: 'Personal and one-off designs', type: 'child' },
+    { href: 'coasters/index.html#holders', label: 'Sets & Holders', note: 'Matching display and storage', type: 'child' }
   ];
 
   const footerLinks = [
@@ -54,6 +68,7 @@
   }
 
   const currentPage = normalizePageName(window.location.pathname || '');
+  const sharedCompanyPages = new Set(['index', 'services', 'quote', 'support', 'cart', 'contact']);
 
   function isProductSectionPage() {
     return currentPage === 'products' ||
@@ -68,7 +83,7 @@
     const items = productLinks.map(item => {
       const itemType = item.type === 'child' ? 'product-nav-child' : 'product-nav-overview';
       return `
-            <a class="${itemType}" href="${item.href}">
+            <a class="${itemType}" href="${siteHref(item.href)}">
               <span>${item.label}</span>
               <small>${item.note}</small>
             </a>`;
@@ -76,8 +91,30 @@
 
     return `
           <div class="nav-product-menu-wrap has-product-menu">
-            <a class="${classes}" href="products.html" aria-haspopup="true" aria-expanded="false"${aria}>Products</a>
-            <div class="product-nav-menu" aria-label="Product navigation">
+            <a class="${classes}" href="${siteHref('products.html')}" aria-haspopup="true" aria-expanded="false"${aria}>Enclosures</a>
+            <div class="product-nav-menu" aria-label="Enclosure navigation">
+${items}
+            </div>
+          </div>`;
+  }
+
+  function coasterMenuHtml(className = 'nav-link') {
+    const isActive = siteSection === 'coasters';
+    const classes = className + ' product-menu-trigger' + (isActive ? ' active' : '');
+    const aria = isActive ? ' aria-current="page"' : '';
+    const items = coasterLinks.map(item => {
+      const itemType = item.type === 'child' ? 'product-nav-child' : 'product-nav-overview';
+      return `
+            <a class="${itemType}" href="${siteHref(item.href)}">
+              <span>${item.label}</span>
+              <small>${item.note}</small>
+            </a>`;
+    }).join('');
+
+    return `
+          <div class="nav-product-menu-wrap has-product-menu">
+            <a class="${classes}" href="${siteHref('coasters/index.html')}" aria-haspopup="true" aria-expanded="false"${aria}>Coasters</a>
+            <div class="product-nav-menu" aria-label="Coaster navigation">
 ${items}
             </div>
           </div>`;
@@ -87,25 +124,34 @@ ${items}
     if (link.productMenu && className === 'nav-link') {
       return productMenuHtml(className);
     }
+    if (link.coasterMenu && className === 'nav-link') {
+      return coasterMenuHtml(className);
+    }
 
     const linkPage = normalizePageName(link.href);
-    const isActive = currentPage === linkPage;
+    let isActive = link.section
+      ? siteSection === link.section
+      : currentPage === linkPage;
+
+    // /coasters/index.html is also named index, so do not mark Home active there.
+    if (link.href === 'index.html' && siteSection) isActive = false;
+
     const classes = className + (isActive ? ' active' : '');
     const aria = isActive ? ' aria-current="page"' : '';
     if (link.cartLink && className === 'nav-link') {
-      return `<a class="${classes} nav-cart-link" href="${link.href}"${aria}>${link.label}<span class="nav-cart-count" data-cart-count hidden>0</span></a>`;
+      return `<a class="${classes} nav-cart-link" href="${siteHref(link.href)}"${aria}>${link.label}<span class="nav-cart-count" data-cart-count hidden>0</span></a>`;
     }
-    return `<a class="${classes}" href="${link.href}"${aria}>${link.label}</a>`;
+    return `<a class="${classes}" href="${siteHref(link.href)}"${aria}>${link.label}</a>`;
   }
 
   const headerHtml = `
     <nav class="nav nav-stack" aria-label="Primary navigation">
       <div class="nav-brand-wrap">
-        <a class="nav-brand" href="index.html" aria-label="WestTech Home Automation home">
+        <a class="nav-brand" href="${siteHref('index.html')}" aria-label="WestTech Home Automation home">
           <img
             class="nav-logo nav-logo-full"
-            src="images/WestTech_Logo_Blue.png"
-            alt="WestTech Home Automation – IoT & Computing Solutions logo"
+            src="${siteHref('images/WestTech_Logo_BuiltSmart_MadeCustom.svg')}"
+            alt="WestTech Home Automation – Built Smart, Made Custom"
           />
         </a>
       </div>
@@ -125,7 +171,7 @@ ${items}
       <div class="nav-menu" id="site-primary-menu">
         <div class="badge badge-nav">
           <span></span>
-          SCOUT • RANGER • COMMAND
+          ${siteSection === 'coasters' ? 'CUSTOM COASTERS • CREATIVE DESIGNS' : (isProductSectionPage() ? 'ESP32 ENCLOSURES' : (sharedCompanyPages.has(currentPage) ? 'ESP32 ENCLOSURES • CUSTOM COASTERS' : 'SCOUT • RANGER • COMMAND'))}
         </div>
 
         <div class="nav-links nav-primary">
@@ -143,8 +189,8 @@ ${items}
             ${footerLinks.map(link => linkHtml(link, 'footer-link')).join('')}
           </div>
         </div>
-        <p class="footer-legal">WestTech Home Automation, LLC enclosure designs, digital files, product photos, and website content are original proprietary works. Unauthorized copying or redistribution is strictly prohibited!</p>
-        <p class="footer-meta footer-meta-pro">© 2026 WestTech Home Automation, LLC · Veteran Owned · Built for Installers and DIYers</p>
+        <p class="footer-legal">WestTech Home Automation, LLC product designs, digital files, product photos, and website content are original proprietary works. Unauthorized copying or redistribution is strictly prohibited!</p>
+        <p class="footer-meta footer-meta-pro">© 2026 WestTech Home Automation, LLC · Veteran Owned · Built Smart · Made Custom</p>
       </div>
     </footer>
   `;

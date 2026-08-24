@@ -1,0 +1,1201 @@
+.house-divided-page{
+  --hd-blue:#1677c4;
+  --hd-dark:#101827;
+  --hd-paper:#f6f1e8;
+  --hd-ink:#142036;
+  --hd-muted:rgba(20,32,54,.66);
+  --hd-line:rgba(20,32,54,.14);
+  --hd-orange:#e36b25;
+}
+
+.hd-main{overflow:hidden;padding-bottom:0;}
+.hd-hero{
+  width:min(1380px,calc(100% - 40px));
+  margin:24px auto 0;
+  min-height:680px;
+  display:grid;
+  grid-template-columns:minmax(0,.92fr) minmax(520px,1.08fr);
+  border-radius:38px;
+  overflow:hidden;
+  background:var(--hd-paper);
+  color:var(--hd-ink);
+  box-shadow:0 26px 70px rgba(15,23,42,.12);
+}
+.hd-hero-copy{padding:76px 66px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;}
+.hd-hero h1{margin:18px 0 0;font-size:clamp(4.3rem,7vw,7.7rem);line-height:.84;letter-spacing:-.07em;font-weight:950;max-width:8ch;}
+.hd-hero h1 em{font-style:normal;color:var(--hd-blue);}
+.hd-hero-copy>p{max-width:620px;margin:30px 0 0;font-size:1.08rem;line-height:1.82;color:var(--hd-muted);}
+.hd-hero-copy .coaster-btn{margin-top:30px;}
+.hd-hero-art{min-height:680px;background:#101827;position:relative;display:grid;place-items:center;overflow:hidden;}
+.hd-hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:42px 42px;}
+.hd-hero-art::before,.hd-hero-art::after{content:"";position:absolute;border-radius:50%;filter:blur(1px);}
+.hd-hero-art::before{width:420px;height:420px;background:rgba(22,119,196,.24);top:-100px;right:-80px;}
+.hd-hero-art::after{width:320px;height:320px;background:rgba(227,107,37,.18);bottom:-80px;left:-60px;}
+.hd-hero-disc{width:min(66%,470px);aspect-ratio:1;border-radius:50%;position:relative;overflow:hidden;border:9px solid #f4eee5;box-shadow:0 46px 80px rgba(0,0,0,.48),inset 0 0 0 2px rgba(0,0,0,.16);transform:rotate(-6deg);z-index:3;}
+.hd-hero-half{position:absolute;inset:-5%;}.hd-hero-half-a{background:#1677c4;clip-path:polygon(0 0,100% 0,0 100%)}.hd-hero-half-b{background:#4e806a;clip-path:polygon(100% 0,100% 100%,0 100%)}
+.hd-hero-ring{position:absolute;inset:8%;border:4px solid rgba(255,255,255,.92);border-radius:50%;z-index:4;}
+.hd-hero-divider{position:absolute;left:49%;top:-10%;width:8px;height:120%;background:#fff;transform:rotate(45deg);z-index:5;box-shadow:0 0 0 2px rgba(16,24,39,.08);}
+.hd-hero-mark{position:absolute;z-index:6;width:88px;height:88px;border:4px solid #fff;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:2.7rem;font-weight:950;letter-spacing:-.06em;background:rgba(16,24,39,.18);backdrop-filter:blur(2px);}
+.hd-hero-mark-a{left:18%;top:18%;}.hd-hero-mark-b{right:16%;bottom:18%;}
+.hd-hero-name{position:absolute;z-index:6;color:#fff;font-size:.74rem;font-weight:950;letter-spacing:.16em;}.hd-hero-name-a{left:15%;bottom:31%;}.hd-hero-name-b{right:13%;top:31%;}
+.hd-hero-stamp{position:absolute;left:28px;bottom:24px;z-index:6;color:#fff;display:grid;gap:4px}.hd-hero-stamp strong{font-size:.72rem;letter-spacing:.17em}.hd-hero-stamp span{font-size:.8rem;color:rgba(255,255,255,.55)}
+
+.hd-builder-shell{width:min(1280px,calc(100% - 40px));margin:118px auto 0;}
+.hd-builder-head{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1fr);gap:70px;align-items:end;padding-bottom:34px;border-bottom:1px solid var(--hd-line);}
+.hd-builder-head h2,.hd-info-grid h2,.hd-how h2{margin:12px 0 0;font-size:clamp(3.1rem,5.2vw,5.5rem);line-height:.9;letter-spacing:-.06em;font-weight:950;color:var(--hd-ink);}
+.hd-builder-head>p{margin:0;color:var(--hd-muted);font-size:1.02rem;line-height:1.82;max-width:650px;}
+.hd-builder-grid{display:grid;grid-template-columns:minmax(0,1.38fr) minmax(360px,.62fr);gap:44px;margin-top:42px;align-items:start;}
+.hd-controls{display:grid;gap:20px;}
+.hd-step{display:grid;grid-template-columns:72px minmax(0,1fr);border:1px solid var(--hd-line);border-radius:28px;background:rgba(255,255,255,.7);overflow:hidden;box-shadow:0 18px 50px rgba(15,23,42,.055);}
+.hd-step-number{padding:30px 16px;border-right:1px solid var(--hd-line);font-size:1.1rem;font-weight:950;letter-spacing:.08em;color:var(--hd-blue);text-align:center;background:rgba(22,119,196,.035);}
+.hd-step-body{padding:30px;min-width:0;}
+.hd-step-title-row{display:flex;gap:20px;align-items:flex-start;justify-content:space-between;}
+.hd-step-label{display:block;font-size:.68rem;letter-spacing:.17em;text-transform:uppercase;font-weight:950;color:var(--hd-blue);}
+.hd-step h3{margin:6px 0 0;font-size:1.65rem;letter-spacing:-.035em;color:var(--hd-ink);}
+.hd-step-status{display:inline-flex;padding:7px 10px;border-radius:999px;border:1px solid var(--hd-line);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;font-weight:900;color:var(--hd-muted);white-space:nowrap;}.hd-step-status-ready{background:rgba(22,119,196,.08);color:var(--hd-blue);border-color:rgba(22,119,196,.18)}
+.hd-sport-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:24px;}
+.hd-sport-option{appearance:none;border:1px solid var(--hd-line);border-radius:18px;background:#fff;min-height:112px;padding:15px;text-align:left;display:grid;align-content:start;gap:4px;cursor:pointer;color:var(--hd-ink);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;}
+.hd-sport-option:hover{transform:translateY(-2px);border-color:rgba(22,119,196,.34);box-shadow:0 10px 24px rgba(15,23,42,.08)}
+.hd-sport-option.is-selected{border:2px solid var(--hd-blue);background:rgba(22,119,196,.055);box-shadow:0 12px 28px rgba(22,119,196,.12);padding:14px;}
+.hd-sport-option.is-planned{opacity:.64;}.hd-sport-option.is-planned:hover{opacity:.9;}
+.hd-sport-code{font-size:.67rem;letter-spacing:.14em;font-weight:950;color:var(--hd-blue);}.hd-sport-option strong{font-size:.96rem}.hd-sport-option small{color:var(--hd-muted);font-size:.72rem}
+.hd-sport-note{margin:16px 0 0;padding:12px 14px;border-radius:14px;background:rgba(20,32,54,.035);font-size:.82rem;line-height:1.55;color:var(--hd-muted);}
+
+.hd-side-grid{display:grid;grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr);gap:12px;align-items:stretch;margin-top:25px;}
+.hd-side-card{min-height:270px;border:1px solid var(--hd-line);border-radius:22px;padding:20px;background:#fff;display:flex;flex-direction:column;align-items:flex-start;}
+.hd-side-card-head{width:100%;display:flex;justify-content:space-between;gap:10px;align-items:center;padding-bottom:14px;border-bottom:1px solid var(--hd-line);}.hd-side-card-head span{font-size:.68rem;letter-spacing:.15em;font-weight:950;color:var(--hd-blue)}.hd-side-card-head small{font-size:.68rem;color:var(--hd-muted)}
+.hd-side-team-mark{width:64px;height:64px;margin-top:20px;border-radius:50%;display:grid;place-items:center;background:var(--team-primary,#1677c4);color:var(--team-secondary,#fff);border:4px solid var(--team-secondary,#fff);box-shadow:0 0 0 1px var(--hd-line),0 10px 24px rgba(15,23,42,.12);font-size:1.25rem;font-weight:950;letter-spacing:-.04em;}
+.hd-side-card h4{margin:17px 0 0;font-size:1.25rem;letter-spacing:-.03em;color:var(--hd-ink)}.hd-side-card p{margin:5px 0 18px;font-size:.78rem;color:var(--hd-muted)}
+.hd-choose-btn{margin-top:auto;width:100%;border:1px solid var(--hd-line);border-radius:13px;background:#f8fafc;color:var(--hd-ink);padding:11px 14px;font:inherit;font-size:.78rem;font-weight:900;cursor:pointer;transition:.18s ease}.hd-choose-btn:hover{border-color:var(--hd-blue);color:var(--hd-blue);background:#fff}
+.hd-versus{display:grid;place-items:center}.hd-versus span{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--hd-dark);color:#fff;font-size:.7rem;font-weight:950;letter-spacing:.09em;box-shadow:0 8px 20px rgba(15,23,42,.15)}
+.hd-swap-btn{border:0;background:transparent;color:var(--hd-blue);font:inherit;font-size:.76rem;font-weight:900;cursor:pointer;padding:8px 4px}.hd-swap-btn span{font-size:1rem;margin-right:5px}.hd-swap-btn:hover{text-decoration:underline}
+
+.hd-team-picker{margin-top:22px;border:1px solid rgba(22,119,196,.22);border-radius:22px;background:#f8fbfe;padding:20px;}
+.hd-picker-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}.hd-picker-head h4{margin:4px 0 0;font-size:1.35rem;color:var(--hd-ink)}
+.hd-picker-close{width:34px;height:34px;border:1px solid var(--hd-line);border-radius:50%;background:#fff;cursor:pointer;font-size:1.35rem;line-height:1;color:var(--hd-muted)}
+.hd-team-search{display:grid;gap:7px;margin-top:18px}.hd-team-search span,.hd-custom-form label>span{font-size:.69rem;letter-spacing:.07em;text-transform:uppercase;font-weight:900;color:var(--hd-muted)}
+.hd-team-search input,.hd-custom-form input[type="text"],.hd-custom-form textarea{width:100%;box-sizing:border-box;border:1px solid var(--hd-line);border-radius:12px;background:#fff;color:var(--hd-ink);font:inherit;padding:12px 14px;outline:none}.hd-team-search input:focus,.hd-custom-form input[type="text"]:focus,.hd-custom-form textarea:focus{border-color:var(--hd-blue);box-shadow:0 0 0 3px rgba(22,119,196,.08)}
+.hd-team-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:16px;max-height:430px;overflow:auto;padding-right:3px;}
+.hd-team-option{appearance:none;border:1px solid var(--hd-line);border-radius:14px;background:#fff;padding:11px;text-align:left;display:grid;grid-template-columns:36px minmax(0,1fr);gap:9px;align-items:center;color:var(--hd-ink);cursor:pointer;min-height:62px;transition:.16s ease}.hd-team-option:hover,.hd-team-option:focus-visible{border-color:var(--hd-blue);transform:translateY(-1px);box-shadow:0 8px 18px rgba(15,23,42,.07)}
+.hd-team-option-mark{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--team-primary);color:var(--team-secondary);border:2px solid var(--team-secondary);font-size:.65rem;font-weight:950;box-shadow:0 0 0 1px rgba(15,23,42,.09)}.hd-team-option strong{font-size:.78rem;line-height:1.2}.hd-team-option small{display:block;margin-top:2px;font-size:.65rem;color:var(--hd-muted)}
+.hd-team-option-custom{border-style:dashed;border-color:rgba(22,119,196,.42);background:rgba(22,119,196,.04)}.hd-team-option-custom .hd-team-option-mark{background:var(--hd-blue);color:#fff;border-color:#fff;font-size:1rem}
+.hd-team-empty{grid-column:1/-1;padding:24px;text-align:center;color:var(--hd-muted);font-size:.85rem;}
+
+.hd-custom-intro{margin:18px 0 0;color:var(--hd-muted);line-height:1.7;font-size:.9rem}.hd-custom-form{display:grid;gap:15px;margin-top:22px}.hd-custom-form label{display:grid;gap:7px}.hd-color-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.hd-custom-form input[type="color"]{width:100%;height:48px;border:1px solid var(--hd-line);border-radius:12px;background:#fff;padding:5px;cursor:pointer}.hd-custom-form input[type="file"]{font:inherit;font-size:.76rem;color:var(--hd-muted)}.hd-custom-form textarea{resize:vertical;min-height:92px}.hd-custom-actions{display:flex;align-items:center;gap:16px;margin-top:22px}.hd-text-button{border:0;background:transparent;color:var(--hd-blue);font:inherit;font-size:.78rem;font-weight:900;cursor:pointer;padding:8px}.hd-text-button:hover{text-decoration:underline}
+
+.hd-preview-panel{position:relative;}.hd-preview-sticky{position:sticky;top:calc(var(--site-header-offset,120px) + 24px);border-radius:30px;background:#101827;color:#fff;padding:24px;box-shadow:0 28px 64px rgba(15,23,42,.22);overflow:hidden}.hd-preview-sticky::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 90% 0,rgba(22,119,196,.26),transparent 35%),linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:auto,34px 34px,34px 34px;pointer-events:none}.hd-preview-label{position:relative;display:flex;justify-content:space-between;gap:16px;align-items:center;font-size:.62rem;letter-spacing:.12em;font-weight:950;color:rgba(255,255,255,.58)}.hd-preview-label b{color:#fff}
+.hd-preview-disc{--side-one-primary:#0a2342;--side-one-secondary:#fc4c02;--side-two-primary:#004c54;--side-two-secondary:#a5acaf;width:min(92%,410px);aspect-ratio:1;border-radius:50%;margin:30px auto 22px;position:relative;overflow:hidden;border:7px solid #f5efe6;box-shadow:0 36px 58px rgba(0,0,0,.42);transform:rotate(-4deg)}
+.hd-preview-half{position:absolute;inset:-5%}.hd-preview-half-one{background:var(--side-one-primary);clip-path:polygon(0 0,100% 0,0 100%)}.hd-preview-half-two{background:var(--side-two-primary);clip-path:polygon(100% 0,100% 100%,0 100%)}.hd-preview-ring{position:absolute;inset:8%;border:3px solid rgba(255,255,255,.94);border-radius:50%;z-index:3}.hd-preview-divider{position:absolute;left:49%;top:-12%;height:124%;width:7px;background:#fff;transform:rotate(45deg);z-index:4;box-shadow:0 0 0 1px rgba(0,0,0,.08)}
+.hd-preview-emblem{position:absolute;z-index:5;width:68px;height:68px;border-radius:50%;display:grid;place-items:center;font-size:1.35rem;font-weight:950;letter-spacing:-.04em;background:rgba(16,24,39,.2);backdrop-filter:blur(2px);box-shadow:0 8px 18px rgba(0,0,0,.15)}.hd-preview-emblem-one{left:17%;top:18%;color:var(--side-one-secondary);border:4px solid var(--side-one-secondary)}.hd-preview-emblem-two{right:15%;bottom:17%;color:var(--side-two-secondary);border:4px solid var(--side-two-secondary)}
+.hd-preview-team{position:absolute;z-index:5;font-size:.62rem;letter-spacing:.12em;font-weight:950;color:#fff;max-width:42%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hd-preview-team-one{left:13%;bottom:31%}.hd-preview-team-two{right:11%;top:31%;text-align:right}
+.hd-preview-summary{position:relative;padding-top:20px;border-top:1px solid rgba(255,255,255,.12)}.hd-preview-summary>span{font-size:.62rem;letter-spacing:.16em;font-weight:950;color:rgba(255,255,255,.52)}.hd-preview-summary h3{margin:8px 0 0;font-size:1.3rem;line-height:1.25;letter-spacing:-.03em}.hd-preview-summary p{margin:6px 0 0;font-size:.78rem;color:rgba(255,255,255,.6)}
+.hd-preview-actions{position:relative;display:grid;gap:6px;margin-top:20px}.hd-preview-actions .coaster-btn{width:100%;box-sizing:border-box;text-align:center;justify-content:center}.hd-preview-actions .hd-text-button{color:rgba(255,255,255,.72)}.hd-build-message{position:relative;margin-top:12px;padding:12px 13px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);font-size:.78rem;line-height:1.55;color:rgba(255,255,255,.82)}.hd-preview-footnote{position:relative;margin:13px 0 0;font-size:.68rem;line-height:1.5;color:rgba(255,255,255,.42)}
+
+.hd-info-grid{width:min(1240px,calc(100% - 40px));margin:110px auto 0;display:grid;grid-template-columns:1fr 1fr;gap:18px}.hd-info-grid article{border-radius:28px;padding:44px;background:#fff;border:1px solid var(--hd-line);box-shadow:0 16px 42px rgba(15,23,42,.055)}.hd-info-grid h2{font-size:clamp(2.4rem,4vw,4.1rem);max-width:10ch}.hd-info-grid p{margin:22px 0 0;color:var(--hd-muted);font-size:.97rem;line-height:1.75;max-width:560px}
+.hd-how{width:min(1380px,calc(100% - 40px));margin:110px auto 0;border-radius:36px;background:#101827;color:#fff;padding:62px;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:70px;align-items:end;box-shadow:0 26px 66px rgba(15,23,42,.2)}.hd-how h2{color:#fff}.hd-how-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}.hd-how-steps div{padding-top:18px;border-top:2px solid rgba(255,255,255,.2);display:grid;gap:8px}.hd-how-steps b{font-size:.7rem;letter-spacing:.13em;color:#7cc7ff}.hd-how-steps strong{font-size:.98rem}.hd-how-steps span{font-size:.78rem;line-height:1.6;color:rgba(255,255,255,.56)}
+.hd-final-cta{margin-top:110px;}
+
+@media(max-width:1120px){
+  .hd-hero{grid-template-columns:1fr}.hd-hero-art{min-height:620px}.hd-hero-copy{padding:64px 55px 52px}.hd-builder-grid{grid-template-columns:1fr}.hd-preview-sticky{position:relative;top:auto}.hd-preview-disc{width:min(70%,430px)}.hd-how{grid-template-columns:1fr}.hd-how-steps{max-width:900px}
+}
+@media(max-width:860px){
+  .hd-builder-head,.hd-info-grid{grid-template-columns:1fr;gap:28px}.hd-sport-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hd-team-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hd-how-steps{grid-template-columns:1fr 1fr 1fr}
+}
+@media(max-width:700px){
+  .hd-hero,.hd-how,.hd-final-cta{width:calc(100% - 20px);border-radius:26px}.hd-hero{margin-top:10px}.hd-hero-copy{padding:48px 24px 38px}.hd-hero h1{font-size:clamp(3.7rem,16vw,5.4rem)}.hd-hero-art{min-height:500px}.hd-hero-disc{width:72%}.hd-hero-mark{width:64px;height:64px;font-size:1.9rem}.hd-builder-shell,.hd-info-grid{width:calc(100% - 28px);margin-top:78px}.hd-builder-head{padding-bottom:24px}.hd-builder-grid{margin-top:28px}.hd-step{grid-template-columns:1fr}.hd-step-number{display:none}.hd-step-body{padding:22px}.hd-step-title-row{align-items:flex-start}.hd-side-grid{grid-template-columns:1fr}.hd-versus{height:36px}.hd-versus span{width:36px;height:36px}.hd-side-card{min-height:230px}.hd-team-grid{grid-template-columns:1fr}.hd-preview-disc{width:min(88%,390px)}.hd-info-grid article{padding:30px}.hd-how{margin-top:78px;padding:45px 24px}.hd-how-steps{grid-template-columns:1fr}.hd-final-cta{margin-top:78px}
+}
+@media(max-width:480px){
+  .hd-sport-grid{grid-template-columns:1fr 1fr}.hd-sport-option{min-height:100px}.hd-side-card-head{align-items:flex-start}.hd-color-fields{grid-template-columns:1fr}.hd-custom-actions{display:grid}.hd-custom-actions .coaster-btn{width:100%}.hd-preview-disc{width:94%}.hd-preview-emblem{width:54px;height:54px;font-size:1rem}.hd-preview-team{font-size:.55rem}.hd-hero-art{min-height:420px}.hd-hero-disc{width:78%}.hd-hero-stamp{display:none}
+}
+
+/* v2.7 — standardized WestTech House Divided visual system */
+.hd-hero-photo{
+  min-height:680px;
+  background:#111827;
+  position:relative;
+  display:block;
+  overflow:hidden;
+  margin:0;
+}
+.hd-hero-photo::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,transparent 58%,rgba(10,15,25,.76) 100%);
+  pointer-events:none;
+}
+.hd-hero-photo img{
+  width:100%;
+  height:100%;
+  min-height:680px;
+  object-fit:cover;
+  object-position:center;
+  display:block;
+}
+.hd-hero-photo figcaption{
+  position:absolute;
+  left:30px;
+  right:30px;
+  bottom:26px;
+  z-index:2;
+  color:#fff;
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:18px;
+  text-shadow:0 2px 14px rgba(0,0,0,.55);
+}
+.hd-hero-photo figcaption strong{
+  font-size:.72rem;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+}
+.hd-hero-photo figcaption span{
+  font-size:.78rem;
+  color:rgba(255,255,255,.78);
+}
+
+.hd-preview-disc{
+  --side-one-primary:#fb4f14;
+  --side-one-secondary:#002244;
+  --side-two-primary:#003594;
+  --side-two-secondary:#869397;
+  width:min(94%,430px);
+  aspect-ratio:1;
+  border-radius:50%;
+  margin:28px auto 18px;
+  position:relative;
+  overflow:hidden;
+  border:8px solid #11151d;
+  background:#11151d;
+  box-shadow:0 36px 58px rgba(0,0,0,.44),0 0 0 3px rgba(255,255,255,.85);
+  transform:none;
+}
+.hd-preview-rim{position:absolute;border-radius:50%;pointer-events:none;z-index:8}
+.hd-preview-rim-outer{inset:1.8%;border:4px solid #f3f4f6}
+.hd-preview-rim-inner{inset:5%;border:2px solid #11151d;box-shadow:0 0 0 2px rgba(255,255,255,.8)}
+.hd-preview-field{position:absolute;left:5.6%;right:5.6%;z-index:1}
+.hd-preview-field-one{top:5.6%;height:44.4%;background:var(--side-one-primary)}
+.hd-preview-field-two{bottom:5.6%;height:44.4%;background:var(--side-two-primary)}
+
+.hd-preview-icon{
+  position:absolute;
+  z-index:4;
+  left:50%;
+  transform:translateX(-50%);
+  width:50%;
+  min-height:24%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  line-height:1;
+}
+.hd-preview-icon-one{top:11%;color:var(--side-one-secondary)}
+.hd-preview-icon-two{bottom:10%;color:var(--side-two-secondary)}
+.hd-preview-icon-mark{
+  display:block;
+  font-size:clamp(2.35rem,6vw,4.4rem);
+  font-weight:1000;
+  letter-spacing:-.08em;
+  text-shadow:0 1px 0 rgba(255,255,255,.14);
+}
+.hd-preview-icon small{
+  margin-top:7px;
+  font-size:.46rem;
+  letter-spacing:.2em;
+  font-weight:950;
+  opacity:.78;
+}
+
+.hd-preview-band{
+  position:absolute;
+  left:5.4%;
+  right:5.4%;
+  top:50%;
+  transform:translateY(-50%);
+  height:24%;
+  z-index:7;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 18% minmax(0,1fr);
+  border-top:4px solid #11151d;
+  border-bottom:4px solid #11151d;
+  box-shadow:0 1px 0 rgba(255,255,255,.2) inset;
+}
+.hd-preview-band-side{display:grid;place-items:center;overflow:hidden}
+.hd-preview-band-left{background:var(--side-two-secondary);color:var(--side-two-primary)}
+.hd-preview-band-right{background:var(--side-two-primary);color:var(--side-one-primary)}
+.hd-preview-band-side span{
+  font-size:clamp(1rem,3.4vw,1.95rem);
+  font-weight:1000;
+  letter-spacing:.035em;
+  transform:scaleX(.88);
+  white-space:nowrap;
+}
+.hd-preview-house{
+  position:relative;
+  background:#f3f4f6;
+  border-left:3px solid #11151d;
+  border-right:3px solid #11151d;
+  overflow:hidden;
+}
+.hd-preview-house-left,.hd-preview-house-right{
+  position:absolute;
+  bottom:22%;
+  width:51%;
+  height:48%;
+}
+.hd-preview-house-left{
+  left:0;
+  background:var(--side-two-primary);
+  clip-path:polygon(0 38%,62% 0,100% 26%,100% 100%,0 100%);
+}
+.hd-preview-house-right{
+  right:0;
+  background:var(--side-one-primary);
+  clip-path:polygon(0 26%,38% 0,100% 38%,100% 100%,0 100%);
+}
+.hd-preview-house i{
+  position:absolute;
+  left:50%;
+  top:0;
+  bottom:0;
+  width:3px;
+  transform:translateX(-50%) rotate(2deg);
+  background:#11151d;
+  z-index:3;
+}
+.hd-preview-art-note{
+  position:relative;
+  margin:-1px 4px 18px;
+  color:rgba(255,255,255,.52);
+  font-size:.66rem;
+  line-height:1.55;
+  text-align:center;
+}
+
+@media(max-width:1120px){
+  .hd-hero-photo,.hd-hero-photo img{min-height:620px}
+}
+@media(max-width:700px){
+  .hd-hero-photo,.hd-hero-photo img{min-height:500px}
+  .hd-hero-photo figcaption{left:20px;right:20px;bottom:18px;display:grid;gap:4px}
+  .hd-preview-band-side span{font-size:clamp(.95rem,5.4vw,1.6rem)}
+}
+@media(max-width:480px){
+  .hd-hero-photo,.hd-hero-photo img{min-height:420px}
+  .hd-preview-disc{width:96%}
+  .hd-preview-icon-mark{font-size:clamp(2rem,12vw,3.7rem)}
+  .hd-preview-band{height:23%;grid-template-columns:minmax(0,1fr) 20% minmax(0,1fr)}
+  .hd-preview-band-side span{font-size:clamp(.82rem,5vw,1.25rem);letter-spacing:.02em}
+}
+
+
+/* v2.8 — team artwork assets + true split-house center mark */
+.hd-side-team-art{
+  --team-primary:#1677c4;
+  --team-secondary:#fff;
+  width:92px;
+  height:92px;
+  margin:18px 0 12px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  background:var(--team-primary);
+  border:4px solid color-mix(in srgb,var(--team-secondary) 75%,white 25%);
+  box-shadow:0 12px 28px rgba(15,23,42,.12);
+}
+.hd-side-team-art img{width:78%;height:78%;object-fit:contain;display:block}
+.hd-side-team-fallback{font-size:1.25rem;font-weight:1000;color:var(--team-secondary);letter-spacing:-.04em}
+.hd-side-color-row{display:flex;align-items:end;justify-content:space-between;gap:10px;margin:12px 0 14px;padding-top:11px;border-top:1px solid var(--hd-line)}
+.hd-side-color-row label{display:flex;align-items:center;gap:8px;font-size:.7rem;font-weight:850;color:var(--hd-muted)}
+.hd-side-color-row input[type=color]{width:34px;height:28px;border:1px solid var(--hd-line);border-radius:8px;padding:2px;background:#fff;cursor:pointer}
+.hd-side-color-reset{appearance:none;border:0;background:none;padding:5px 0;color:var(--hd-blue);font-size:.67rem;font-weight:900;cursor:pointer}
+.hd-side-color-reset:hover{text-decoration:underline}
+
+.hd-team-option-art{
+  width:56px;height:56px;border-radius:50%;overflow:hidden;display:grid;place-items:center;position:relative;flex:0 0 auto;
+  background:var(--team-primary);border:3px solid color-mix(in srgb,var(--team-secondary) 72%,white 28%);
+}
+.hd-team-option-art img{width:82%;height:82%;object-fit:contain;display:block}
+.hd-team-option-art b{font-size:.72rem;color:var(--team-secondary);font-weight:1000}
+
+.hd-preview-team-logo{
+  width:100%;height:100%;max-width:190px;max-height:126px;object-fit:contain;display:block;
+  filter:drop-shadow(0 4px 5px rgba(0,0,0,.12));
+}
+.hd-preview-icon-mark{font-size:clamp(2.2rem,6vw,4rem);font-weight:1000;letter-spacing:-.08em}
+.hd-preview-icon small{display:none}
+
+/* One house silhouette, split exactly down the middle: Side 2 on the left, Side 1 on the right. */
+.hd-preview-house{position:relative;background:#f3f4f6;border-left:3px solid #11151d;border-right:3px solid #11151d;overflow:hidden}
+.hd-preview-house::before{
+  content:"";position:absolute;left:11%;right:11%;top:15%;bottom:16%;background:#11151d;
+  clip-path:polygon(50% 0,100% 36%,100% 100%,0 100%,0 36%);z-index:1;
+}
+.hd-preview-house-shape{
+  position:absolute;left:15%;right:15%;top:20%;bottom:21%;
+  background:linear-gradient(90deg,var(--side-two-primary) 0 50%,var(--side-one-primary) 50% 100%);
+  clip-path:polygon(50% 0,100% 36%,100% 100%,0 100%,0 36%);z-index:2;
+}
+.hd-preview-house i{
+  position:absolute;left:50%;top:20%;bottom:21%;width:3px;transform:translateX(-50%);background:#11151d;z-index:3;
+}
+.hd-preview-house-left,.hd-preview-house-right{display:none!important}
+
+/* Each center-band half follows its corresponding team while the split house bridges both. */
+.hd-preview-band-left{background:var(--side-two-secondary);color:var(--side-two-primary)}
+.hd-preview-band-right{background:var(--side-one-secondary);color:var(--side-one-primary)}
+
+@media(max-width:700px){
+  .hd-side-team-art{width:80px;height:80px}
+  .hd-preview-team-logo{max-width:150px;max-height:105px}
+}
+
+/* v2.9 — center band flows around the split house; no white center box */
+.hd-preview-house{
+  background:linear-gradient(
+    90deg,
+    var(--side-two-secondary) 0 50%,
+    var(--side-one-secondary) 50% 100%
+  );
+  border-left:0;
+  border-right:0;
+  overflow:visible;
+}
+
+/* v2.10 — normalize wired SVG artwork presentation without changing the artwork. */
+.hd-preview-icon{
+  width:62%;
+  height:28%;
+  min-height:0;
+}
+.hd-preview-icon-one{top:8.5%}
+.hd-preview-icon-two{bottom:7.5%}
+.hd-preview-team-logo{
+  width:100%;
+  height:100%;
+  max-width:none;
+  max-height:none;
+  object-fit:contain;
+  object-position:center;
+}
+.hd-side-team-art img{width:84%;height:84%;object-fit:contain;object-position:center}
+.hd-team-option-art img{width:86%;height:86%;object-fit:contain;object-position:center}
+
+/* Do not let author display rules override the native hidden fallback state. */
+.hd-preview-team-logo[hidden],
+.hd-preview-icon-mark[hidden],
+.hd-side-team-art img[hidden],
+.hd-side-team-fallback[hidden],
+.hd-team-option-art img[hidden],
+.hd-team-option-art b[hidden]{display:none!important}
+
+@media(max-width:700px){
+  .hd-preview-icon{width:64%;height:27%}
+  .hd-preview-icon-one{top:9%}
+  .hd-preview-icon-two{bottom:8%}
+}
+
+
+/* v2.11 — standardized House Divided color rules.
+   Customers choose teams; WestTech owns all printable color decisions. */
+.hd-preview-band,
+.hd-preview-band-left,
+.hd-preview-band-right,
+.hd-preview-house{
+  background:#f7f7f4;
+}
+.hd-preview-band-left,
+.hd-preview-band-right{
+  color:#11151d;
+}
+/* The single house remains split vertically: Side 2 on the left, Side 1 on the right. */
+.hd-preview-house-shape{
+  background:linear-gradient(90deg,var(--side-two-primary) 0 50%,var(--side-one-primary) 50% 100%);
+}
+.hd-custom-color-note{
+  margin:12px 0 18px;
+  padding:12px 14px;
+  border:1px solid var(--hd-line);
+  border-radius:12px;
+  background:rgba(22,119,196,.055);
+  color:var(--hd-muted);
+  font-size:.78rem;
+  line-height:1.55;
+}
+.hd-custom-color-note strong{color:var(--hd-ink)}
+
+
+/* v2.12 — WestTech-managed per-team print roles. Customer never sees color controls. */
+.hd-preview-band-left{background:var(--side-two-secondary);color:var(--side-two-band-text,#fff)}
+.hd-preview-band-right{background:var(--side-one-secondary);color:var(--side-one-band-text,#fff)}
+.hd-preview-house{
+  background:linear-gradient(90deg,var(--side-two-secondary) 0 50%,var(--side-one-secondary) 50% 100%);
+}
+.hd-preview-house-shape{
+  background:linear-gradient(90deg,var(--side-two-house,var(--side-two-primary)) 0 50%,var(--side-one-house,var(--side-one-primary)) 50% 100%);
+}
+
+/* v2.17 — fit HOUSE / DIVIDED typography to the coaster, not the browser viewport.
+   Match the readable proportions proven in the NFL Color Lab. */
+.hd-preview-band-side{
+  padding-inline:6px;
+}
+.hd-preview-band-side span{
+  width:100%;
+  font-size:clamp(1rem,2.1vw,1.45rem);
+  line-height:1;
+  letter-spacing:.02em;
+  transform:none;
+  text-align:center;
+  white-space:nowrap;
+}
+@media(max-width:700px){
+  .hd-preview-band-side{padding-inline:4px}
+  .hd-preview-band-side span{
+    font-size:clamp(.9rem,4.1vw,1.25rem);
+    letter-spacing:.01em;
+  }
+}
+@media(max-width:480px){
+  .hd-preview-band-side span{
+    font-size:clamp(.82rem,4.3vw,1.08rem);
+  }
+}
+
+/* v2.21 — storefront UX cleanup: compact Step 01, focus Step 02, custom stays inside the team picker. */
+.hd-controls{gap:18px}
+.hd-sport-step{
+  grid-template-columns:48px minmax(0,1fr);
+  border-radius:22px;
+}
+.hd-sport-step .hd-step-number{
+  padding:18px 8px;
+  font-size:.9rem;
+}
+.hd-sport-step .hd-step-body{padding:18px 20px}
+.hd-sport-step .hd-step-title-row{align-items:center}
+.hd-sport-step h3{font-size:1.2rem;margin-top:3px}
+.hd-sport-step .hd-step-status{padding:5px 8px;font-size:.58rem}
+.hd-sport-grid{
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:7px;
+  margin-top:13px;
+}
+.hd-sport-option{
+  min-height:68px;
+  border-radius:13px;
+  padding:9px 10px;
+  gap:1px;
+}
+.hd-sport-option.is-selected{padding:8px 9px}
+.hd-sport-code{font-size:.57rem}
+.hd-sport-option strong{font-size:.78rem;line-height:1.15}
+.hd-sport-option small{font-size:.6rem;line-height:1.2}
+.hd-sport-note{
+  margin:10px 0 0;
+  padding:0;
+  background:transparent;
+  font-size:.72rem;
+  line-height:1.4;
+}
+
+/* Step 02 remains the primary working area but loses some dead space. */
+.hd-step:not(.hd-sport-step){grid-template-columns:54px minmax(0,1fr)}
+.hd-step:not(.hd-sport-step)>.hd-step-number{padding:24px 10px;font-size:1rem}
+.hd-step:not(.hd-sport-step)>.hd-step-body{padding:24px}
+.hd-side-grid{margin-top:20px}
+.hd-side-card{min-height:238px;padding:18px}
+.hd-side-team-art{width:78px;height:78px;margin:14px 0 8px}
+.hd-side-card h4{margin-top:12px}
+.hd-side-card p{margin-bottom:14px}
+
+/* Custom Team is an alternate choice inside the active team picker, not a third builder step. */
+.hd-custom-inline{
+  margin-top:16px;
+  padding:18px;
+  border:1px solid rgba(22,119,196,.2);
+  border-radius:16px;
+  background:#fff;
+}
+.hd-custom-inline-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+.hd-custom-inline-head h4{margin:4px 0 0;font-size:1.25rem;color:var(--hd-ink)}
+.hd-custom-inline .hd-custom-intro{margin:12px 0 16px;font-size:.8rem;line-height:1.55;color:var(--hd-muted)}
+.hd-custom-inline .hd-custom-form{margin-top:0}
+.hd-custom-inline .hd-custom-actions{margin-top:16px}
+
+.hd-how-steps-two{grid-template-columns:repeat(2,minmax(0,1fr));max-width:900px}
+
+@media(max-width:1180px){
+  .hd-sport-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:700px){
+  .hd-sport-step,.hd-step:not(.hd-sport-step){grid-template-columns:1fr}
+  .hd-sport-step .hd-step-number,.hd-step:not(.hd-sport-step)>.hd-step-number{display:none}
+  .hd-sport-step .hd-step-body{padding:16px}
+  .hd-sport-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hd-sport-option{min-height:62px}
+  .hd-how-steps-two{grid-template-columns:1fr}
+}
+
+/* v2.22 — integrated product-first builder. 01 + 02 live with the coaster instead of separate form blocks. */
+.hd-builder-integrated-shell{max-width:1120px;margin-left:auto;margin-right:auto}
+.hd-builder-head-integrated{margin-bottom:20px}
+.hd-builder-head-integrated p{max-width:560px}
+.hd-integrated-builder{
+  position:relative;
+  background:linear-gradient(145deg,#0b1525 0%,#101d31 58%,#0b1422 100%);
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:28px;
+  padding:24px clamp(18px,3vw,38px) 30px;
+  color:#fff;
+  box-shadow:0 30px 70px rgba(0,0,0,.28);
+  overflow:hidden;
+}
+.hd-integrated-builder:before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:38px 38px}
+.hd-integrated-builder>*{position:relative;z-index:1}
+.hd-integrated-step-label{display:flex;align-items:center;gap:11px;min-width:max-content}
+.hd-integrated-step-label>b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#1677c4;color:#fff;font-size:.78rem;letter-spacing:.05em}
+.hd-integrated-step-label span{display:grid;gap:1px}
+.hd-integrated-step-label small{font-size:.58rem;letter-spacing:.16em;font-weight:950;color:#79b9ee}
+.hd-integrated-step-label strong{font-size:.98rem;color:#fff}
+.hd-integrated-sport{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:18px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.12)}
+.hd-sport-grid-integrated{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}
+.hd-sport-grid-integrated .hd-sport-option{min-height:48px;padding:8px 10px;border-radius:11px;background:#132238;border-color:#30445f;color:#fff;text-align:left}
+.hd-sport-grid-integrated .hd-sport-option strong{font-size:.72rem;color:#dfe8f4;line-height:1.1}
+.hd-sport-grid-integrated .hd-sport-code{font-size:.58rem;color:#7eb8e7}
+.hd-sport-grid-integrated .hd-sport-option small{display:none}
+.hd-sport-grid-integrated .hd-sport-option.is-selected{background:#17365a;border-color:#4e9be0;box-shadow:inset 0 0 0 1px #4e9be0}
+.hd-sport-grid-integrated .hd-sport-option.is-planned{opacity:.55}
+.hd-sport-note-integrated{grid-column:2;margin:3px 0 0;color:#8fa1b9;font-size:.68rem}
+.hd-integrated-preview{max-width:500px;margin:22px auto 12px}
+.hd-integrated-preview .hd-preview-label{padding:0 10px;color:#9fb0c6}
+.hd-integrated-preview .hd-preview-disc{width:min(92%,430px);margin:16px auto 12px}
+.hd-integrated-teams{max-width:850px;margin:0 auto;padding-top:16px;border-top:1px solid rgba(255,255,255,.12)}
+.hd-integrated-teams-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:12px}
+.hd-swap-btn-integrated{color:#8fc5ef}
+.hd-side-grid-integrated{display:grid;grid-template-columns:minmax(0,1fr) 44px minmax(0,1fr);gap:10px;align-items:stretch}
+.hd-side-card-integrated{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"head head head" "art copy button";align-items:center;gap:10px 12px;min-height:0;padding:12px 14px;background:#f8fafc;border-radius:15px}
+.hd-side-card-integrated .hd-side-card-head{grid-area:head;margin:0;padding-bottom:7px;border-bottom:1px solid #e2e8f0}
+.hd-side-card-integrated .hd-side-card-head small{display:none}
+.hd-side-card-integrated .hd-side-team-art{grid-area:art;width:56px;height:56px;margin:0;border-width:3px;box-shadow:none}
+.hd-side-card-integrated .hd-side-team-copy{grid-area:copy;min-width:0}
+.hd-side-card-integrated h4{margin:0 0 2px;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd-side-card-integrated p{margin:0;font-size:.66rem}
+.hd-side-card-integrated .hd-choose-btn{grid-area:button;width:auto;min-width:92px;margin:0;padding:8px 10px;font-size:.68rem}
+.hd-versus-integrated{align-self:center}
+.hd-preview-summary-integrated{text-align:center;max-width:760px;margin:18px auto 0;padding-top:16px;border-top:1px solid rgba(255,255,255,.12)}
+.hd-preview-summary-integrated span{color:#7f93ad}
+.hd-preview-summary-integrated h3{color:#fff;margin:6px 0 4px;font-size:1.35rem}
+.hd-preview-summary-integrated p{color:#9caec5;margin:0}
+.hd-preview-actions-integrated{display:flex;justify-content:center;align-items:center;gap:14px;margin:15px auto 0}
+.hd-preview-actions-integrated .hd-text-button{color:#b8c5d7}
+.hd-integrated-builder .hd-build-message{max-width:680px;margin:14px auto 0}
+.hd-team-picker-modal{position:fixed!important;z-index:5000;left:50%;top:50%;transform:translate(-50%,-50%);width:min(880px,calc(100vw - 40px));max-height:min(82vh,760px);overflow:auto;background:#fff;color:#111827;border:1px solid #d7dee8;border-radius:22px;padding:20px;box-shadow:0 40px 100px rgba(0,0,0,.62)}
+.hd-team-picker-modal[hidden]{display:none!important}
+.hd-team-picker-modal .hd-team-grid{max-height:50vh;overflow:auto}
+
+@media(max-width:900px){
+  .hd-integrated-sport{grid-template-columns:1fr;gap:10px}
+  .hd-sport-note-integrated{grid-column:1}
+  .hd-sport-grid-integrated{grid-template-columns:repeat(3,1fr)}
+  .hd-side-card-integrated{grid-template-columns:auto 1fr;grid-template-areas:"head head" "art copy" "button button"}
+  .hd-side-card-integrated .hd-choose-btn{width:100%}
+}
+@media(max-width:650px){
+  .hd-integrated-builder{border-radius:20px;padding:18px 14px 22px}
+  .hd-sport-grid-integrated{grid-template-columns:repeat(2,1fr)}
+  .hd-sport-grid-integrated .hd-sport-option{min-height:44px}
+  .hd-side-grid-integrated{grid-template-columns:1fr}
+  .hd-versus-integrated{height:30px}
+  .hd-integrated-teams-head{align-items:flex-start}
+  .hd-preview-actions-integrated{display:grid}
+  .hd-preview-actions-integrated .coaster-btn{width:100%;text-align:center}
+}
+
+/* v2.23 — team picker card alignment: reserve real logo width so names never sit under artwork. */
+.hd-team-picker-modal .hd-team-option{
+  grid-template-columns:60px minmax(0,1fr);
+  gap:12px;
+  min-height:72px;
+  padding:10px 12px;
+}
+.hd-team-picker-modal .hd-team-option-art{
+  width:52px;
+  height:52px;
+  justify-self:start;
+}
+.hd-team-picker-modal .hd-team-option-mark{
+  width:44px;
+  height:44px;
+  justify-self:center;
+}
+.hd-team-picker-modal .hd-team-option>span:last-child{
+  min-width:0;
+  display:block;
+}
+.hd-team-picker-modal .hd-team-option strong{
+  display:block;
+  font-size:.8rem;
+  line-height:1.2;
+  overflow-wrap:anywhere;
+}
+.hd-team-picker-modal .hd-team-option small{
+  margin-top:3px;
+  line-height:1.2;
+}
+@media(max-width:700px){
+  .hd-team-picker-modal .hd-team-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){
+  .hd-team-picker-modal .hd-team-grid{grid-template-columns:1fr}
+}
+
+/* v2.25 — repair the v2.24 overview/builder page shell.
+   Keep the structural split; restore normal centered WestTech content widths. */
+.house-divided-page .hd-main{
+  width:100%;
+  overflow:hidden;
+}
+
+
+/* Dedicated builder page: same site shell, intentionally narrower/focused content. */
+.hd-builder-page-main{width:100%;padding-top:34px}
+.hd-builder-page-intro{
+  width:min(1120px,calc(100% - 40px));
+  margin:0 auto 26px;
+}
+.hd-builder-back{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:20px;
+  color:#8fc5ef;
+  text-decoration:none;
+  font-size:.78rem;
+  font-weight:850;
+}
+.hd-builder-back:hover{text-decoration:underline}
+.hd-builder-page-intro h1{
+  margin:8px 0 14px;
+  color:#fff;
+  font-size:clamp(2.4rem,5vw,4.8rem);
+  line-height:.92;
+  letter-spacing:-.045em;
+  max-width:10ch;
+}
+.hd-builder-page-intro h1 em{color:#3987d4;font-style:normal}
+.hd-builder-page-intro>p{
+  max-width:760px;
+  margin:0;
+  color:#9fb0c6;
+  font-size:1rem;
+  line-height:1.65;
+}
+.house-divided-builder-page .hd-builder-integrated-shell{
+  width:min(1120px,calc(100% - 40px));
+  max-width:none;
+  margin:0 auto;
+}
+.house-divided-builder-page .hd-builder-head-integrated{margin-top:0}
+.hd-builder-page-footer-note{
+  width:min(1120px,calc(100% - 40px));
+  margin:28px auto 50px;
+  padding:18px 22px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  border-top:1px solid rgba(255,255,255,.1);
+  color:#8fa1b9;
+  font-size:.78rem;
+}
+.hd-builder-page-footer-note a{color:#8fc5ef;text-decoration:none;font-weight:850}
+.hd-builder-page-footer-note a:hover{text-decoration:underline}
+
+@media(max-width:760px){
+  .hd-builder-page-main{padding-top:22px}
+  .hd-builder-page-intro,
+  .house-divided-builder-page .hd-builder-integrated-shell,
+  .hd-builder-page-footer-note{width:calc(100% - 28px)}
+  .hd-builder-page-footer-note{display:grid;padding-inline:0}
+}
+
+/* v2.26 — dedicated builder page typography/vertical rhythm.
+   Keep the builder focused: site-scale intro copy, then the configurator immediately. */
+.house-divided-builder-page .hd-builder-page-main{
+  padding-top:18px;
+}
+.house-divided-builder-page .hd-builder-page-intro{
+  margin-bottom:14px;
+}
+.house-divided-builder-page .hd-builder-back{
+  margin-bottom:10px;
+  font-size:.72rem;
+}
+.house-divided-builder-page .hd-builder-page-intro .coaster-kicker{
+  margin-top:0;
+}
+.house-divided-builder-page .hd-builder-page-intro h1{
+  margin:6px 0 8px;
+  max-width:none;
+  font-size:clamp(1.9rem,3vw,2.85rem);
+  line-height:.98;
+  letter-spacing:-.04em;
+}
+.house-divided-builder-page .hd-builder-page-intro>p{
+  max-width:820px;
+  font-size:.9rem;
+  line-height:1.5;
+}
+.house-divided-builder-page .hd-builder-integrated-shell{
+  margin-top:0;
+}
+.house-divided-builder-page .hd-builder-head-integrated{
+  grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr);
+  gap:28px;
+  align-items:end;
+  margin:0 0 14px;
+  padding-bottom:16px;
+}
+.house-divided-builder-page .hd-builder-head-integrated h2{
+  margin:7px 0 0;
+  font-size:clamp(1.55rem,2.25vw,2.25rem);
+  line-height:1.02;
+  letter-spacing:-.04em;
+  max-width:25ch;
+}
+.house-divided-builder-page .hd-builder-head-integrated>p{
+  font-size:.88rem;
+  line-height:1.5;
+  max-width:520px;
+}
+@media(max-width:760px){
+  .house-divided-builder-page .hd-builder-page-main{padding-top:12px}
+  .house-divided-builder-page .hd-builder-page-intro{margin-bottom:12px}
+  .house-divided-builder-page .hd-builder-page-intro h1{font-size:clamp(1.75rem,8vw,2.35rem)}
+  .house-divided-builder-page .hd-builder-head-integrated{
+    grid-template-columns:1fr;
+    gap:8px;
+    padding-bottom:12px;
+  }
+  .house-divided-builder-page .hd-builder-head-integrated h2{font-size:1.65rem;max-width:none}
+}
+
+
+/* v2.28 — overview cleanup: one supporting section, one primary CTA in the hero. */
+.hd-overview-support{
+  width:min(1240px,calc(100% - 40px));
+  margin:64px auto 72px;
+  padding:34px 38px;
+  display:grid;
+  grid-template-columns:minmax(0,1.25fr) minmax(360px,.75fr);
+  gap:48px;
+  align-items:center;
+  border:1px solid var(--hd-line);
+  border-radius:28px;
+  background:rgba(255,255,255,.72);
+  box-shadow:0 16px 42px rgba(15,23,42,.055);
+}
+.hd-overview-support h2{
+  margin:9px 0 0;
+  color:var(--hd-ink);
+  font-size:clamp(2rem,3.2vw,3.35rem);
+  line-height:.96;
+  letter-spacing:-.05em;
+  font-weight:950;
+}
+.hd-overview-support p{
+  max-width:760px;
+  margin:15px 0 0;
+  color:var(--hd-muted);
+  font-size:.94rem;
+  line-height:1.7;
+}
+.hd-overview-support-points{display:grid;gap:10px}
+.hd-overview-support-points span{
+  padding:15px 17px;
+  display:grid;
+  gap:4px;
+  border-radius:16px;
+  background:#fff;
+  border:1px solid var(--hd-line);
+}
+.hd-overview-support-points b{color:var(--hd-ink);font-size:.9rem}
+.hd-overview-support-points small{color:var(--hd-muted);font-size:.76rem;line-height:1.45}
+@media(max-width:860px){
+  .hd-overview-support{grid-template-columns:1fr;gap:24px}
+}
+@media(max-width:700px){
+  .hd-overview-support{width:calc(100% - 28px);margin:42px auto 54px;padding:26px 22px;border-radius:22px}
+}
+
+
+/* v2.30 — builder page cleanup: one concise intro, then the builder. */
+.house-divided-builder-page .hd-builder-page-main{padding-top:14px}
+.house-divided-builder-page .hd-builder-page-intro{margin-bottom:10px}
+.house-divided-builder-page .hd-builder-back{margin-bottom:8px}
+.house-divided-builder-page .hd-builder-page-intro .coaster-kicker{margin-top:0}
+.house-divided-builder-page .hd-builder-page-intro h1{
+  margin:5px 0 4px;
+  font-size:clamp(1.65rem,2.4vw,2.25rem);
+  line-height:1;
+  letter-spacing:-.035em;
+}
+.house-divided-builder-page .hd-builder-page-intro>p{
+  margin:0;
+  font-size:.86rem;
+  line-height:1.4;
+}
+.house-divided-builder-page .hd-builder-integrated-shell{margin-top:0}
+@media(max-width:760px){
+  .house-divided-builder-page .hd-builder-page-main{padding-top:10px}
+  .house-divided-builder-page .hd-builder-page-intro{margin-bottom:8px}
+  .house-divided-builder-page .hd-builder-page-intro h1{font-size:1.65rem}
+}
+
+/* v2.31 — team picker uses one scrollbar only.
+   Keep the modal shell/header/search fixed and scroll only the team list. */
+.hd-team-picker-modal{
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  max-height:min(82vh,760px);
+}
+.hd-team-picker-modal #team-standard-picker{
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+  flex:1 1 auto;
+}
+.hd-team-picker-modal .hd-team-search{
+  flex:0 0 auto;
+}
+.hd-team-picker-modal .hd-team-grid{
+  flex:1 1 auto;
+  min-height:0;
+  max-height:none;
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
+  padding-right:6px;
+}
+.hd-team-picker-modal .hd-custom-inline{
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+@media(max-width:650px){
+  .hd-team-picker-modal{
+    width:calc(100vw - 20px);
+    max-height:88vh;
+    padding:16px;
+  }
+}
+
+/* v2.37 — coaster lettering standard: Copperplate Gothic Bold for HOUSE / DIVIDED only. */
+.hd-preview-band-side span{font-family:"Copperplate Gothic Bold","Copperplate Gothic",Copperplate,serif;font-weight:400}
+
+
+/* v2.41 — House Divided builder intro now matches the integrated Single Team treatment. */
+.house-divided-builder-page .hd-builder-page-main{padding-top:18px}
+.hd-builder-page-back-wrap{width:min(1120px,calc(100% - 40px));margin:0 auto 10px}
+.house-divided-builder-page .hd-builder-back{margin:0}
+.hd-integrated-builder-head{display:grid;grid-template-columns:minmax(0,.9fr) minmax(300px,1fr);align-items:end;gap:36px;padding:6px 4px 24px;margin-bottom:22px;border-bottom:1px solid rgba(255,255,255,.12)}
+.hd-integrated-builder-head h1{margin:10px 0 0;color:#fff;font-size:clamp(2.3rem,4.4vw,4.6rem);line-height:.94;letter-spacing:-.055em;font-weight:950}
+.hd-integrated-builder-head>p{margin:0;color:#9eafc5;line-height:1.65;max-width:520px;justify-self:end}
+@media(max-width:900px){
+  .hd-integrated-builder-head{grid-template-columns:1fr;gap:10px}
+  .hd-integrated-builder-head>p{justify-self:start}
+}
+@media(max-width:650px){
+  .hd-builder-page-back-wrap{width:calc(100% - 28px);margin-bottom:8px}
+  .hd-integrated-builder-head{padding:2px 2px 18px;margin-bottom:18px}
+  .hd-integrated-builder-head h1{font-size:2.2rem}
+}
+
+/* v2.44 — Builder theme split.
+   Light/Auto-Light becomes a clean WestTech workspace with the live coaster
+   retained on a dark showroom card. Dark mode keeps the existing full-dark look. */
+.house-divided-builder-page .hd-integrated-builder{
+  background:var(--hd-builder-surface,linear-gradient(145deg,#0b1525 0%,#101d31 58%,#0b1422 100%));
+  color:var(--hd-builder-text,#fff);
+  border-color:var(--hd-builder-border,rgba(255,255,255,.11));
+}
+.house-divided-builder-page .hd-integrated-builder:before{
+  background-image:
+    linear-gradient(var(--hd-builder-grid-line,rgba(255,255,255,.025)) 1px,transparent 1px),
+    linear-gradient(90deg,var(--hd-builder-grid-line,rgba(255,255,255,.025)) 1px,transparent 1px);
+}
+.house-divided-builder-page .hd-integrated-builder-head{
+  border-bottom-color:var(--hd-builder-line,rgba(255,255,255,.12));
+}
+.house-divided-builder-page .hd-integrated-builder-head h1{
+  color:var(--hd-builder-text,#fff);
+}
+.house-divided-builder-page .hd-integrated-builder-head>p{
+  color:var(--hd-builder-muted,#9eafc5);
+}
+.house-divided-builder-page .hd-integrated-builder .coaster-section-tag-light{
+  color:var(--hd-builder-tag,rgba(255,255,255,.68));
+}
+.house-divided-builder-page .hd-integrated-step-label strong{
+  color:var(--hd-builder-text,#fff);
+}
+.house-divided-builder-page .hd-integrated-sport{
+  border-bottom-color:var(--hd-builder-line,rgba(255,255,255,.12));
+}
+.house-divided-builder-page .hd-sport-grid-integrated .hd-sport-option{
+  background:var(--hd-sport-surface,#132238);
+  border-color:var(--hd-sport-border,#30445f);
+  color:var(--hd-sport-text,#fff);
+}
+.house-divided-builder-page .hd-sport-grid-integrated .hd-sport-option strong{
+  color:var(--hd-sport-strong,#dfe8f4);
+}
+.house-divided-builder-page .hd-sport-grid-integrated .hd-sport-code{
+  color:var(--hd-sport-kicker,#7eb8e7);
+}
+.house-divided-builder-page .hd-sport-grid-integrated .hd-sport-option.is-selected{
+  background:var(--hd-sport-selected-surface,#17365a);
+  border-color:var(--hd-sport-selected-border,#4e9be0);
+  box-shadow:inset 0 0 0 1px var(--hd-sport-selected-border,#4e9be0);
+}
+.house-divided-builder-page .hd-sport-note-integrated{
+  color:var(--hd-builder-muted,#8fa1b9);
+}
+.house-divided-builder-page .hd-integrated-preview{
+  background:var(--hd-preview-panel,transparent);
+  border:1px solid var(--hd-preview-panel-border,transparent);
+  border-radius:var(--hd-preview-panel-radius,0);
+  padding:var(--hd-preview-panel-pad,0);
+  box-shadow:var(--hd-preview-panel-shadow,none);
+}
+.house-divided-builder-page .hd-integrated-teams{
+  border-top-color:var(--hd-builder-line,rgba(255,255,255,.12));
+}
+.house-divided-builder-page .hd-swap-btn-integrated{
+  color:var(--hd-builder-link,#8fc5ef);
+}
+.house-divided-builder-page .hd-preview-summary-integrated{
+  border-top-color:var(--hd-builder-line,rgba(255,255,255,.12));
+}
+.house-divided-builder-page .hd-preview-summary-integrated span{
+  color:var(--hd-builder-kicker,#7f93ad);
+}
+.house-divided-builder-page .hd-preview-summary-integrated h3{
+  color:var(--hd-builder-text,#fff);
+}
+.house-divided-builder-page .hd-preview-summary-integrated p{
+  color:var(--hd-builder-muted,#9caec5);
+}
+.house-divided-builder-page .hd-preview-actions-integrated .hd-text-button{
+  color:var(--hd-builder-button-muted,#b8c5d7);
+}
+.house-divided-builder-page .hd-integrated-builder .hd-build-message{
+  background:var(--hd-message-surface,rgba(255,255,255,.08));
+  border-color:var(--hd-message-border,rgba(255,255,255,.12));
+  color:var(--hd-message-text,rgba(255,255,255,.82));
+}
+
+html[data-theme="light"] .house-divided-builder-page{
+  --hd-builder-surface:#f7f9fc;
+  --hd-builder-text:#142036;
+  --hd-builder-muted:#607086;
+  --hd-builder-kicker:#607b99;
+  --hd-builder-tag:#586b82;
+  --hd-builder-line:rgba(20,32,54,.14);
+  --hd-builder-border:#d7e0ea;
+  --hd-builder-grid-line:rgba(22,119,196,.035);
+  --hd-sport-surface:#ffffff;
+  --hd-sport-border:#ced9e6;
+  --hd-sport-text:#33465f;
+  --hd-sport-strong:#33465f;
+  --hd-sport-kicker:#1677c4;
+  --hd-sport-selected-surface:#e9f3fb;
+  --hd-sport-selected-border:#1677c4;
+  --hd-preview-panel:#0b1627;
+  --hd-preview-panel-border:rgba(22,119,196,.18);
+  --hd-preview-panel-radius:24px;
+  --hd-preview-panel-pad:18px 14px 20px;
+  --hd-preview-panel-shadow:0 20px 46px rgba(15,23,42,.18);
+  --hd-builder-link:#1677c4;
+  --hd-builder-button-muted:#5e7188;
+  --hd-message-surface:#eef6fc;
+  --hd-message-border:#c9dbea;
+  --hd-message-text:#31516c;
+}
+html[data-theme="light"] .house-divided-builder-page .hd-integrated-builder{
+  box-shadow:0 24px 60px rgba(15,23,42,.11);
+}
+html[data-theme="light"] .house-divided-builder-page .hd-side-card-integrated{
+  border:1px solid #d7e0ea;
+  box-shadow:0 10px 26px rgba(15,23,42,.07);
+}
+
+@media (prefers-color-scheme:light){
+  html:not([data-theme]) .house-divided-builder-page{
+    --hd-builder-surface:#f7f9fc;
+    --hd-builder-text:#142036;
+    --hd-builder-muted:#607086;
+    --hd-builder-kicker:#607b99;
+    --hd-builder-tag:#586b82;
+    --hd-builder-line:rgba(20,32,54,.14);
+    --hd-builder-border:#d7e0ea;
+    --hd-builder-grid-line:rgba(22,119,196,.035);
+    --hd-sport-surface:#ffffff;
+    --hd-sport-border:#ced9e6;
+    --hd-sport-text:#33465f;
+    --hd-sport-strong:#33465f;
+    --hd-sport-kicker:#1677c4;
+    --hd-sport-selected-surface:#e9f3fb;
+    --hd-sport-selected-border:#1677c4;
+    --hd-preview-panel:#0b1627;
+    --hd-preview-panel-border:rgba(22,119,196,.18);
+    --hd-preview-panel-radius:24px;
+    --hd-preview-panel-pad:18px 14px 20px;
+    --hd-preview-panel-shadow:0 20px 46px rgba(15,23,42,.18);
+    --hd-builder-link:#1677c4;
+    --hd-builder-button-muted:#5e7188;
+    --hd-message-surface:#eef6fc;
+    --hd-message-border:#c9dbea;
+    --hd-message-text:#31516c;
+  }
+  html:not([data-theme]) .house-divided-builder-page .hd-integrated-builder{
+    box-shadow:0 24px 60px rgba(15,23,42,.11);
+  }
+  html:not([data-theme]) .house-divided-builder-page .hd-side-card-integrated{
+    border:1px solid #d7e0ea;
+    box-shadow:0 10px 26px rgba(15,23,42,.07);
+  }
+}
+
+
+/* v2.45 — House Divided physical-coaster preview geometry.
+   Match the printed/SCAD layout: simpler outer rim, slimmer center band,
+   larger team artwork, and bolder HOUSE / DIVIDED typography. */
+.hd-preview-disc{
+  border:10px solid #c7c9cc;
+  background:#11151d;
+  box-shadow:0 30px 54px rgba(0,0,0,.42),0 0 0 2px rgba(17,21,29,.7);
+}
+.hd-preview-rim-outer{
+  inset:3.9%;
+  border:2px solid #34383e;
+}
+.hd-preview-rim-inner{display:none}
+.hd-preview-field{
+  left:4.9%;
+  right:4.9%;
+}
+.hd-preview-field-one{
+  top:4.9%;
+  height:45.1%;
+}
+.hd-preview-field-two{
+  bottom:4.9%;
+  height:45.1%;
+}
+.hd-preview-band{
+  left:4.8%;
+  right:4.8%;
+  height:18.4%;
+  grid-template-columns:minmax(0,1fr) 16% minmax(0,1fr);
+  border-top:3px solid #11151d;
+  border-bottom:3px solid #11151d;
+  box-shadow:none;
+}
+.hd-preview-band-side{padding-inline:3px}
+.hd-preview-band-side span{
+  font-family:"Copperplate Gothic Bold","Copperplate Gothic",Copperplate,serif;
+  font-size:clamp(1.5rem,3.2vw,2.42rem);
+  font-weight:700;
+  line-height:.92;
+  letter-spacing:.01em;
+  -webkit-text-stroke:.28px currentColor;
+  paint-order:stroke fill;
+}
+.hd-preview-house::before{
+  left:9%;right:9%;top:10%;bottom:11%;
+}
+.hd-preview-house-shape{
+  left:13%;right:13%;top:15%;bottom:16%;
+}
+.hd-preview-house i{
+  top:15%;bottom:16%;width:3px;
+}
+.hd-preview-icon{
+  width:72%;
+  height:31%;
+}
+.hd-preview-icon-one{top:5.7%}
+.hd-preview-icon-two{bottom:4.8%}
+
+@media(max-width:700px){
+  .hd-preview-disc{border-width:8px}
+  .hd-preview-band{height:18.8%;grid-template-columns:minmax(0,1fr) 17% minmax(0,1fr)}
+  .hd-preview-band-side span{font-size:clamp(1.12rem,5vw,1.75rem)}
+  .hd-preview-icon{width:72%;height:30%}
+  .hd-preview-icon-one{top:6.2%}
+  .hd-preview-icon-two{bottom:5.2%}
+}
+
+
+/* v2.46 — rebuild House Divided builder preview as an SVG coaster so it matches
+   the proven Single Team rendering approach with clean printable regions. */
+.hd-integrated-preview .hd-preview-svg{
+  --hd-side-one-field:#f26a21;
+  --hd-side-two-field:#2447b8;
+  --hd-side-one-band:#2447b8;
+  --hd-side-two-band:#8d949b;
+  --hd-side-one-band-text:#f5f5f2;
+  --hd-side-two-band-text:#f5f5f2;
+  --hd-side-one-house:#f26a21;
+  --hd-side-two-house:#2447b8;
+  display:block;
+  width:min(92%,430px);
+  margin:16px auto 12px;
+  filter:drop-shadow(0 30px 54px rgba(0,0,0,.42));
+}
+.hd-svg-outer{fill:var(--hd-frame-outer,#f5f5f2);stroke:none}
+.hd-svg-rim{fill:none;stroke:var(--hd-frame-inner,#111317);stroke-width:22}
+.hd-svg-top-field{fill:var(--hd-side-one-field)}
+.hd-svg-bottom-field{fill:var(--hd-side-two-field)}
+.hd-svg-band-left{fill:var(--hd-side-two-band)}
+.hd-svg-band-right{fill:var(--hd-side-one-band)}
+.hd-svg-divider{stroke:#111317;stroke-width:5}
+#preview-logo-one,#preview-logo-two{pointer-events:none}
+#preview-mark-one,#preview-mark-two{
+  font-family:Inter,Arial,sans-serif;
+  font-size:110px;
+  font-weight:950;
+  fill:#f5f5f2;
+  display:none;
+}
+.hd-svg-band-text{
+  dominant-baseline:middle;
+  font-family:"Copperplate Gothic Bold","Copperplate Gothic",Copperplate,serif;
+  font-size:82px;
+  font-weight:700;
+  letter-spacing:.2px;
+  paint-order:stroke fill;
+  stroke-width:.8px;
+}
+.hd-svg-band-text-left{fill:var(--hd-side-two-band-text);stroke:var(--hd-side-two-band-text)}
+.hd-svg-band-text-right{fill:var(--hd-side-one-band-text);stroke:var(--hd-side-one-band-text)}
+.hd-svg-house-left{fill:var(--hd-side-two-house);stroke:#111317;stroke-width:3;stroke-linejoin:round}
+.hd-svg-house-right{fill:var(--hd-side-one-house);stroke:#111317;stroke-width:3;stroke-linejoin:round}
+.hd-svg-band-center-line{stroke:#111317;stroke-width:6;stroke-linecap:butt}
+@media(max-width:700px){
+  .hd-integrated-preview .hd-preview-svg{width:min(94%,400px)}
+  .hd-svg-band-text{font-size:66px}
+  #preview-mark-one,#preview-mark-two{font-size:92px}
+}
+html[data-theme="light"] .house-divided-builder-page .hd-integrated-preview .hd-preview-svg,
+html:not([data-theme]) .house-divided-builder-page .hd-integrated-preview .hd-preview-svg{
+  filter:drop-shadow(0 26px 42px rgba(15,23,42,.22));
+}

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" data-site-root="../" data-site-section="coasters">
+<head>
+  <meta charset="utf-8"/>
+  <title>Build a House Divided Coaster – WestTech Home Automation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Build a WestTech House Divided coaster by choosing a sport and two teams, with a custom-team option for either side."/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="../css/site.css" rel="stylesheet"/>
+  <link href="../css/coasters.css" rel="stylesheet"/>
+  <link href="../css/house-divided.css" rel="stylesheet"/>
+</head>
+<body class="coaster-page house-divided-page house-divided-builder-page">
+<div class="page">
+  <div id="site-header"></div>
+
+  <main class="hd-main hd-builder-page-main">
+    <div class="hd-builder-page-back-wrap">
+      <a class="hd-builder-back" href="house-divided.html"><span aria-hidden="true">←</span> House Divided overview</a>
+    </div>
+
+    <section class="hd-builder-shell hd-builder-integrated-shell" id="builder">
+      <div class="hd-integrated-builder" aria-label="House Divided builder">
+        <div class="hd-integrated-builder-head">
+          <div>
+            <div class="coaster-section-tag coaster-section-tag-light">BUILD YOURS</div>
+            <h1>Your matchup.<br/>Your house.</h1>
+          </div>
+          <p>Start with the finished Denver + Dallas example and change only the teams that belong to you.</p>
+        </div>
+        <div class="hd-integrated-sport" aria-labelledby="sport-heading">
+          <div class="hd-integrated-step-label"><b>01</b><span><small>SPORT</small><strong id="sport-heading">NFL</strong></span></div>
+          <div class="hd-sport-grid hd-sport-grid-integrated" role="radiogroup" aria-label="House Divided sport">
+            <button class="hd-sport-option is-selected" type="button" role="radio" aria-checked="true" data-sport="NFL"><span class="hd-sport-code">NFL</span><strong>Football</strong></button>
+            <button class="hd-sport-option is-planned" type="button" role="radio" aria-checked="false" data-sport="NHL"><span class="hd-sport-code">NHL</span><strong>Hockey</strong></button>
+            <button class="hd-sport-option is-planned" type="button" role="radio" aria-checked="false" data-sport="MLB"><span class="hd-sport-code">MLB</span><strong>Baseball</strong></button>
+            <button class="hd-sport-option is-planned" type="button" role="radio" aria-checked="false" data-sport="NBA"><span class="hd-sport-code">NBA</span><strong>Basketball</strong></button>
+            <button class="hd-sport-option is-planned" type="button" role="radio" aria-checked="false" data-sport="WNBA"><span class="hd-sport-code">WNBA</span><strong>Women’s Basketball</strong></button>
+            <button class="hd-sport-option is-planned" type="button" role="radio" aria-checked="false" data-sport="MLS"><span class="hd-sport-code">MLS</span><strong>Soccer</strong></button>
+          </div>
+          <p class="hd-sport-note hd-sport-note-integrated" id="sport-note">NFL is active now. Other sport catalogs are already accounted for and can be enabled later.</p>
+        </div>
+
+        <div class="hd-integrated-preview" aria-label="House Divided live preview">
+          <div class="hd-preview-label"><span>YOUR HOUSE DIVIDED COASTER</span><b id="preview-sport">NFL</b></div>
+          <svg class="hd-preview-svg" id="preview-disc" viewBox="0 0 1000 1000" role="img" aria-labelledby="hd-preview-title hd-preview-desc">
+            <title id="hd-preview-title">Denver Broncos + Dallas Cowboys house divided coaster preview</title>
+            <desc id="hd-preview-desc">Circular House Divided coaster with Denver Broncos on the top half, Dallas Cowboys on the bottom half, and a split HOUSE DIVIDED center band.</desc>
+            <defs>
+              <clipPath id="hd-preview-clip">
+                <circle cx="500" cy="500" r="430"></circle>
+              </clipPath>
+            </defs>
+            <circle class="hd-svg-outer" cx="500" cy="500" r="470"></circle>
+            <circle class="hd-svg-rim" cx="500" cy="500" r="441"></circle>
+
+            <g clip-path="url(#hd-preview-clip)">
+              <rect class="hd-svg-top-field" x="70" y="70" width="860" height="385"></rect>
+              <rect class="hd-svg-bottom-field" x="70" y="545" width="860" height="385"></rect>
+              <rect class="hd-svg-band-left" x="70" y="452" width="430" height="98"></rect>
+              <rect class="hd-svg-band-right" x="500" y="452" width="430" height="98"></rect>
+              <line class="hd-svg-divider" x1="70" y1="452" x2="930" y2="452"></line>
+              <line class="hd-svg-divider" x1="70" y1="550" x2="930" y2="550"></line>
+              <image id="preview-logo-one" x="240" y="118" width="520" height="295" preserveAspectRatio="xMidYMid meet"></image>
+              <text id="preview-mark-one" x="500" y="270" text-anchor="middle">DEN</text>
+              <image id="preview-logo-two" x="240" y="595" width="520" height="255" preserveAspectRatio="xMidYMid meet"></image>
+              <text id="preview-mark-two" x="500" y="755" text-anchor="middle">DAL</text>
+            </g>
+
+            <g class="hd-svg-band-copy">
+              <text class="hd-svg-band-text hd-svg-band-text-left" id="preview-band-left" x="262" y="503" text-anchor="middle" textLength="332" lengthAdjust="spacingAndGlyphs">COWBOYS</text>
+              <text class="hd-svg-band-text hd-svg-band-text-right" id="preview-band-right" x="738" y="503" text-anchor="middle" textLength="332" lengthAdjust="spacingAndGlyphs">BRONCOS</text>
+              <g class="hd-svg-house" aria-hidden="true">
+                <polygon class="hd-svg-house-left" points="500,460 452,496 452,537 500,537"></polygon>
+                <polygon class="hd-svg-house-right" points="500,460 548,496 548,537 500,537"></polygon>
+              </g>
+              <line class="hd-svg-band-center-line" x1="500" y1="452" x2="500" y2="550"></line>
+            </g>
+          </svg>
+        </div>
+
+        <div class="hd-integrated-teams" aria-labelledby="teams-heading">
+          <div class="hd-integrated-teams-head">
+            <div class="hd-integrated-step-label"><b>02</b><span><small>TEAMS</small><strong id="teams-heading">Your matchup</strong></span></div>
+            <button class="hd-swap-btn hd-swap-btn-integrated" id="swap-teams" type="button" aria-label="Swap Side 1 and Side 2"><span aria-hidden="true">⇄</span> Swap sides</button>
+          </div>
+
+          <div class="hd-side-grid hd-side-grid-integrated">
+            <article class="hd-side-card hd-side-card-integrated" data-side-card="one">
+              <div class="hd-side-card-head"><span>SIDE 1 / TOP</span></div>
+              <div class="hd-side-team-art" id="side-one-art"><img id="side-one-logo" alt=""/><span class="hd-side-team-fallback" id="side-one-mark">DEN</span></div>
+              <div class="hd-side-team-copy"><h4 id="side-one-name">Denver Broncos</h4><p id="side-one-kind">Standard NFL team</p></div>
+              <button class="hd-choose-btn" type="button" data-open-picker="one">Change team</button>
+            </article>
+
+            <div class="hd-versus hd-versus-integrated" aria-hidden="true"><span>VS</span></div>
+
+            <article class="hd-side-card hd-side-card-integrated" data-side-card="two">
+              <div class="hd-side-card-head"><span>SIDE 2 / BOTTOM</span></div>
+              <div class="hd-side-team-art" id="side-two-art"><img id="side-two-logo" alt=""/><span class="hd-side-team-fallback" id="side-two-mark">DAL</span></div>
+              <div class="hd-side-team-copy"><h4 id="side-two-name">Dallas Cowboys</h4><p id="side-two-kind">Standard NFL team</p></div>
+              <button class="hd-choose-btn" type="button" data-open-picker="two">Change team</button>
+            </article>
+          </div>
+        </div>
+
+        <div class="hd-preview-summary hd-preview-summary-integrated">
+          <span>HOUSE DIVIDED</span>
+          <h3 id="preview-summary">Denver Broncos + Dallas Cowboys</h3>
+          <p id="preview-detail">Standard NFL matchup · fixed HOUSE DIVIDED band</p>
+        </div>
+        <div class="hd-preview-actions hd-preview-actions-integrated">
+          <button class="coaster-btn coaster-btn-primary" id="continue-build" type="button">Continue with this matchup</button>
+          <button class="hd-text-button" id="reset-build" type="button">Reset example</button>
+        </div>
+        <div class="hd-build-message" id="build-message" role="status" aria-live="polite" hidden></div>
+
+        <div class="hd-team-picker hd-team-picker-modal" id="team-picker" hidden>
+          <div class="hd-picker-head">
+            <div><span class="hd-step-label" id="picker-side-label">Side 1</span><h4 id="picker-title">Choose a team</h4></div>
+            <button class="hd-picker-close" id="picker-close" type="button" aria-label="Close team selector">×</button>
+          </div>
+          <div id="team-standard-picker">
+            <label class="hd-team-search"><span>Find a team</span><input id="team-search" type="search" placeholder="Search city or team name" autocomplete="off"/></label>
+            <div class="hd-team-grid" id="team-grid"></div>
+          </div>
+          <div class="hd-custom-inline" id="custom-team-panel" aria-labelledby="custom-heading" hidden>
+            <div class="hd-custom-inline-head"><div><span class="hd-step-label">Custom team</span><h4 id="custom-heading">Make this side yours.</h4></div><span class="hd-step-status">Design review</span></div>
+            <p class="hd-custom-intro">Use this only when a school, club, local team, or organization is not in the standard list. WestTech reviews the artwork and assigns the printable colors.</p>
+            <div class="hd-custom-form">
+              <label><span>Team / organization name</span><input id="custom-team-name" type="text" maxlength="45" placeholder="Example: West High Wildcats"/></label>
+              <label><span>Artwork reference <small>(optional for this prototype)</small></span><input id="custom-artwork" type="file" accept="image/*,.svg,.pdf"/></label>
+              <label><span>Notes <small>(optional)</small></span><textarea id="custom-notes" rows="3" maxlength="300" placeholder="Anything WestTech should know about this team or design."></textarea></label>
+            </div>
+            <div class="hd-custom-actions"><button class="coaster-btn coaster-btn-primary" id="apply-custom" type="button">Use this custom team</button><button class="hd-text-button" id="cancel-custom" type="button">Back to team list</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="hd-builder-page-footer-note">
+      <span>Want to review the product first?</span>
+      <a href="house-divided.html">Back to the House Divided overview <span aria-hidden="true">→</span></a>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+</div>
+<script src="../js/theme.js"></script>
+<script src="../js/site-shell.js"></script>
+<script src="../js/coasters.js"></script>
+<script src="../js/nfl-house-divided-color-baseline.js"></script>
+<script src="../js/house-divided.js"></script>
+</body>
+</html>

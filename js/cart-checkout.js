@@ -138,7 +138,7 @@
   function availabilityLabel() {
     const items = checkoutItems();
     if (!items.length) return 'Cart is empty';
-    if (totalQuantity(items) > 4) return 'Custom order required';
+    if (totalQuantity(items) > 4) return 'Quote required';
     if (canFulfillCart()) return 'In stock';
     return 'One or more items are unavailable';
   }
@@ -205,7 +205,7 @@
     if (!items.length) {
       const empty = document.createElement('div');
       empty.className = 'cart-empty';
-      empty.innerHTML = 'Your cart is empty. <a href="products.html">Browse products</a> to add an enclosure.';
+      empty.innerHTML = 'Your cart is empty. <a href="products.html">Browse Enclosures</a> or <a href="coasters/index.html">browse Coasters</a> to keep shopping.';
       els.items.appendChild(empty);
       return;
     }
@@ -218,7 +218,7 @@
       card.innerHTML = `
         <div>
           <h3 class="cart-item-title">${product.name || item.name}</h3>
-          <p class="cart-item-meta">${item.color} • ${product.layout || 'Selected enclosure'}</p>
+          <p class="cart-item-meta">${item.color} • ${product.layout || 'Selected product'}</p>
           <div class="cart-item-controls">
             <label>Color
               <select data-cart-color="${index}">
@@ -253,10 +253,10 @@
     els.totalQty.textContent = String(qty);
     els.productSummary.textContent = items.length ? items.map((item) => `${item.quantity}× ${state.products[item.sku]?.name || item.name} (${item.color})`).join(' • ') : 'No items selected';
     els.subtotal.textContent = formatMoney(subtotal);
-    els.shipping.textContent = custom ? 'Custom quote required' : formatMoney(shipping);
-    els.tax.textContent = custom ? 'Quoted during custom order' : 'Finalized during checkout';
-    els.totalLabel.textContent = custom ? 'Direct checkout is available for 1 through 4 total units' : 'Base total before any applicable tax';
-    els.total.textContent = custom ? 'Use custom / email order' : formatMoney(subtotal + shipping);
+    els.shipping.textContent = custom ? 'Quote required' : formatMoney(shipping);
+    els.tax.textContent = custom ? 'Quoted during order review' : 'Finalized during checkout';
+    els.totalLabel.textContent = custom ? 'Direct checkout is available for 1 through 4 total items' : 'Base total before any applicable tax';
+    els.total.textContent = custom ? 'Use quote / email order' : formatMoney(subtotal + shipping);
     els.totalLine.classList.remove('is-final');
     els.availability.textContent = `Availability: ${availabilityLabel()}`;
     els.availability.className = `checkout-inventory-status availability-${canFulfillCart() ? 'in-stock' : 'unknown'}`;
@@ -266,8 +266,8 @@
     if (els.paypalContainer) els.paypalContainer.classList.toggle('is-hidden', !items.length || custom || !canFulfillCart() || !state.buttonsRendered);
 
     resetColoradoState();
-    if (!items.length) setStatus('Your cart is empty. Add an enclosure to begin checkout.');
-    else if (custom) setStatus('For 5+ total units, use the custom / email order path so shipping can be quoted correctly.');
+    if (!items.length) setStatus('Your cart is empty. Choose a product to begin checkout.');
+    else if (custom) setStatus('For 5+ total items, use the quote / email order path so shipping can be quoted correctly.');
     else if (!canFulfillCart()) setStatus('One or more cart items are temporarily unavailable or do not have enough stock.', true);
     else setStatus('PayPal is ready. Website checkout currently supports U.S. shipping addresses only.');
   }
@@ -293,7 +293,7 @@
     if (quantityIndex !== null) items[Number(quantityIndex)].quantity = normalizeQuantity(event.target.value);
 
     if (totalQuantity(items) > 4) {
-      setStatus('Website cart checkout supports up to 4 total units. Use the quote page for 5+ units.', true);
+      setStatus('Website cart checkout supports up to 4 total items. Use the quote page for 5+ items.', true);
     }
     writeItems(items);
     await refresh();
@@ -494,7 +494,7 @@
       async createOrder() {
         const items = checkoutItems();
         if (!items.length) throw new Error('Your cart is empty.');
-        if (totalQuantity(items) > 4) throw new Error('Use the custom / email order path for 5+ units.');
+        if (totalQuantity(items) > 4) throw new Error('Use the quote / email order path for 5+ items.');
         setStatus('Opening PayPal. Website checkout currently supports U.S. shipping addresses only.');
         const orderData = await fetchJson(CREATE_ORDER_ENDPOINT, {
           method: 'POST',
