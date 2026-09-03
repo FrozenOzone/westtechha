@@ -3,6 +3,26 @@ import { billableTotal, getCoasterOrderDetail, logEvent } from './coaster-order-
 import { bool, calcTotal, clean, integer, isLocked, makeError, nowIso, number, termsFrozen } from './coaster-order-util.js';
 
 const PRODUCTION_STATUSES = new Set(['PRODUCTION_QUEUE','IN_PRODUCTION','PREPARING_TO_SHIP','PREPARING_FOR_PICKUP','READY_FOR_PICKUP','SHIPPED','COMPLETED']);
+const FORWARD_STATUS = {
+  PRODUCTION_QUEUE: 'IN_PRODUCTION',
+  IN_PRODUCTION: {SHIP:'PREPARING_TO_SHIP',LOCAL_PICKUP:'PREPARING_FOR_PICKUP'},
+  PREPARING_TO_SHIP: 'SHIPPED',
+  PREPARING_FOR_PICKUP: 'READY_FOR_PICKUP',
+  SHIPPED: 'COMPLETED',
+  READY_FOR_PICKUP: 'COMPLETED'
+};
+
+function assertForwardProductionStatus(order,status){
+  const current=String(order.status||'').toUpperCase();
+  const configured=FORWARD_STATUS[current];
+  const next=typeof configured==='string'?configured:configured?.[order.fulfillmentMethod];
+  if(status!==current&&status!==next){
+    const message=next
+      ? `Order status can only remain ${current} or move forward to ${next}.`
+      : `Order status cannot move backward from ${current}.`;
+    throw makeError(message,409);
+  }
+}
 
 export async function updateCoasterOrderAdmin(env,orderId,payload={}){
   const db=requireOrdersDb(env);const order=await getCoasterOrderDetail(env,orderId);if(!order)throw makeError('Coaster order not found.',404);
@@ -29,7 +49,7 @@ export async function updateCoasterOrderAdmin(env,orderId,payload={}){
   if(action!=='saveReview')throw makeError('Unsupported admin action.');
   const locked=isLocked(order),frozen=termsFrozen(order);
   if(locked){
-    const status=clean(payload.status,40)||order.status;if(!PRODUCTION_STATUSES.has(status))throw makeError('Approved production orders can only use production statuses.',409);
+    const status=(clean(payload.status,40)||order.status).toUpperCase();if(!PRODUCTION_STATUSES.has(status))throw makeError('Approved production orders can only use production statuses.',409);assertForwardProductionStatus(order,status);
     if(status==='PREPARING_FOR_PICKUP'&&order.fulfillmentMethod!=='LOCAL_PICKUP')throw makeError('Preparing for Pickup is only valid for Local Pickup orders.');
     if(status==='READY_FOR_PICKUP'&&order.fulfillmentMethod!=='LOCAL_PICKUP')throw makeError('Ready for Pickup is only valid for Local Pickup orders.');
     if(status==='PREPARING_TO_SHIP'&&order.fulfillmentMethod!=='SHIP')throw makeError('Preparing to Ship is only valid for shipped orders.');
