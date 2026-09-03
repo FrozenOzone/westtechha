@@ -9,6 +9,7 @@
   const privateToken=params.get('approvalToken') || (!paymentReturn&&!paymentCancelled ? (params.get('token')||'') : '');
   const isLocal=location.protocol==='file:'||params.get('mode')==='local';
   let approval=null;
+  let taxReview=null;
 
   function money(v){const n=Number(v||0);return Number.isFinite(n)?n:0;}
   function fmt(v){return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(money(v));}
@@ -45,12 +46,41 @@
     const r=await fetch(`/api/coasters/orders/${encodeURIComponent(orderId)}/approval?token=${encodeURIComponent(privateToken)}`,{headers:{Accept:'application/json'}});const data=await r.json().catch(()=>({}));if(!r.ok||!data.ok)throw new Error(data.message||'Could not load this proof.');approval=data.approval;
   }
 
-  async function captureReturnedPayPal(){
+  async function captureReturnedPayPal(confirmTax=false){
     if(isLocal||!paymentReturn||!paypalReturnOrderId||!privateToken)return;
-    message('PayPal approved. Finalizing your payment and importing the PayPal shipping address…','');
-    const r=await fetch(`/api/coasters/orders/${encodeURIComponent(orderId)}/payment/capture`,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({approvalToken:privateToken,paypalOrderId:paypalReturnOrderId})});
-    const data=await r.json().catch(()=>({}));if(!r.ok||!data.ok)throw new Error(data.message||'PayPal approved the payment, but WestTech could not finalize it. Please contact WestTech with your order number.');approval=data.approval;
+    const target=confirmTax?$('#cap-tax-message'):$('#cap-message');
+    if(target){target.hidden=false;target.className='cap-message';target.textContent=confirmTax?'Completing your payment…':'PayPal approved. Calculating the destination tax and preparing your payment…';}
+    const r=await fetch(`/api/coasters/orders/${encodeURIComponent(orderId)}/payment/capture`,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({approvalToken:privateToken,paypalOrderId:paypalReturnOrderId,confirmTax})});
+    const data=await r.json().catch(()=>({}));if(!r.ok||!data.ok)throw new Error(data.message||'PayPal approved the payment, but WestTech could not finalize it. Please contact WestTech with your order number.');
+    approval=data.approval;
+    if(data.taxConfirmationRequired){
+      taxReview=data.taxReview||null;
+      return;
+    }
+    taxReview=null;
     history.replaceState({},'',new URL(`order-approval.html?order=${encodeURIComponent(orderId)}&approvalToken=${encodeURIComponent(privateToken)}`,location.href).href);
+  }
+
+  function renderTaxReview(){
+    const card=$('#cap-tax-card'),actions=$('#cap-actions');if(!card||!actions)return;
+    if(!taxReview){card.hidden=true;actions.hidden=false;return;}
+    card.hidden=false;actions.hidden=true;
+    const a=taxReview.address||{},lines=[a.fullName,a.address1,a.address2,[a.city,a.state,a.postalCode].filter(Boolean).join(', ').replace(', '+(a.postalCode||''),' '+(a.postalCode||''))].filter(Boolean);
+    $('#cap-tax-address').textContent=lines.join('\n');
+    const pickup=taxReview.addressSource==='WESTTECH_PICKUP';
+    $('#cap-tax-intro').textContent=pickup?'This local-pickup order uses WestTech’s pickup address for the Colorado tax calculation. The address is locked.':'PayPal returned this shipping address. It is locked here so the tax quote and fulfillment address stay identical.';
+    $('#cap-tax-confirm-copy').textContent=pickup?'I understand this order is for pickup at the WestTech address shown above and Colorado sales tax is based on that location.':'I verified that this PayPal shipping address is correct and understand Colorado sales tax is based on it.';
+    $('#cap-tax-subtotal').textContent=fmt(taxReview.taxableAmount);$('#cap-tax-shipping').textContent=fmt(taxReview.shippingAmount);$('#cap-tax-shipping-row').hidden=money(taxReview.shippingAmount)===0;
+    $('#cap-tax-review-amount').textContent=fmt(taxReview.taxAmount);$('#cap-tax-rate').textContent=taxReview.taxRate?'('+(Number(taxReview.taxRate)*100).toFixed(3).replace(/0+$/,'').replace(/\.$/,'')+'%)':'';
+    $('#cap-tax-total').textContent=fmt(taxReview.totalAmount);$('#cap-tax-confirm').checked=false;$('#cap-complete-order').disabled=true;$('#cap-tax-message').hidden=true;
+    $('#cap-status').textContent='TAX CONFIRMATION';$('#cap-status').classList.add('approved');
+  }
+
+  async function completeOrder(){
+    if(!taxReview||!$('#cap-tax-confirm').checked)return;
+    const button=$('#cap-complete-order'),original=button.textContent;button.disabled=true;button.textContent='Completing Order…';
+    try{await captureReturnedPayPal(true);render();}
+    catch(e){const el=$('#cap-tax-message');el.hidden=false;el.className='cap-message error';el.textContent=e.message||'Could not complete the payment.';button.disabled=false;button.textContent=original;}
   }
 
   async function renderProof(){
@@ -72,19 +102,19 @@
     $('#cap-order-id').textContent=`Order ${approval.orderId}`;$('#cap-proof-version').textContent=`V${Number(approval.proofVersion||1)}`;
     $('#cap-set').textContent=`${Number(approval.setSize||4)}-Coaster Set`;$('#cap-set-count').textContent=String(approval.setCount||1);$('#cap-total-coasters').textContent=String(approval.totalCoasters||approval.setSize||4);$('#cap-fulfillment').textContent=fulfillment(approval.fulfillmentMethod);
     const designWork=money(approval.artworkCharge)+money(approval.billableWorkTotal);
-    $('#cap-base-total').textContent=fmt(money(approval.basePrice)*Math.max(1,Number(approval.setCount||1)));$('#cap-art-charge').textContent=fmt(designWork);$('#cap-other-charge').textContent=fmt(approval.otherCharge);$('#cap-shipping').textContent=fmt(approval.shippingAmount);$('#cap-discount').textContent=`−${fmt(approval.discountAmount)}`;$('#cap-final-total').textContent=fmt(approval.finalAmount);
-    $('#cap-art-row').hidden=designWork===0;$('#cap-other-row').hidden=money(approval.otherCharge)===0;$('#cap-shipping-row').hidden=money(approval.shippingAmount)===0;$('#cap-discount-row').hidden=money(approval.discountAmount)===0;
+    const payStatus=String(approval.paymentStatus||'').toUpperCase(),paid=payStatus==='PAID';const knownTax=taxReview?money(taxReview.taxAmount):money(approval.taxAmount);const knownPaymentTotal=taxReview?money(taxReview.totalAmount):(money(approval.paymentTotal)||money(approval.finalAmount));const showPaymentTotal=!!taxReview||paid;
+    $('#cap-base-total').textContent=fmt(money(approval.basePrice)*Math.max(1,Number(approval.setCount||1)));$('#cap-art-charge').textContent=fmt(designWork);$('#cap-other-charge').textContent=fmt(approval.otherCharge);$('#cap-shipping').textContent=fmt(approval.shippingAmount);$('#cap-discount').textContent=`−${fmt(approval.discountAmount)}`;$('#cap-tax-amount').textContent=fmt(knownTax);$('#cap-final-total').textContent=fmt(showPaymentTotal?knownPaymentTotal:approval.finalAmount);$('#cap-total-label').textContent=showPaymentTotal?'PAYMENT TOTAL':'APPROVED SUBTOTAL';
+    $('#cap-art-row').hidden=designWork===0;$('#cap-other-row').hidden=money(approval.otherCharge)===0;$('#cap-shipping-row').hidden=money(approval.shippingAmount)===0;$('#cap-tax-row').hidden=knownTax===0;$('#cap-discount-row').hidden=money(approval.discountAmount)===0;
     const shipped=approval.fulfillmentMethod==='SHIP';
     $('#cap-paypal-address-card').hidden=!(shipped&&approval.paymentRequired);
     if(approval.paymentRequired){
-      $('#cap-payment-note').textContent=shipped?'After approval, continue to PayPal to pay and choose/confirm the shipping address. WestTech imports the PayPal-confirmed address after payment.':'Payment will be requested after you approve this proof. After payment, your order enters the WestTech production queue.';
+      $('#cap-payment-note').textContent=shipped?'After approval, continue to PayPal and confirm the shipping address. Colorado destinations add address-based sales tax before capture; out-of-state shipments do not.':'After approval, Colorado sales tax is calculated using WestTech’s pickup address before PayPal captures payment.';
     }else $('#cap-payment-note').textContent='WestTech has marked this order as no-charge. No payment will be requested after approval.';
     if(approval.customerReviewNote){$('#cap-note-card').hidden=false;$('#cap-review-note').textContent=approval.customerReviewNote;}else $('#cap-note-card').hidden=true;
 
     const status=String(approval.proofStatus||'SENT');
     if(status==='APPROVED'){
       $('#cap-status').textContent='APPROVED';$('#cap-status').classList.add('approved');
-      const payStatus=String(approval.paymentStatus||'').toUpperCase();
       if(!approval.paymentRequired||payStatus==='NOT_REQUIRED')$('#cap-actions').innerHTML='<div class="cap-complete"><strong>Proof approved.</strong>No payment is required. Your order is now in the WestTech production queue.</div>';
       else if(payStatus==='PAID')$('#cap-actions').innerHTML='<div class="cap-complete"><strong>Proof approved + paid.</strong>Thank you. Your order is now in the WestTech production queue.</div>';
       else if(approval.paypalApprovalUrl)$('#cap-actions').innerHTML=`<div class="cap-complete"><strong>Proof approved.</strong>Continue to PayPal to complete payment${shipped?' and confirm your shipping address':''}.</div><a class="cap-primary" href="${esc(approval.paypalApprovalUrl)}">Continue to PayPal →</a>`;
@@ -94,6 +124,7 @@
     }else if(status==='CHANGES_REQUESTED'){
       $('#cap-status').textContent='CHANGES REQUESTED';$('#cap-status').classList.add('changes');$('#cap-actions').innerHTML='<div class="cap-complete"><strong>Changes requested.</strong>WestTech has received your request and will prepare the next proof.</div>';
     }
+    renderTaxReview();
     renderProof();
   }
 
@@ -122,6 +153,6 @@
     try{await loadApproval();if(paymentCancelled)message('PayPal payment was cancelled. Your approved proof is still saved; you can continue to PayPal whenever you are ready.','');if(paymentReturn){await captureReturnedPayPal();}render();}
     catch(e){showError(e.message||'Could not load this proof.');}
   }
-  $('#cap-confirm').addEventListener('change',()=>{$('#cap-approve').disabled=!$('#cap-confirm').checked;});$('#cap-approve').addEventListener('click',()=>act('approve'));$('#cap-request-change').addEventListener('click',()=>act('requestChanges'));
+  $('#cap-confirm').addEventListener('change',()=>{$('#cap-approve').disabled=!$('#cap-confirm').checked;});$('#cap-approve').addEventListener('click',()=>act('approve'));$('#cap-request-change').addEventListener('click',()=>act('requestChanges'));$('#cap-tax-confirm').addEventListener('change',()=>{$('#cap-complete-order').disabled=!$('#cap-tax-confirm').checked;});$('#cap-complete-order').addEventListener('click',completeOrder);
   boot();
 })();

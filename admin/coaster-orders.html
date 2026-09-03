@@ -104,14 +104,17 @@
             <div class="ca-production-summary">
               <div class="ca-production-stat"><small>MAKE</small><strong id="ca-prod-quantity">—</strong><span id="ca-prod-set-detail">—</span></div>
               <div class="ca-production-stat"><small>DELIVERY</small><strong id="ca-prod-fulfillment">—</strong><span>Approved fulfillment method</span></div>
-              <div class="ca-production-stat"><small>APPROVED TOTAL</small><strong id="ca-prod-price">$0.00</strong><span>Customer terms frozen</span></div>
+              <div class="ca-production-stat"><small>ORDER TOTAL</small><strong id="ca-prod-price">$0.00</strong><span id="ca-prod-price-detail">Customer terms frozen</span></div>
               <div class="ca-production-stat"><small>PAYMENT</small><strong id="ca-prod-payment">—</strong><span id="ca-prod-payment-detail">—</span></div>
             </div>
             <div class="ca-production-controls">
               <div class="ca-field">
                 <label for="ca-production-status">Production status</label>
                 <select id="ca-production-status">
+                  <option value="PRODUCTION_QUEUE">Production Queue</option>
                   <option value="IN_PRODUCTION">In Production</option>
+                  <option value="PREPARING_TO_SHIP">Preparing to Ship</option>
+                  <option value="PREPARING_FOR_PICKUP">Preparing for Pickup</option>
                   <option value="READY_FOR_PICKUP">Ready for Pickup</option>
                   <option value="SHIPPED">Shipped</option>
                   <option value="COMPLETED">Completed</option>

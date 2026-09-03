@@ -45,9 +45,10 @@
                 <div id="cap-art-row"><span>Artwork / design work</span><strong id="cap-art-charge">$0.00</strong></div>
                 <div id="cap-other-row"><span>Other charge</span><strong id="cap-other-charge">$0.00</strong></div>
                 <div id="cap-shipping-row"><span>Shipping</span><strong id="cap-shipping">$0.00</strong></div>
+                <div id="cap-tax-row" hidden><span>Colorado sales tax</span><strong id="cap-tax-amount">$0.00</strong></div>
                 <div id="cap-discount-row"><span>Discount / special pricing</span><strong id="cap-discount">−$0.00</strong></div>
               </div>
-              <div class="cap-total"><span>FINAL TOTAL</span><strong id="cap-final-total">$0.00</strong></div>
+              <div class="cap-total"><span id="cap-total-label">APPROVED SUBTOTAL</span><strong id="cap-final-total">$0.00</strong></div>
               <p class="cap-payment-note" id="cap-payment-note">Payment will be requested after proof approval.</p>
             </section>
 
@@ -61,9 +62,24 @@
               <p class="cap-review-note" id="cap-review-note"></p>
             </section>
 
+            <section class="cap-card" id="cap-tax-card" hidden>
+              <div class="cap-card-head"><div><span>COLORADO SALES TAX</span><strong>Verify the locked address and payment total</strong></div><small>BEFORE CAPTURE</small></div>
+              <p class="cap-review-note" id="cap-tax-intro">PayPal returned this address for the tax calculation.</p>
+              <div class="cap-tax-address" id="cap-tax-address"></div>
+              <div class="cap-price-lines">
+                <div><span>Approved taxable subtotal</span><strong id="cap-tax-subtotal">$0.00</strong></div>
+                <div id="cap-tax-shipping-row"><span>Shipping</span><strong id="cap-tax-shipping">$0.00</strong></div>
+                <div><span>Colorado sales tax <small id="cap-tax-rate"></small></span><strong id="cap-tax-review-amount">$0.00</strong></div>
+              </div>
+              <div class="cap-total"><span>PAYMENT TOTAL</span><strong id="cap-tax-total">$0.00</strong></div>
+              <label class="cap-confirm"><input id="cap-tax-confirm" type="checkbox"/><span id="cap-tax-confirm-copy">I verified this address and authorize the payment total shown above.</span></label>
+              <button class="cap-primary" id="cap-complete-order" type="button" disabled>Complete Order</button>
+              <div class="cap-message" id="cap-tax-message" hidden></div>
+            </section>
+
             <section class="cap-card cap-action-card" id="cap-actions">
               <div class="cap-card-head"><div><span>YOUR DECISION</span><strong>Approve or request a change</strong></div></div>
-              <label class="cap-confirm"><input id="cap-confirm" type="checkbox"/><span>I approve the proof, quantity, final price, and delivery method shown above.</span></label>
+              <label class="cap-confirm"><input id="cap-confirm" type="checkbox"/><span>I approve the proof, quantity, approved subtotal, and delivery method shown above. Applicable Colorado sales tax is calculated before payment.</span></label>
               <button class="cap-primary" id="cap-approve" type="button" disabled>Approve Design &amp; Terms →</button>
               <div class="cap-divider"><span>or</span></div>
               <label class="cap-change-label" for="cap-change">Need something changed?</label>

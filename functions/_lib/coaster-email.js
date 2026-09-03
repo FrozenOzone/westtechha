@@ -31,7 +31,7 @@ function template(type,order,links={}){
   const name=clean(order?.customerName,120)||'there';
   const orderId=clean(order?.orderId,80)||'WestTech order';
   const summary=setSummary(order);
-  const finalTotal=money(order?.finalAmount);
+  const finalTotal=money(String(order?.paymentStatus||'').toUpperCase()==='PAID'&&Number(order?.paymentTotal)>0?order.paymentTotal:order?.finalAmount);
   const approvalUrl=safeLink(links.approvalUrl);
   const paymentUrl=safeLink(links.paymentUrl||order?.paypalApprovalUrl);
   const siteUrl=safeLink(links.siteUrl)||'https://westtechha.com/coasters/';
@@ -53,7 +53,7 @@ function template(type,order,links={}){
     intro='I’ve reviewed your request and prepared the design that WestTech will use for your order.';
     process='Please check the artwork, wording, quantity, fulfillment method, and final total. Once you approve the proof, those customer-facing terms become the production reference. If something needs changing, use the change-request option instead of approving it.';
     action='Your next step is to review the proof and either approve it or request changes.';
-    details=[`Order: ${orderId}`,summary,`Final total: ${finalTotal}`];
+    details=[`Order: ${orderId}`,summary,`Approved subtotal: ${finalTotal}`];
     buttonLabel='Review Proof & Terms';buttonUrl=approvalUrl;
   }else if(type==='CHANGES_REQUESTED'){
     subject=`I received your coaster changes — ${orderId}`;
@@ -68,7 +68,7 @@ function template(type,order,links={}){
     intro='Your proof approval is recorded and the design is locked in. Payment is the last step before your order enters the WestTech production queue.';
     process='Paying does not mean a printer starts immediately. WestTech manufactures custom work in small batches, so paid orders enter the production queue first and I’ll send another update when manufacturing actually begins.';
     action='Your next step is to complete payment through PayPal.';
-    details=[`Order: ${orderId}`,summary,`Approved total: ${finalTotal}`];
+    details=[`Order: ${orderId}`,summary,`Approved subtotal: ${finalTotal}`];
     if(order?.fulfillmentMethod==='SHIP')details.push('Shipping address: choose or confirm it in PayPal. WestTech will use the PayPal-confirmed address for this order.');
     buttonLabel='Continue to PayPal';buttonUrl=paymentUrl;
   }else if(type==='PRODUCTION_QUEUED'){

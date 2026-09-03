@@ -36,7 +36,8 @@ export async function sendCoasterAdminProductionEmail(env,{order,requestUrl=''}=
   const adminUrl=`${root}/admin/coaster-orders.html?order=${encodeURIComponent(order.orderId)}`;
   const subject=paid?`PAYMENT RECEIVED — ${order.orderId} — PRODUCTION QUEUE`:`CUSTOMER APPROVED — ${order.orderId} — PRODUCTION QUEUE`;
   const headline=paid?'Payment received — order is queued.':'Customer approved — order is queued.';
-  const paymentLine=paid?`Paid: ${money(order.finalAmount)}`:(noCharge?'Payment: Not required':`Approved total: ${money(order.finalAmount)}`);
+  const paidTotal=Number(order.paymentTotal)>0?order.paymentTotal:order.finalAmount;
+  const paymentLine=paid?`Paid: ${money(paidTotal)}${Number(order.taxAmount)>0?` (includes ${money(order.taxAmount)} Colorado sales tax)`:''}`:(noCharge?'Payment: Not required':`Approved subtotal: ${money(order.finalAmount)}`);
   const fulfillment=order.fulfillmentMethod==='LOCAL_PICKUP'?'Local Pickup':'Ship Order';
   const rows=[
     ['Order',order.orderId],['Customer',order.customerName||'—'],['Email',order.customerEmail||'—'],

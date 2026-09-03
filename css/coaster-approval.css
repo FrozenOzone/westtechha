@@ -5,3 +5,9 @@
 
 .cap-address-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}.cap-field{display:grid;gap:6px}.cap-field-full{grid-column:1/-1}.cap-field>span{color:#879db5;font-size:.59rem;font-weight:900}.cap-field>span small{font-weight:700;color:#6f879f}.cap-field input{width:100%;min-width:0;border:1px solid #334a66;border-radius:10px;background:#0a1626;color:#f0f6fc;padding:10px 11px;font:inherit;font-size:.7rem;outline:none}.cap-field input:focus{border-color:#5baae4;box-shadow:0 0 0 3px rgba(22,119,196,.12)}.cap-field input:disabled{opacity:.76;background:#08131f;color:#9eb1c4}.cap-address-note{margin:10px 1px 0;color:#7890aa;font-size:.59rem;line-height:1.5}#cap-shipping-status{color:#9ed1f3}.cap-card.address-error{border-color:#8e3e49;box-shadow:inset 0 0 0 1px rgba(142,62,73,.18)}
 @media(max-width:760px){.cap-address-grid{grid-template-columns:1fr}.cap-field-full{grid-column:auto}}
+
+
+#cap-tax-card[hidden]{display:none!important}
+.cap-tax-address{margin:12px 0;padding:13px;border:1px solid rgba(91,170,228,.28);border-radius:11px;background:#081522;color:#e3eef8;font-size:.72rem;font-weight:800;line-height:1.55;white-space:pre-line}
+#cap-tax-card .cap-confirm{margin-top:13px}
+#cap-tax-rate{color:#7f95ad;font-size:.55rem;font-weight:700}
