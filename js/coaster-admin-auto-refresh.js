@@ -3,7 +3,7 @@
   if(location.protocol==='file:')return;
   let lastActivity=Date.now();
   let lastRefresh=0;
-  const ACTIVE_STATUSES=new Set(['AWAITING PAYMENT','PROOF APPROVED']);
+  const ACTIVE_STATUSES=new Set(['PROOF SENT','PROOF APPROVED','AWAITING PAYMENT']);
 
   function status(){return String(document.querySelector('#ca-status-pill')?.textContent||'').trim().toUpperCase();}
   function editing(){const el=document.activeElement;return !!el&&/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName);}
