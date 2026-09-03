@@ -115,7 +115,10 @@
   }
 
   async function renderQueueIfNeeded(){
-    if(queueRenderBusy||status()!=='PRODUCTION QUEUE')return;
+    if(queueRenderBusy||queueSelectTouched||status()!=='PRODUCTION QUEUE')return;
+    const select=ensureQueueOption();
+    const card=$('#ca-production-card');
+    if(card&&!card.hidden&&select?.value==='PRODUCTION_QUEUE')return;
     queueRenderBusy=true;
     try{applyQueueView(await getOrder());}catch(e){}finally{queueRenderBusy=false;}
   }
