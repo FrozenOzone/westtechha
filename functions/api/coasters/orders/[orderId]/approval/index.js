@@ -20,7 +20,7 @@ export async function onRequestPost(context){
       try{
         order=await ensureCoasterPayPalOrder(context.env,order.orderId,{returnUrl,cancelUrl});
         if(order.paymentRequired)await sendCoasterCustomerEmail(context.env,{type:'PAYMENT_REQUIRED',order,paymentUrl:order.paypalApprovalUrl,requestUrl:context.request.url});
-        else if(String(order.status||'').toUpperCase()==='IN_PRODUCTION')await sendCoasterAdminProductionEmail(context.env,{order,requestUrl:context.request.url});
+        else if(String(order.status||'').toUpperCase()==='PRODUCTION_QUEUE')await sendCoasterAdminProductionEmail(context.env,{order,requestUrl:context.request.url});
       }catch(error){order=await recordCoasterPayPalFailure(context.env,order.orderId,error);paymentWarning=error.message||'PayPal checkout setup needs WestTech review.';}
     }
     return jsonResponse({ok:true,approval:approvalView(order),paymentWarning:paymentWarning||undefined});
