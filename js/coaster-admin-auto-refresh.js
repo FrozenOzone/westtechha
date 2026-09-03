@@ -13,6 +13,12 @@
   const WAITING_STATUSES=new Set(['PROOF_SENT','PROOF_APPROVED','AWAITING_PAYMENT']);
   const EXTENDED_STATUSES=new Set(['PRODUCTION_QUEUE','PREPARING_TO_SHIP','PREPARING_FOR_PICKUP']);
   const STANDARD_SHIPPING=['8.95','10.95','14.95'];
+  const STANDARD_CARRIERS=new Map([
+    ['USPS','USPS'],
+    ['UPS','UPS'],
+    ['FEDEX','FedEx'],
+    ['DHL','DHL']
+  ]);
 
   const $=s=>document.querySelector(s);
   function statusCode(){return String($('#ca-status-pill')?.textContent||'').trim().toUpperCase().replaceAll(' ','_');}
@@ -151,6 +157,44 @@
     return select;
   }
 
+  function carrierKey(value){return String(value||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'');}
+  function addCustomCarrierOption(select,value){
+    const cleanValue=String(value||'').trim().slice(0,80);if(!cleanValue)return '';
+    let option=Array.from(select.options).find(o=>o.value===cleanValue);
+    if(!option){option=document.createElement('option');option.value=cleanValue;option.textContent=`Other — ${cleanValue}`;option.dataset.custom='1';select.insertBefore(option,Array.from(select.options).find(o=>o.value==='OTHER')||null);}
+    return cleanValue;
+  }
+  function setCarrierValue(value){
+    const select=ensureCarrierControl();if(!select)return;
+    const raw=String(value||'').trim();
+    if(!raw){select.value='';return;}
+    const standard=STANDARD_CARRIERS.get(carrierKey(raw));
+    if(standard){select.value=standard;return;}
+    select.value=addCustomCarrierOption(select,raw)||'';
+  }
+  function ensureCarrierControl(){
+    const existing=$('#ca-tracking-carrier');if(!existing)return null;
+    if(existing.tagName==='SELECT')return existing;
+    const current=String(existing.value||'').trim();
+    const select=document.createElement('select');
+    select.id='ca-tracking-carrier';
+    select.innerHTML='<option value="">Select carrier…</option><option value="USPS">USPS</option><option value="UPS">UPS</option><option value="FedEx">FedEx</option><option value="DHL">DHL</option><option value="OTHER">Other / Custom…</option>';
+    select.disabled=existing.disabled;
+    select.className=existing.className;
+    existing.replaceWith(select);
+    const field=select.closest('.ca-field');
+    if(field&&!field.querySelector('.ca-carrier-note')){const note=document.createElement('small');note.className='ca-carrier-note';note.textContent='USPS, UPS, FedEx, and DHL create the customer tracking link automatically.';field.appendChild(note);}
+    select.addEventListener('change',()=>{
+      if(select.value!=='OTHER')return;
+      const custom=window.prompt('Enter the carrier name for this shipment:','');
+      if(custom&&custom.trim()){const value=addCustomCarrierOption(select,custom);select.value=value;}
+      else select.value='';
+    });
+    if(current){const standard=STANDARD_CARRIERS.get(carrierKey(current));if(standard)select.value=standard;else select.value=addCustomCarrierOption(select,current);}
+    return select;
+  }
+  function selectedCarrierValue(){const select=ensureCarrierControl();return String(select?.value||'').trim();}
+
   function insertOption(select,value,label,beforeValue=''){
     if(Array.from(select.options).some(o=>o.value===value))return;
     const option=document.createElement('option');option.value=value;option.textContent=label;
@@ -238,7 +282,7 @@
       if($('#ca-prod-delivery-secondary'))$('#ca-prod-delivery-secondary').textContent=address?`${address} • ${stageHelp(currentStatus,false)}`:stageHelp(currentStatus,false)||'Shipping address is missing from this order.';
       if(tracking)tracking.hidden=false;delivery?.classList.toggle('missing',!address);
     }
-    if($('#ca-tracking-carrier')&&document.activeElement!==$('#ca-tracking-carrier'))$('#ca-tracking-carrier').value=order.trackingCarrier||'';
+    if($('#ca-tracking-carrier')&&document.activeElement!==$('#ca-tracking-carrier'))setCarrierValue(order.trackingCarrier||'');
     if($('#ca-tracking-number')&&document.activeElement!==$('#ca-tracking-number'))$('#ca-tracking-number').value=order.trackingNumber||'';
     if($('#ca-production-notes')&&document.activeElement!==$('#ca-production-notes'))$('#ca-production-notes').value=order.adminNotes||'';
 
@@ -283,7 +327,7 @@
     const button=e.currentTarget;const original=button.textContent;button.disabled=true;button.textContent='Saving Production Update…';
     try{
       const select=ensureProductionOptions();const next=select?.value||statusCode();
-      const payload={action:'saveReview',status:next,adminNotes:($('#ca-production-notes')?.value||'').trim(),trackingCarrier:($('#ca-tracking-carrier')?.value||'').trim(),trackingNumber:($('#ca-tracking-number')?.value||'').trim()};
+      const payload={action:'saveReview',status:next,adminNotes:($('#ca-production-notes')?.value||'').trim(),trackingCarrier:selectedCarrierValue(),trackingNumber:($('#ca-tracking-number')?.value||'').trim()};
       const r=await fetch(`/api/admin/coasters/orders/${encodeURIComponent(orderId())}`,{method:'POST',headers:authHeaders({'Content-Type':'application/json'}),body:JSON.stringify(payload)});
       const data=await r.json().catch(()=>({}));if(!r.ok||!data.ok)throw new Error(data.message||'Could not save production update.');
       productionSelectTouched=false;
@@ -299,14 +343,15 @@
   }
 
   ensureShippingControl();
+  ensureCarrierControl();
   ensureProductionOptions();
   $('#ca-production-status')?.addEventListener('change',()=>{productionSelectTouched=true;configureFulfillmentOptions();});
   ['#ca-save','#ca-save-top'].forEach(sel=>$(sel)?.addEventListener('click',saveExtended,true));
   ['input','change','keydown','pointerdown'].forEach(type=>document.addEventListener(type,markActivity,{passive:true}));
-  window.addEventListener('focus',()=>setTimeout(()=>{ensureShippingControl();refreshIfWaiting(true);renderExtendedIfNeeded();configureFulfillmentOptions();},400));
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(()=>{ensureShippingControl();refreshIfWaiting(true);renderExtendedIfNeeded();configureFulfillmentOptions();},400);});
-  const observer=new MutationObserver(()=>{ensureShippingControl();ensureProductionOptions();if(EXTENDED_STATUSES.has(statusCode()))setTimeout(renderExtendedIfNeeded,50);else configureFulfillmentOptions();});
+  window.addEventListener('focus',()=>setTimeout(()=>{ensureShippingControl();ensureCarrierControl();refreshIfWaiting(true);renderExtendedIfNeeded();configureFulfillmentOptions();},400));
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(()=>{ensureShippingControl();ensureCarrierControl();refreshIfWaiting(true);renderExtendedIfNeeded();configureFulfillmentOptions();},400);});
+  const observer=new MutationObserver(()=>{ensureShippingControl();ensureCarrierControl();ensureProductionOptions();if(EXTENDED_STATUSES.has(statusCode()))setTimeout(renderExtendedIfNeeded,50);else configureFulfillmentOptions();});
   if($('#ca-status-pill'))observer.observe($('#ca-status-pill'),{childList:true,characterData:true,subtree:true});
-  setInterval(()=>{ensureShippingControl();refreshIfWaiting(false);renderExtendedIfNeeded();configureFulfillmentOptions();},12000);
-  setTimeout(()=>{ensureShippingControl();renderExtendedIfNeeded();configureFulfillmentOptions();},300);
+  setInterval(()=>{ensureShippingControl();ensureCarrierControl();refreshIfWaiting(false);renderExtendedIfNeeded();configureFulfillmentOptions();},12000);
+  setTimeout(()=>{ensureShippingControl();ensureCarrierControl();renderExtendedIfNeeded();configureFulfillmentOptions();},300);
 })();
