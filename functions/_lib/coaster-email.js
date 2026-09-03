@@ -6,7 +6,7 @@ const EMAIL_TYPES = new Set([
   'READY_FOR_PICKUP','SHIPPED','COMPLETED'
 ]);
 
-function esc(value){return String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function esc(value){return String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));}
 function money(value){const n=Number(value||0);return Number.isFinite(n)?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n):'$0.00';}
 function clean(value,max=500){return typeof value==='string'?value.trim().slice(0,max):'';}
 function setSummary(order){const setSize=Math.max(1,Number(order?.setSize||4));const setCount=Math.max(1,Number(order?.setCount||1));const total=Math.max(1,Number(order?.totalCoasters||setSize*setCount));return `${setCount} × ${setSize}-Coaster Set${setCount===1?'':'s'} • ${total} coaster${total===1?'':'s'}`;}
@@ -15,6 +15,17 @@ function replyTo(env){return clean(env?.COASTER_EMAIL_REPLY_TO||env?.ORDERS_EMAI
 function fromAddress(env){return clean(env?.COASTER_EMAIL_FROM||'WestTech Home Automation <orders@westtechha.com>',320);}
 function bccList(env){return clean(env?.COASTER_EMAIL_BCC||'',600).split(',').map(v=>v.trim()).filter(Boolean).slice(0,10);}
 function safeLink(value){try{const u=new URL(String(value||''));return ['https:','http:'].includes(u.protocol)?u.toString():'';}catch(e){return '';}}
+function trackingLink(carrier,tracking){
+  const code=clean(carrier,80).toUpperCase().replace(/[^A-Z0-9]/g,'');
+  const number=clean(tracking,160).replace(/\s+/g,'');
+  if(!number)return '';
+  const q=encodeURIComponent(number);
+  if(code==='USPS')return `https://tools.usps.com/go/TrackConfirmAction?tLabels=${q}`;
+  if(code==='UPS')return `https://www.ups.com/track?loc=en_US&tracknum=${q}`;
+  if(code==='FEDEX')return `https://www.fedex.com/fedextrack/?trknbr=${q}`;
+  if(code==='DHL')return `https://www.dhl.com/us-en/home/tracking.html?awb=${q}&brand=dhl`;
+  return '';
+}
 
 function template(type,order,links={}){
   const name=clean(order?.customerName,120)||'there';
@@ -26,6 +37,7 @@ function template(type,order,links={}){
   const siteUrl=safeLink(links.siteUrl)||'https://westtechha.com/coasters/';
   const tracking=clean(order?.trackingNumber,160);
   const carrier=clean(order?.trackingCarrier,80);
+  const trackingUrl=safeLink(trackingLink(carrier,tracking));
   let subject='',headline='',intro='',process='',action='',details=[],buttonLabel='',buttonUrl='';
 
   if(type==='REQUEST_RECEIVED'){
@@ -100,9 +112,11 @@ function template(type,order,links={}){
     headline=`Your coaster order is on the way, ${name}.`;
     intro='Manufacturing, inspection, and packaging are complete, and your WestTech custom coaster order has now shipped.';
     process='The order has left the WestTech production workflow and is now with the carrier.';
-    action='Use the tracking information below to follow the shipment.';
+    action=trackingUrl?'Use the tracking information below or the Track Your Package button to follow the shipment.':'Use the tracking information below to follow the shipment.';
     details=[`Order: ${orderId}`,summary];
-    if(carrier||tracking)details.push(`Tracking: ${[carrier,tracking].filter(Boolean).join(' • ')}`);
+    if(carrier)details.push(`Carrier: ${carrier}`);
+    if(tracking)details.push(`Tracking number: ${tracking}`);
+    if(trackingUrl){buttonLabel='Track Your Package';buttonUrl=trackingUrl;}
   }else if(type==='COMPLETED'){
     subject=`WestTech coaster order complete — ${orderId}`;
     headline=`That wraps up your custom coaster order, ${name}.`;
@@ -112,7 +126,14 @@ function template(type,order,links={}){
     details=[`Order: ${orderId}`,summary];
   }
 
-  const detailHtml=details.map(v=>`<div style="padding:8px 0;border-bottom:1px solid #dfe7f1;color:#182437;font-size:14px;">${esc(v)}</div>`).join('');
+  const detailHtml=details.map(v=>{
+    const value=String(v||'');
+    if(trackingUrl&&value.startsWith('Tracking number: ')){
+      const number=value.slice('Tracking number: '.length);
+      return `<div style="padding:8px 0;border-bottom:1px solid #dfe7f1;color:#182437;font-size:14px;">Tracking number: <a href="${esc(trackingUrl)}" style="color:#1677C4;font-weight:700;text-decoration:underline;">${esc(number)}</a></div>`;
+    }
+    return `<div style="padding:8px 0;border-bottom:1px solid #dfe7f1;color:#182437;font-size:14px;">${esc(value)}</div>`;
+  }).join('');
   const button=buttonLabel&&buttonUrl?`<div style="margin:26px 0;"><a href="${esc(buttonUrl)}" style="display:inline-block;background:#1677C4;color:#fff;text-decoration:none;font-weight:700;padding:13px 20px;border-radius:8px;">${esc(buttonLabel)}</a></div>`:'';
   const paragraph=v=>v?`<p style="font-size:15px;line-height:1.65;color:#42526a;margin:0 0 16px;">${esc(v)}</p>`:'';
   const html=`<!doctype html><html><body style="margin:0;background:#f3f6fa;font-family:Arial,Helvetica,sans-serif;color:#152033;"><div style="max-width:640px;margin:0 auto;padding:28px 16px;"><div style="background:#071426;color:#fff;padding:22px 26px;border-radius:12px 12px 0 0;"><div style="font-size:22px;font-weight:800;color:#67aee8;">WestTech Home Automation</div><div style="font-size:11px;letter-spacing:1.5px;margin-top:4px;color:#aabbd0;">CUSTOM COASTERS • BUILT SMART • MADE CUSTOM</div></div><div style="background:#fff;padding:30px 26px;border:1px solid #dde6f0;border-top:0;border-radius:0 0 12px 12px;"><h1 style="font-size:24px;line-height:1.2;margin:0 0 18px;">${esc(headline)}</h1>${paragraph(intro)}${paragraph(process)}${paragraph(action)}<div style="border-top:1px solid #dfe7f1;margin-top:20px;">${detailHtml}</div>${button}<p style="font-size:14px;line-height:1.6;color:#42526a;margin:26px 0 0;">Thanks,<br><strong>Ed</strong><br>WestTech Home Automation</p><p style="font-size:12px;line-height:1.5;color:#74839a;margin:18px 0 0;">Questions? Reply to this email or contact orders@westtechha.com.<br><a href="${esc(siteUrl)}" style="color:#1677C4;">WestTech Custom Coasters</a></p></div></div></body></html>`;
