@@ -1,5 +1,5 @@
 import { jsonResponse } from '../../../../../_lib/shared.js';
-import { getCoasterApprovalByToken, recordCoasterApprovalAction, approvalView } from '../../../../../_lib/coaster-orders.js';
+import { getCoasterApprovalByToken, recordCoasterApprovalAction, approvalView, getCoasterOrderDetail } from '../../../../../_lib/coaster-orders.js';
 import { ensureCoasterPayPalOrder, recordCoasterPayPalFailure } from '../../../../../_lib/coaster-paypal.js';
 import { sendCoasterCustomerEmail } from '../../../../../_lib/coaster-email.js';
 import { sendCoasterAdminProductionEmail } from '../../../../../_lib/coaster-admin-production-email.js';
@@ -18,7 +18,7 @@ async function stagePreviewAwaitingPayment(context,order){
   const db=requireOrdersDb(context.env);
   await db.prepare(`UPDATE coaster_orders SET status='AWAITING_PAYMENT',payment_status='PREVIEW_AWAITING_TEST_PAYMENT',paypal_last_error=NULL,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(order.orderId).run();
   await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PREVIEW_PAYMENT_BYPASS_READY',?)`).bind(order.orderId,JSON.stringify({status:'AWAITING_PAYMENT',paymentStatus:'PREVIEW_AWAITING_TEST_PAYMENT',paypalCalled:false})).run();
-  return (await import('../../../../../_lib/coaster-orders.js')).getCoasterOrderDetail(context.env,order.orderId);
+  return getCoasterOrderDetail(context.env,order.orderId);
 }
 export async function onRequestGet(context){
   try{const token=new URL(context.request.url).searchParams.get('token')||'';const approval=await getCoasterApprovalByToken(context.env,context.params.orderId,token);if(!approval)return jsonResponse({ok:false,message:'This approval link is invalid or expired.'},404);return jsonResponse({ok:true,approval});}
@@ -32,7 +32,7 @@ export async function onRequestPost(context){
     }else if(action==='approve'){
       if(order.paymentRequired&&previewPaymentBypass(context)){
         order=await stagePreviewAwaitingPayment(context,order);
-        paymentWarning='Preview test mode: no PayPal checkout was created. WestTech can use “Preview: Mark Paid” in Admin to continue the paid shipping workflow.';
+        paymentWarning='Preview test mode: no PayPal checkout was created. WestTech can use the Preview Payment Test page to mark this order paid and continue the shipping workflow.';
       }else{
         const root=base(context.request);const encodedOrder=encodeURIComponent(order.orderId),encodedToken=encodeURIComponent(token);
         const returnUrl=`${root}/coasters/order-approval.html?order=${encodedOrder}&approvalToken=${encodedToken}&payment=return`;
