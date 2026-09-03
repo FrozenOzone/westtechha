@@ -12,7 +12,8 @@ function adminAddress(env){return clean(env?.COASTER_ADMIN_EMAIL||env?.COASTER_E
 async function hasSent(env,orderId,key){
   try{
     const db=requireOrdersDb(env);
-    const row=await db.prepare(`SELECT id FROM coaster_order_events WHERE order_id=? AND event_type='EMAIL_SENT' AND detail LIKE ? LIMIT 1`).bind(orderId,`%\"idempotencyKey\":\"${key}\"%`).first();
+    const needle=`\"idempotencyKey\":\"${key}\"`;
+    const row=await db.prepare(`SELECT id FROM coaster_order_events WHERE order_id=? AND event_type='EMAIL_SENT' AND instr(detail,?)>0 LIMIT 1`).bind(orderId,needle).first();
     return !!row;
   }catch(e){return false;}
 }
