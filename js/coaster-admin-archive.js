@@ -9,6 +9,11 @@
   const orderId=()=>String($('#ca-order-id')?.textContent||'').trim();
   const statusCode=()=>normalize($('#ca-status-pill')?.textContent||'');
   const FILTER_KEY='westtechha-coaster-order-filter';
+  const FILTER_VALUES=new Set(['ACTIVE','COMPLETED','ARCHIVED','ALL']);
+  let filterAlignTimer=0;
+  let filterAligningTo='';
+  let archiveRenderKey='';
+  let archiveRenderBusy=false;
 
   function authHeaders(extra={}){return {'Accept':'application/json','Authorization':`Bearer ${token()}`,...extra};}
   async function getOrder(){
@@ -41,11 +46,11 @@
   function ensureFilter(){
     let select=$('#ca-order-filter');if(select)return select;
     const search=$('#ca-search');if(!search)return null;
-    select=document.createElement('select');select.id='ca-order-filter';select.className='ca-search ca-order-filter';
+    select=document.createElement('select');select.id='ca-order-filter';select.className='ca-search ca-order-filter';select.setAttribute('aria-label','Order view');
     select.innerHTML='<option value="ACTIVE">Active Orders</option><option value="COMPLETED">Completed</option><option value="ARCHIVED">Archived</option><option value="ALL">All Orders</option>';
-    select.value=sessionStorage.getItem(FILTER_KEY)||'ACTIVE';
+    const stored=sessionStorage.getItem(FILTER_KEY)||'ACTIVE';select.value=FILTER_VALUES.has(stored)?stored:'ACTIVE';
     search.insertAdjacentElement('afterend',select);
-    select.addEventListener('change',()=>{sessionStorage.setItem(FILTER_KEY,select.value);applyFilter();});
+    select.addEventListener('change',()=>{sessionStorage.setItem(FILTER_KEY,select.value);applyFilter();scheduleFilterAlignment(0);});
     return select;
   }
   function itemStatus(button){return normalize(button.querySelector('small')?.textContent||'');}
@@ -55,13 +60,40 @@
     if(filter==='ARCHIVED')return status==='ARCHIVED';
     return status!=='COMPLETED'&&status!=='ARCHIVED';
   }
+  function emptyFilterText(filter){
+    if(filter==='ARCHIVED')return 'No archived coaster orders.';
+    if(filter==='COMPLETED')return 'No completed coaster orders.';
+    return 'No orders in this view.';
+  }
   function applyFilter(){
     const select=ensureFilter();const list=$('#ca-order-list');if(!select||!list)return;
     const buttons=Array.from(list.querySelectorAll('.ca-order-item'));let visible=0;
     buttons.forEach(button=>{const show=filterMatch(itemStatus(button),select.value);button.hidden=!show;if(show)visible++;});
     const count=$('#ca-count');if(count)count.textContent=`${visible} order${visible===1?'':'s'}`;
-    const old=list.querySelector('.ca-filter-empty');if(old)old.remove();
-    if(buttons.length&&!visible){const empty=document.createElement('div');empty.className='ca-empty ca-filter-empty';empty.textContent=select.value==='ARCHIVED'?'No archived coaster orders.':select.value==='COMPLETED'?'No completed coaster orders.':'No orders in this view.';list.appendChild(empty);}
+    let empty=list.querySelector('.ca-filter-empty');
+    if(buttons.length&&!visible){
+      const message=emptyFilterText(select.value);
+      if(!empty){empty=document.createElement('div');empty.className='ca-empty ca-filter-empty';list.appendChild(empty);}
+      if(empty.textContent!==message)empty.textContent=message;
+    }else if(empty)empty.remove();
+  }
+  function alignDetailToFilter(){
+    const select=ensureFilter(),list=$('#ca-order-list');if(!select||!list)return;
+    const buttons=Array.from(list.querySelectorAll('.ca-order-item'));
+    const visible=buttons.filter(button=>!button.hidden);
+    const detail=$('#ca-detail');
+    if(!visible.length){if(detail)detail.hidden=true;filterAligningTo='';return;}
+    const selected=orderId();
+    const selectedButton=buttons.find(button=>String(button.dataset.order||'')===selected);
+    if(selectedButton&&!selectedButton.hidden){filterAligningTo='';return;}
+    const target=visible[0],targetId=String(target.dataset.order||'');
+    if(!targetId||filterAligningTo===targetId)return;
+    filterAligningTo=targetId;target.click();
+    setTimeout(()=>{if(filterAligningTo===targetId)filterAligningTo='';},1500);
+  }
+  function scheduleFilterAlignment(delay=120){
+    clearTimeout(filterAlignTimer);
+    filterAlignTimer=setTimeout(alignDetailToFilter,delay);
   }
 
   function ensureArchivePanel(){
@@ -83,8 +115,12 @@
   function shippingAddress(order){const city=[order.shippingCity,order.shippingRegion,order.shippingPostalCode].filter(Boolean).join(' ');return [order.shippingAddress1,order.shippingAddress2,city].filter(Boolean).join(' • ');}
   function ensureArchivedStatusOption(){const select=$('#ca-production-status');if(!select)return;let option=Array.from(select.options).find(o=>o.value==='ARCHIVED');if(!option){option=document.createElement('option');option.value='ARCHIVED';option.textContent='Archived';select.appendChild(option);}select.value='ARCHIVED';}
   async function renderArchivedRecord(){
-    if(statusCode()!=='ARCHIVED')return;
-    let order;try{order=await getOrder();}catch(e){return;}if(!order||normalize(order.status)!=='ARCHIVED')return;
+    const id=orderId();
+    if(statusCode()!=='ARCHIVED'||!id||archiveRenderBusy||archiveRenderKey===id)return;
+    archiveRenderBusy=true;
+    let order;try{order=await getOrder();}catch(e){archiveRenderBusy=false;return;}
+    archiveRenderBusy=false;
+    if(orderId()!==id||!order||normalize(order.status)!=='ARCHIVED')return;
     $('#ca-detail')?.classList.add('ca-production-mode');
     const card=$('#ca-production-card');if(card)card.hidden=false;
     const commercial=$('#ca-review-commercial');if(commercial)commercial.hidden=true;
@@ -119,13 +155,15 @@
     if($('#ca-proof-eyebrow'))$('#ca-proof-eyebrow').textContent='ARCHIVED ORDER RECORD';
     if($('#ca-proof-title'))$('#ca-proof-title').textContent='Proof + payment summary';
     if($('#ca-proof-status'))$('#ca-proof-status').textContent='ARCHIVED • LOCKED';
+    archiveRenderKey=id;
   }
 
   function updateArchiveUi(){
     ensureStyle();ensureFilter();ensureArchivePanel();applyFilter();
     const status=statusCode(),panel=$('#ca-archive-panel'),button=$('#ca-archive-button'),badge=$('#ca-archive-badge'),title=$('#ca-archive-title'),help=$('#ca-archive-help');
     const finished=status==='COMPLETED'||status==='ARCHIVED';
-    setArchiveLocked(finished);
+    if(status!=='ARCHIVED')archiveRenderKey='';
+    setArchiveLocked(status==='ARCHIVED');
     if(!panel||!button)return;
     panel.hidden=!finished;
     if(status==='COMPLETED'){
@@ -147,8 +185,8 @@
     catch(err){button.disabled=false;button.textContent=original;const msg=$('#ca-message');if(msg){msg.hidden=false;msg.textContent=err.message||'Could not update archive state.';msg.className='ca-inline-message error';}}
   }
 
-  const listObserver=new MutationObserver(()=>setTimeout(applyFilter,0));
-  const statusObserver=new MutationObserver(()=>setTimeout(updateArchiveUi,0));
-  function start(){ensureStyle();ensureFilter();ensureArchivePanel();applyFilter();updateArchiveUi();const list=$('#ca-order-list');if(list)listObserver.observe(list,{childList:true,subtree:true});const pill=$('#ca-status-pill');if(pill)statusObserver.observe(pill,{childList:true,characterData:true,subtree:true});setInterval(()=>{applyFilter();updateArchiveUi();},2500);}
+  const listObserver=new MutationObserver(()=>setTimeout(()=>{applyFilter();scheduleFilterAlignment();},0));
+  const statusObserver=new MutationObserver(()=>setTimeout(()=>{updateArchiveUi();scheduleFilterAlignment();},0));
+  function start(){ensureStyle();ensureFilter();ensureArchivePanel();applyFilter();updateArchiveUi();const list=$('#ca-order-list');if(list)listObserver.observe(list,{childList:true,subtree:true});const pill=$('#ca-status-pill');if(pill)statusObserver.observe(pill,{childList:true,characterData:true,subtree:true});scheduleFilterAlignment(250);setInterval(()=>{applyFilter();updateArchiveUi();scheduleFilterAlignment();},2500);}
   setTimeout(start,350);
 })();
