@@ -2,7 +2,7 @@ import { requireOrdersDb } from './orders.js';
 import { billableTotal, getCoasterOrderDetail, logEvent } from './coaster-order-data.js';
 import { bool, calcTotal, clean, integer, isLocked, makeError, nowIso, number, termsFrozen } from './coaster-order-util.js';
 
-const PRODUCTION_STATUSES = new Set(['IN_PRODUCTION','READY_FOR_PICKUP','SHIPPED','COMPLETED']);
+const PRODUCTION_STATUSES = new Set(['PRODUCTION_QUEUE','IN_PRODUCTION','READY_FOR_PICKUP','SHIPPED','COMPLETED']);
 
 export async function updateCoasterOrderAdmin(env,orderId,payload={}){
   const db=requireOrdersDb(env);const order=await getCoasterOrderDetail(env,orderId);if(!order)throw makeError('Coaster order not found.',404);
