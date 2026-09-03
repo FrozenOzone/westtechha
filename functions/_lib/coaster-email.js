@@ -98,9 +98,14 @@ function idempotencyKey(type,order){
   return `coaster-${type.toLowerCase().replaceAll('_','-')}-${id}${suffix}`.slice(0,240);
 }
 async function hasSent(env,orderId,key){
-  const db=requireOrdersDb(env);
-  const row=await db.prepare(`SELECT id FROM coaster_order_events WHERE order_id=? AND event_type='EMAIL_SENT' AND detail LIKE ? LIMIT 1`).bind(orderId,`%\"idempotencyKey\":\"${key}\"%`).first();
-  return !!row;
+  try{
+    const db=requireOrdersDb(env);
+    const needle=`\"idempotencyKey\":\"${key}\"`;
+    const row=await db.prepare(`SELECT id FROM coaster_order_events WHERE order_id=? AND event_type='EMAIL_SENT' AND instr(detail,?)>0 LIMIT 1`).bind(orderId,needle).first();
+    return !!row;
+  }catch(e){
+    return false;
+  }
 }
 async function logEvent(env,orderId,eventType,detail){
   try{const db=requireOrdersDb(env);await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,?,?)`).bind(orderId,eventType,JSON.stringify(detail)).run();}catch(e){}
