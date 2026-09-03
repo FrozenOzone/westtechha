@@ -6,6 +6,10 @@
   let lastRefresh=0;
   let productionSelectTouched=false;
   let extendedRenderBusy=false;
+  let shippingMode='AUTO';
+  let shippingOrderKey='';
+  let shippingLastCount=null;
+
   const WAITING_STATUSES=new Set(['PROOF_SENT','PROOF_APPROVED','AWAITING_PAYMENT']);
   const EXTENDED_STATUSES=new Set(['PRODUCTION_QUEUE','PREPARING_TO_SHIP','PREPARING_FOR_PICKUP']);
   const STANDARD_SHIPPING=['8.95','10.95','14.95'];
@@ -29,45 +33,121 @@
     return '';
   }
   function normalizeMoneyValue(v){const n=Number(v);return Number.isFinite(n)?n.toFixed(2):'';}
-  function syncShippingPreset(){
-    const input=$('#ca-shipping'),select=$('#ca-shipping-preset');if(!input||!select)return;
-    const value=normalizeMoneyValue(input.value);
-    select.value=STANDARD_SHIPPING.includes(value)?value:'CUSTOM';
-  }
-  function applyShippingPreset(value){
-    const input=$('#ca-shipping');if(!input||!value||value==='CUSTOM')return;
+  function setShippingAmount(value){
+    const input=$('#ca-shipping');if(!input)return;
     input.value=value;
     input.dispatchEvent(new Event('input',{bubbles:true}));
     input.dispatchEvent(new Event('change',{bubbles:true}));
   }
-  function ensureShippingPreset(){
+  function shippingIsPickup(){return document.querySelector('input[name="fulfillment"][value="LOCAL_PICKUP"]')?.checked===true;}
+  function showShippingMode(mode){
+    const input=$('#ca-shipping'),select=$('#ca-shipping-preset'),back=$('#ca-shipping-custom-back'),note=$('#ca-shipping-preset-note');
+    if(!input||!select)return;
+    const moneyWrap=input.parentElement;
+    const custom=mode==='CUSTOM';
+    select.hidden=custom;
+    if(moneyWrap)moneyWrap.hidden=!custom;
+    if(back)back.hidden=!custom;
+    if(note)note.textContent=custom?'Enter the shipping amount WestTech will charge for this order.':'Automatically suggested from the number of sets. Choose Custom Amount for larger or unusual shipments.';
+    if(custom&&!input.disabled)setTimeout(()=>input.focus(),0);
+  }
+  function syncShippingControl(autoFill=true){
+    const input=$('#ca-shipping'),select=$('#ca-shipping-preset'),count=$('#ca-set-count');
+    if(!input||!select||!count)return;
+    const key=orderId();
+    const setCount=Math.max(1,Number.parseInt(count.value,10)||1);
+    const suggested=suggestedShipping(setCount);
+    const current=normalizeMoneyValue(input.value);
+
+    if(key!==shippingOrderKey){
+      shippingOrderKey=key;
+      shippingLastCount=setCount;
+      shippingMode=(current&&current!=='0.00'&&!STANDARD_SHIPPING.includes(current))||setCount>=5?'CUSTOM':'AUTO';
+    }
+
+    const pickup=shippingIsPickup();
+    const locked=input.disabled;
+
+    if(!pickup&&shippingMode!=='CUSTOM'&&autoFill&&!locked&&suggested&&(!current||current==='0.00')){
+      setShippingAmount(suggested);
+    }
+
+    const value=normalizeMoneyValue(input.value);
+    if(shippingMode!=='CUSTOM'){
+      if(STANDARD_SHIPPING.includes(value))select.value=value;
+      else if(suggested)select.value=suggested;
+      else select.value='CUSTOM';
+    }else select.value='CUSTOM';
+
+    select.disabled=pickup||locked;
+    const back=$('#ca-shipping-custom-back');if(back)back.disabled=pickup||locked;
+    showShippingMode(shippingMode);
+  }
+  function handleShippingSetCountChange(){
+    const count=$('#ca-set-count');if(!count)return;
+    const setCount=Math.max(1,Number.parseInt(count.value,10)||1);
+    if(setCount===shippingLastCount)return;
+    shippingLastCount=setCount;
+    if(shippingMode==='CUSTOM'){syncShippingControl(false);return;}
+    const next=suggestedShipping(setCount);
+    if(next){shippingMode='AUTO';setShippingAmount(next);}
+    else{shippingMode='CUSTOM';showShippingMode('CUSTOM');}
+    syncShippingControl(false);
+  }
+  function ensureShippingControl(){
     const input=$('#ca-shipping');if(!input)return null;
     let select=$('#ca-shipping-preset');
     if(!select){
       const field=input.closest('.ca-field');if(!field)return null;
-      const label=field.querySelector('label[for="ca-shipping"]');if(label)label.textContent='Shipping amount';
+      const label=field.querySelector('label[for="ca-shipping"]');if(label)label.textContent='Shipping';
+      const moneyWrap=input.parentElement;
       select=document.createElement('select');
       select.id='ca-shipping-preset';
-      select.setAttribute('aria-label','Shipping rate preset');
-      select.innerHTML='<option value="CUSTOM">Custom / Large Order</option><option value="8.95">1 set — $8.95</option><option value="10.95">2 sets — $10.95</option><option value="14.95">3–4 sets — $14.95</option>';
-      const moneyWrap=input.parentElement;
+      select.setAttribute('aria-label','Shipping rate');
+      select.innerHTML='<option value="8.95">1 set — $8.95</option><option value="10.95">2 sets — $10.95</option><option value="14.95">3–4 sets — $14.95</option><option value="CUSTOM">Custom Amount</option>';
       field.insertBefore(select,moneyWrap);
+
+      const back=document.createElement('button');
+      back.type='button';
+      back.id='ca-shipping-custom-back';
+      back.className='ca-mini-btn';
+      back.textContent='Use standard shipping rate';
+      back.hidden=true;
+      field.insertBefore(back,moneyWrap.nextSibling);
+
       const note=document.createElement('small');
       note.id='ca-shipping-preset-note';
-      note.textContent='WestTech standard shipping presets. The dollar amount below stays editable for larger or unusual orders.';
-      field.insertBefore(note,moneyWrap);
-      select.addEventListener('change',()=>{if(select.value==='CUSTOM'){input.focus();return;}applyShippingPreset(select.value);});
-      input.addEventListener('input',syncShippingPreset);
-      input.addEventListener('change',syncShippingPreset);
-      const count=$('#ca-set-count');
-      if(count)count.addEventListener('change',()=>{
-        const current=normalizeMoneyValue(input.value);
-        if(!STANDARD_SHIPPING.includes(current))return;
-        const next=suggestedShipping(count.value);
-        if(next){select.value=next;applyShippingPreset(next);}else select.value='CUSTOM';
+      field.insertBefore(note,back.nextSibling);
+
+      select.addEventListener('change',()=>{
+        if(select.value==='CUSTOM'){
+          shippingMode='CUSTOM';
+          showShippingMode('CUSTOM');
+          return;
+        }
+        shippingMode='AUTO';
+        setShippingAmount(select.value);
+        showShippingMode('AUTO');
       });
+      back.addEventListener('click',()=>{
+        shippingMode='AUTO';
+        const next=suggestedShipping($('#ca-set-count')?.value||1);
+        if(next)setShippingAmount(next);
+        syncShippingControl(false);
+      });
+      input.addEventListener('input',()=>{if(shippingMode==='CUSTOM')syncShippingControl(false);});
+      input.addEventListener('change',()=>{if(shippingMode==='CUSTOM')syncShippingControl(false);});
+      $('#ca-set-count')?.addEventListener('input',handleShippingSetCountChange);
+      $('#ca-set-count')?.addEventListener('change',handleShippingSetCountChange);
+      document.querySelectorAll('input[name="fulfillment"]').forEach(el=>el.addEventListener('change',()=>setTimeout(()=>{
+        if(!shippingIsPickup()&&shippingMode!=='CUSTOM'){
+          const next=suggestedShipping($('#ca-set-count')?.value||1);
+          if(next&&normalizeMoneyValue(input.value)==='0.00')setShippingAmount(next);
+        }
+        syncShippingControl(false);
+      },0)));
     }
-    syncShippingPreset();
+    syncShippingControl(true);
     return select;
   }
 
@@ -218,15 +298,15 @@
     const button=$('#ca-refresh');if(!button||button.disabled)return;lastRefresh=now;button.click();
   }
 
-  ensureShippingPreset();
+  ensureShippingControl();
   ensureProductionOptions();
   $('#ca-production-status')?.addEventListener('change',()=>{productionSelectTouched=true;configureFulfillmentOptions();});
   ['#ca-save','#ca-save-top'].forEach(sel=>$(sel)?.addEventListener('click',saveExtended,true));
   ['input','change','keydown','pointerdown'].forEach(type=>document.addEventListener(type,markActivity,{passive:true}));
-  window.addEventListener('focus',()=>setTimeout(()=>{ensureShippingPreset();refreshIfWaiting(true);renderExtendedIfNeeded();configureFulfillmentOptions();},400));
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(()=>{ensureShippingPreset();refreshIfWaiting(true);renderExtendedIfNeeded();configureFulfillmentOptions();},400);});
-  const observer=new MutationObserver(()=>{ensureShippingPreset();ensureProductionOptions();if(EXTENDED_STATUSES.has(statusCode()))setTimeout(renderExtendedIfNeeded,50);else configureFulfillmentOptions();});
+  window.addEventListener('focus',()=>setTimeout(()=>{ensureShippingControl();refreshIfWaiting(true);renderExtendedIfNeeded();configureFulfillmentOptions();},400));
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(()=>{ensureShippingControl();refreshIfWaiting(true);renderExtendedIfNeeded();configureFulfillmentOptions();},400);});
+  const observer=new MutationObserver(()=>{ensureShippingControl();ensureProductionOptions();if(EXTENDED_STATUSES.has(statusCode()))setTimeout(renderExtendedIfNeeded,50);else configureFulfillmentOptions();});
   if($('#ca-status-pill'))observer.observe($('#ca-status-pill'),{childList:true,characterData:true,subtree:true});
-  setInterval(()=>{ensureShippingPreset();refreshIfWaiting(false);renderExtendedIfNeeded();configureFulfillmentOptions();},12000);
-  setTimeout(()=>{ensureShippingPreset();renderExtendedIfNeeded();configureFulfillmentOptions();},300);
+  setInterval(()=>{ensureShippingControl();refreshIfWaiting(false);renderExtendedIfNeeded();configureFulfillmentOptions();},12000);
+  setTimeout(()=>{ensureShippingControl();renderExtendedIfNeeded();configureFulfillmentOptions();},300);
 })();
