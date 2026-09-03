@@ -77,7 +77,7 @@
     const shipped=approval.fulfillmentMethod==='SHIP';
     $('#cap-paypal-address-card').hidden=!(shipped&&approval.paymentRequired);
     if(approval.paymentRequired){
-      $('#cap-payment-note').textContent=shipped?'After approval, continue to PayPal to pay and choose/confirm the shipping address. WestTech imports the PayPal-confirmed address after payment.':'Payment will be requested after you approve this proof. Production begins only after payment is completed.';
+      $('#cap-payment-note').textContent=shipped?'After approval, continue to PayPal to pay and choose/confirm the shipping address. WestTech imports the PayPal-confirmed address after payment.':'Payment will be requested after you approve this proof. After payment, your order enters the WestTech production queue.';
     }else $('#cap-payment-note').textContent='WestTech has marked this order as no-charge. No payment will be requested after approval.';
     if(approval.customerReviewNote){$('#cap-note-card').hidden=false;$('#cap-review-note').textContent=approval.customerReviewNote;}else $('#cap-note-card').hidden=true;
 
@@ -85,8 +85,8 @@
     if(status==='APPROVED'){
       $('#cap-status').textContent='APPROVED';$('#cap-status').classList.add('approved');
       const payStatus=String(approval.paymentStatus||'').toUpperCase();
-      if(!approval.paymentRequired||payStatus==='NOT_REQUIRED')$('#cap-actions').innerHTML='<div class="cap-complete"><strong>Proof approved.</strong>No payment is required for this order. WestTech can move it into production.</div>';
-      else if(payStatus==='PAID')$('#cap-actions').innerHTML='<div class="cap-complete"><strong>Proof approved + paid.</strong>Thank you. Your order has been released to production.</div>';
+      if(!approval.paymentRequired||payStatus==='NOT_REQUIRED')$('#cap-actions').innerHTML='<div class="cap-complete"><strong>Proof approved.</strong>No payment is required. Your order is now in the WestTech production queue.</div>';
+      else if(payStatus==='PAID')$('#cap-actions').innerHTML='<div class="cap-complete"><strong>Proof approved + paid.</strong>Thank you. Your order is now in the WestTech production queue.</div>';
       else if(approval.paypalApprovalUrl)$('#cap-actions').innerHTML=`<div class="cap-complete"><strong>Proof approved.</strong>Continue to PayPal to complete payment${shipped?' and confirm your shipping address':''}.</div><a class="cap-primary" href="${esc(approval.paypalApprovalUrl)}">Continue to PayPal →</a>`;
       else if(isLocal&&approval.paypalOrderId)$('#cap-actions').innerHTML='<div class="cap-complete"><strong>Proof approved.</strong>Local test: PayPal checkout is ready. Return to the WestTech Order page and use Mark Paid (Local Test). For a shipped local test, the paid step will simulate the address PayPal would return.</div>';
       else if(payStatus==='PAYPAL_ERROR')$('#cap-actions').innerHTML='<div class="cap-complete"><strong>Proof approved.</strong>WestTech has your approval. The PayPal checkout needs a quick WestTech check.</div>';
@@ -98,7 +98,7 @@
   }
 
   async function act(action){
-    if(String(approval?.paymentStatus||'').toUpperCase()==='PAID'||['IN_PRODUCTION','READY_FOR_PICKUP','SHIPPED','COMPLETED'].includes(String(approval?.status||'').toUpperCase())){message('This order is already in production. The approved design and terms are locked.','error');return;}
+    if(String(approval?.paymentStatus||'').toUpperCase()==='PAID'||['PRODUCTION_QUEUE','IN_PRODUCTION','READY_FOR_PICKUP','SHIPPED','COMPLETED'].includes(String(approval?.status||'').toUpperCase())){message('This order is already queued or in production. The approved design and terms are locked.','error');return;}
     const note=$('#cap-change')?.value.trim()||'';if(action==='requestChanges'&&note.length<2)return message('Please tell WestTech what you would like changed.','error');
     const button=action==='approve'?$('#cap-approve'):$('#cap-request-change');const original=button.textContent;button.disabled=true;button.textContent=action==='approve'?'Recording approval…':'Sending request…';
     try{
@@ -107,10 +107,10 @@
         const adminRows=localAdminOrders();let admin=adminRows.find(r=>r?.orderId===orderId)||{};
         if(action==='approve'){
           if(approval.paymentRequired){approval.paypalOrderId=`LOCAL-PP-${Date.now().toString(36).toUpperCase()}`;approval.paypalOrderStatus='PAYER_ACTION_REQUIRED';approval.paymentStatus='AWAITING_PAYMENT';approval.status='AWAITING_PAYMENT';}
-          else{approval.paymentStatus='NOT_REQUIRED';approval.status='IN_PRODUCTION';}
+          else{approval.paymentStatus='NOT_REQUIRED';approval.status='PRODUCTION_QUEUE';}
         }
         saveLocalApproval(approval);
-        if(admin.orderId===orderId){admin.proofStatus=approval.proofStatus;admin.status=approval.status;admin.customerChangeRequest=approval.customerChangeRequest||'';admin.paymentStatus=approval.paymentStatus||admin.paymentStatus;admin.paypalOrderId=approval.paypalOrderId||admin.paypalOrderId;admin.paypalOrderStatus=approval.paypalOrderStatus||admin.paypalOrderStatus;admin.updatedAt=new Date().toISOString();admin.events=admin.events||[];admin.events.push({eventType:action==='approve'?'CUSTOMER_PROOF_APPROVED':'CUSTOMER_CHANGES_REQUESTED',detail:JSON.stringify({proofVersion:approval.proofVersion,message:note||undefined}),createdAt:new Date().toISOString()});if(action==='approve'){admin.events.push({eventType:approval.paymentRequired?'PAYPAL_ORDER_CREATED':'PAYMENT_NOT_REQUIRED',detail:JSON.stringify({paypalOrderId:approval.paypalOrderId||null,amount:approval.finalAmount,addressSource:approval.fulfillmentMethod==='SHIP'?'PAYPAL':'NONE'}),createdAt:new Date().toISOString()});admin.events.push({eventType:'EMAIL_SENT',detail:JSON.stringify({emailType:approval.paymentRequired?'PAYMENT_REQUIRED':'IN_PRODUCTION',to:admin.customerEmail,provider:'LOCAL_TEST',localSimulation:true}),createdAt:new Date().toISOString()});}else admin.events.push({eventType:'EMAIL_SENT',detail:JSON.stringify({emailType:'CHANGES_REQUESTED',to:admin.customerEmail,provider:'LOCAL_TEST',localSimulation:true}),createdAt:new Date().toISOString()});saveLocalAdmin(admin);}
+        if(admin.orderId===orderId){admin.proofStatus=approval.proofStatus;admin.status=approval.status;admin.customerChangeRequest=approval.customerChangeRequest||'';admin.paymentStatus=approval.paymentStatus||admin.paymentStatus;admin.paypalOrderId=approval.paypalOrderId||admin.paypalOrderId;admin.paypalOrderStatus=approval.paypalOrderStatus||admin.paypalOrderStatus;admin.updatedAt=new Date().toISOString();admin.events=admin.events||[];admin.events.push({eventType:action==='approve'?'CUSTOMER_PROOF_APPROVED':'CUSTOMER_CHANGES_REQUESTED',detail:JSON.stringify({proofVersion:approval.proofVersion,message:note||undefined}),createdAt:new Date().toISOString()});if(action==='approve'){admin.events.push({eventType:approval.paymentRequired?'PAYPAL_ORDER_CREATED':'PAYMENT_NOT_REQUIRED',detail:JSON.stringify({paypalOrderId:approval.paypalOrderId||null,amount:approval.finalAmount,addressSource:approval.fulfillmentMethod==='SHIP'?'PAYPAL':'NONE'}),createdAt:new Date().toISOString()});admin.events.push({eventType:'EMAIL_SENT',detail:JSON.stringify({emailType:approval.paymentRequired?'PAYMENT_REQUIRED':'PRODUCTION_QUEUED',to:admin.customerEmail,provider:'LOCAL_TEST',localSimulation:true}),createdAt:new Date().toISOString()});}else admin.events.push({eventType:'EMAIL_SENT',detail:JSON.stringify({emailType:'CHANGES_REQUESTED',to:admin.customerEmail,provider:'LOCAL_TEST',localSimulation:true}),createdAt:new Date().toISOString()});saveLocalAdmin(admin);}
       }else{
         const r=await fetch(`/api/coasters/orders/${encodeURIComponent(orderId)}/approval`,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({token:privateToken,action,message:note})});const data=await r.json().catch(()=>({}));if(!r.ok||!data.ok)throw new Error(data.message||'Could not update the proof.');approval=data.approval;if(data.paymentWarning)message('Your proof is approved. WestTech is finishing the PayPal checkout setup.','');
       }
