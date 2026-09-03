@@ -50,11 +50,12 @@ export async function recordCoasterPayPalFailure(env,orderId,error){
 export async function ensureCoasterPayPalOrder(env,orderId,{returnUrl,cancelUrl}={}){
   const db=requireOrdersDb(env);let order=await getCoasterOrderDetail(env,orderId);if(!order)return null;
   if(order.paymentRequired===false){
-    await db.prepare(`UPDATE coaster_orders SET payment_status='NOT_REQUIRED',status='IN_PRODUCTION',paypal_last_error=NULL,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(orderId).run();
+    await db.prepare(`UPDATE coaster_orders SET payment_status='NOT_REQUIRED',status='PRODUCTION_QUEUE',paypal_last_error=NULL,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(orderId).run();
     await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PAYMENT_NOT_REQUIRED',?)`).bind(orderId,JSON.stringify({finalAmount:money(order.finalAmount)})).run();
-    const released=await getCoasterOrderDetail(env,orderId);
-    if(released)await sendCoasterCustomerEmail(env,{type:'IN_PRODUCTION',order:released});
-    return await getCoasterOrderDetail(env,orderId)||released;
+    await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PRODUCTION_QUEUED',?)`).bind(orderId,JSON.stringify({reason:'NO_PAYMENT_REQUIRED'})).run();
+    const queued=await getCoasterOrderDetail(env,orderId);
+    if(queued)await sendCoasterCustomerEmail(env,{type:'PRODUCTION_QUEUED',order:queued});
+    return await getCoasterOrderDetail(env,orderId)||queued;
   }
   if(String(order.proofStatus)!=='APPROVED')throw Object.assign(new Error('Customer proof approval is required before PayPal checkout can be created.'),{status:409});
   if(money(order.finalAmount)<=0)throw Object.assign(new Error('The approved customer total must be greater than $0 before PayPal checkout can be created.'),{status:400});
@@ -62,7 +63,7 @@ export async function ensureCoasterPayPalOrder(env,orderId,{returnUrl,cancelUrl}
 
   if(order.paypalOrderId){
     const got=await paypalCall(env,`/v2/checkout/orders/${encodeURIComponent(order.paypalOrderId)}`);const url=approvalUrl(got.data);
-    await db.prepare(`UPDATE coaster_orders SET paypal_order_status=?, paypal_approval_url=CASE WHEN ?<>'' THEN ? ELSE paypal_approval_url END, payment_status=CASE WHEN payment_status='PAID' THEN payment_status ELSE 'AWAITING_PAYMENT' END, status=CASE WHEN status='IN_PRODUCTION' THEN status ELSE 'AWAITING_PAYMENT' END, updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(String(got.data?.status||''),url,url,orderId).run();
+    await db.prepare(`UPDATE coaster_orders SET paypal_order_status=?, paypal_approval_url=CASE WHEN ?<>'' THEN ? ELSE paypal_approval_url END, payment_status=CASE WHEN payment_status='PAID' THEN payment_status ELSE 'AWAITING_PAYMENT' END, status=CASE WHEN payment_status='PAID' THEN status ELSE 'AWAITING_PAYMENT' END, updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(String(got.data?.status||''),url,url,orderId).run();
     return getCoasterOrderDetail(env,orderId);
   }
 
@@ -80,11 +81,12 @@ async function markCaptured(env,orderId,paypalOrderId,details,captured){
   const db=requireOrdersDb(env);const order=await getCoasterOrderDetail(env,orderId);if(!order)return null;
   const ship=order.fulfillmentMethod==='SHIP'?extractShipping(captured||details):null;if(ship)requireUsShipping(ship);
   const cap=captureId(captured)||captureId(details);const paidAt=new Date().toISOString();
-  await db.prepare(`UPDATE coaster_orders SET paypal_order_status='COMPLETED',paypal_capture_id=?,paypal_payment_id=?,payment_status='PAID',paypal_paid_at=COALESCE(paypal_paid_at,?),paypal_last_error=NULL,status='IN_PRODUCTION',shipping_name=?,shipping_address1=?,shipping_address2=?,shipping_city=?,shipping_region=?,shipping_postal_code=?,shipping_country=?,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(cap||null,cap||null,paidAt,ship?.name||null,ship?.address1||null,ship?.address2||null,ship?.city||null,ship?.region||null,ship?.postalCode||null,ship?.country||null,orderId).run();
+  await db.prepare(`UPDATE coaster_orders SET paypal_order_status='COMPLETED',paypal_capture_id=?,paypal_payment_id=?,payment_status='PAID',paypal_paid_at=COALESCE(paypal_paid_at,?),paypal_last_error=NULL,status='PRODUCTION_QUEUE',shipping_name=?,shipping_address1=?,shipping_address2=?,shipping_city=?,shipping_region=?,shipping_postal_code=?,shipping_country=?,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(cap||null,cap||null,paidAt,ship?.name||null,ship?.address1||null,ship?.address2||null,ship?.city||null,ship?.region||null,ship?.postalCode||null,ship?.country||null,orderId).run();
   await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PAYPAL_ORDER_CAPTURED',?)`).bind(orderId,JSON.stringify({paypalOrderId,captureId:cap||null,paymentStatus:'PAID',addressSource:ship?'PAYPAL':'NONE'})).run();
-  const released=await getCoasterOrderDetail(env,orderId);
-  if(released)await sendCoasterCustomerEmail(env,{type:'IN_PRODUCTION',order:released});
-  return await getCoasterOrderDetail(env,orderId)||released;
+  await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PRODUCTION_QUEUED',?)`).bind(orderId,JSON.stringify({reason:'PAYMENT_RECEIVED',paypalOrderId,captureId:cap||null})).run();
+  const queued=await getCoasterOrderDetail(env,orderId);
+  if(queued)await sendCoasterCustomerEmail(env,{type:'PRODUCTION_QUEUED',order:queued});
+  return await getCoasterOrderDetail(env,orderId)||queued;
 }
 
 export async function captureCoasterPayPalOrder(env,orderId,approvalToken,paypalOrderId){
