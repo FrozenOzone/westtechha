@@ -6,7 +6,7 @@ const EMAIL_TYPES = new Set([
   'READY_FOR_PICKUP','SHIPPED','COMPLETED'
 ]);
 
-function esc(value){return String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));}
+function esc(value){return String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function money(value){const n=Number(value||0);return Number.isFinite(n)?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n):'$0.00';}
 function clean(value,max=500){return typeof value==='string'?value.trim().slice(0,max):'';}
 function setSummary(order){const setSize=Math.max(1,Number(order?.setSize||4));const setCount=Math.max(1,Number(order?.setCount||1));const total=Math.max(1,Number(order?.totalCoasters||setSize*setCount));return `${setCount} × ${setSize}-Coaster Set${setCount===1?'':'s'} • ${total} coaster${total===1?'':'s'}`;}
