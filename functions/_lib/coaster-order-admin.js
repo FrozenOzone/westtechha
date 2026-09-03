@@ -2,7 +2,7 @@ import { requireOrdersDb } from './orders.js';
 import { billableTotal, getCoasterOrderDetail, logEvent } from './coaster-order-data.js';
 import { bool, calcTotal, clean, integer, isLocked, makeError, nowIso, number, termsFrozen } from './coaster-order-util.js';
 
-const PRODUCTION_STATUSES = new Set(['PRODUCTION_QUEUE','IN_PRODUCTION','READY_FOR_PICKUP','SHIPPED','COMPLETED']);
+const PRODUCTION_STATUSES = new Set(['PRODUCTION_QUEUE','IN_PRODUCTION','PREPARING_TO_SHIP','PREPARING_FOR_PICKUP','READY_FOR_PICKUP','SHIPPED','COMPLETED']);
 
 export async function updateCoasterOrderAdmin(env,orderId,payload={}){
   const db=requireOrdersDb(env);const order=await getCoasterOrderDetail(env,orderId);if(!order)throw makeError('Coaster order not found.',404);
@@ -18,7 +18,9 @@ export async function updateCoasterOrderAdmin(env,orderId,payload={}){
   const locked=isLocked(order),frozen=termsFrozen(order);
   if(locked){
     const status=clean(payload.status,40)||order.status;if(!PRODUCTION_STATUSES.has(status))throw makeError('Approved production orders can only use production statuses.',409);
+    if(status==='PREPARING_FOR_PICKUP'&&order.fulfillmentMethod!=='LOCAL_PICKUP')throw makeError('Preparing for Pickup is only valid for Local Pickup orders.');
     if(status==='READY_FOR_PICKUP'&&order.fulfillmentMethod!=='LOCAL_PICKUP')throw makeError('Ready for Pickup is only valid for Local Pickup orders.');
+    if(status==='PREPARING_TO_SHIP'&&order.fulfillmentMethod!=='SHIP')throw makeError('Preparing to Ship is only valid for shipped orders.');
     if(status==='SHIPPED'&&order.fulfillmentMethod!=='SHIP')throw makeError('Shipped is only valid for shipped orders.');
     const now=nowIso();
     await db.prepare(`UPDATE coaster_orders SET status=?,admin_notes=?,tracking_carrier=?,tracking_number=?,pickup_ready_at=CASE WHEN ?='READY_FOR_PICKUP' THEN COALESCE(pickup_ready_at,?) ELSE pickup_ready_at END,shipped_at=CASE WHEN ?='SHIPPED' THEN COALESCE(shipped_at,?) ELSE shipped_at END,completed_at=CASE WHEN ?='COMPLETED' THEN COALESCE(completed_at,?) ELSE completed_at END,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(status,clean(payload.adminNotes,4000),clean(payload.trackingCarrier,100),clean(payload.trackingNumber,180),status,now,status,now,status,now,order.orderId).run();
