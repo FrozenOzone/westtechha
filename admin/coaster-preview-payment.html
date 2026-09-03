@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" data-site-root="../" data-site-section="coasters">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow,noarchive"/>
+<title>Coaster Preview Payment Test – WestTech Admin</title>
+<link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+<link href="../css/site-20260824-mobilefix.css" rel="stylesheet"/>
+<link href="../css/coasters.css" rel="stylesheet"/>
+<link href="../css/coaster-admin.css" rel="stylesheet"/>
+<link href="../css/coaster-order-theme.css" rel="stylesheet"/>
+<style>
+.cpt-wrap{max-width:980px;margin:0 auto;padding:36px 20px 70px}.cpt-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:24px}.cpt-head h1{margin:.2rem 0;font-size:clamp(2rem,5vw,3.4rem)}.cpt-warning{padding:14px 16px;border:1px solid #d6a64b;border-radius:10px;background:#fff8e7;margin:18px 0;color:#563f12}.cpt-list{display:grid;gap:14px}.cpt-card{background:var(--co-card,#fff);border:1px solid rgba(100,120,145,.25);border-radius:14px;padding:18px;display:grid;gap:12px}.cpt-row{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}.cpt-card small{opacity:.7}.cpt-card strong{font-size:1.05rem}.cpt-actions{display:flex;gap:10px;flex-wrap:wrap}.cpt-message{padding:12px 14px;border-radius:9px;margin:12px 0}.cpt-message.error{background:#ffe9e9;color:#7b1818}.cpt-message.success{background:#e9f8ee;color:#175c2d}.cpt-empty{padding:28px;border:1px dashed rgba(100,120,145,.4);border-radius:12px;text-align:center}.cpt-auth{display:flex;gap:8px;max-width:520px}.cpt-auth input{flex:1}
+</style>
+</head>
+<body class="coaster-page custom-coasters-page">
+<div class="page"><div id="site-header"></div>
+<main class="cpt-wrap">
+<div class="cpt-head"><div><div class="ca-eyebrow">WESTTECH • PREVIEW TEST TOOL</div><h1>Payment <em>Bypass.</em></h1><p>Simulate payment so the shipping workflow can be tested without calling PayPal.</p></div><div class="ca-mode live">PREVIEW ONLY</div></div>
+<div class="cpt-warning"><strong>No money moves here.</strong> This tool is hard-blocked outside the coaster preview host. A simulated paid shipping order receives a clearly labeled test address and then enters the normal Production Queue workflow.</div>
+<div id="cpt-auth" hidden><p>Enter the same WestTech Admin Token used on the order page.</p><div class="cpt-auth"><input id="cpt-token" type="password" autocomplete="current-password"/><button class="ca-primary" id="cpt-connect" type="button">Connect</button></div></div>
+<div id="cpt-message" hidden></div>
+<div class="cpt-actions" style="margin:18px 0"><button class="ca-secondary" id="cpt-refresh" type="button">Reload Waiting Orders</button><a class="ca-secondary" href="coaster-orders.html">Back to Orders</a></div>
+<div class="cpt-list" id="cpt-list"><div class="cpt-empty">Loading…</div></div>
+</main><div id="site-footer"></div></div>
+<script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script>
+<script>
+(function(){'use strict';
+const $=s=>document.querySelector(s);const allowed=location.hostname==='coasters-v30-preview.westtechha.pages.dev';let token=sessionStorage.getItem('westtechha-admin-token')||'';
+function headers(extra={}){return {'Accept':'application/json','Authorization':`Bearer ${token}`,...extra};}
+function money(v){return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(v||0));}
+function msg(text,type){const el=$('#cpt-message');el.hidden=false;el.textContent=text;el.className='cpt-message '+(type||'');}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function api(path,options={}){const r=await fetch(path,{...options,headers:headers(options.headers||{})});const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok)throw new Error(d.message||`Request failed (${r.status}).`);return d;}
+async function load(){
+ if(!allowed){$('#cpt-list').innerHTML='<div class="cpt-empty">This tool only runs on coasters-v30-preview.westtechha.pages.dev.</div>';return;}
+ if(!token){$('#cpt-auth').hidden=false;$('#cpt-list').innerHTML='<div class="cpt-empty">Connect with the WestTech Admin Token.</div>';return;}
+ $('#cpt-auth').hidden=true;$('#cpt-list').innerHTML='<div class="cpt-empty">Loading waiting orders…</div>';
+ try{const data=await api('/api/admin/coasters/orders');const rows=(data.orders||[]).filter(o=>o.paymentRequired&&String(o.paymentStatus||'').toUpperCase()!=='PAID'&&['PROOF_APPROVED','AWAITING_PAYMENT'].includes(String(o.status||'').toUpperCase()));render(rows);}catch(e){if(/token|unauthorized|admin/i.test(e.message)){$('#cpt-auth').hidden=false;}msg(e.message,'error');$('#cpt-list').innerHTML='<div class="cpt-empty">Could not load waiting orders.</div>';}
+}
+function render(rows){const host=$('#cpt-list');if(!rows.length){host.innerHTML='<div class="cpt-empty"><strong>No approved orders are waiting for preview payment.</strong><br/>Approve a Payment Required order first, then reload this page.</div>';return;}host.innerHTML=rows.map(o=>`<article class="cpt-card"><div class="cpt-row"><div><small>ORDER</small><br/><strong>${esc(o.orderId)}</strong></div><div><small>CUSTOMER</small><br/><strong>${esc(o.customerName||'—')}</strong></div><div><small>FULFILLMENT</small><br/><strong>${o.fulfillmentMethod==='LOCAL_PICKUP'?'Local Pickup':'Ship Order'}</strong></div><div><small>APPROVED TOTAL</small><br/><strong>${money(o.finalAmount)}</strong></div></div><div><small>PAYMENT STATE</small><br/>${esc(String(o.paymentStatus||'').replaceAll('_',' '))}</div><div class="cpt-actions"><button class="ca-primary" type="button" data-pay="${esc(o.orderId)}">Mark Paid for Preview</button><a class="ca-secondary" href="coaster-orders.html?order=${encodeURIComponent(o.orderId)}">Open Order</a></div></article>`).join('');host.querySelectorAll('[data-pay]').forEach(b=>b.addEventListener('click',()=>markPaid(b,b.dataset.pay)));}
+async function markPaid(button,id){const original=button.textContent;button.disabled=true;button.textContent='Marking Test Paid…';try{await api(`/api/admin/coasters/orders/${encodeURIComponent(id)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'previewMarkPaid'})});msg(`${id} marked paid for preview. No PayPal call was made. The order is now in Production Queue.`,'success');setTimeout(()=>{location.href=`coaster-orders.html?order=${encodeURIComponent(id)}`;},700);}catch(e){msg(e.message,'error');button.disabled=false;button.textContent=original;}}
+$('#cpt-refresh').addEventListener('click',load);$('#cpt-connect').addEventListener('click',()=>{token=$('#cpt-token').value.trim();if(token){sessionStorage.setItem('westtechha-admin-token',token);load();}});$('#cpt-token').addEventListener('keydown',e=>{if(e.key==='Enter')$('#cpt-connect').click();});if(token)$('#cpt-token').value=token;load();
+})();
+</script>
+</body></html>
