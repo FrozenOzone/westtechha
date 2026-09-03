@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" data-site-root="../" data-site-section="coasters">
+<head>
+  <meta charset="utf-8"/>
+  <title>Custom Coaster Request Received – WestTech Home Automation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="WestTech custom coaster design-review request received."/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="../css/site-20260824-mobilefix.css" rel="stylesheet"/>
+  <link href="../css/coasters.css" rel="stylesheet"/>
+  <style>
+    .cr-main{width:min(900px,calc(100% - 40px));margin:52px auto 78px}.cr-card{border:1px solid rgba(148,163,184,.18);border-radius:28px;background:#0c1729;padding:44px;box-shadow:0 30px 80px rgba(2,6,23,.28)}.cr-kicker{color:#72b7ea;font-size:.65rem;font-weight:950;letter-spacing:.16em}.cr-card h1{margin:12px 0 12px;color:#f7fbff;font-size:clamp(2.6rem,7vw,5rem);line-height:.95;letter-spacing:-.055em}.cr-lead{color:#aebfd3;line-height:1.7;max-width:700px}.cr-order{margin:25px 0;padding:18px 20px;border-radius:15px;background:#091321;border:1px solid rgba(148,163,184,.16)}.cr-order small{display:block;color:#7489a3;font-size:.61rem;font-weight:900;letter-spacing:.12em}.cr-order strong{display:block;margin-top:5px;color:#fff;font-size:1.3rem;letter-spacing:.025em}.cr-local{display:none;margin:20px 0;padding:15px 17px;border-radius:13px;background:#2a2311;border:1px solid #6f5d26;color:#f1df9a;font-size:.76rem;line-height:1.55}.cr-local.show{display:block}.cr-flow{display:grid;gap:9px;margin:25px 0}.cr-flow div{padding:13px 15px;border-radius:12px;background:#101f34;color:#c5d4e7;font-size:.77rem}.cr-flow b{color:#7cc0f1}.cr-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}.cr-actions a{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}.cr-note{margin-top:24px;color:#788da7;font-size:.68rem;line-height:1.55}@media(max-width:640px){.cr-main{width:calc(100% - 20px);margin-top:30px}.cr-card{padding:30px 22px}.cr-actions{display:grid}.cr-actions a{width:100%}}
+  </style>
+  <link href="../css/coaster-order-theme.css" rel="stylesheet"/>
+</head>
+<body class="coaster-page custom-coasters-page">
+<div class="page">
+  <div id="site-header"></div>
+  <main class="cr-main">
+    <section class="cr-card">
+      <div class="cr-kicker">CUSTOM COASTERS • DESIGN REVIEW</div>
+      <h1>Request received.</h1>
+      <p class="cr-lead">Your design is now at the review stage. <strong>No payment has been collected and nothing has entered production.</strong> WestTech reviews the artwork, requested set, design work required, final price, and fulfillment terms before the proof/payment stage.</p>
+      <div class="cr-local" id="cr-local"><strong>Local test mode:</strong> this request was saved only in this browser so you can test the workflow from a downloaded site. It was not sent to WestTech or stored in the live order database.</div>
+      <div class="cr-order"><small>REQUEST / ORDER ID</small><strong id="cr-order-id">Pending</strong></div>
+      <div class="cr-flow">
+        <div><b>1.</b> Design Review — WestTech checks the artwork and scope.</div>
+        <div><b>2.</b> Proof + Final Terms — pricing, any artwork work, and shipping/pickup are confirmed.</div>
+        <div><b>3.</b> Customer Approval — you approve the final design.</div>
+        <div><b>4.</b> Payment — the approved order receives its payment request.</div>
+        <div><b>5.</b> Production — paid orders move into the small-batch production queue.</div>
+      </div>
+      <div class="cr-actions"><a class="coaster-btn coaster-btn-primary" href="index.html">Custom Coasters</a><a class="coaster-btn coaster-btn-secondary" href="custom-builder.html">Start Another Design</a><a class="coaster-btn coaster-btn-secondary" id="cr-admin-test" href="../admin/coaster-orders.html" style="display:none">Open WestTech Order Test</a></div>
+      <p class="cr-note">Keep the request ID above. It will become the reference for the design-review, proof, payment, and production workflow.</p>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+</div>
+<script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script><script src="../js/coasters.js"></script>
+<script>
+(function(){const p=new URLSearchParams(location.search);const id=p.get('order')||'Pending';document.getElementById('cr-order-id').textContent=id;if(p.get('mode')==='local'){document.getElementById('cr-local').classList.add('show');const a=document.getElementById('cr-admin-test');a.style.display='inline-flex';a.href='../admin/coaster-orders.html?mode=local&order='+encodeURIComponent(id);}})();
+</script>
+</body></html>

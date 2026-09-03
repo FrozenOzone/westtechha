@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" data-site-root="../" data-site-section="coasters">
+<head>
+  <meta charset="utf-8"/>
+  <title>Build a Custom Coaster – WestTech Home Automation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Preview a WestTech custom single-artwork coaster using your own authorized artwork, ring text, and production color choices."/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="../css/site-20260824-mobilefix.css" rel="stylesheet"/>
+  <link href="../css/coasters.css" rel="stylesheet"/>
+  <link href="../css/custom-builder.css" rel="stylesheet"/>
+  <link href="../css/coaster-order-theme.css" rel="stylesheet"/>
+</head>
+<body class="coaster-page custom-coasters-page custom-builder-page">
+<div class="page">
+  <div id="site-header"></div>
+  <main class="cb-main">
+    <div class="cb-back"><a href="index.html"><span aria-hidden="true">←</span> Custom Coasters</a></div>
+    <section class="cb-builder" aria-label="Custom single artwork coaster builder" data-reveal>
+      <header class="cb-head">
+        <div><div class="coaster-section-tag coaster-section-tag-light">SINGLE ARTWORK • CUSTOM COASTER</div><h1>Build from<br/><em>your artwork.</em></h1></div>
+        <p>Upload artwork you control, add the wording you want around the coaster, choose a 4- or 8-coaster set, and send the design to WestTech for review. <strong>No payment is collected here — WestTech reviews the artwork, scope, final price, and fulfillment before anything moves toward production.</strong></p>
+      </header>
+      <div class="cb-workspace">
+        <section class="cb-preview-panel" aria-label="Live coaster preview">
+          <div class="cb-preview-head"><span>LIVE DESIGN PREVIEW</span></div>
+          <div class="cb-coaster-wrap">
+            <svg class="cb-coaster" id="cb-coaster" viewBox="0 0 1000 1000" role="img" aria-labelledby="cb-title cb-desc">
+              <title id="cb-title">Custom artwork coaster preview</title><desc id="cb-desc">Circular custom coaster preview with customer artwork, top and bottom ring text, and selected preview colors.</desc>
+              <circle class="cb-outer" cx="500" cy="500" r="470"/><circle class="cb-rim" cx="500" cy="500" r="445"/><circle class="cb-field" cx="500" cy="500" r="350"/><circle class="cb-inner" cx="500" cy="500" r="355"/>
+              <g class="cb-ring-text" id="cb-top-text" aria-label="YOUR"></g><g class="cb-ring-text" id="cb-bottom-text" aria-label="DESIGN"></g>
+              <image class="cb-art" id="cb-art" x="185" y="185" width="630" height="630" preserveAspectRatio="xMidYMid meet" style="display:none"/><text class="cb-art-fallback" id="cb-art-fallback" x="500" y="530" text-anchor="middle">YOUR ART</text>
+            </svg>
+          </div>
+          <p class="cb-preview-note"><strong>Preview only.</strong> Screen colors approximate the design. WestTech confirms the closest available production filament and any artwork adjustments during design review.</p>
+        </section>
+        <form class="cb-controls" id="cb-order-form" aria-label="Custom coaster controls" autocomplete="on" novalidate>
+          <div class="cb-step"><div class="cb-step-head"><b class="cb-step-no">01</b><span><small>ARTWORK</small><strong>Upload your image</strong></span></div>
+            <label class="cb-upload" for="cb-file"><span class="cb-upload-icon">+</span><span class="cb-upload-copy"><strong>Choose artwork or a logo</strong><span>PNG, JPG, WEBP, or SVG. Transparent-background artwork works best.</span></span><span class="cb-upload-action">Choose file</span><input id="cb-file" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml,.svg"/></label>
+            <div class="cb-file-status" id="cb-file-status">No artwork loaded yet.</div>
+            <label class="cb-rights-check"><input id="cb-rights" type="checkbox"/><span>I confirm that I created or own the artwork I submit, or I have permission from the rights holder to reproduce it for this project. <a href="artwork-policy.html">Artwork &amp; IP Policy</a></span></label>
+          </div>
+          <div class="cb-step"><div class="cb-step-head"><b class="cb-step-no">02</b><span><small>WORDING</small><strong>Set the name ring</strong></span></div><div class="cb-fields"><label class="cb-field-control"><span>Top ring text</span><input id="cb-top" type="text" maxlength="24" value="YOUR"/></label><label class="cb-field-control"><span>Bottom ring text</span><input id="cb-bottom" type="text" maxlength="24" value="DESIGN"/></label></div></div>
+          <div class="cb-step"><div class="cb-step-head"><b class="cb-step-no">03</b><span><small>COLOR LAB</small><strong>Choose the look</strong></span></div><div class="cb-colors"><label><span>Center / artwork field</span><div class="cb-color-row"><i class="cb-color-dot" id="dot-field"></i><select id="cb-field-color"></select></div></label><label><span>Accent ring</span><div class="cb-color-row"><i class="cb-color-dot" id="dot-accent"></i><select id="cb-accent-color"></select></div></label><label><span>Name ring</span><div class="cb-color-row"><i class="cb-color-dot" id="dot-ring"></i><select id="cb-ring-color"></select></div></label><label><span>Ring text</span><div class="cb-color-row"><i class="cb-color-dot" id="dot-text"></i><select id="cb-text-color"></select></div></label></div><p class="cb-color-note"><strong>WestTech-managed production colors.</strong> These choices use the current physical filament palette as a starting point. Final matching is confirmed with your proof.</p></div>
+          <div class="cb-step"><div class="cb-step-head"><b class="cb-step-no">04</b><span><small>SET SIZE</small><strong>Choose the starting set</strong></span></div>
+            <div class="cb-set-options" role="radiogroup" aria-label="Coaster set size">
+              <label class="cb-set-option"><input id="cb-set-4" type="radio" name="cb-set-size" value="4" checked/><span class="cb-set-card"><strong>4-Coaster Set</strong><small>A standard custom set with one approved design.</small></span></label>
+              <label class="cb-set-option"><input id="cb-set-8" type="radio" name="cb-set-size" value="8"/><span class="cb-set-card"><strong>8-Coaster Set</strong><small>More of the same approved design in one order.</small></span></label>
+            </div>
+            <p class="cb-set-note">Need something outside 4 or 8? Submit the design and mention it in the notes. WestTech can adjust the final order during review.</p>
+          </div>
+          <div class="cb-step"><div class="cb-step-head"><b class="cb-step-no">05</b><span><small>CONTACT + PROJECT</small><strong>Tell us who this is for</strong></span></div>
+            <div class="cb-contact-grid">
+              <label class="cb-field-control"><span>Name</span><input id="cb-name" name="name" type="text" maxlength="120" autocomplete="name" placeholder="Your name" required/></label>
+              <label class="cb-field-control"><span>Email</span><input id="cb-email" name="email" type="email" maxlength="254" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" placeholder="you@example.com" required/></label>
+              <label class="cb-field-control"><span>Phone <small>(optional)</small></span><input id="cb-phone" name="tel" type="tel" maxlength="40" autocomplete="tel" inputmode="tel" placeholder="(555) 555-5555"/></label>
+              <label class="cb-field-control cb-contact-notes"><span>Notes <small>(optional)</small></span><textarea id="cb-notes" name="notes" maxlength="400" autocomplete="off" placeholder="Anything WestTech should know about this project, timing, pickup discussion, special quantity, or other request."></textarea></label>
+            </div>
+            <input class="cb-honey" id="cb-website" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true"/>
+          </div>
+          <div class="cb-submit"><button class="coaster-btn coaster-btn-primary" id="cb-submit" type="submit" disabled>Send to WestTech for Review <span aria-hidden="true">→</span></button><div class="cb-submit-note">This creates a design-review request, not a purchase. WestTech controls final pricing, artwork charges, shipping or pickup terms, and payment release after review.</div><div class="cb-message" id="cb-message" role="status" hidden></div></div>
+        </form>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+</div>
+<script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script><script src="../js/coasters.js"></script><script src="../js/custom-builder.js"></script>
+</body></html>

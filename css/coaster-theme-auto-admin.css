@@ -1,0 +1,89 @@
+@media (prefers-color-scheme: light){
+html:not([data-theme]) .custom-coasters-page .ca-main{color:#17233a}
+html:not([data-theme]) .custom-coasters-page .ca-eyebrow{color:#1677c4}
+html:not([data-theme]) .custom-coasters-page .ca-topbar h1{color:#0f172a}
+html:not([data-theme]) .custom-coasters-page .ca-topbar h1 em{color:#1677c4}
+html:not([data-theme]) .custom-coasters-page .ca-mode{background:#fff;border-color:#d4e0eb;color:#60758c}
+html:not([data-theme]) .custom-coasters-page .ca-shell{background:#f8fbff;border-color:#d6e1ec;box-shadow:0 28px 72px rgba(15,23,42,.10)}
+html:not([data-theme]) .custom-coasters-page .ca-sidebar{background:#f1f5fa;border-color:#d8e2ed}
+html:not([data-theme]) .custom-coasters-page .ca-sidebar-head strong{color:#17233a}
+html:not([data-theme]) .custom-coasters-page .ca-sidebar-head span{color:#6c8096}
+html:not([data-theme]) .custom-coasters-page .ca-auth{background:#fff;border-color:#d7e1ec}
+html:not([data-theme]) .custom-coasters-page .ca-auth label{color:#526980}
+html:not([data-theme]) .custom-coasters-page .ca-auth input,html:not([data-theme]) .custom-coasters-page .ca-search{background:#fff;color:#16263b;border-color:#c7d5e3}
+html:not([data-theme]) .custom-coasters-page .ca-mini-btn{background:#edf5fb;color:#244a67;border-color:#acc7da}
+html:not([data-theme]) .custom-coasters-page .ca-order-item{background:#fff;color:#253a52;border-color:#d8e2ed}
+html:not([data-theme]) .custom-coasters-page .ca-order-item:hover,html:not([data-theme]) .custom-coasters-page .ca-order-item.active{background:#eaf4fb;border-color:#5a9bca}
+html:not([data-theme]) .custom-coasters-page .ca-order-item span{color:#60758c}
+html:not([data-theme]) .custom-coasters-page .ca-order-item small{color:#1677c4}
+html:not([data-theme]) .custom-coasters-page .ca-empty{color:#687d93}
+html:not([data-theme]) .custom-coasters-page .ca-detail{background:#fff}
+html:not([data-theme]) .custom-coasters-page .ca-loading{color:#62778d}
+html:not([data-theme]) .custom-coasters-page .ca-order-head{border-color:#dbe4ee}
+html:not([data-theme]) .custom-coasters-page .ca-order-head h2{color:#102039}
+html:not([data-theme]) .custom-coasters-page .ca-order-head p{color:#687d93}
+html:not([data-theme]) .custom-coasters-page .ca-status-pill{background:#edf6fc;border-color:#b5d2e7;color:#265b80}
+html:not([data-theme]) .custom-coasters-page .ca-card{background:#fff;border-color:#dce5ef}
+html:not([data-theme]) .custom-coasters-page .ca-card-head span{color:#1677c4}
+html:not([data-theme]) .custom-coasters-page .ca-card-head strong{color:#17233a}
+html:not([data-theme]) .custom-coasters-page .ca-card-head small{color:#687e94}
+html:not([data-theme]) .custom-coasters-page .ca-submitted-design{background:radial-gradient(circle at 50% 43%,rgba(22,119,196,.08),transparent 50%),#f4f7fb;border-color:#d8e2ec}
+html:not([data-theme]) .custom-coasters-page .ca-submitted-design>svg{filter:drop-shadow(0 20px 24px rgba(15,23,42,.20))}
+html:not([data-theme]) .custom-coasters-page .ca-design-placeholder{color:#687d93}
+html:not([data-theme]) .custom-coasters-page .ca-design-placeholder strong,html:not([data-theme]) .custom-coasters-page .ca-design-note strong{color:#31465d}
+html:not([data-theme]) .custom-coasters-page .ca-design-note{color:#65798f}
+html:not([data-theme]) .custom-coasters-page .ca-info,html:not([data-theme]) .custom-coasters-page .ca-customer-note,html:not([data-theme]) .custom-coasters-page .ca-attachment-row{background:#f5f8fb;border-color:#e0e8f1}
+html:not([data-theme]) .custom-coasters-page .ca-info small,html:not([data-theme]) .custom-coasters-page .ca-customer-row span,html:not([data-theme]) .custom-coasters-page .ca-attachment-file>small{color:#667b91}
+html:not([data-theme]) .custom-coasters-page .ca-info strong,html:not([data-theme]) .custom-coasters-page .ca-customer-row strong,html:not([data-theme]) .custom-coasters-page .ca-attachment-file>strong{color:#1d3046}
+html:not([data-theme]) .custom-coasters-page .ca-customer-row{border-color:#e1e8f0}
+html:not([data-theme]) .custom-coasters-page .ca-customer-note{color:#3e536a}
+html:not([data-theme]) .custom-coasters-page .ca-attachment-file>span{color:#687d93}
+html:not([data-theme]) .custom-coasters-page .ca-attachment-file i{color:#8a9caf}
+html:not([data-theme]) .custom-coasters-page .ca-field label,html:not([data-theme]) .custom-coasters-page .ca-field>span{color:#52677e}
+html:not([data-theme]) .custom-coasters-page .ca-field input,html:not([data-theme]) .custom-coasters-page .ca-field select,html:not([data-theme]) .custom-coasters-page .ca-field textarea{background:#fff;color:#15263b;border-color:#c7d4e2}
+html:not([data-theme]) .custom-coasters-page .ca-field input[readonly],html:not([data-theme]) .custom-coasters-page .ca-field input:disabled,html:not([data-theme]) .custom-coasters-page .ca-field select:disabled,html:not([data-theme]) .custom-coasters-page .ca-field textarea:disabled{background:#f0f4f8;color:#687d93;border-color:#d5dfe9;opacity:1}
+html:not([data-theme]) .custom-coasters-page .ca-money::before{color:#61768c}
+html:not([data-theme]) .custom-coasters-page .ca-total{background:#eef6fc;border-color:#bdd8eb}
+html:not([data-theme]) .custom-coasters-page .ca-total span{color:#49627b}
+html:not([data-theme]) .custom-coasters-page .ca-total strong{color:#10233a}
+html:not([data-theme]) .custom-coasters-page .ca-total small{color:#687d93}
+html:not([data-theme]) .custom-coasters-page .ca-option span,html:not([data-theme]) .custom-coasters-page .ca-check{background:#f5f8fb;border-color:#d7e1eb;color:#354b62}
+html:not([data-theme]) .custom-coasters-page .ca-option input:checked+span{background:#e9f4fb;border-color:#559fd2;color:#17334d}
+html:not([data-theme]) .custom-coasters-page .ca-secondary{background:#fff;color:#23445f;border-color:#b8c9da}
+html:not([data-theme]) .custom-coasters-page .ca-secondary:hover{background:#edf6fc;border-color:#64a9d9}
+html:not([data-theme]) .custom-coasters-page .ca-inline-message{background:#edf6fc;border-color:#b9d5e9;color:#285775}
+html:not([data-theme]) .custom-coasters-page .ca-inline-message.error{background:#fff0f1;border-color:#dfa5ab;color:#7a2931}
+html:not([data-theme]) .custom-coasters-page .ca-inline-message.success{background:#eef9f3;border-color:#a5d4bb;color:#255e42}
+html:not([data-theme]) .custom-coasters-page .ca-work-item{background:#f5f8fb;border-color:#e0e8f1}
+html:not([data-theme]) .custom-coasters-page .ca-work-item strong,html:not([data-theme]) .custom-coasters-page .ca-event strong{color:#253a50}
+html:not([data-theme]) .custom-coasters-page .ca-work-item span,html:not([data-theme]) .custom-coasters-page .ca-event span,html:not([data-theme]) .custom-coasters-page .ca-work-empty{color:#687e94}
+html:not([data-theme]) .custom-coasters-page .ca-work-item b{color:#2874a7}
+html:not([data-theme]) .custom-coasters-page .ca-event-dot{background:#1677c4}
+html:not([data-theme]) .custom-coasters-page .ca-paypal,html:not([data-theme]) .custom-coasters-page .ca-order-actions{background:#f5f8fb;border-color:#dce5ef}
+html:not([data-theme]) .custom-coasters-page .ca-paypal strong{color:#1a2e45}
+html:not([data-theme]) .custom-coasters-page .ca-paypal span{color:#687d93}
+html:not([data-theme]) .custom-coasters-page .ca-proof-intro{color:#63788f}
+html:not([data-theme]) .custom-coasters-page .ca-proof-option>span{background:#f5f8fb;border-color:#cedae6}
+html:not([data-theme]) .custom-coasters-page .ca-proof-option strong{color:#25394f}
+html:not([data-theme]) .custom-coasters-page .ca-proof-option small{color:#667b91}
+html:not([data-theme]) .custom-coasters-page .ca-proof-option input:checked+span{background:#eaf4fb;border-color:#559fd2}
+html:not([data-theme]) .custom-coasters-page .ca-proof-upload{background:#f5f8fb;border-color:#aabfd2}
+html:not([data-theme]) .custom-coasters-page .ca-proof-upload input{color:#263a50}
+html:not([data-theme]) .custom-coasters-page .ca-proof-upload small{color:#687d93}
+html:not([data-theme]) .custom-coasters-page .ca-approval-link{background:#eef6fc;border-color:#bdd8eb}
+html:not([data-theme]) .custom-coasters-page .ca-approval-link>label{color:#52677e}
+html:not([data-theme]) .custom-coasters-page .ca-approval-link input{background:#fff;color:#23384e;border-color:#c5d3e1}
+html:not([data-theme]) .custom-coasters-page .ca-approval-link small{color:#687d93}
+html:not([data-theme]) .custom-coasters-page .ca-locked-section{border-color:#b9d8ec;box-shadow:inset 0 0 0 1px rgba(22,119,196,.04)}
+html:not([data-theme]) .custom-coasters-page .ca-option input:disabled+span,html:not([data-theme]) .custom-coasters-page .ca-proof-option input:disabled+span{border-color:#d5dfe9}
+html:not([data-theme]) .custom-coasters-page #ca-work-billable-note{color:#6a8096}
+html:not([data-theme]) .custom-coasters-page .ca-production-card{background:linear-gradient(180deg,#eef6fc 0%,#f9fbfd 100%);border-color:#b8d7eb;box-shadow:inset 0 0 0 1px rgba(22,119,196,.04)}
+html:not([data-theme]) .custom-coasters-page .ca-production-stat,html:not([data-theme]) .custom-coasters-page .ca-production-reference,html:not([data-theme]) .custom-coasters-page .ca-production-controls>.ca-field,html:not([data-theme]) .custom-coasters-page .ca-production-delivery,html:not([data-theme]) .custom-coasters-page .ca-production-lock-summary>div{background:#fff;border-color:#d8e3ed}
+html:not([data-theme]) .custom-coasters-page .ca-production-stat small,html:not([data-theme]) .custom-coasters-page .ca-production-reference small,html:not([data-theme]) .custom-coasters-page .ca-production-delivery small,html:not([data-theme]) .custom-coasters-page .ca-production-lock-summary small{color:#667d94}
+html:not([data-theme]) .custom-coasters-page .ca-production-stat strong,html:not([data-theme]) .custom-coasters-page .ca-production-reference strong,html:not([data-theme]) .custom-coasters-page .ca-production-delivery strong,html:not([data-theme]) .custom-coasters-page .ca-production-lock-summary strong{color:#1d3147}
+html:not([data-theme]) .custom-coasters-page .ca-production-stat span,html:not([data-theme]) .custom-coasters-page .ca-production-reference span,html:not([data-theme]) .custom-coasters-page .ca-production-delivery span{color:#657b92}
+html:not([data-theme]) .custom-coasters-page .ca-production-rule{background:#eef6fc;border-color:#c8deed;color:#536b82}
+html:not([data-theme]) .custom-coasters-page .ca-production-rule strong{color:#285c7e}
+html:not([data-theme]) .custom-coasters-page .ca-production-mode .ca-order-actions{background:#f5f8fb;border-color:#d5e3ee}
+html:not([data-theme]) .custom-coasters-page .ca-production-delivery.missing{background:#fff0f1;border-color:#dfa4ab}
+}

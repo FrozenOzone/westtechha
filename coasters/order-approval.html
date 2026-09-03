@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" data-site-root="../" data-site-section="coasters">
+<head>
+  <meta charset="utf-8"/>
+  <title>Review Your Custom Coaster – WestTech Home Automation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="noindex,nofollow,noarchive"/>
+  <meta name="description" content="Private WestTech custom coaster proof and order approval."/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="../css/site-20260824-mobilefix.css" rel="stylesheet"/>
+  <link href="../css/coasters.css" rel="stylesheet"/>
+  <link href="../css/coaster-approval.css" rel="stylesheet"/>
+  <link href="../css/coaster-order-theme.css" rel="stylesheet"/>
+</head>
+<body class="coaster-page custom-coasters-page">
+<div class="page">
+  <div id="site-header"></div>
+  <main class="cap-main">
+    <section class="cap-shell">
+      <div class="cap-loading" id="cap-loading">Loading your private proof…</div>
+      <div id="cap-content" hidden>
+        <header class="cap-head">
+          <div><div class="cap-eyebrow">PRIVATE CUSTOMER PROOF</div><h1>Review your <em>custom coaster.</em></h1><p id="cap-order-id"></p></div>
+          <div class="cap-status" id="cap-status">AWAITING APPROVAL</div>
+        </header>
+
+        <div class="cap-grid">
+          <section class="cap-card cap-proof-card">
+            <div class="cap-card-head"><div><span>WESTTECH PROOF</span><strong id="cap-proof-title">Final design for approval</strong></div><small id="cap-proof-version">V1</small></div>
+            <div class="cap-proof" id="cap-proof"><div class="cap-proof-loading">Loading proof…</div></div>
+            <p class="cap-proof-note">Review the design carefully. Approval confirms the proof and the final order terms shown on this page.</p>
+          </section>
+
+          <div class="cap-stack">
+            <section class="cap-card">
+              <div class="cap-card-head"><div><span>FINAL ORDER TERMS</span><strong>What WestTech will make</strong></div></div>
+              <div class="cap-terms">
+                <div><span>Set</span><strong id="cap-set">—</strong></div>
+                <div><span>Number of sets</span><strong id="cap-set-count">—</strong></div>
+                <div><span>Total coasters</span><strong id="cap-total-coasters">—</strong></div>
+                <div><span>Delivery</span><strong id="cap-fulfillment">—</strong></div>
+              </div>
+              <div class="cap-price-lines">
+                <div><span>Coaster sets</span><strong id="cap-base-total">$0.00</strong></div>
+                <div id="cap-art-row"><span>Artwork / design work</span><strong id="cap-art-charge">$0.00</strong></div>
+                <div id="cap-other-row"><span>Other charge</span><strong id="cap-other-charge">$0.00</strong></div>
+                <div id="cap-shipping-row"><span>Shipping</span><strong id="cap-shipping">$0.00</strong></div>
+                <div id="cap-discount-row"><span>Discount / special pricing</span><strong id="cap-discount">−$0.00</strong></div>
+              </div>
+              <div class="cap-total"><span>FINAL TOTAL</span><strong id="cap-final-total">$0.00</strong></div>
+              <p class="cap-payment-note" id="cap-payment-note">Payment will be requested after proof approval.</p>
+            </section>
+
+            <section class="cap-card" id="cap-paypal-address-card" hidden>
+              <div class="cap-card-head"><div><span>PAYPAL SHIPPING</span><strong>Shipping address comes from PayPal</strong></div><small>NO RE-TYPING</small></div>
+              <p class="cap-review-note">When you continue to PayPal, choose or confirm the shipping address there. WestTech imports the PayPal-confirmed address into this order after payment and uses it for fulfillment.</p>
+            </section>
+
+            <section class="cap-card" id="cap-note-card" hidden>
+              <div class="cap-card-head"><div><span>WESTTECH NOTE</span><strong>About this order</strong></div></div>
+              <p class="cap-review-note" id="cap-review-note"></p>
+            </section>
+
+            <section class="cap-card cap-action-card" id="cap-actions">
+              <div class="cap-card-head"><div><span>YOUR DECISION</span><strong>Approve or request a change</strong></div></div>
+              <label class="cap-confirm"><input id="cap-confirm" type="checkbox"/><span>I approve the proof, quantity, final price, and delivery method shown above.</span></label>
+              <button class="cap-primary" id="cap-approve" type="button" disabled>Approve Design &amp; Terms →</button>
+              <div class="cap-divider"><span>or</span></div>
+              <label class="cap-change-label" for="cap-change">Need something changed?</label>
+              <textarea id="cap-change" maxlength="1200" placeholder="Tell WestTech exactly what you would like changed."></textarea>
+              <button class="cap-secondary" id="cap-request-change" type="button">Request Changes</button>
+              <div class="cap-message" id="cap-message" hidden></div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+</div>
+<script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script><script src="../js/coaster-approval.js"></script>
+</body>
+</html>

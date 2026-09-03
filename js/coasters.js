@@ -1,6 +1,18 @@
 (function(){
   'use strict';
 
+  // Keep the legacy coaster stylesheet untouched; load the v30 Custom Coasters
+  // storefront layer only on the public Custom Coasters landing page.
+  if(document.body.classList.contains('custom-coasters-page') && /\/coasters\/(?:index\.html)?$/.test(location.pathname)){
+    if(!document.querySelector('link[data-custom-coasters-v30]')){
+      const link=document.createElement('link');
+      link.rel='stylesheet';
+      link.href='../css/custom-coasters-v30.css';
+      link.dataset.customCoastersV30='true';
+      document.head.appendChild(link);
+    }
+  }
+
   const revealItems = Array.from(document.querySelectorAll('[data-reveal]'));
   const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" data-site-root="../" data-site-section="coasters">
+<head>
+  <meta charset="utf-8"/>
+  <title>Custom Coaster Orders – WestTech Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="noindex,nofollow,noarchive"/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="../css/site-20260824-mobilefix.css" rel="stylesheet"/>
+  <link href="../css/coasters.css" rel="stylesheet"/>
+  <link href="../css/coaster-admin.css" rel="stylesheet"/>
+  <link href="../css/coaster-order-theme.css" rel="stylesheet"/>
+</head>
+<body class="coaster-page custom-coasters-page">
+<div class="page">
+  <div id="site-header"></div>
+  <main class="ca-main">
+    <div class="ca-topbar">
+      <div>
+        <div class="ca-eyebrow">WESTTECH • PRIVATE ORDER CONTROL</div>
+        <h1>Custom Coaster <em>Orders.</em></h1>
+      </div>
+      <div class="ca-mode" id="ca-mode">LOCAL TEST MODE</div>
+    </div>
+
+    <section class="ca-shell" aria-label="WestTech custom coaster orders">
+      <aside class="ca-sidebar">
+        <div class="ca-sidebar-head"><strong>Orders</strong><span id="ca-count">0 orders</span></div>
+        <div class="ca-auth" id="ca-auth" hidden>
+          <label>WestTech Admin Token
+            <div class="ca-auth-row"><input id="ca-token" type="password" autocomplete="current-password"/><button class="ca-mini-btn" id="ca-connect" type="button">Connect</button></div>
+          </label>
+        </div>
+        <input class="ca-search" id="ca-search" type="search" placeholder="Search order, name, email…"/>
+        <div class="ca-order-list" id="ca-order-list"></div>
+      </aside>
+
+      <section class="ca-detail">
+        <div class="ca-loading" id="ca-loading">Loading order…</div>
+        <div class="ca-detail-inner" id="ca-detail" hidden>
+          <header class="ca-order-head">
+            <div>
+              <div class="ca-eyebrow">CUSTOM COASTER ORDER</div>
+              <h2 id="ca-order-id">—</h2>
+              <p id="ca-order-created">—</p>
+            </div>
+            <div class="ca-status-pill" id="ca-status-pill">DESIGN REVIEW</div>
+          </header>
+
+          <section class="ca-order-overview">
+            <article class="ca-card ca-submitted-card">
+              <div class="ca-card-head">
+                <div><span>SUBMITTED DESIGN</span><strong>What the customer selected</strong></div>
+                <small>AS SUBMITTED</small>
+              </div>
+              <div class="ca-submitted-design" id="ca-design-host" aria-label="Exact customer submitted coaster design">
+                <div class="ca-design-placeholder">Loading submitted design…</div>
+              </div>
+              <p class="ca-design-note"><strong>Order verification.</strong> This is the exact coaster design snapshot saved when the customer submitted the request. It is not a WestTech production proof.</p>
+            </article>
+
+            <div class="ca-overview-stack">
+              <article class="ca-card">
+                <div class="ca-card-head"><div><span>ORDER DETAILS</span><strong>Customer request</strong></div></div>
+                <div class="ca-info-grid">
+                  <div class="ca-info"><small>SET</small><strong id="ca-set">—</strong></div>
+                  <div class="ca-info"><small>TOP TEXT</small><strong id="ca-top-text">—</strong></div>
+                  <div class="ca-info"><small>BOTTOM TEXT</small><strong id="ca-bottom-text">—</strong></div>
+                  <div class="ca-info ca-info-wide"><small>COLORS</small><strong id="ca-design-colors">—</strong></div>
+                </div>
+              </article>
+
+              <article class="ca-card">
+                <div class="ca-card-head"><div><span>CUSTOMER</span><strong>Contact + request</strong></div></div>
+                <div class="ca-customer">
+                  <div class="ca-customer-row"><span>Name</span><strong id="ca-customer-name">—</strong></div>
+                  <div class="ca-customer-row"><span>Email</span><strong id="ca-customer-email">—</strong></div>
+                  <div class="ca-customer-row"><span>Phone</span><strong id="ca-customer-phone">—</strong></div>
+                  <div class="ca-customer-row"><span>Colors</span><strong id="ca-colors">—</strong></div>
+                </div>
+                <div class="ca-customer-note" id="ca-customer-notes">No customer notes.</div>
+              </article>
+
+              <article class="ca-card ca-attachment-card">
+                <div class="ca-card-head"><div><span>ATTACHMENT</span><strong>Original customer artwork</strong></div><small id="ca-art-size"></small></div>
+                <img id="ca-artwork" alt="Original artwork uploaded by customer" hidden/>
+                <div class="ca-attachment-row">
+                  <div class="ca-attachment-file">
+                    <small>ORIGINAL FILE</small>
+                    <strong id="ca-art-file">—</strong>
+                    <span><b id="ca-art-type">—</b><i>•</i><b id="ca-art-size-meta">—</b><i>•</i><b>Rights: <span id="ca-rights">—</span></b></span>
+                  </div>
+                  <button class="ca-secondary ca-art-download" id="ca-download-artwork" type="button">↓ Download Original</button>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="ca-card ca-production-card" id="ca-production-card" hidden>
+            <div class="ca-card-head">
+              <div><span>PRODUCTION WORK ORDER</span><strong>Build + fulfill this approved order</strong></div>
+              <small id="ca-production-lock-label">PAID • TERMS LOCKED</small>
+            </div>
+            <div class="ca-production-summary">
+              <div class="ca-production-stat"><small>MAKE</small><strong id="ca-prod-quantity">—</strong><span id="ca-prod-set-detail">—</span></div>
+              <div class="ca-production-stat"><small>DELIVERY</small><strong id="ca-prod-fulfillment">—</strong><span>Approved fulfillment method</span></div>
+              <div class="ca-production-stat"><small>APPROVED TOTAL</small><strong id="ca-prod-price">$0.00</strong><span>Customer terms frozen</span></div>
+              <div class="ca-production-stat"><small>PAYMENT</small><strong id="ca-prod-payment">—</strong><span id="ca-prod-payment-detail">—</span></div>
+            </div>
+            <div class="ca-production-controls">
+              <div class="ca-field">
+                <label for="ca-production-status">Production status</label>
+                <select id="ca-production-status">
+                  <option value="IN_PRODUCTION">In Production</option>
+                  <option value="READY_FOR_PICKUP">Ready for Pickup</option>
+                  <option value="SHIPPED">Shipped</option>
+                  <option value="COMPLETED">Completed</option>
+                </select>
+              </div>
+              <div class="ca-production-reference"><small>APPROVED PROOF</small><strong id="ca-prod-proof">—</strong><span>The approved design shown above is the production reference.</span></div>
+              <div class="ca-production-reference"><small>PAYPAL / PAYMENT</small><strong id="ca-prod-paypal">—</strong><span id="ca-prod-paypal-detail">—</span></div>
+            </div>
+            <div class="ca-production-delivery" id="ca-production-delivery">
+              <div><small id="ca-prod-delivery-label">DELIVERY DETAILS</small><strong id="ca-prod-delivery-primary">—</strong><span id="ca-prod-delivery-secondary">—</span></div>
+            </div>
+            <div class="ca-production-tracking" id="ca-production-tracking">
+              <div class="ca-field"><label for="ca-tracking-carrier">Carrier</label><input id="ca-tracking-carrier" type="text" maxlength="80" placeholder="USPS, UPS, FedEx…"/></div>
+              <div class="ca-field"><label for="ca-tracking-number">Tracking number</label><input id="ca-tracking-number" type="text" maxlength="160" placeholder="Optional until the order ships"/></div>
+            </div>
+            <div class="ca-field ca-production-notes">
+              <label for="ca-production-notes">Internal production notes</label>
+              <textarea id="ca-production-notes" maxlength="1600" placeholder="Print setup, filament/spool notes, reprint reason, packaging, pickup discussion, production reminders…"></textarea>
+            </div>
+            <p class="ca-production-rule"><strong>Production mode.</strong> Customer-approved design, price, set count, fulfillment terms, and payment are frozen. Work Log and internal production tracking remain available.</p>
+          </section>
+
+          <div class="ca-production-save-row" id="ca-production-save-row" hidden>
+            <button class="ca-primary ca-production-save" id="ca-save-top" type="button">Save Production Update</button>
+          </div>
+
+          <section class="ca-card ca-commercial-card" id="ca-review-commercial">
+            <div class="ca-card-head"><div><span>WESTTECH CONTROL</span><strong>Pricing + order terms</strong></div><small id="ca-commercial-lock">Customer cannot edit these</small></div>
+            <div class="ca-fields ca-fields-three">
+              <div class="ca-field"><label for="ca-base-price">Base price per set</label><div class="ca-money"><input id="ca-base-price" type="number" min="0" step="0.01" value="0.00"/></div></div>
+              <div class="ca-field"><label for="ca-art-charge">Artwork / design charge</label><div class="ca-money"><input id="ca-art-charge" type="number" min="0" step="0.01" value="0.00"/></div></div>
+              <div class="ca-field"><label for="ca-billable-work">Billable work logged</label><div class="ca-money"><input id="ca-billable-work" type="number" value="0.00" readonly aria-readonly="true"/></div><small>Calculated from the Work Log below.</small></div>
+              <div class="ca-field"><label for="ca-other-charge">Other charge</label><div class="ca-money"><input id="ca-other-charge" type="number" min="0" step="0.01" value="0.00"/></div></div>
+              <div class="ca-field"><label for="ca-shipping">Shipping</label><div class="ca-money"><input id="ca-shipping" type="number" min="0" step="0.01" value="0.00"/></div></div>
+              <div class="ca-field"><label for="ca-discount">Discount / special pricing</label><div class="ca-money"><input id="ca-discount" type="number" min="0" step="0.01" value="0.00"/></div></div>
+              <div class="ca-field"><label for="ca-set-count">Number of sets</label><input id="ca-set-count" type="number" min="1" max="125" step="1" value="1"/></div>
+              <div class="ca-field"><label for="ca-total-coasters">Total coasters</label><input id="ca-total-coasters" type="number" value="4" readonly aria-readonly="true"/></div>
+              <div class="ca-field"><label for="ca-status">Order status</label><select id="ca-status"><option value="DESIGN_REVIEW">Design Review</option><option value="PROOF_READY">Proof Ready</option><option value="PROOF_SENT">Proof Sent</option><option value="CHANGES_REQUESTED">Changes Requested</option><option value="PROOF_APPROVED">Proof Approved</option><option value="AWAITING_PAYMENT">Awaiting Payment</option><option value="IN_PRODUCTION">In Production</option><option value="READY_FOR_PICKUP">Ready for Pickup</option><option value="SHIPPED">Shipped</option><option value="COMPLETED">Completed</option><option value="CANCELLED">Cancelled</option></select></div>
+              <div class="ca-total ca-total-inline"><div><span>FINAL CUSTOMER PRICE</span></div><div><strong id="ca-final-total">$0.00</strong><small id="ca-total-detail">1 set • 4 coasters</small></div></div>
+            </div>
+          </section>
+
+          <div class="ca-order-row" id="ca-review-terms-row">
+            <section class="ca-card" id="ca-fulfillment-card">
+              <div class="ca-card-head"><div><span>FULFILLMENT</span><strong>How this order gets delivered</strong></div><small id="ca-fulfillment-lock"></small></div>
+              <div class="ca-options"><label class="ca-option"><input type="radio" name="fulfillment" value="SHIP" checked/><span>Ship Order</span></label><label class="ca-option"><input type="radio" name="fulfillment" value="LOCAL_PICKUP"/><span>Local Pickup</span></label></div>
+              <label class="ca-check"><input id="ca-payment-required" type="checkbox" checked/><span><strong>Payment required</strong><br/>Turn this off for a no-charge or gift order.<br/><small>Set before releasing the proof. Once the proof is sent, payment terms are frozen.</small></span></label>
+            </section>
+
+            <section class="ca-card" id="ca-notes-card">
+              <div class="ca-card-head"><div><span>NOTES</span><strong>Review + internal notes</strong></div><small id="ca-notes-lock"></small></div>
+              <div class="ca-fields">
+                <div class="ca-field full"><label for="ca-customer-message">Customer-facing review note</label><textarea id="ca-customer-message" maxlength="800" placeholder="What should appear with the proof/final terms?"></textarea></div>
+                <div class="ca-field full"><label for="ca-admin-notes">Internal WestTech notes</label><textarea id="ca-admin-notes" maxlength="1600" placeholder="Pricing reason, artwork concerns, special pricing, pickup discussion, production notes…"></textarea></div>
+              </div>
+            </section>
+          </div>
+
+          <section class="ca-card ca-work-card">
+            <div class="ca-card-head"><div><span>WORK LOG</span><strong>Track the work behind the order</strong></div><small id="ca-work-total">0 min • $0.00 logged</small></div>
+            <div class="ca-work-form">
+              <div class="ca-field"><label for="ca-work-type">Work type</label><select id="ca-work-type"><option>Artwork cleanup</option><option>Artwork redraw / rebuild</option><option>Proof revision</option><option>Production setup</option><option>Customer communication</option><option>Other</option></select></div>
+              <div class="ca-field"><label for="ca-work-minutes">Minutes</label><input id="ca-work-minutes" type="number" min="0" max="1440" step="5" value="0"/></div>
+              <div class="ca-field"><label for="ca-work-billable" id="ca-work-billable-label">Billable</label><div class="ca-money"><input id="ca-work-billable" type="number" min="0" step="0.01" value="0.00"/></div><small id="ca-work-billable-note"></small></div>
+              <div class="ca-field full"><label for="ca-work-note">Work note</label><input id="ca-work-note" type="text" maxlength="300" placeholder="What did you do?"/></div>
+              <button class="ca-secondary ca-work-add" id="ca-add-work" type="button">+ Add Work Entry</button>
+            </div>
+            <div class="ca-work-list" id="ca-work-list"></div>
+          </section>
+
+          <div class="ca-order-row ca-order-row-bottom">
+            <section class="ca-card ca-proof-card">
+              <div class="ca-card-head"><div><span id="ca-proof-eyebrow">PROOF + CUSTOMER APPROVAL</span><strong id="ca-proof-title">Release the final design + terms</strong></div><small id="ca-proof-status">NOT SENT</small></div>
+              <div class="ca-production-lock-summary" id="ca-production-lock-summary" hidden>
+                <div><small>PROOF</small><strong id="ca-lock-proof">—</strong></div>
+                <div><small>PAYMENT</small><strong id="ca-lock-payment">—</strong></div>
+                <div><small>FINAL TOTAL</small><strong id="ca-lock-total">—</strong></div>
+                <div><small>PAYPAL</small><strong id="ca-lock-invoice">—</strong></div>
+              </div>
+              <p class="ca-proof-intro">Choose what the customer should approve. If the submitted design is already production-ready, use it directly. If WestTech changed or rebuilt the artwork, upload the WestTech proof instead.</p>
+              <div class="ca-proof-source">
+                <label class="ca-proof-option"><input type="radio" name="proof-source" value="SUBMITTED_DESIGN" checked/><span><strong>Use submitted design</strong><small>Approve the exact coaster snapshot already on this order.</small></span></label>
+                <label class="ca-proof-option"><input type="radio" name="proof-source" value="UPLOADED"/><span><strong>Upload WestTech proof</strong><small>PNG, JPG, WEBP, SVG, or PDF.</small></span></label>
+              </div>
+              <div class="ca-proof-upload" id="ca-proof-upload" hidden>
+                <input id="ca-proof-file" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml,application/pdf,.svg,.pdf"/>
+                <small id="ca-proof-file-note">No proof file selected.</small>
+              </div>
+              <div class="ca-proof-actions">
+                <button class="ca-primary" id="ca-release-proof" type="button">Release Proof for Approval</button>
+                <button class="ca-secondary" id="ca-refresh-link" type="button" hidden>Generate Fresh Approval Link</button>
+              </div>
+              <div class="ca-approval-link" id="ca-approval-link" hidden>
+                <label for="ca-approval-url">Private customer approval link</label>
+                <div><input id="ca-approval-url" type="text" readonly/><button class="ca-secondary" id="ca-copy-approval" type="button">Copy</button><button class="ca-secondary" id="ca-open-approval" type="button">Open</button></div>
+                <small id="ca-approval-help">Only the customer with this private link can view and act on the proof.</small>
+              </div>
+              <div class="ca-paypal ca-proof-payment"><div><strong id="ca-payment-label">PayPal checkout not released</strong><span id="ca-payment-detail">Proof approval comes first.</span></div><div class="ca-paypal-actions"><button class="ca-secondary" id="ca-paypal-sync" type="button" hidden>Sync Status</button><button class="ca-secondary" id="ca-paypal" type="button" disabled>PayPal Locked</button></div></div>
+            </section>
+            <section class="ca-card">
+              <div class="ca-card-head"><div><span>ORDER HISTORY</span><strong>What has happened</strong></div></div>
+              <div class="ca-timeline" id="ca-events"></div>
+            </section>
+          </div>
+
+          <footer class="ca-order-actions">
+            <div class="ca-inline-message" id="ca-message" hidden></div>
+            <div class="ca-action-buttons"><button class="ca-secondary" id="ca-refresh" type="button">Reload</button><button class="ca-primary" id="ca-save" type="button">Save Order Review</button></div>
+          </footer>
+        </div>
+      </section>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+</div>
+<script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script><script src="../js/coaster-admin.js"></script>
+</body>
+</html>
