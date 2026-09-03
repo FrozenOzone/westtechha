@@ -2,3 +2,15 @@
 @import url("coaster-theme-light-admin.css");
 @import url("coaster-theme-auto-public.css");
 @import url("coaster-theme-auto-admin.css");
+
+/* Admin pricing card visual order: order facts first, pricing mechanics second. */
+#ca-review-commercial .ca-fields-three > .ca-field:has(#ca-set-count){order:1}
+#ca-review-commercial .ca-fields-three > .ca-field:has(#ca-total-coasters){order:2}
+#ca-review-commercial .ca-fields-three > .ca-field:has(#ca-status){order:3}
+#ca-review-commercial .ca-fields-three > .ca-field:has(#ca-base-price){order:4}
+#ca-review-commercial .ca-fields-three > .ca-field:has(#ca-shipping){order:5}
+#ca-review-commercial .ca-fields-three > .ca-field:has(#ca-billable-work){order:6}
+#ca-review-commercial .ca-fields-three > .ca-field:has(#ca-art-charge){order:7}
+#ca-review-commercial .ca-fields-three > .ca-field:has(#ca-other-charge){order:8}
+#ca-review-commercial .ca-fields-three > .ca-field:has(#ca-discount){order:9}
+#ca-review-commercial .ca-fields-three > .ca-total-inline{order:10}
