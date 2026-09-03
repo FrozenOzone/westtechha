@@ -14,6 +14,18 @@ export async function updateCoasterOrderAdmin(env,orderId,payload={}){
     if(!frozen){const workTotal=await billableTotal(db,order.orderId),final=calcTotal({...order,workTotal});await db.prepare(`UPDATE coaster_orders SET final_amount=?,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(final,order.orderId).run();}
     await logEvent(db,order.orderId,'WORK_LOGGED',{workType,minutes,billableAmount:amount,customerPriceLocked:frozen});return getCoasterOrderDetail(env,order.orderId);
   }
+  if(action==='archive'){
+    if(String(order.status||'').toUpperCase()!=='COMPLETED')throw makeError('Only completed orders can be archived.',409);
+    await db.prepare(`UPDATE coaster_orders SET status='ARCHIVED',updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(order.orderId).run();
+    await logEvent(db,order.orderId,'ORDER_ARCHIVED',{previousStatus:'COMPLETED',status:'ARCHIVED'});
+    return getCoasterOrderDetail(env,order.orderId);
+  }
+  if(action==='restoreArchive'){
+    if(String(order.status||'').toUpperCase()!=='ARCHIVED')throw makeError('Only archived orders can be restored.',409);
+    await db.prepare(`UPDATE coaster_orders SET status='COMPLETED',updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(order.orderId).run();
+    await logEvent(db,order.orderId,'ORDER_RESTORED',{previousStatus:'ARCHIVED',status:'COMPLETED'});
+    return getCoasterOrderDetail(env,order.orderId);
+  }
   if(action!=='saveReview')throw makeError('Unsupported admin action.');
   const locked=isLocked(order),frozen=termsFrozen(order);
   if(locked){
