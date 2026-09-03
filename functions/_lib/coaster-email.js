@@ -2,7 +2,7 @@ import { requireOrdersDb } from './orders.js';
 
 const EMAIL_TYPES = new Set([
   'REQUEST_RECEIVED','PROOF_READY','CHANGES_REQUESTED','PAYMENT_REQUIRED',
-  'IN_PRODUCTION','READY_FOR_PICKUP','SHIPPED','COMPLETED'
+  'PRODUCTION_QUEUED','IN_PRODUCTION','READY_FOR_PICKUP','SHIPPED','COMPLETED'
 ]);
 
 function esc(value){
@@ -58,14 +58,20 @@ function template(type,order,links={}){
   }else if(type==='PAYMENT_REQUIRED'){
     subject=`Design approved — complete payment — ${orderId}`;
     headline='Your design is approved.';
-    intro=`Hi ${name}, your proof approval is recorded. Complete payment to release the order to production.`;
+    intro=`Hi ${name}, your proof approval is recorded. Complete payment to place your order in the WestTech production queue.`;
     details=[`Order: ${orderId}`,summary,`Approved total: ${finalTotal}`];
     if(order?.fulfillmentMethod==='SHIP')details.push('Shipping address: choose or confirm it in PayPal. WestTech will import the PayPal-confirmed address after payment.');
     buttonLabel='Continue to PayPal';buttonUrl=paymentUrl;
+  }else if(type==='PRODUCTION_QUEUED'){
+    const paid=String(order?.paymentStatus||'').toUpperCase()==='PAID';
+    subject=paid?`Payment received — production queue — ${orderId}`:`Your WestTech order is in the production queue — ${orderId}`;
+    headline=paid?'Payment received. Your order is in the production queue.':'Your approved order is in the production queue.';
+    intro=paid?`Hi ${name}, your payment is complete and your approved order has been added to the WestTech production queue.`:`Hi ${name}, your approved order has been added to the WestTech production queue. No payment is required for this order.`;
+    details=[`Order: ${orderId}`,summary,paid?`Paid total: ${finalTotal}`:'Payment: Not required','WestTech will email you again when manufacturing actually begins.'];
   }else if(type==='IN_PRODUCTION'){
-    subject=`Your WestTech coaster order is in production — ${orderId}`;
-    headline='Your coaster order is now in production.';
-    intro=`Hi ${name}, your approved order has been released to WestTech production.`;
+    subject=`Your WestTech coaster order is now in production — ${orderId}`;
+    headline='Manufacturing has started on your coaster order.';
+    intro=`Hi ${name}, WestTech has started manufacturing your approved custom coaster order.`;
     details=[`Order: ${orderId}`,summary,order?.paymentRequired===false?'Payment: Not required':`Paid total: ${finalTotal}`];
   }else if(type==='READY_FOR_PICKUP'){
     subject=`Your WestTech coaster order is ready for pickup — ${orderId}`;
