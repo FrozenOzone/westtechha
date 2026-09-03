@@ -1,5 +1,5 @@
-const PRODUCTION_STATUSES = new Set(['IN_PRODUCTION','READY_FOR_PICKUP','SHIPPED','COMPLETED']);
-const FROZEN_STATUSES = new Set(['PROOF_SENT','PROOF_APPROVED','AWAITING_PAYMENT','IN_PRODUCTION','READY_FOR_PICKUP','SHIPPED','COMPLETED']);
+const PRODUCTION_STATUSES = new Set(['PRODUCTION_QUEUE','IN_PRODUCTION','READY_FOR_PICKUP','SHIPPED','COMPLETED']);
+const FROZEN_STATUSES = new Set(['PROOF_SENT','PROOF_APPROVED','AWAITING_PAYMENT','PRODUCTION_QUEUE','IN_PRODUCTION','READY_FOR_PICKUP','SHIPPED','COMPLETED']);
 export const ART_TYPES = new Set(['image/png','image/jpeg','image/webp','image/svg+xml']);
 export const PROOF_TYPES = new Set(['image/png','image/jpeg','image/webp','image/svg+xml','application/pdf']);
 
