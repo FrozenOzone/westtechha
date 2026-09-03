@@ -8,6 +8,7 @@
   let extendedRenderBusy=false;
   const WAITING_STATUSES=new Set(['PROOF_SENT','PROOF_APPROVED','AWAITING_PAYMENT']);
   const EXTENDED_STATUSES=new Set(['PRODUCTION_QUEUE','PREPARING_TO_SHIP','PREPARING_FOR_PICKUP']);
+  const STANDARD_SHIPPING=['8.95','10.95','14.95'];
 
   const $=s=>document.querySelector(s);
   function statusCode(){return String($('#ca-status-pill')?.textContent||'').trim().toUpperCase().replaceAll(' ','_');}
@@ -19,6 +20,56 @@
   function token(){return sessionStorage.getItem('westtechha-admin-token')||'';}
   function orderId(){return String($('#ca-order-id')?.textContent||'').trim();}
   function authHeaders(extra={}){return {'Accept':'application/json','Authorization':`Bearer ${token()}`,...extra};}
+
+  function suggestedShipping(setCount){
+    const n=Math.max(1,Number.parseInt(setCount,10)||1);
+    if(n===1)return '8.95';
+    if(n===2)return '10.95';
+    if(n===3||n===4)return '14.95';
+    return '';
+  }
+  function normalizeMoneyValue(v){const n=Number(v);return Number.isFinite(n)?n.toFixed(2):'';}
+  function syncShippingPreset(){
+    const input=$('#ca-shipping'),select=$('#ca-shipping-preset');if(!input||!select)return;
+    const value=normalizeMoneyValue(input.value);
+    select.value=STANDARD_SHIPPING.includes(value)?value:'CUSTOM';
+  }
+  function applyShippingPreset(value){
+    const input=$('#ca-shipping');if(!input||!value||value==='CUSTOM')return;
+    input.value=value;
+    input.dispatchEvent(new Event('input',{bubbles:true}));
+    input.dispatchEvent(new Event('change',{bubbles:true}));
+  }
+  function ensureShippingPreset(){
+    const input=$('#ca-shipping');if(!input)return null;
+    let select=$('#ca-shipping-preset');
+    if(!select){
+      const field=input.closest('.ca-field');if(!field)return null;
+      const label=field.querySelector('label[for="ca-shipping"]');if(label)label.textContent='Shipping amount';
+      select=document.createElement('select');
+      select.id='ca-shipping-preset';
+      select.setAttribute('aria-label','Shipping rate preset');
+      select.innerHTML='<option value="CUSTOM">Custom / Large Order</option><option value="8.95">1 set — $8.95</option><option value="10.95">2 sets — $10.95</option><option value="14.95">3–4 sets — $14.95</option>';
+      const moneyWrap=input.parentElement;
+      field.insertBefore(select,moneyWrap);
+      const note=document.createElement('small');
+      note.id='ca-shipping-preset-note';
+      note.textContent='WestTech standard shipping presets. The dollar amount below stays editable for larger or unusual orders.';
+      field.insertBefore(note,moneyWrap);
+      select.addEventListener('change',()=>{if(select.value==='CUSTOM'){input.focus();return;}applyShippingPreset(select.value);});
+      input.addEventListener('input',syncShippingPreset);
+      input.addEventListener('change',syncShippingPreset);
+      const count=$('#ca-set-count');
+      if(count)count.addEventListener('change',()=>{
+        const current=normalizeMoneyValue(input.value);
+        if(!STANDARD_SHIPPING.includes(current))return;
+        const next=suggestedShipping(count.value);
+        if(next){select.value=next;applyShippingPreset(next);}else select.value='CUSTOM';
+      });
+    }
+    syncShippingPreset();
+    return select;
+  }
 
   function insertOption(select,value,label,beforeValue=''){
     if(Array.from(select.options).some(o=>o.value===value))return;
@@ -167,14 +218,15 @@
     const button=$('#ca-refresh');if(!button||button.disabled)return;lastRefresh=now;button.click();
   }
 
+  ensureShippingPreset();
   ensureProductionOptions();
   $('#ca-production-status')?.addEventListener('change',()=>{productionSelectTouched=true;configureFulfillmentOptions();});
   ['#ca-save','#ca-save-top'].forEach(sel=>$(sel)?.addEventListener('click',saveExtended,true));
   ['input','change','keydown','pointerdown'].forEach(type=>document.addEventListener(type,markActivity,{passive:true}));
-  window.addEventListener('focus',()=>setTimeout(()=>{refreshIfWaiting(true);renderExtendedIfNeeded();configureFulfillmentOptions();},400));
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(()=>{refreshIfWaiting(true);renderExtendedIfNeeded();configureFulfillmentOptions();},400);});
-  const observer=new MutationObserver(()=>{ensureProductionOptions();if(EXTENDED_STATUSES.has(statusCode()))setTimeout(renderExtendedIfNeeded,50);else configureFulfillmentOptions();});
+  window.addEventListener('focus',()=>setTimeout(()=>{ensureShippingPreset();refreshIfWaiting(true);renderExtendedIfNeeded();configureFulfillmentOptions();},400));
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(()=>{ensureShippingPreset();refreshIfWaiting(true);renderExtendedIfNeeded();configureFulfillmentOptions();},400);});
+  const observer=new MutationObserver(()=>{ensureShippingPreset();ensureProductionOptions();if(EXTENDED_STATUSES.has(statusCode()))setTimeout(renderExtendedIfNeeded,50);else configureFulfillmentOptions();});
   if($('#ca-status-pill'))observer.observe($('#ca-status-pill'),{childList:true,characterData:true,subtree:true});
-  setInterval(()=>{refreshIfWaiting(false);renderExtendedIfNeeded();configureFulfillmentOptions();},12000);
-  setTimeout(()=>{renderExtendedIfNeeded();configureFulfillmentOptions();},300);
+  setInterval(()=>{ensureShippingPreset();refreshIfWaiting(false);renderExtendedIfNeeded();configureFulfillmentOptions();},12000);
+  setTimeout(()=>{ensureShippingPreset();renderExtendedIfNeeded();configureFulfillmentOptions();},300);
 })();
