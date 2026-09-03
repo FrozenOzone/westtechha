@@ -2,6 +2,7 @@ import { jsonResponse } from '../../../../../_lib/shared.js';
 import { getCoasterApprovalByToken, recordCoasterApprovalAction, approvalView } from '../../../../../_lib/coaster-orders.js';
 import { ensureCoasterPayPalOrder, recordCoasterPayPalFailure } from '../../../../../_lib/coaster-paypal.js';
 import { sendCoasterCustomerEmail } from '../../../../../_lib/coaster-email.js';
+import { sendCoasterAdminProductionEmail } from '../../../../../_lib/coaster-admin-production-email.js';
 function base(request){const u=new URL(request.url);return `${u.protocol}//${u.host}`;}
 export async function onRequestGet(context){
   try{const token=new URL(context.request.url).searchParams.get('token')||'';const approval=await getCoasterApprovalByToken(context.env,context.params.orderId,token);if(!approval)return jsonResponse({ok:false,message:'This approval link is invalid or expired.'},404);return jsonResponse({ok:true,approval});}
@@ -19,6 +20,7 @@ export async function onRequestPost(context){
       try{
         order=await ensureCoasterPayPalOrder(context.env,order.orderId,{returnUrl,cancelUrl});
         if(order.paymentRequired)await sendCoasterCustomerEmail(context.env,{type:'PAYMENT_REQUIRED',order,paymentUrl:order.paypalApprovalUrl,requestUrl:context.request.url});
+        else if(String(order.status||'').toUpperCase()==='IN_PRODUCTION')await sendCoasterAdminProductionEmail(context.env,{order,requestUrl:context.request.url});
       }catch(error){order=await recordCoasterPayPalFailure(context.env,order.orderId,error);paymentWarning=error.message||'PayPal checkout setup needs WestTech review.';}
     }
     return jsonResponse({ok:true,approval:approvalView(order),paymentWarning:paymentWarning||undefined});
