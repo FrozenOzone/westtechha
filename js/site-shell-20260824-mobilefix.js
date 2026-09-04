@@ -14,7 +14,6 @@
     { href: 'services.html', label: 'Services' },
     { href: 'quote.html',    label: 'Quote' },
     { href: 'support.html',  label: 'Support' },
-    { href: 'cart.html',     label: 'Cart', cartLink: true },
     { href: 'contact.html',  label: 'Contact' }
   ];
 
@@ -80,7 +79,7 @@
   const sharedCompanyPages = new Set(['index', 'services', 'quote', 'support', 'cart', 'contact']);
 
   function isProductSectionPage() {
-    return currentPage === 'products' || currentPage.startsWith('product-') || currentPage.startsWith('checkout-');
+    return siteSection === 'enclosures' || currentPage === 'products' || currentPage.startsWith('product-') || currentPage.startsWith('checkout-');
   }
 
   function productMenuHtml(className = 'nav-link') {

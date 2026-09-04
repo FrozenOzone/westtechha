@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" data-site-root="../" data-site-section="enclosures">
+<head>
+  <meta charset="utf-8"/>
+  <title>Enclosure Request Received – WestTech Home Automation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="noindex"/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="../css/site-20260824-mobilefix.css" rel="stylesheet"/>
+  <link href="../css/enclosure-order.css" rel="stylesheet"/>
+</head>
+<body class="enclosure-order-page">
+<div class="page"><div id="site-header"></div>
+  <main class="eo-result-main">
+    <section class="eo-result-card">
+      <div class="eo-result-check" aria-hidden="true">✓</div>
+      <div class="eo-eyebrow">REQUEST RECEIVED</div>
+      <h1>Your enclosure request is in.</h1>
+      <p>WestTech will review the configuration, current production workload, final pricing, and delivery terms before asking you to approve or pay.</p>
+      <div class="eo-result-order"><span>WestTech order</span><strong id="eo-result-order">Loading…</strong></div>
+      <div class="eo-result-next"><strong>What happens next</strong><ol><li>WestTech reviews the enclosure and hardware configuration.</li><li>You receive the final configuration, price, and estimated production window.</li><li>You approve the terms before PayPal payment is requested.</li><li>After payment, the order enters the shared WestTech production queue.</li></ol></div>
+      <p class="eo-result-note"><strong>No payment has been collected.</strong> A confirmation email has been sent when email delivery is available.</p>
+      <div class="eo-result-actions"><a href="../products.html">Return to Enclosures</a><a class="primary" href="order-request.html">Configure Another Enclosure</a></div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+</div>
+<script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script>
+<script>const order=new URLSearchParams(location.search).get('order')||'Request received';document.getElementById('eo-result-order').textContent=order;</script>
+</body>
+</html>

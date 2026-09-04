@@ -1,113 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-site-section="enclosures">
 <head>
   <meta charset="utf-8"/>
-  <title>Cart – WestTech Home Automation</title>
+  <title>Enclosure Ordering – WestTech Home Automation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Review your WestTech Home Automation cart and complete checkout."/>
+  <meta name="robots" content="noindex"/>
   <link href="icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
   <link href="css/site-20260824-mobilefix.css" rel="stylesheet"/>
+  <link href="css/enclosure-order.css" rel="stylesheet"/>
 </head>
-<body class="cart-page">
-<div class="page">
-  <div id="site-header"></div>
-
-  <header class="page-header cart-page-header">
-    <div class="eyebrow"><span class="dot"></span>Session Cart • U.S. Shipping Only</div>
-    <h1>Review your cart.</h1>
-    <p class="tagline">Add available products, options, colors, and quantities to one session cart. Website checkout currently supports U.S. shipping addresses only and direct checkout supports 1 through 4 total items.</p>
-  </header>
-
-  <section class="section cart-layout cart-section">
-    <article class="checkout-card">
-      <div class="product-label">Cart Items</div>
-      <h2>Your selected items</h2>
-      <div id="cart-items" class="cart-items"></div>
-      <div class="cart-actions">
-        <a class="btn btn-outline" href="index.html">Continue Shopping</a>
-        <button id="cart-clear-button" class="btn btn-outline" type="button">Clear Cart</button>
-        <a id="cart-custom-link" class="btn btn-buy-pop is-hidden" href="order.html">Request Quote</a>
-      </div>
-    </article>
-
-    <aside class="checkout-card checkout-summary-card">
-      <div class="product-label">Cart Summary</div>
-      <h2>Checkout summary</h2>
-      <div class="checkout-summary-lines">
-        <div class="checkout-line"><span>Total items</span><strong id="cart-total-quantity">0</strong></div>
-        <div class="checkout-product-summary"><span class="checkout-line-label">Products</span><span id="cart-product-summary">No items selected</span></div>
-        <div class="checkout-line"><span>Subtotal</span><strong id="cart-subtotal">$0.00</strong></div>
-        <div class="checkout-line"><span>Flat shipping</span><strong id="cart-shipping">$0.00</strong></div>
-        <div class="checkout-line checkout-line-note"><span>Tax</span><strong id="cart-tax">Finalized during checkout</strong></div>
-      </div>
-      <div id="cart-total-line" class="checkout-total-line">
-        <span id="cart-total-label">Base total before any applicable tax</span>
-        <strong id="cart-total">$0.00</strong>
-      </div>
-      <div id="cart-availability-status" class="checkout-inventory-status availability-in-stock">Availability: In stock</div>
-
-      <div id="cart-colorado-card" class="checkout-mini-card checkout-address-card is-hidden">
-        <div class="product-label">Confirm your shipping address</div>
-        <p class="checkout-mini-note">The address below was provided by PayPal. Please review it and make sure it looks correct before completing your order.</p>
-
-        <div class="checkout-address-compact">
-          <div class="checkout-address-compact-head">
-            <div class="checkout-address-display-title">Ship to</div>
-            <div class="checkout-address-invoice">WestTech Order # <strong id="cart-invoice-id" class="checkout-static-value">Pending…</strong></div>
-          </div>
-          <div class="checkout-address-recipient" id="cart-display-name">Pending…</div>
-          <div class="checkout-address-lines">
-            <div id="cart-display-address1">—</div>
-            <div id="cart-display-address2" class="is-hidden"></div>
-            <div id="cart-display-citystatezip">—</div>
-          </div>
-        </div>
-
-        <form id="cart-colorado-form" class="checkout-address-form checkout-address-form-hidden" aria-hidden="true">
-          <input id="cart-full-name" type="hidden"/>
-          <input id="cart-address1" autocomplete="shipping address-line1" readonly disabled required type="text"/>
-          <input id="cart-address2" autocomplete="shipping address-line2" readonly disabled type="text"/>
-          <input id="cart-city" autocomplete="shipping address-level2" readonly disabled required type="text"/>
-          <input id="cart-state" autocomplete="shipping address-level1" maxlength="2" readonly disabled required type="text" value="CO"/>
-          <input id="cart-postal" autocomplete="shipping postal-code" readonly disabled required type="text"/>
-        </form>
-
-        <p id="cart-change-note" class="checkout-mini-note checkout-change-note is-hidden">Need to change the address? Click the PayPal button below again, then select a different shipping address to continue checkout.</p>
-        <label id="cart-verify-wrap" class="checkout-verify-row is-hidden"><input id="cart-verify-checkbox" type="checkbox"/><span>I confirm this is my correct shipping address.</span></label>
-        <div id="cart-colorado-summary" class="checkout-mini-note is-hidden"></div>
-        <div id="cart-colorado-result" class="checkout-colorado-result is-hidden">
-          <div class="checkout-colorado-result-title">Updated order total</div>
-          <div class="checkout-colorado-result-lines">
-            <div class="checkout-line"><span>Cart subtotal</span><strong id="cart-result-item">$0.00</strong></div>
-            <div class="checkout-line"><span>Flat shipping</span><strong id="cart-result-shipping">$0.00</strong></div>
-            <div class="checkout-line"><span>Colorado tax</span><strong id="cart-result-tax">$0.00</strong></div>
-            <div class="checkout-colorado-result-total"><span>Final total</span><strong id="cart-result-total">$0.00</strong></div>
-          </div>
-        </div>
-        <button id="cart-complete-button" class="btn-buy-pop checkout-tax-button checkout-tax-button-primary is-hidden" type="button">Complete Order</button>
-      </div>
-
-      <div class="checkout-paypal-shell">
-        <div class="checkout-paypal-head">
-          <div><div class="product-label">Secure Payment</div><h3>PayPal Checkout</h3></div>
-          <span class="checkout-security-pill">PayPal</span>
-        </div>
-        <div id="cart-paypal-button-container" class="paypal-button-container is-hidden"></div>
-        <p id="cart-status" class="checkout-status">Loading cart…</p>
-      </div>
-
-      <div class="checkout-policy-list">
-        <p><strong>Shipping:</strong> Website checkout currently supports U.S. shipping addresses only. Quantity-based U.S. shipping applies to 1 through 4 total items. Orders for 5+ items use the quote / email order path.</p>
-        <p><strong>Sales tax:</strong> Any applicable sales tax is finalized before the order is captured.</p>
-        <p><strong>Cart:</strong> This is a session cart stored in your browser. It does not require a customer account.</p>
-      </div>
-    </aside>
-  </section>
-
-  <div id="site-footer"></div>
-</div>
-<script src="js/site-shell-20260824-mobilefix.js"></script>
-<script src="js/theme.js" defer></script>
-<script src="js/cart-checkout.js" defer></script>
-</body>
-</html>
+<body class="enclosure-order-page"><div class="page"><div id="site-header"></div>
+  <main class="eo-moved-main"><section class="eo-moved-card"><div class="eo-eyebrow">ENCLOSURE ORDERING</div><h1>The cart is taking a break.</h1><p>WestTech enclosure orders now begin with a configuration request. This lets us confirm hardware fit, current printer workload, final pricing, and the expected production window before you approve or pay.</p><p>Your old browser cart has not been submitted or charged.</p><a href="enclosures/order-request.html">Configure &amp; Request an Enclosure →</a></section></main>
+  <div id="site-footer"></div></div>
+<script src="js/theme.js"></script><script src="js/site-shell-20260824-mobilefix.js"></script>
+</body></html>

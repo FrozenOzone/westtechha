@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" data-site-root="../" data-site-section="enclosures">
+<head>
+  <meta charset="utf-8"/>
+  <title>Configure an Enclosure – WestTech Home Automation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Configure a WestTech Scout, Ranger, or Command enclosure and send it for final pricing and production review."/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="../css/site-20260824-mobilefix.css" rel="stylesheet"/>
+  <link href="../css/enclosure-order.css" rel="stylesheet"/>
+</head>
+<body class="enclosure-order-page">
+<div class="page">
+  <div id="site-header"></div>
+  <main class="eo-main">
+    <div class="eo-back"><a href="../products.html"><span aria-hidden="true">←</span> Enclosures</a></div>
+    <section class="eo-shell" aria-label="Enclosure order request">
+      <header class="eo-head">
+        <div><div class="eo-eyebrow">SCOUT • RANGER • COMMAND</div><h1>Configure your<br/><em>WestTech enclosure.</em></h1></div>
+        <p>Choose the enclosure, board layout, build level, color, and quantity. WestTech reviews the configuration, current workload, final price, and production timing before payment. <strong>No payment is collected here.</strong></p>
+      </header>
+
+      <div class="eo-layout">
+        <aside class="eo-summary" aria-label="Current enclosure configuration">
+          <div class="eo-summary-label">LIVE CONFIGURATION</div>
+          <div class="eo-image-frame"><img id="eo-product-image" alt="Selected WestTech enclosure"/></div>
+          <div class="eo-summary-copy">
+            <div class="eo-summary-kicker" id="eo-family-summary">SCOUT FAMILY</div>
+            <h2 id="eo-product-summary">Scout 30 — Unloaded</h2>
+            <dl>
+              <div><dt>Board layout</dt><dd id="eo-board-summary">30-pin</dd></div>
+              <div><dt>Build level</dt><dd id="eo-offer-summary">Unloaded</dd></div>
+              <div><dt>Color</dt><dd id="eo-color-summary">White</dd></div>
+              <div><dt>Quantity</dt><dd id="eo-quantity-summary">1</dd></div>
+            </dl>
+            <div class="eo-estimate"><span>Starting product subtotal</span><strong id="eo-price-summary">Loading…</strong><small>Final price, shipping or pickup terms, tax, and timing are confirmed during review.</small></div>
+            <div class="eo-queue-note"><strong>Shared production queue</strong><span>WestTech enclosures and custom products share the same small-batch printer capacity. Your estimated production window will be confirmed before payment.</span></div>
+          </div>
+        </aside>
+
+        <form class="eo-form" id="eo-order-form" autocomplete="on" novalidate>
+          <section class="eo-step">
+            <div class="eo-step-head"><b>01</b><span><small>ENCLOSURE</small><strong>Choose the family and model</strong></span></div>
+            <div class="eo-fields">
+              <label><span>Family</span><select id="eo-family" required><option value="Scout">Scout</option><option value="Ranger">Ranger</option><option value="Command">Command</option></select></label>
+              <label><span>Model</span><select id="eo-model" required></select></label>
+            </div>
+          </section>
+
+          <section class="eo-step">
+            <div class="eo-step-head"><b>02</b><span><small>HARDWARE FIT</small><strong>Choose the board and build level</strong></span></div>
+            <div class="eo-choice-grid">
+              <label class="eo-choice"><input type="radio" name="board" value="30" checked/><span><strong>30-pin</strong><small>30-pin ESP32 layout</small></span></label>
+              <label class="eo-choice"><input type="radio" name="board" value="38"/><span><strong>38-pin</strong><small>38-pin ESP32 layout</small></span></label>
+            </div>
+            <div class="eo-choice-grid eo-offers">
+              <label class="eo-choice"><input type="radio" name="offer" value="Unloaded" checked/><span><strong>Unloaded</strong><small>Printed enclosure and standard enclosure hardware</small></span></label>
+              <label class="eo-choice"><input type="radio" name="offer" value="Loaded"/><span><strong>Loaded</strong><small>Selected electronics path prepared before shipment</small></span></label>
+            </div>
+          </section>
+
+          <section class="eo-step">
+            <div class="eo-step-head"><b>03</b><span><small>FINISH + QUANTITY</small><strong>Choose the color and amount</strong></span></div>
+            <div class="eo-fields">
+              <label><span>Enclosure color</span><select id="eo-color"><option value="White">White</option><option value="Black">Black</option></select></label>
+              <label><span>Quantity</span><input id="eo-quantity" type="number" min="1" max="50" step="1" value="1" inputmode="numeric" required/></label>
+            </div>
+            <p class="eo-help">Larger quantities are welcome. Because this is a reviewed order request, WestTech can confirm production timing and shipping before payment.</p>
+          </section>
+
+          <section class="eo-step">
+            <div class="eo-step-head"><b>04</b><span><small>DELIVERY</small><strong>Tell us how you expect to receive it</strong></span></div>
+            <div class="eo-choice-grid eo-delivery">
+              <label class="eo-choice"><input type="radio" name="fulfillment" value="SHIP" checked/><span><strong>Ship Order</strong><small>Address will come from PayPal later</small></span></label>
+              <label class="eo-choice"><input type="radio" name="fulfillment" value="LOCAL_PICKUP"/><span><strong>Local Pickup</strong><small>Pickup details confirmed during review</small></span></label>
+              <label class="eo-choice"><input type="radio" name="fulfillment" value="DISCUSS"/><span><strong>Discuss It</strong><small>Decide with WestTech during review</small></span></label>
+            </div>
+          </section>
+
+          <section class="eo-step">
+            <div class="eo-step-head"><b>05</b><span><small>CONTACT + PROJECT</small><strong>Tell us who this is for</strong></span></div>
+            <div class="eo-fields">
+              <label><span>Name</span><input id="eo-name" type="text" maxlength="120" autocomplete="name" placeholder="Your name" required/></label>
+              <label><span>Email</span><input id="eo-email" type="email" maxlength="254" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" placeholder="you@example.com" required/></label>
+              <label><span>Phone <small>(optional)</small></span><input id="eo-phone" type="tel" maxlength="60" autocomplete="tel" inputmode="tel" placeholder="(555) 555-5555"/></label>
+              <label class="eo-notes"><span>Project notes <small>(optional)</small></span><textarea id="eo-notes" maxlength="2500" placeholder="Hardware fit questions, insert or opening needs, timing, quantity, pickup discussion, or anything else WestTech should review."></textarea></label>
+            </div>
+            <input class="eo-honey" id="eo-website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true"/>
+          </section>
+
+          <section class="eo-submit">
+            <label class="eo-confirm"><input id="eo-confirm" type="checkbox"/><span>I understand this submits an enclosure request for WestTech review. The final configuration, price, production window, and payment step will be confirmed before the order enters production.</span></label>
+            <button id="eo-submit" type="submit">Send to WestTech for Review <span aria-hidden="true">→</span></button>
+            <p>This creates a request, not a purchase. No payment is collected on this page.</p>
+            <div class="eo-message" id="eo-message" role="status" hidden></div>
+          </section>
+        </form>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+</div>
+<script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script><script src="../js/enclosure-order.js?v=20260904-1"></script>
+</body>
+</html>

@@ -11,6 +11,10 @@
   const DIRECT_PAYPAL_ON_PRODUCT_PAGE = false;
 
   const checkoutConfig = window.WESTTECH_CHECKOUT || {};
+  if (checkoutConfig.sku) {
+    window.location.replace(`enclosures/order-request.html?sku=${encodeURIComponent(checkoutConfig.sku)}`);
+    return;
+  }
   let PRODUCT = {
     sku: checkoutConfig.sku || "scout-30-unloaded",
     name: checkoutConfig.name || "Loading product…",
