@@ -67,10 +67,10 @@ function template(type,order,links={}){
     headline=`Your design is approved, ${name}.`;
     intro='Your proof approval is recorded and the design is locked in. Payment is the last step before your order enters the WestTech production queue.';
     process='Paying does not mean a printer starts immediately. WestTech manufactures custom work in small batches, so paid orders enter the production queue first and I’ll send another update when manufacturing actually begins.';
-    action='Your next step is to complete payment through PayPal.';
+    action='If you have not already completed payment, return to your secure order page to continue. If you already paid, that page will confirm the payment status—no further payment is needed.';
     details=[`Order: ${orderId}`,summary,`Approved subtotal: ${finalTotal}`];
     if(order?.fulfillmentMethod==='SHIP')details.push('Shipping address: choose or confirm it in PayPal. WestTech will use the PayPal-confirmed address for this order.');
-    buttonLabel='Continue to PayPal';buttonUrl=paymentUrl;
+    buttonLabel='View Order & Payment Status';buttonUrl=approvalUrl;
   }else if(type==='PRODUCTION_QUEUED'){
     const paid=String(order?.paymentStatus||'').toUpperCase()==='PAID';
     subject=paid?`Payment received — your order is in the production queue — ${orderId}`:`Your order is in the production queue — ${orderId}`;
