@@ -13,5 +13,4 @@
 #cap-tax-rate{color:#7f95ad;font-size:.55rem;font-weight:700}
 
 #cap-tax-row.pending{align-items:center;background:rgba(22,119,196,.07)}
-#cap-tax-row.pending span,#cap-tax-row.pending strong{color:#77b9e8}
-#cap-tax-row.pending strong{max-width:58%;text-align:right;line-height:1.3}
+#cap-tax-row.pending strong{max-width:58%;text-align:right;line-height:1.3;font-weight:900}
