@@ -7,6 +7,8 @@
   const $=s=>document.querySelector(s);
   const form=$('#cb-order-form');
   const submit=$('#cb-submit');
+  const submitDefaultHtml=submit.innerHTML;
+  const submitRightsHtml='Check the artwork permission box above <span aria-hidden="true">↑</span>';
   const message=$('#cb-message');
   let originalArtworkDataUrl='';
   let previewArtworkDataUrl='';
@@ -34,8 +36,16 @@
   function emailLooksValid(value){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((value||'').trim());}
   function selectedSetSize(){const checked=document.querySelector('input[name="cb-set-size"]:checked');return checked?checked.value:'';}
   function updateReady(){
-    const ready=!!$('#cb-file').files[0] && $('#cb-rights').checked && $('#cb-name').value.trim().length>=2 && emailLooksValid($('#cb-email').value) && !!selectedSetSize();
-    submit.disabled=!ready || submit.dataset.busy==='true';
+    const rights=$('#cb-rights');
+    const busy=submit.dataset.busy==='true';
+    const ready=!!$('#cb-file').files[0] && rights.checked && $('#cb-name').value.trim().length>=2 && emailLooksValid($('#cb-email').value) && !!selectedSetSize();
+    submit.disabled=!ready || busy;
+    if(!busy){
+      const rightsMissing=!rights.checked;
+      submit.classList.toggle('needs-rights',rightsMissing);
+      submit.innerHTML=rightsMissing?submitRightsHtml:submitDefaultHtml;
+      rights.closest('.cb-rights-check')?.classList.toggle('needs-attention',rightsMissing);
+    }
   }
   function showMessage(text,type){
     message.hidden=false;message.textContent=text;message.classList.remove('is-error','is-success');
