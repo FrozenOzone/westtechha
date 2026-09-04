@@ -35,11 +35,12 @@ export async function onRequestPost(context){
         paymentWarning='Preview test mode: no PayPal checkout was created. WestTech can use the Preview Payment Test page to mark this order paid and continue the shipping workflow.';
       }else{
         const root=base(context.request);const encodedOrder=encodeURIComponent(order.orderId),encodedToken=encodeURIComponent(token);
-        const returnUrl=`${root}/coasters/order-approval.html?order=${encodedOrder}&approvalToken=${encodedToken}&payment=return`;
-        const cancelUrl=`${root}/coasters/order-approval.html?order=${encodedOrder}&approvalToken=${encodedToken}&payment=cancel`;
+        const orderPageUrl=`${root}/coasters/order-approval.html?order=${encodedOrder}&approvalToken=${encodedToken}`;
+        const returnUrl=`${orderPageUrl}&payment=return`;
+        const cancelUrl=`${orderPageUrl}&payment=cancel`;
         try{
           order=await ensureCoasterPayPalOrder(context.env,order.orderId,{returnUrl,cancelUrl});
-          if(order.paymentRequired)await sendCoasterCustomerEmail(context.env,{type:'PAYMENT_REQUIRED',order,paymentUrl:order.paypalApprovalUrl,requestUrl:context.request.url});
+          if(order.paymentRequired)await sendCoasterCustomerEmail(context.env,{type:'PAYMENT_REQUIRED',order,approvalUrl:orderPageUrl,paymentUrl:order.paypalApprovalUrl,requestUrl:context.request.url});
           else if(String(order.status||'').toUpperCase()==='PRODUCTION_QUEUE')await sendCoasterAdminProductionEmail(context.env,{order,requestUrl:context.request.url});
         }catch(error){order=await recordCoasterPayPalFailure(context.env,order.orderId,error);paymentWarning=error.message||'PayPal checkout setup needs WestTech review.';}
       }
