@@ -7,7 +7,7 @@
   const normalize=v=>String(v||'').trim().toUpperCase().replaceAll(' ','_');
   const token=()=>sessionStorage.getItem('westtechha-admin-token')||'';
   const orderId=()=>String($('#ca-order-id')?.textContent||'').trim();
-  const statusCode=()=>normalize($('#ca-status-pill')?.textContent||'');
+  const statusCode=()=>normalize($('#ca-status-pill')?.dataset.savedStatus||$('#ca-status-pill')?.textContent||'');
   const FILTER_KEY='westtechha-coaster-order-filter';
   const FILTER_VALUES=new Set(['ACTIVE','COMPLETED','ARCHIVED','ALL']);
   let filterAlignTimer=0;
@@ -167,10 +167,10 @@
     if(!panel||!button)return;
     panel.hidden=!finished;
     if(status==='COMPLETED'){
-      badge.hidden=true;button.hidden=false;button.textContent='Archive Order';button.dataset.action='archive';
+      badge.hidden=true;button.hidden=false;button.className='ca-primary';button.textContent='Archive Order';button.dataset.action='archive';
       title.textContent='Completed order';help.textContent='Archive this finished order to remove it from Active while keeping the complete customer, payment, artwork, tracking, work-log, and event record.';
     }else if(status==='ARCHIVED'){
-      badge.hidden=false;button.hidden=false;button.textContent='Restore to Completed';button.dataset.action='restoreArchive';
+      badge.hidden=false;button.hidden=false;button.className='ca-secondary';button.textContent='Restore to Completed';button.dataset.action='restoreArchive';
       title.textContent='Archived order';help.textContent='This record is retained and hidden from Active orders. Restore it if you need to work with the completed order again.';
       renderArchivedRecord();
     }else{button.dataset.action='';}
@@ -179,6 +179,7 @@
   async function handleArchiveButton(){
     const button=$('#ca-archive-button'),action=button?.dataset.action;if(!button||!action)return;
     const id=orderId();const archiving=action==='archive';
+    if(archiving&&($('#ca-save-top')&&!$('#ca-save-top').disabled)){const msg=$('#ca-message');if(msg){msg.hidden=false;msg.textContent='Save your tracking or notes changes before archiving this order.';msg.className='ca-inline-message error';}return;}
     const ok=window.confirm(archiving?`Archive ${id}?\n\nThe complete order record will be retained. No customer email will be sent.`:`Restore ${id} to Completed?\n\nNo customer email will be sent.`);if(!ok)return;
     const original=button.textContent;button.disabled=true;button.textContent=archiving?'Archiving…':'Restoring…';
     try{await orderAction(action);sessionStorage.setItem(FILTER_KEY,archiving?'ARCHIVED':'COMPLETED');location.reload();}
