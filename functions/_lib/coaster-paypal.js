@@ -168,7 +168,7 @@ export async function captureCoasterPayPalOrder(env,orderId,approvalToken,paypal
   if(status==='COMPLETED'){const paid=await markCaptured(env,orderId,paypalOrderId,detailResult.data,detailResult.data);return {order:paid,capturedNow:!!paid?._paymentCapturedNow,taxConfirmationRequired:false};}
   const prepared=await preparePayPalTax(env,order,detailResult.data,accessToken,{confirmTax});
   if(prepared.quote.isColorado&&!prepared.confirmationAccepted)return {order:prepared.order,capturedNow:false,taxConfirmationRequired:true,taxReview:taxReview(prepared)};
-  const captured=await paypalCall(env,`/v2/checkout/orders/${encodeURIComponent(paypalOrderId)}/capture`,{method:'POST',accessToken,requestId:requestId(order.orderId,order.proofVersion,'capture')});
+  const captured=await paypalCall(env,`/v2/checkout/orders/${encodeURIComponent(paypalOrderId)}/capture`,{method:'POST',body:{},accessToken,requestId:requestId(order.orderId,order.proofVersion,'capture')});
   const paid=await markCaptured(env,orderId,paypalOrderId,detailResult.data,captured.data);
   return {order:paid,capturedNow:!!paid?._paymentCapturedNow,taxConfirmationRequired:false};
 }
@@ -184,7 +184,7 @@ export async function syncCoasterPayPalOrder(env,orderId){
   if(status==='APPROVED'){
     const prepared=await preparePayPalTax(env,order,got.data,accessToken);
     if(prepared.quote.isColorado&&!prepared.confirmationAccepted)throw Object.assign(new Error('The customer must confirm the Colorado tax total on the approval page before this payment can be captured.'),{status:409});
-    const captured=await paypalCall(env,`/v2/checkout/orders/${encodeURIComponent(order.paypalOrderId)}/capture`,{method:'POST',accessToken,requestId:requestId(order.orderId,order.proofVersion,'capture')});
+    const captured=await paypalCall(env,`/v2/checkout/orders/${encodeURIComponent(order.paypalOrderId)}/capture`,{method:'POST',body:{},accessToken,requestId:requestId(order.orderId,order.proofVersion,'capture')});
     return markCaptured(env,orderId,order.paypalOrderId,got.data,captured.data);
   }
   await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PAYPAL_STATUS_SYNCED',?)`).bind(orderId,JSON.stringify({paypalOrderId:order.paypalOrderId,paypalStatus:status})).run();
