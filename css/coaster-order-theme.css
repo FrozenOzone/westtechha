@@ -15,3 +15,46 @@
 #ca-review-commercial .ca-fields-three > .ca-field:has(#ca-shipping){order:8}
 #ca-review-commercial .ca-fields-three > .ca-field:has(#ca-billable-work){order:9}
 #ca-review-commercial .ca-fields-three > .ca-total-inline{order:10}
+
+/* Completed-order controls: light-theme parity and correct archive badge visibility. */
+.custom-coasters-page .ca-archive-badge[hidden]{display:none!important}
+
+html[data-theme="light"] .custom-coasters-page #ca-production-status{
+  background:#eef6fc;
+  border-color:#a9cde5;
+  color:#1d3147;
+  font-weight:800;
+}
+html[data-theme="light"] .custom-coasters-page .ca-archive-panel{
+  background:#f5f8fb;
+  border-color:#c9dcea;
+  box-shadow:inset 0 0 0 1px rgba(22,119,196,.03);
+}
+html[data-theme="light"] .custom-coasters-page .ca-archive-copy strong{color:#17233a}
+html[data-theme="light"] .custom-coasters-page .ca-archive-copy span{color:#52677e}
+html[data-theme="light"] .custom-coasters-page .ca-archive-badge{
+  background:#edf6fc;
+  border-color:#b5d2e7;
+  color:#265b80;
+}
+
+@media (prefers-color-scheme:light){
+  html:not([data-theme]) .custom-coasters-page #ca-production-status{
+    background:#eef6fc;
+    border-color:#a9cde5;
+    color:#1d3147;
+    font-weight:800;
+  }
+  html:not([data-theme]) .custom-coasters-page .ca-archive-panel{
+    background:#f5f8fb;
+    border-color:#c9dcea;
+    box-shadow:inset 0 0 0 1px rgba(22,119,196,.03);
+  }
+  html:not([data-theme]) .custom-coasters-page .ca-archive-copy strong{color:#17233a}
+  html:not([data-theme]) .custom-coasters-page .ca-archive-copy span{color:#52677e}
+  html:not([data-theme]) .custom-coasters-page .ca-archive-badge{
+    background:#edf6fc;
+    border-color:#b5d2e7;
+    color:#265b80;
+  }
+}
