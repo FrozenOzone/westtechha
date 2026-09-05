@@ -99,7 +99,7 @@
     }));
   }
 
-  function frameUrl(order){const page=order.sourceType==='COASTER'?'coaster-orders.html':'enclosure-orders.html';return `${page}?pane=1&order=${encodeURIComponent(order.orderId)}`;}
+  function frameUrl(order){const page=order.sourceType==='COASTER'?'coaster-orders.html':'enclosure-orders.html',layout=order.sourceType==='ENCLOSURE'?'&layout=20260905-parity1':'';return `${page}?pane=1&order=${encodeURIComponent(order.orderId)}${layout}`;}
   function selectOrder(key){
     const order=orders.find(row=>keyFor(row)===key);if(!order)return;selectedKey=key;renderList();
     const frame=$('#uo-order-frame');$('#uo-empty-detail').hidden=true;$('#uo-frame-loading').hidden=false;frame.hidden=true;frame.src=frameUrl(order);

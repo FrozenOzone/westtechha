@@ -23,6 +23,16 @@ Rollback boundary: restore the Dev branch to the accepted commit for source reco
 
 Rollback boundary: restore the Dev branch to `7cd2b9f3f12c1f8f6aa0cf8740895047421fcbe0`. No database restore is required for this change.
 
+## 2026-09-05 — Enclosure admin layout parity
+
+- Pre-change Dev commit: `d3356eff465c5bdbe5d981360fe32ce26bb92003`
+- Named checkpoint branch: `checkpoint-before-enclosure-layout-parity-20260905`
+- Scope: rebuild the enclosure order detail around the accepted coaster admin layout while preserving enclosure-specific fields and workflow behavior.
+- Visual parity: large product image, two-column customer overview, matching pricing/terms, fulfillment/notes, production, work-log, approval/payment, and history surfaces.
+- Database impact: none; Preview D1 schema, data, and order records remain untouched.
+
+Rollback boundary: restore the Dev branch to `d3356eff465c5bdbe5d981360fe32ce26bb92003`. No database restore is required for this change.
+
 ## Rule for future complex changes
 
 1. Record the accepted Dev commit.
