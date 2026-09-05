@@ -1,75 +1,49 @@
 <!DOCTYPE html>
 <html lang="en" data-site-root="../" data-site-section="enclosures">
 <head>
-  <meta charset="utf-8"/>
-  <title>Enclosure Order Review – WestTech Home Automation</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="robots" content="noindex,nofollow"/>
-  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
-  <link href="../css/site-20260824-mobilefix.css" rel="stylesheet"/>
-  <link href="../css/coaster-admin.css" rel="stylesheet"/>
-  <link href="../css/coaster-order-theme.css" rel="stylesheet"/>
-  <link href="../css/coaster-theme-auto-admin.css" rel="stylesheet"/>
-  <link href="../css/coaster-theme-light-admin.css" rel="stylesheet"/>
-  <link href="../css/enclosure-admin.css" rel="stylesheet"/>
+  <meta charset="utf-8"/><title>Enclosure Orders – WestTech Home Automation</title><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="robots" content="noindex,nofollow"/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/><link href="../css/site-20260824-mobilefix.css" rel="stylesheet"/><link href="../css/coaster-admin.css" rel="stylesheet"/><link href="../css/coaster-order-theme.css" rel="stylesheet"/><link href="../css/coaster-theme-auto-admin.css" rel="stylesheet"/><link href="../css/coaster-theme-light-admin.css" rel="stylesheet"/><link href="../css/enclosure-admin.css" rel="stylesheet"/>
 </head>
-<body class="coaster-page custom-coasters-page enclosure-admin-page">
-<div class="page"><div id="site-header"></div>
-  <main class="ca-main">
-    <div class="ca-topbar"><div><div class="ca-eyebrow">ENCLOSURE ORDER REVIEW</div><h1>WestTech <em>enclosure requests.</em></h1></div><div class="ca-mode live">DEV ADMIN</div></div>
-    <section class="ca-shell">
-      <aside class="ca-sidebar">
-        <div class="ca-sidebar-head"><strong>Requests</strong><span id="ea-count">0 orders</span></div>
-        <div class="ca-auth" id="ea-auth"><label>Admin token<div class="ca-auth-row"><input id="ea-token" type="password" autocomplete="current-password"/><button class="ca-mini-btn" id="ea-connect" type="button">Connect</button></div></label></div>
-        <select class="ea-filter" id="ea-filter" aria-label="Filter enclosure orders"><option value="ACTIVE">Active review</option><option value="ALL">All requests</option><option value="REQUEST_RECEIVED">Request received</option><option value="UNDER_REVIEW">Under review</option><option value="NEEDS_CUSTOMER_INFO">Needs customer info</option><option value="ON_HOLD">On hold</option></select>
-        <input class="ca-search" id="ea-search" type="search" placeholder="Search orders or customers"/>
-        <div class="ca-order-list" id="ea-order-list"><div class="ca-empty">Enter the admin token to load enclosure requests.</div></div>
-      </aside>
+<body class="coaster-page custom-coasters-page enclosure-admin-page"><div class="page"><div id="site-header"></div>
+<main class="ca-main">
+  <div class="ca-topbar"><div><div class="ca-eyebrow">ENCLOSURE ORDER WORKFLOW</div><h1>WestTech <em>enclosure orders.</em></h1></div><div class="ca-mode live">DEV ADMIN</div></div>
+  <section class="ca-shell">
+    <aside class="ca-sidebar">
+      <div class="ca-sidebar-head"><strong>Orders</strong><span id="ea-count">0 orders</span></div>
+      <div class="ca-auth" id="ea-auth"><label>Admin token<div class="ca-auth-row"><input id="ea-token" type="password" autocomplete="current-password"/><button class="ca-mini-btn" id="ea-connect" type="button">Connect</button></div></label></div>
+      <select class="ea-filter" id="ea-filter" aria-label="Filter enclosure orders"><option value="ACTIVE">Active orders</option><option value="ALL">All orders</option><option value="REQUEST_RECEIVED">Request received</option><option value="UNDER_REVIEW">Under review</option><option value="NEEDS_CUSTOMER_INFO">Needs customer info</option><option value="ON_HOLD">On hold</option><option value="CHANGES_REQUESTED">Changes requested</option><option value="CONFIGURATION_SENT">Configuration sent</option><option value="AWAITING_PAYMENT">Awaiting payment</option><option value="PRODUCTION_QUEUE">Production queue</option><option value="IN_PRODUCTION">In production</option><option value="PREPARING_TO_SHIP">Preparing to ship</option><option value="PREPARING_FOR_PICKUP">Preparing for pickup</option><option value="READY_FOR_PICKUP">Ready for pickup</option><option value="SHIPPED">Shipped</option><option value="COMPLETED">Completed</option><option value="ARCHIVED">Archived</option></select>
+      <input class="ca-search" id="ea-search" type="search" placeholder="Search orders or customers"/><div class="ca-order-list" id="ea-order-list"><div class="ca-empty">Enter the admin token to load enclosure orders.</div></div>
+    </aside>
+    <section class="ca-detail"><div class="ca-loading" id="ea-loading">Choose an enclosure order.</div><div class="ca-detail-inner" id="ea-detail" hidden>
+      <header class="ca-order-head"><div><div class="ca-eyebrow">ENCLOSURE ORDER</div><h2 id="ea-order-id">—</h2><p id="ea-order-created">—</p></div><span class="ca-status-pill" id="ea-status-pill">—</span></header>
+      <div class="ea-summary-grid"><article class="ca-card"><div class="ca-eyebrow">CUSTOMER</div><h3 id="ea-customer">—</h3><p id="ea-contact">—</p></article><article class="ca-card"><div class="ca-eyebrow">CONFIGURATION</div><h3 id="ea-configuration">—</h3><p id="ea-options">—</p></article><article class="ca-card"><div class="ca-eyebrow">STARTING ESTIMATE</div><h3 id="ea-starting-total">—</h3><p>Product subtotal before review</p></article></div>
+      <article class="ca-card ea-notes-card"><div class="ca-eyebrow">CUSTOMER REQUEST</div><p id="ea-customer-notes">No customer notes.</p><div id="ea-change-request" class="ea-change-request" hidden></div></article>
 
-      <section class="ca-detail">
-        <div class="ca-loading" id="ea-loading">Choose an enclosure request.</div>
-        <div class="ca-detail-inner" id="ea-detail" hidden>
-          <header class="ca-order-head"><div><div class="ca-eyebrow">ENCLOSURE REQUEST</div><h2 id="ea-order-id">—</h2><p id="ea-order-created">—</p></div><span class="ca-status-pill" id="ea-status-pill">—</span></header>
-          <div class="ea-summary-grid">
-            <article class="ca-card"><div class="ca-eyebrow">CUSTOMER</div><h3 id="ea-customer">—</h3><p id="ea-contact">—</p></article>
-            <article class="ca-card"><div class="ca-eyebrow">CONFIGURATION</div><h3 id="ea-configuration">—</h3><p id="ea-options">—</p></article>
-            <article class="ca-card"><div class="ca-eyebrow">STARTING ESTIMATE</div><h3 id="ea-starting-total">—</h3><p>Product subtotal before review</p></article>
-          </div>
-
-          <article class="ca-card ea-notes-card"><div class="ca-eyebrow">CUSTOMER REQUEST</div><p id="ea-customer-notes">No customer notes.</p></article>
-
-          <form id="ea-review-form" class="ca-card ea-review-card">
-            <div class="ea-section-head"><div><div class="ca-eyebrow">ORDER REVIEW</div><h3>Confirm the enclosure order</h3></div><span>No payment is collected in this phase.</span></div>
-            <div class="ea-fields ea-fields-three">
-              <label><span>Review status</span><select id="ea-status"><option value="REQUEST_RECEIVED">Request Received</option><option value="UNDER_REVIEW">Under Review</option><option value="NEEDS_CUSTOMER_INFO">Needs Customer Info</option><option value="ON_HOLD">On Hold</option></select></label>
-              <label><span>Fulfillment</span><select id="ea-fulfillment"><option value="UNSET">Not confirmed</option><option value="SHIP">Ship Order</option><option value="LOCAL_PICKUP">Local Pickup</option></select></label>
-              <label><span>Estimated printer minutes</span><input id="ea-printer-minutes" type="number" min="0" max="100000" step="1" value="0"/></label>
-              <label><span>Printer assignment <small>(optional)</small></span><input id="ea-printer" type="text" maxlength="80" placeholder="K2 #1, K2 #2, or leave open"/></label>
-              <label class="ea-span-two"><span>Estimated production window</span><input id="ea-production-window" type="text" maxlength="160" placeholder="Example: 7–10 business days after payment"/></label>
-            </div>
-            <div class="ea-fields ea-pricing-grid">
-              <label><span>Product amount</span><input id="ea-product-amount" type="number" min="0" step="0.01"/></label>
-              <label><span>Custom charge</span><input id="ea-custom-charge" type="number" min="0" step="0.01" value="0"/></label>
-              <label><span>Shipping</span><input id="ea-shipping" type="number" min="0" step="0.01" value="0"/></label>
-              <label><span>Discount</span><input id="ea-discount" type="number" min="0" step="0.01" value="0"/></label>
-              <div class="ea-total"><span>Reviewed subtotal</span><strong id="ea-total">$0.00</strong></div>
-            </div>
-            <div class="ea-fields">
-              <label><span>Customer-facing review note</span><textarea id="ea-customer-message" maxlength="2500" placeholder="Configuration details or questions that will eventually appear with the approval terms."></textarea></label>
-              <label><span>Internal production notes</span><textarea id="ea-admin-notes" maxlength="5000" placeholder="Fit checks, hardware availability, print setup, or other internal notes."></textarea></label>
-            </div>
-            <div class="ea-review-note"><strong>This is the first review phase.</strong> The customer approval and PayPal release controls will be added after this request-and-review path is tested.</div>
-            <div class="ea-save-row"><button class="ca-primary" id="ea-save" type="submit">Save Enclosure Review</button></div>
-            <div class="ca-inline-message" id="ea-message" role="status" hidden></div>
-          </form>
-
-          <article class="ca-card ea-history"><div class="ea-section-head"><div><div class="ca-eyebrow">ORDER HISTORY</div><h3>What has happened</h3></div></div><div id="ea-events"></div></article>
+      <form id="ea-review-form" class="ca-card ea-review-card">
+        <div class="ea-section-head"><div><div class="ca-eyebrow">ORDER REVIEW</div><h3>Confirm the configuration and customer terms</h3></div><span id="ea-review-lock">No payment is collected in this phase.</span></div>
+        <div class="ea-fields ea-fields-three">
+          <label><span>Review status</span><select id="ea-status"><option value="REQUEST_RECEIVED">Request Received</option><option value="UNDER_REVIEW">Under Review</option><option value="NEEDS_CUSTOMER_INFO">Needs Customer Info</option><option value="ON_HOLD">On Hold</option><option value="CHANGES_REQUESTED">Changes Requested</option></select></label>
+          <label><span>Fulfillment</span><select id="ea-fulfillment"><option value="UNSET">Not confirmed</option><option value="SHIP">Ship Order</option><option value="LOCAL_PICKUP">Local Pickup</option></select></label>
+          <label class="ea-payment-check"><span>Payment</span><span class="ea-check"><input id="ea-payment-required" type="checkbox" checked/> Payment required before production</span></label>
+          <label><span>Estimated printer minutes</span><input id="ea-printer-minutes" type="number" min="0" max="100000" step="1" value="0"/></label>
+          <label><span>Printer assignment <small>(optional)</small></span><input id="ea-printer" type="text" maxlength="80" placeholder="K2 #1, K2 #2, or leave open"/></label>
+          <label><span>Estimated production window</span><input id="ea-production-window" type="text" maxlength="160" placeholder="Example: 7–10 business days after payment"/></label>
         </div>
-      </section>
-    </section>
-  </main>
-  <div id="site-footer"></div>
-</div>
-<script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script><script src="../js/enclosure-admin.js?v=20260904-1"></script>
-</body>
-</html>
+        <div class="ea-fields ea-pricing-grid"><label><span>Product amount</span><input id="ea-product-amount" type="number" min="0" step="0.01"/></label><label><span>Custom charge</span><input id="ea-custom-charge" type="number" min="0" step="0.01" value="0"/></label><label><span>Shipping</span><input id="ea-shipping" type="number" min="0" step="0.01" value="0"/></label><label><span>Discount</span><input id="ea-discount" type="number" min="0" step="0.01" value="0"/></label><div class="ea-total"><span>Reviewed subtotal</span><strong id="ea-total">$0.00</strong></div></div>
+        <div class="ea-fields"><label><span>Customer-facing review note</span><textarea id="ea-customer-message" maxlength="2500" placeholder="Configuration details or questions included with the approval terms."></textarea></label><label><span>Internal production notes</span><textarea id="ea-admin-notes" maxlength="5000" placeholder="Fit checks, hardware availability, print setup, or other internal notes."></textarea></label></div>
+        <div class="ea-review-note" id="ea-review-note"><strong>Review phase.</strong> Save the configuration, final subtotal, fulfillment method, and production window before sending it to the customer.</div><div class="ea-save-row"><button class="ca-primary" id="ea-save" type="submit">Save Enclosure Review</button></div><div class="ca-inline-message" id="ea-message" role="status" hidden></div>
+      </form>
+
+      <article class="ca-card ea-release-card" id="ea-release-card"><div class="ea-section-head"><div><div class="ca-eyebrow">CUSTOMER APPROVAL</div><h3 id="ea-release-title">Send configuration and terms</h3></div><span id="ea-version">NOT SENT</span></div><p id="ea-release-copy">After saving the review, send a private page where the customer can approve the configuration, price, fulfillment method, and production window.</p><div class="ea-release-actions"><button class="ca-primary" id="ea-send-terms" type="button">Send Configuration &amp; Terms</button><button class="ca-secondary" id="ea-refresh-link" type="button" hidden>Resend Private Approval Link</button></div><div class="ca-inline-message" id="ea-release-message" role="status" hidden></div></article>
+
+      <article class="ca-card ea-order-state" id="ea-order-state"><div class="ea-section-head"><div><div class="ca-eyebrow">APPROVED ORDER</div><h3>Configuration, payment, and production</h3></div><span id="ea-payment-pill">NOT REQUESTED</span></div><div class="ea-state-grid"><div><span>Configuration</span><strong id="ea-config-state">Not sent</strong><small id="ea-config-time">—</small></div><div><span>Fulfillment</span><strong id="ea-fulfillment-state">—</strong><small id="ea-window-state">—</small></div><div><span>Payment total</span><strong id="ea-payment-total">$0.00</strong><small id="ea-tax-state">Tax not prepared</small></div><div><span>PayPal</span><strong id="ea-paypal-state">Not created</strong><small id="ea-paypal-time">—</small></div></div><div class="ea-address" id="ea-address" hidden></div><div class="ea-release-actions"><button class="ca-secondary" id="ea-sync-paypal" type="button" hidden>Sync PayPal Status</button></div></article>
+
+      <form id="ea-production-form" class="ca-card ea-production-card" hidden><div class="ea-section-head"><div><div class="ca-eyebrow">PRODUCTION + FULFILLMENT</div><h3>Move this approved order forward</h3></div><span>Customer terms locked</span></div><div class="ea-fields ea-fields-three"><label><span>Production status</span><select id="ea-production-status"></select></label><label><span>Printer assignment</span><input id="ea-production-printer" maxlength="80"/></label><label><span>Carrier</span><input id="ea-carrier" maxlength="100" placeholder="USPS, UPS, FedEx, or DHL"/></label><label class="ea-span-two"><span>Tracking number</span><input id="ea-tracking" maxlength="180"/></label></div><div class="ea-save-row"><button class="ca-primary" id="ea-save-production" type="submit">Save Production Update</button></div><div class="ca-inline-message" id="ea-production-message" role="status" hidden></div></form>
+
+      <article class="ea-archive-card" id="ea-archive-card" hidden><div><strong id="ea-archive-title">Completed order</strong><span id="ea-archive-copy">Archive this finished order to remove it from Active while keeping the complete record.</span></div><button class="ca-secondary" id="ea-archive" type="button">Archive Order</button></article>
+
+      <article class="ca-card ea-work-card"><div class="ea-section-head"><div><div class="ca-eyebrow">WORK LOG</div><h3>Track the work behind the order</h3></div><span id="ea-work-total">0 min</span></div><form id="ea-work-form"><div class="ea-work-fields"><label><span>Work type</span><select id="ea-work-type"><option value="PRINT_PREP">Print preparation</option><option value="PRINTING">Printing</option><option value="HARDWARE">Hardware / assembly</option><option value="FIT_CHECK">Fit check</option><option value="FINISHING">Cleanup / finishing</option><option value="PACKAGING">Packaging</option><option value="OTHER">Other</option></select></label><label><span>Minutes</span><input id="ea-work-minutes" type="number" min="0" max="100000" value="0"/></label><label class="ea-span-two"><span>Work note</span><input id="ea-work-note" maxlength="1200" placeholder="What did you do?"/></label></div><button class="ca-secondary" id="ea-add-work" type="submit">+ Add Work Entry</button></form><div id="ea-work-list"></div><div class="ca-inline-message" id="ea-work-message" role="status" hidden></div></article>
+      <article class="ca-card ea-history"><div class="ea-section-head"><div><div class="ca-eyebrow">ORDER HISTORY</div><h3>What has happened</h3></div></div><div id="ea-events"></div></article>
+    </div></section>
+  </section>
+</main><div id="site-footer"></div></div><script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script><script src="../js/enclosure-admin.js?v=20260905-1"></script></body></html>

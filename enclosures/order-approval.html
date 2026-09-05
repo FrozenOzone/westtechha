@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" data-site-root="../" data-site-section="enclosures">
+<head>
+  <meta charset="utf-8"/>
+  <title>Review Your Enclosure Order – WestTech Home Automation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="noindex,nofollow,noarchive"/>
+  <meta name="description" content="Private WestTech enclosure configuration, order approval, payment, and status page."/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="../css/site-20260824-mobilefix.css" rel="stylesheet"/>
+  <link href="../css/coasters.css" rel="stylesheet"/>
+  <link href="../css/coaster-approval.css" rel="stylesheet"/>
+  <link href="../css/coaster-order-theme.css" rel="stylesheet"/>
+  <link href="../css/enclosure-approval.css" rel="stylesheet"/>
+</head>
+<body class="coaster-page custom-coasters-page enclosure-approval-page">
+<div class="page"><div id="site-header"></div>
+  <main class="cap-main"><section class="cap-shell">
+    <div class="cap-loading" id="cap-loading">Loading your private enclosure order…</div>
+    <div id="cap-content" hidden>
+      <header class="cap-head"><div><div class="cap-eyebrow">PRIVATE CUSTOMER ORDER</div><h1>Review your <em>WestTech enclosure.</em></h1><p id="cap-order-id"></p></div><div class="cap-status" id="cap-status">AWAITING APPROVAL</div></header>
+      <div class="cap-grid">
+        <section class="cap-card cap-proof-card enclosure-configuration-card">
+          <div class="cap-card-head"><div><span>REVIEWED CONFIGURATION</span><strong id="cap-config-title">Your enclosure order</strong></div><small id="cap-config-version">V1</small></div>
+          <div class="cap-proof enclosure-product"><img id="cap-product-image" alt="WestTech enclosure configuration"/></div>
+          <div class="enclosure-specs">
+            <div><span>Model</span><strong id="cap-model">—</strong></div><div><span>Board layout</span><strong id="cap-board">—</strong></div><div><span>Build level</span><strong id="cap-offer">—</strong></div><div><span>Color</span><strong id="cap-color">—</strong></div>
+          </div>
+          <p class="cap-proof-note">Approval confirms this configuration and the final order terms shown on this page.</p>
+        </section>
+        <div class="cap-stack">
+          <section class="cap-card">
+            <div class="cap-card-head"><div><span>FINAL ORDER TERMS</span><strong>What WestTech will make</strong></div></div>
+            <div class="cap-terms"><div><span>Product</span><strong id="cap-product">—</strong></div><div><span>Quantity</span><strong id="cap-quantity">—</strong></div><div><span>Delivery</span><strong id="cap-fulfillment">—</strong></div><div><span>Production window</span><strong id="cap-window">—</strong></div></div>
+            <div class="cap-price-lines"><div><span>Enclosure product</span><strong id="cap-product-total">$0.00</strong></div><div id="cap-custom-row"><span>Custom charge</span><strong id="cap-custom">$0.00</strong></div><div id="cap-shipping-row"><span>Shipping</span><strong id="cap-shipping">$0.00</strong></div><div id="cap-tax-row" hidden><span id="cap-tax-label">Colorado sales tax (if applicable)</span><strong id="cap-tax-amount">Calculated before payment</strong></div><div id="cap-discount-row"><span>Discount / special pricing</span><strong id="cap-discount">−$0.00</strong></div></div>
+            <div class="cap-total"><span id="cap-total-label">APPROVED SUBTOTAL</span><strong id="cap-final-total">$0.00</strong></div>
+            <p class="cap-payment-note" id="cap-payment-note">Payment will be requested after configuration approval.</p>
+          </section>
+          <section class="cap-card" id="cap-paypal-address-card" hidden><div class="cap-card-head"><div><span>PAYPAL SHIPPING</span><strong>Shipping address comes from PayPal</strong></div><small>NO RE-TYPING</small></div><p class="cap-review-note">When you continue to PayPal, choose or confirm the shipping address there. WestTech imports that PayPal-confirmed address into this order for tax and fulfillment.</p></section>
+          <section class="cap-card" id="cap-note-card" hidden><div class="cap-card-head"><div><span>WESTTECH NOTE</span><strong>About this enclosure</strong></div></div><p class="cap-review-note" id="cap-review-note"></p></section>
+          <section class="cap-card" id="cap-tax-card" hidden>
+            <div class="cap-card-head"><div><span>COLORADO SALES TAX</span><strong>Verify the locked address and payment total</strong></div><small>BEFORE CAPTURE</small></div><p class="cap-review-note" id="cap-tax-intro"></p><div class="cap-tax-address" id="cap-tax-address"></div>
+            <div class="cap-price-lines"><div><span>Approved taxable subtotal</span><strong id="cap-tax-subtotal">$0.00</strong></div><div id="cap-tax-shipping-row"><span>Shipping</span><strong id="cap-tax-shipping">$0.00</strong></div><div><span>Colorado sales tax <small id="cap-tax-rate"></small></span><strong id="cap-tax-review-amount">$0.00</strong></div></div><div class="cap-total"><span>PAYMENT TOTAL</span><strong id="cap-tax-total">$0.00</strong></div>
+            <label class="cap-confirm"><input id="cap-tax-confirm" type="checkbox"/><span id="cap-tax-confirm-copy">I verified this address and authorize the payment total shown above.</span></label><button class="cap-primary" id="cap-complete-order" type="button" disabled>Check the tax box above</button><div class="cap-message" id="cap-tax-message" hidden></div>
+          </section>
+          <section class="cap-card cap-action-card" id="cap-actions">
+            <div class="cap-card-head"><div><span>YOUR DECISION</span><strong>Approve or request a change</strong></div></div>
+            <label class="cap-confirm" id="cap-confirm-label"><input id="cap-confirm" type="checkbox"/><span>I approve the enclosure configuration, quantity, approved subtotal, fulfillment method, and estimated production window shown above. I understand that applicable Colorado sales tax will be calculated and added before payment is captured.</span></label>
+            <button class="cap-primary" id="cap-approve" type="button" disabled>Check the approval box above</button>
+            <div class="cap-divider"><span>or</span></div><label class="cap-change-label" for="cap-change">Need something changed?</label><textarea id="cap-change" maxlength="1200" placeholder="Tell WestTech exactly what you would like changed."></textarea><button class="cap-secondary" id="cap-request-change" type="button">Request Changes</button><div class="cap-message" id="cap-message" hidden></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </section></main><div id="site-footer"></div>
+</div>
+<script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script><script src="../js/enclosure-approval.js?v=20260904-1"></script>
+</body></html>
