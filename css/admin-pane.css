@@ -1,0 +1,10 @@
+html.admin-pane-mode body{margin:0;min-width:0;background:#0c1829}
+html.admin-pane-mode #site-header,html.admin-pane-mode #site-footer,html.admin-pane-mode .ca-topbar,html.admin-pane-mode .ca-sidebar{display:none!important}
+html.admin-pane-mode .page{min-height:0}
+html.admin-pane-mode .ca-main{width:100%;margin:0;color:#eaf2fb}
+html.admin-pane-mode .ca-shell{display:block;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:visible}
+html.admin-pane-mode .ca-detail{min-height:100vh;padding:20px;background:#0c1829}
+html.admin-pane-mode .ca-detail-inner{max-width:1420px;margin:0 auto}
+html[data-theme="light"].admin-pane-mode body,html[data-theme="light"].admin-pane-mode .ca-detail{background:#f5f9fc}
+@media(prefers-color-scheme:light){html:not([data-theme]).admin-pane-mode body,html:not([data-theme]).admin-pane-mode .ca-detail{background:#f5f9fc}}
+@media(max-width:760px){html.admin-pane-mode .ca-detail{padding:14px}}

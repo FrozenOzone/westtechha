@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" data-site-root="../" data-site-section="enclosures">
+<head>
+  <meta charset="utf-8"/>
+  <title>Orders – WestTech Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="noindex,nofollow,noarchive"/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="../css/site-20260824-mobilefix.css" rel="stylesheet"/>
+  <link href="../css/coaster-admin.css" rel="stylesheet"/>
+  <link href="../css/coaster-order-theme.css" rel="stylesheet"/>
+  <link href="../css/coaster-theme-auto-admin.css" rel="stylesheet"/>
+  <link href="../css/coaster-theme-light-admin.css" rel="stylesheet"/>
+  <link href="../css/unified-orders.css" rel="stylesheet"/>
+</head>
+<body class="coaster-page custom-coasters-page unified-orders-page">
+<div class="page">
+  <div id="site-header"></div>
+  <main class="uo-main">
+    <header class="uo-topbar">
+      <div>
+        <div class="ca-eyebrow">WESTTECH • PRIVATE ORDER CONTROL</div>
+        <h1>All WestTech <em>Orders.</em></h1>
+        <p>Coasters and enclosures together, in original request order.</p>
+      </div>
+      <nav class="uo-admin-links" aria-label="Order administration">
+        <a class="active" href="orders.html">All Orders</a>
+        <a href="work-orders.html">Manufacturing Queue</a>
+      </nav>
+    </header>
+
+    <section class="uo-auth ca-card" id="uo-auth">
+      <label>WestTech Admin Token
+        <span><input id="uo-token" type="password" autocomplete="current-password"/><button class="ca-primary" id="uo-connect" type="button">Connect</button></span>
+      </label>
+    </section>
+
+    <section class="uo-summary" id="uo-summary" aria-label="Combined order summary" hidden>
+      <article><span>ACTIVE ORDERS</span><strong id="uo-active-count">—</strong><small>Coasters + enclosures</small></article>
+      <article><span>AWAITING ACTION</span><strong id="uo-action-count">—</strong><small>Review or customer step</small></article>
+      <article><span>IN MANUFACTURING</span><strong id="uo-manufacturing-count">—</strong><small>Released to shared FIFO</small></article>
+      <article><span>PRINTER TIME LEFT</span><strong id="uo-hours-left">—</strong><small>Across both K2 printers</small></article>
+    </section>
+
+    <section class="uo-shell" aria-label="Combined coaster and enclosure orders">
+      <aside class="uo-sidebar">
+        <div class="uo-sidebar-head"><div><strong>Orders</strong><span id="uo-count">0 orders</span></div><button id="uo-refresh" type="button">Reload</button></div>
+        <label class="uo-filter-label" for="uo-filter">Show</label>
+        <select class="uo-filter" id="uo-filter">
+          <option value="ACTIVE">All Active</option>
+          <option value="COASTER">Coasters</option>
+          <option value="ENCLOSURE">Enclosures</option>
+          <option value="REVIEW">Awaiting Review</option>
+          <option value="CUSTOMER">Awaiting Customer</option>
+          <option value="PAYMENT">Awaiting Payment</option>
+          <option value="PRODUCTION">Production + Fulfillment</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="ARCHIVED">Archived</option>
+          <option value="ALL">All Orders</option>
+        </select>
+        <input class="ca-search" id="uo-search" type="search" placeholder="Search order, customer, or product"/>
+        <div class="uo-sort-note"><strong>Oldest request first</strong><span>Manufacturing FIFO starts after payment or no-charge release.</span></div>
+        <div class="uo-order-list" id="uo-order-list"><div class="ca-empty">Enter the admin token to load all orders.</div></div>
+      </aside>
+
+      <section class="uo-detail">
+        <div class="uo-empty-detail" id="uo-empty-detail">
+          <span>ALL WESTTECH ORDERS</span>
+          <strong>Select an order</strong>
+          <p>The full coaster or enclosure workflow will open here without changing its familiar layout.</p>
+        </div>
+        <div class="uo-frame-loading" id="uo-frame-loading" hidden>Loading order…</div>
+        <iframe id="uo-order-frame" title="Selected WestTech order" hidden></iframe>
+      </section>
+    </section>
+    <div class="ca-inline-message uo-message" id="uo-message" role="status" hidden></div>
+  </main>
+  <div id="site-footer"></div>
+</div>
+<script src="../js/theme.js"></script>
+<script src="../js/site-shell-20260824-mobilefix.js"></script>
+<script src="../js/orders.js?v=20260905-1"></script>
+</body>
+</html>
