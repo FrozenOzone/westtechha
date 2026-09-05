@@ -38,6 +38,7 @@ function template(type,order,links={}){
   const tracking=clean(order?.trackingNumber,160);
   const carrier=clean(order?.trackingCarrier,80);
   const trackingUrl=safeLink(trackingLink(carrier,tracking));
+  const productionWindow=clean(order?.productionWindow,160);
   let subject='',headline='',intro='',process='',action='',details=[],buttonLabel='',buttonUrl='';
 
   if(type==='REQUEST_RECEIVED'){
@@ -53,7 +54,7 @@ function template(type,order,links={}){
     intro='I’ve reviewed your request and prepared the design that WestTech will use for your order.';
     process='Please check the artwork, wording, quantity, fulfillment method, and final total. Once you approve the proof, those customer-facing terms become the production reference. If something needs changing, use the change-request option instead of approving it.';
     action='Your next step is to review the proof and either approve it or request changes.';
-    details=[`Order: ${orderId}`,summary,`Approved subtotal: ${finalTotal}`];
+    details=[`Order: ${orderId}`,summary,`Approved subtotal: ${finalTotal}`];if(productionWindow)details.push(`Estimated production / ship window: ${productionWindow}`);
     buttonLabel='Review Proof & Terms';buttonUrl=approvalUrl;
   }else if(type==='CHANGES_REQUESTED'){
     subject=`I received your coaster changes — ${orderId}`;
@@ -68,7 +69,7 @@ function template(type,order,links={}){
     intro='Your proof approval is recorded and the design is locked in. Payment is the last step before your order enters the WestTech production queue.';
     process='Paying does not mean a printer starts immediately. WestTech manufactures custom work in small batches, so paid orders enter the production queue first and I’ll send another update when manufacturing actually begins.';
     action='If you have not already completed payment, return to your secure order page to continue. If you already paid, that page will confirm the payment status—no further payment is needed.';
-    details=[`Order: ${orderId}`,summary,`Approved subtotal: ${finalTotal}`];
+    details=[`Order: ${orderId}`,summary,`Approved subtotal: ${finalTotal}`];if(productionWindow)details.push(`Estimated production / ship window: ${productionWindow}`);
     if(order?.fulfillmentMethod==='SHIP')details.push('Shipping address: choose or confirm it in PayPal. WestTech will use the PayPal-confirmed address for this order.');
     buttonLabel='View Order & Payment Status';buttonUrl=approvalUrl;
   }else if(type==='PRODUCTION_QUEUED'){
@@ -78,14 +79,14 @@ function template(type,order,links={}){
     intro=paid?`Thanks, ${name}. Your payment is complete and your approved coaster order is now in the WestTech production queue.`:`Thanks, ${name}. Your approved coaster order is now in the WestTech production queue, and no payment is required for this order.`;
     process='This means your design and order details are locked and ready to manufacture. Because WestTech produces custom work in small batches, your order may wait while earlier jobs are completed and the equipment is prepared for your print. Manufacturing has not started yet.';
     action='You don’t need to do anything right now. I’ll email you again when your order actually moves into production.';
-    details=[`Order: ${orderId}`,summary,paid?`Paid total: ${finalTotal}`:'Payment: Not required'];
+    details=[`Order: ${orderId}`,summary,paid?`Paid total: ${finalTotal}`:'Payment: Not required'];if(productionWindow)details.push(`Estimated production / ship window: ${productionWindow}`);
   }else if(type==='IN_PRODUCTION'){
     subject=`Manufacturing has started — ${orderId}`;
     headline=`Good news, ${name} — your coaster order is in production.`;
     intro='Your order has moved out of the production queue and manufacturing has actually started.';
     process=order?.fulfillmentMethod==='LOCAL_PICKUP'?'Once the print work is complete, I’ll inspect the pieces and prepare the order for pickup. You’ll get another update before it is marked Ready for Pickup.':'Once the print work is complete, I’ll inspect the pieces and prepare the order for shipment. You’ll get another update before it is marked Shipped.';
     action='No action is needed from you right now.';
-    details=[`Order: ${orderId}`,summary,order?.paymentRequired===false?'Payment: Not required':`Paid total: ${finalTotal}`];
+    details=[`Order: ${orderId}`,summary,order?.paymentRequired===false?'Payment: Not required':`Paid total: ${finalTotal}`];if(productionWindow)details.push(`Estimated production / ship window: ${productionWindow}`);
   }else if(type==='PREPARING_TO_SHIP'){
     subject=`Your coaster order is being prepared to ship — ${orderId}`;
     headline=`Manufacturing is finished — I’m preparing your order to ship.`;

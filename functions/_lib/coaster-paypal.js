@@ -4,6 +4,7 @@ import { requireOrdersDb } from './orders.js';
 import { readJsonSafe, sanitizeEnvValue } from './shared.js';
 import { sendCoasterCustomerEmail } from './coaster-email.js';
 import { buildTaxQuote } from './tax.js';
+import { ensureManufacturingWorkOrder } from './manufacturing-work-orders.js';
 
 const PICKUP_ADDRESS={
   fullName:'WestTech Home Automation, LLC',
@@ -111,13 +112,14 @@ export async function recordCoasterPayPalFailure(env,orderId,error){
 
 export async function ensureCoasterPayPalOrder(env,orderId,{returnUrl,cancelUrl}={}){
   const db=requireOrdersDb(env);let order=await getCoasterOrderDetail(env,orderId);if(!order)return null;
-  if(String(order.paymentStatus||'').toUpperCase()==='PAID')return order;
+  if(String(order.paymentStatus||'').toUpperCase()==='PAID'){await ensureManufacturingWorkOrder(env,'COASTER',order);return order;}
   if(order.paymentRequired===false){
-    if(String(order.paymentStatus||'').toUpperCase()==='NOT_REQUIRED')return order;
+    if(String(order.paymentStatus||'').toUpperCase()==='NOT_REQUIRED'){await ensureManufacturingWorkOrder(env,'COASTER',order);return order;}
     await db.prepare(`UPDATE coaster_orders SET payment_status='NOT_REQUIRED',status='PRODUCTION_QUEUE',paypal_last_error=NULL,payment_total=0,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(orderId).run();
     await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PAYMENT_NOT_REQUIRED',?)`).bind(orderId,JSON.stringify({finalAmount:money(order.finalAmount)})).run();
     await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PRODUCTION_QUEUED',?)`).bind(orderId,JSON.stringify({reason:'NO_PAYMENT_REQUIRED'})).run();
     const queued=await getCoasterOrderDetail(env,orderId);
+    if(queued)await ensureManufacturingWorkOrder(env,'COASTER',queued);
     if(queued)await sendCoasterCustomerEmail(env,{type:'PRODUCTION_QUEUED',order:queued});
     return await getCoasterOrderDetail(env,orderId)||queued;
   }
@@ -143,7 +145,7 @@ export async function ensureCoasterPayPalOrder(env,orderId,{returnUrl,cancelUrl}
 
 async function markCaptured(env,orderId,paypalOrderId,details,captured){
   const db=requireOrdersDb(env);const order=await getCoasterOrderDetail(env,orderId);if(!order)return null;
-  if(String(order.paymentStatus||'').toUpperCase()==='PAID'){order._paymentCapturedNow=false;return order;}
+  if(String(order.paymentStatus||'').toUpperCase()==='PAID'){await ensureManufacturingWorkOrder(env,'COASTER',order);order._paymentCapturedNow=false;return order;}
   const ship=order.fulfillmentMethod==='SHIP'?extractShipping(captured||details):null;if(order.fulfillmentMethod==='SHIP')requireUsShipping(ship);
   const cap=captureId(captured)||captureId(details);const paidAt=new Date().toISOString();
   const write=await db.prepare(`UPDATE coaster_orders SET paypal_order_status='COMPLETED',paypal_capture_id=?,paypal_payment_id=?,payment_status='PAID',paypal_paid_at=COALESCE(paypal_paid_at,?),paypal_last_error=NULL,status='PRODUCTION_QUEUE',shipping_name=?,shipping_address1=?,shipping_address2=?,shipping_city=?,shipping_region=?,shipping_postal_code=?,shipping_country=?,payment_total=CASE WHEN payment_total>0 THEN payment_total ELSE final_amount END,updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND COALESCE(payment_status,'')<>'PAID'`).bind(cap||null,cap||null,paidAt,ship?.name||null,ship?.address1||null,ship?.address2||null,ship?.city||null,ship?.region||null,ship?.postalCode||null,ship?.country||null,orderId).run();
@@ -152,6 +154,7 @@ async function markCaptured(env,orderId,paypalOrderId,details,captured){
   await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PAYPAL_ORDER_CAPTURED',?)`).bind(orderId,JSON.stringify({paypalOrderId,captureId:cap||null,paymentStatus:'PAID',approvedSubtotal:money(paid?.finalAmount),taxAmount:money(paid?.taxAmount),paymentTotal:money(paid?.paymentTotal),addressSource:ship?'PAYPAL':'WESTTECH_PICKUP'})).run();
   await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PRODUCTION_QUEUED',?)`).bind(orderId,JSON.stringify({reason:'PAYMENT_RECEIVED',paypalOrderId,captureId:cap||null})).run();
   const queued=await getCoasterOrderDetail(env,orderId);
+  if(queued)await ensureManufacturingWorkOrder(env,'COASTER',queued);
   if(queued)await sendCoasterCustomerEmail(env,{type:'PRODUCTION_QUEUED',order:queued});
   if(queued)queued._paymentCapturedNow=true;
   return queued;
@@ -161,7 +164,7 @@ export async function captureCoasterPayPalOrder(env,orderId,approvalToken,paypal
   const approval=await getCoasterApprovalByToken(env,orderId,approvalToken);if(!approval)throw Object.assign(new Error('This approval link is invalid.'),{status:404});
   const order=await getCoasterOrderDetail(env,orderId);if(!order)throw Object.assign(new Error('Coaster order not found.'),{status:404});
   if(!order.paypalOrderId||order.paypalOrderId!==paypalOrderId)throw Object.assign(new Error('This PayPal checkout does not match the approved coaster order.'),{status:409});
-  if(String(order.paymentStatus||'').toUpperCase()==='PAID')return {order,capturedNow:false,taxConfirmationRequired:false};
+  if(String(order.paymentStatus||'').toUpperCase()==='PAID'){await ensureManufacturingWorkOrder(env,'COASTER',order);return {order,capturedNow:false,taxConfirmationRequired:false};}
   let accessToken=await generateAccessToken(env);const detailResult=await paypalCall(env,`/v2/checkout/orders/${encodeURIComponent(paypalOrderId)}`,{accessToken});accessToken=detailResult.accessToken;
   const status=String(detailResult.data?.status||'').toUpperCase();
   if(!['APPROVED','COMPLETED'].includes(status))throw Object.assign(new Error(`PayPal checkout is not ready to capture (status: ${status||'UNKNOWN'}).`),{status:409});
@@ -175,7 +178,7 @@ export async function captureCoasterPayPalOrder(env,orderId,approvalToken,paypal
 
 export async function syncCoasterPayPalOrder(env,orderId){
   const db=requireOrdersDb(env);const order=await getCoasterOrderDetail(env,orderId);if(!order)return null;
-  if(String(order.paymentStatus||'').toUpperCase()==='PAID')return order;
+  if(String(order.paymentStatus||'').toUpperCase()==='PAID'){await ensureManufacturingWorkOrder(env,'COASTER',order);return order;}
   if(!order.paypalOrderId)throw Object.assign(new Error('No PayPal checkout exists for this order yet.'),{status:404});
   let accessToken=await generateAccessToken(env);const got=await paypalCall(env,`/v2/checkout/orders/${encodeURIComponent(order.paypalOrderId)}`,{accessToken});accessToken=got.accessToken;
   const status=String(got.data?.status||'').toUpperCase();const url=approvalUrl(got.data);

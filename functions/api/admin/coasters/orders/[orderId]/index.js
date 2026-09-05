@@ -4,6 +4,7 @@ import { getCoasterOrderDetail, updateCoasterOrderAdmin } from '../../../../../_
 import { sendCoasterCustomerEmail } from '../../../../../_lib/coaster-email.js';
 import { sendCoasterAdminProductionEmail } from '../../../../../_lib/coaster-admin-production-email.js';
 import { requireOrdersDb } from '../../../../../_lib/orders.js';
+import { ensureManufacturingWorkOrder } from '../../../../../_lib/manufacturing-work-orders.js';
 function previewHostAllowed(context){
   try{
     const host=new URL(context.request.url).hostname.toLowerCase();
@@ -25,6 +26,7 @@ async function markPreviewPaid(context,order){
   }
   await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PREVIEW_PAYMENT_SIMULATED',?)`).bind(order.orderId,JSON.stringify({paymentStatus:'PAID',status:'PRODUCTION_QUEUE',captureId:capture,paypalCalled:false,testShippingAddress:order.fulfillmentMethod==='SHIP'})).run();
   const updated=await getCoasterOrderDetail(context.env,order.orderId);
+  await ensureManufacturingWorkOrder(context.env,'COASTER',updated);
   await sendCoasterCustomerEmail(context.env,{type:'PRODUCTION_QUEUED',order:updated,requestUrl:context.request.url});
   await sendCoasterAdminProductionEmail(context.env,{order:updated,requestUrl:context.request.url});
   return getCoasterOrderDetail(context.env,order.orderId);

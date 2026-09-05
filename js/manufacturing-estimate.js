@@ -1,0 +1,8 @@
+(function(){
+  'use strict';
+  const token=()=>sessionStorage.getItem('westtechha-admin-token')||'';
+  document.querySelectorAll('[data-manufacturing-estimate]').forEach(panel=>{
+    const button=panel.querySelector('[data-estimate-button]'),result=panel.querySelector('[data-estimate-result]'),minutes=document.querySelector(panel.dataset.minutesTarget),windowField=document.querySelector(panel.dataset.windowTarget);if(!button||!result||!minutes||!windowField)return;
+    button.addEventListener('click',async()=>{const value=Math.max(0,Math.round(Number(minutes.value||0)));if(!value){result.textContent='Enter the estimated printer minutes first.';minutes.focus();return;}const original=button.textContent;button.disabled=true;button.textContent='Calculating…';result.textContent='Reading the shared queue…';try{const response=await fetch(`/api/admin/work-orders?action=estimate&minutes=${value}`,{headers:{Accept:'application/json',Authorization:`Bearer ${token()}`}}),data=await response.json().catch(()=>({}));if(!response.ok||!data.ok)throw new Error(data.message||'Could not calculate the shared production window.');const estimate=data.estimate;windowField.value=estimate.suggestedProductionWindow;windowField.dispatchEvent(new Event('input',{bubbles:true}));result.innerHTML=`<strong>${estimate.suggestedProductionWindow}</strong> • FIFO position if paid now: ${estimate.queuePosition} • ${Math.round(estimate.remainingPrinterMinutes/6)/10} printer hours currently ahead.`;}catch(error){result.textContent=error.message;}finally{button.disabled=false;button.textContent=original;}});
+  });
+})();

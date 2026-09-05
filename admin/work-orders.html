@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" data-site-root="../" data-site-section="enclosures">
+<head>
+  <meta charset="utf-8"/>
+  <title>Shared Work Orders – WestTech Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="noindex,nofollow,noarchive"/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="../css/site-20260824-mobilefix.css" rel="stylesheet"/>
+  <link href="../css/coaster-admin.css" rel="stylesheet"/>
+  <link href="../css/coaster-order-theme.css" rel="stylesheet"/>
+  <link href="../css/coaster-theme-auto-admin.css" rel="stylesheet"/>
+  <link href="../css/coaster-theme-light-admin.css" rel="stylesheet"/>
+  <link href="../css/work-orders.css" rel="stylesheet"/>
+</head>
+<body class="coaster-page custom-coasters-page work-orders-page">
+<div class="page"><div id="site-header"></div>
+<main class="wo-main">
+  <header class="wo-topbar">
+    <div><div class="ca-eyebrow">SHARED MANUFACTURING CONTROL</div><h1>WestTech <em>Work Orders.</em></h1><p>Coasters and enclosures compete for the same two K2 printers. Paid and approved work enters this list in FIFO order.</p></div>
+    <nav class="wo-admin-links" aria-label="Order administration"><a href="coaster-orders.html">Coaster Orders</a><a href="enclosure-orders.html">Enclosure Orders</a></nav>
+  </header>
+
+  <section class="wo-auth ca-card" id="wo-auth"><label>Admin token <span><input id="wo-token" type="password" autocomplete="current-password"/><button class="ca-primary" id="wo-connect" type="button">Connect</button></span></label></section>
+
+  <section class="wo-summary" aria-label="Shared production summary">
+    <article><span>ACTIVE FIFO WORK</span><strong id="wo-active">—</strong><small>Queued or printing</small></article>
+    <article><span>REMAINING PRINTER TIME</span><strong id="wo-hours">—</strong><small>Across both product lines</small></article>
+    <article><span>ACTIVE PRINTERS</span><strong id="wo-printers">—</strong><small>K2 capacity pool</small></article>
+    <article><span>DAILY CAPACITY</span><strong id="wo-capacity">—</strong><small>Productive printer hours</small></article>
+  </section>
+
+  <section class="wo-controls ca-card">
+    <div><div class="ca-eyebrow">QUEUE VIEW</div><h2>What gets manufactured next</h2></div>
+    <div class="wo-control-row"><label>Show<select id="wo-filter"><option value="ACTIVE">Active manufacturing</option><option value="ALL">All work orders</option><option value="COASTER">Coasters</option><option value="ENCLOSURE">Enclosures</option><option value="PAUSED">Paused</option><option value="COMPLETED">Completed</option></select></label><label>Search<input id="wo-search" type="search" placeholder="Order or customer"/></label><button class="ca-secondary" id="wo-refresh" type="button">Reload</button></div>
+  </section>
+
+  <div class="wo-message ca-inline-message" id="wo-message" hidden role="status"></div>
+  <section class="wo-list" id="wo-list"><div class="ca-card wo-empty">Enter the admin token to load the shared queue.</div></section>
+
+  <details class="wo-settings ca-card">
+    <summary><span><span class="ca-eyebrow">CAPACITY SETTINGS</span><strong>How projected ship windows are calculated</strong></span><span>Adjust when printer availability changes</span></summary>
+    <form id="wo-settings-form"><label>Active K2 printers<input id="wo-setting-printers" type="number" min="1" max="8" step="1"/></label><label>Productive minutes per printer/day<input id="wo-setting-minutes" type="number" min="60" max="1440" step="30"/></label><label>Handling business days<input id="wo-setting-handling" type="number" min="0" max="30" step="1"/></label><label>Window span business days<input id="wo-setting-span" type="number" min="0" max="30" step="1"/></label><button class="ca-primary" type="submit">Save Capacity Settings</button></form>
+    <p>Default capacity assumes two K2 printers with 20 productive hours each per day. The calculation adds handling time, skips weekends, and never changes a customer-approved promised window.</p>
+  </details>
+</main><div id="site-footer"></div></div>
+<script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script><script src="../js/work-orders.js?v=20260905-1"></script>
+</body></html>

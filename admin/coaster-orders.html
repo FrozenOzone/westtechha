@@ -10,6 +10,7 @@
   <link href="../css/coasters.css" rel="stylesheet"/>
   <link href="../css/coaster-admin.css" rel="stylesheet"/>
   <link href="../css/coaster-order-theme.css" rel="stylesheet"/>
+  <link href="../css/work-orders.css" rel="stylesheet"/>
 </head>
 <body class="coaster-page custom-coasters-page">
 <div class="page">
@@ -20,7 +21,7 @@
         <div class="ca-eyebrow">WESTTECH • PRIVATE ORDER CONTROL</div>
         <h1>Custom Coaster <em>Orders.</em></h1>
       </div>
-      <div class="ca-mode" id="ca-mode">LOCAL TEST MODE</div>
+      <div class="wo-admin-links"><a href="work-orders.html">Shared Work Orders</a><div class="ca-mode" id="ca-mode">LOCAL TEST MODE</div></div>
     </div>
 
     <section class="ca-shell" aria-label="WestTech custom coaster orders">
@@ -153,8 +154,12 @@
               <div class="ca-field"><label for="ca-set-count">Number of sets</label><input id="ca-set-count" type="number" min="1" max="125" step="1" value="1"/></div>
               <div class="ca-field"><label for="ca-total-coasters">Total coasters</label><input id="ca-total-coasters" type="number" value="4" readonly aria-readonly="true"/></div>
               <div class="ca-field"><label for="ca-status">Order status</label><select id="ca-status"><option value="DESIGN_REVIEW">Design Review</option><option value="PROOF_READY">Proof Ready</option><option value="PROOF_SENT">Proof Sent</option><option value="CHANGES_REQUESTED">Changes Requested</option><option value="PROOF_APPROVED">Proof Approved</option><option value="AWAITING_PAYMENT">Awaiting Payment</option><option value="IN_PRODUCTION">In Production</option><option value="READY_FOR_PICKUP">Ready for Pickup</option><option value="SHIPPED">Shipped</option><option value="COMPLETED">Completed</option><option value="CANCELLED">Cancelled</option></select></div>
+              <div class="ca-field"><label for="ca-printer-minutes">Estimated printer minutes</label><input id="ca-printer-minutes" type="number" min="0" max="1000000" step="1" value="0"/></div>
+              <div class="ca-field"><label for="ca-printer-assignment">Printer assignment</label><select id="ca-printer-assignment"><option value="UNASSIGNED">Unassigned</option><option value="K2_1">K2 #1</option><option value="K2_2">K2 #2</option><option value="BOTH">Both K2s</option></select></div>
+              <div class="ca-field"><label for="ca-production-window">Estimated production / ship window</label><input id="ca-production-window" type="text" maxlength="160" placeholder="Calculated from the shared queue"/></div>
               <div class="ca-total ca-total-inline"><div><span>FINAL CUSTOMER PRICE</span></div><div><strong id="ca-final-total">$0.00</strong><small id="ca-total-detail">1 set • 4 coasters</small></div></div>
             </div>
+            <div class="mw-estimate-panel" data-manufacturing-estimate data-minutes-target="#ca-printer-minutes" data-window-target="#ca-production-window"><p id="ca-window-estimate" data-estimate-result>Enter the expected printer minutes, then calculate a suggested customer window from the combined coaster + enclosure queue.</p><button class="ca-secondary" type="button" data-estimate-button>Calculate Shared Queue Window</button></div>
           </section>
 
           <div class="ca-order-row" id="ca-review-terms-row">
@@ -230,6 +235,6 @@
   </main>
   <div id="site-footer"></div>
 </div>
-<script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script><script src="../js/coaster-admin.js?v=20260904-completed-actions"></script><script src="../js/coaster-admin-auto-refresh.js"></script><script src="../js/coaster-admin-archive.js?v=20260904-archive3"></script>
+<script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script><script src="../js/coaster-admin.js?v=20260905-shared-fifo"></script><script src="../js/manufacturing-estimate.js?v=20260905-1"></script><script src="../js/coaster-admin-auto-refresh.js"></script><script src="../js/coaster-admin-archive.js?v=20260904-archive3"></script>
 </body>
 </html>
