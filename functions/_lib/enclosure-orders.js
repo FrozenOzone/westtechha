@@ -7,6 +7,7 @@ const FROZEN_STATUSES=new Set(['CONFIGURATION_SENT','CONFIGURATION_APPROVED','AW
 const FULFILLMENT_PREFERENCES=new Set(['SHIP','LOCAL_PICKUP','DISCUSS']);
 const FULFILLMENT_METHODS=new Set(['UNSET','SHIP','LOCAL_PICKUP']);
 const COLORS=new Set(['White','Black']);
+const TRACKING_CARRIERS=new Map([['USPS','USPS'],['UPS','UPS'],['FEDEX','FedEx'],['DHL','DHL']]);
 const FORWARD_STATUS={
   PRODUCTION_QUEUE:'IN_PRODUCTION',
   IN_PRODUCTION:{SHIP:'PREPARING_TO_SHIP',LOCAL_PICKUP:'PREPARING_FOR_PICKUP'},
@@ -21,6 +22,7 @@ export function number(value,fallback=0){const n=Number(value);return Number.isF
 export function integer(value,min=0,max=999999){return Math.min(max,Math.max(min,Math.round(number(value,min))));}
 export function money(value){return Math.round(Math.max(0,number(value,0))*100)/100;}
 export function nowIso(){return new Date().toISOString();}
+function normalizeTrackingCarrier(value){return TRACKING_CARRIERS.get(clean(value,100).toUpperCase().replace(/[^A-Z0-9]/g,''))||'';}
 function utcDate(){return nowIso().slice(0,10).replaceAll('-','');}
 export function makeError(message,status=400){return Object.assign(new Error(message),{status});}
 function jsonDetail(value){try{return JSON.stringify(value??{});}catch(e){return '{}';}}
@@ -89,9 +91,11 @@ export async function updateEnclosureOrderAdmin(env,orderId,body={}){
   if(isEnclosureOrderLocked(current)){
     const status=(clean(body?.status,40)||current.status).toUpperCase();if(!PRODUCTION_STATUSES.has(status))throw makeError('Approved enclosure orders can only use production statuses.',409);assertForwardProductionStatus(current,status);
     if(['PREPARING_FOR_PICKUP','READY_FOR_PICKUP'].includes(status)&&current.fulfillmentMethod!=='LOCAL_PICKUP')throw makeError('That status is only valid for Local Pickup orders.');if(['PREPARING_TO_SHIP','SHIPPED'].includes(status)&&current.fulfillmentMethod!=='SHIP')throw makeError('That status is only valid for shipped orders.');
-    if(status==='SHIPPED'&&(!clean(body?.trackingCarrier,100)||!clean(body?.trackingNumber,180)))throw makeError('Enter the carrier and tracking number before marking the order Shipped.');
-    const when=nowIso();await db.prepare(`UPDATE enclosure_orders SET status=?,admin_notes=?,printer_assignment=?,tracking_carrier=?,tracking_number=?,pickup_ready_at=CASE WHEN ?='READY_FOR_PICKUP' THEN COALESCE(pickup_ready_at,?) ELSE pickup_ready_at END,shipped_at=CASE WHEN ?='SHIPPED' THEN COALESCE(shipped_at,?) ELSE shipped_at END,completed_at=CASE WHEN ?='COMPLETED' THEN COALESCE(completed_at,?) ELSE completed_at END,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(status,clean(body?.adminNotes,5000),clean(body?.printerAssignment,80),clean(body?.trackingCarrier,100),clean(body?.trackingNumber,180),status,when,status,when,status,when,current.orderId).run();
-    await logEnclosureEvent(db,current.orderId,'PRODUCTION_UPDATED',{previousStatus:current.status,status,printerAssignment:clean(body?.printerAssignment,80),trackingCarrier:clean(body?.trackingCarrier,100),trackingNumber:clean(body?.trackingNumber,180)});const updated=await getEnclosureOrderDetail(env,current.orderId);updated._statusChanged=current.status!==status;return updated;
+    const suppliedCarrier=clean(body?.trackingCarrier,100),trackingCarrier=normalizeTrackingCarrier(suppliedCarrier),trackingNumber=clean(body?.trackingNumber,180);
+    if(suppliedCarrier&&!trackingCarrier)throw makeError('Choose USPS, UPS, FedEx, or DHL as the shipping carrier.');
+    if(status==='SHIPPED'&&(!trackingCarrier||!trackingNumber))throw makeError('Choose the carrier and enter the tracking number before marking the order Shipped.');
+    const when=nowIso();await db.prepare(`UPDATE enclosure_orders SET status=?,admin_notes=?,printer_assignment=?,tracking_carrier=?,tracking_number=?,pickup_ready_at=CASE WHEN ?='READY_FOR_PICKUP' THEN COALESCE(pickup_ready_at,?) ELSE pickup_ready_at END,shipped_at=CASE WHEN ?='SHIPPED' THEN COALESCE(shipped_at,?) ELSE shipped_at END,completed_at=CASE WHEN ?='COMPLETED' THEN COALESCE(completed_at,?) ELSE completed_at END,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(status,clean(body?.adminNotes,5000),clean(body?.printerAssignment,80),trackingCarrier,trackingNumber,status,when,status,when,status,when,current.orderId).run();
+    await logEnclosureEvent(db,current.orderId,'PRODUCTION_UPDATED',{previousStatus:current.status,status,printerAssignment:clean(body?.printerAssignment,80),trackingCarrier,trackingNumber});const updated=await getEnclosureOrderDetail(env,current.orderId);updated._statusChanged=current.status!==status;return updated;
   }
   if(areEnclosureTermsFrozen(current)){
     await db.prepare(`UPDATE enclosure_orders SET admin_notes=?,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(clean(body?.adminNotes,5000),current.orderId).run();await logEnclosureEvent(db,current.orderId,'INTERNAL_NOTE_UPDATED',{customerTermsLocked:true});return getEnclosureOrderDetail(env,current.orderId);
