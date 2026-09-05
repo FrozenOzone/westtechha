@@ -13,6 +13,16 @@ This file records accepted Dev checkpoints and the recovery point created before
 
 Rollback boundary: restore the Dev branch to the accepted commit for source recovery. Restore the private SQL export only if order data or schema was changed after this checkpoint. The unified Orders workspace itself is designed to require no D1 schema change.
 
+## 2026-09-05 — Unified Orders detail-pane visibility fix
+
+- Pre-fix Dev commit: `7cd2b9f3f12c1f8f6aa0cf8740895047421fcbe0`
+- Named checkpoint branch: `checkpoint-before-orders-pane-fix-20260905`
+- Scope: CSS visibility correction and stylesheet cache refresh only.
+- Cause: the empty-state grid rule overrode the element's `hidden` state, leaving the placeholder above the selected order.
+- Database impact: none; Preview D1 schema, data, and order records remain untouched.
+
+Rollback boundary: restore the Dev branch to `7cd2b9f3f12c1f8f6aa0cf8740895047421fcbe0`. No database restore is required for this change.
+
 ## Rule for future complex changes
 
 1. Record the accepted Dev commit.
