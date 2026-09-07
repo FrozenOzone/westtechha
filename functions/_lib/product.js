@@ -10,6 +10,43 @@ export const SHIPPING_TIERS = Object.freeze([
 
 export const CUSTOM_QUOTE_MIN_QUANTITY = 5;
 
+// Loaded configuration pricing and compatibility live here so the customer form,
+// order creation, admin review, approval page, and PayPal amount all use the same rules.
+export const LOADED_OPTION_COMPONENTS = Object.freeze({
+  "oled-096": Object.freeze({
+    componentSku: "oled-096",
+    label: "0.96-inch OLED display",
+    description: "Installed and wired for the selected enclosure layout.",
+    unitAmount: "8.00"
+  }),
+  "buzzer": Object.freeze({
+    componentSku: "buzzer",
+    label: "Buzzer",
+    description: "Installed and wired as an audible alert option.",
+    unitAmount: "3.00"
+  }),
+  "lcd2004": Object.freeze({
+    componentSku: "lcd2004",
+    label: "LCD2004 display",
+    description: "20×4 I²C display installed and wired for the selected Command layout.",
+    unitAmount: "15.00"
+  }),
+  "dht11": Object.freeze({
+    componentSku: "dht11",
+    label: "DHT11 temperature and humidity sensor",
+    description: "Installed and wired for temperature and humidity sensing.",
+    unitAmount: "5.00"
+  })
+});
+
+const LOADED_MODEL_OPTIONS = Object.freeze({
+  scout: Object.freeze(["buzzer"]),
+  "ranger-relay": Object.freeze(["oled-096", "buzzer"]),
+  "ranger-bucks": Object.freeze(["oled-096", "buzzer"]),
+  "command-core": Object.freeze(["oled-096", "lcd2004", "dht11", "buzzer"]),
+  "command-gp": Object.freeze(["oled-096", "lcd2004", "dht11", "buzzer"])
+});
+
 function money(value) {
   const number = Number(value || 0);
   if (!Number.isFinite(number) || number < 0) return "0.00";
@@ -329,6 +366,68 @@ export function getProduct(sku) {
 
 export function getProductOrDefault(sku) {
   return getProduct(sku) || PRODUCT;
+}
+
+function loadedModelKey(sku) {
+  const value = String(sku || "").toLowerCase();
+  if (value.startsWith("ranger-") && value.includes("-bucks-")) return "ranger-bucks";
+  if (value.startsWith("ranger-")) return "ranger-relay";
+  if (value.startsWith("command-") && value.includes("-gp-")) return "command-gp";
+  if (value.startsWith("command-")) return "command-core";
+  return "scout";
+}
+
+export function loadedComponentsForProduct(sku, selectedSkus = []) {
+  const product = getProduct(sku);
+  if (!product || product.offerType !== "Loaded") return [];
+
+  const board = String(product.variant || "").includes("38") ? "38" : "30";
+  const model = loadedModelKey(product.sku);
+  const selected = new Set(Array.isArray(selectedSkus) ? selectedSkus.map((value) => String(value || "").trim().toLowerCase()) : []);
+  const required = [{
+    componentSku: `esp32-${board}-kit`,
+    label: `${board}-pin ESP32 + matching breakout board`,
+    description: "Installed, wired, checked, and loaded with WestTech Quick Start firmware.",
+    unitAmount: "0.00",
+    required: true,
+    selected: true
+  }];
+
+  if (model === "ranger-relay") required.push({componentSku:"relay-module",label:"Relay module",description:"Installed and wired for the Ranger Relay path.",unitAmount:"0.00",required:true,selected:true});
+  if (model === "ranger-bucks") required.push({componentSku:"buck-converter",label:"Buck converter",description:"Installed and wired for the Ranger Bucks power path.",unitAmount:"0.00",required:true,selected:true});
+  if (model === "command-core" || model === "command-gp") {
+    required.push({componentSku:"relay-module",label:"Relay module",description:"Installed and wired for the Command platform.",unitAmount:"0.00",required:true,selected:true});
+    required.push({componentSku:"buck-converter",label:"Buck converter",description:"Installed and wired for the Command power path.",unitAmount:"0.00",required:true,selected:true});
+  }
+
+  const optional = (LOADED_MODEL_OPTIONS[model] || []).map((componentSku) => {
+    const component = LOADED_OPTION_COMPONENTS[componentSku];
+    return {...component, required:false, selected:selected.has(componentSku)};
+  });
+  return [...required, ...optional];
+}
+
+export function buildConfiguredProduct(sku, quantity, selectedComponentSkus = []) {
+  const product = buildCheckoutProduct(sku, quantity);
+  const loadedComponents = loadedComponentsForProduct(product.sku, selectedComponentSkus);
+  const allowedOptional = new Set(loadedComponents.filter((component) => !component.required).map((component) => component.componentSku));
+  const requested = Array.isArray(selectedComponentSkus) ? selectedComponentSkus.map((value) => String(value || "").trim().toLowerCase()).filter(Boolean) : [];
+  if (requested.some((componentSku) => !allowedOptional.has(componentSku))) {
+    const error = new Error("Choose only components compatible with this enclosure.");
+    error.status = 400;
+    throw error;
+  }
+  const optionUnitAmount = money(loadedComponents.filter((component) => !component.required && component.selected).reduce((sum, component) => sum + Number(component.unitAmount || 0), 0));
+  const qty = normalizeQuantity(quantity);
+  return {
+    ...product,
+    baseUnitAmount: product.unitAmount,
+    baseItemAmount: product.itemAmount,
+    loadedComponents,
+    loadedComponentsAmount: money(Number(optionUnitAmount) * qty),
+    unitAmount: money(Number(product.unitAmount) + Number(optionUnitAmount)),
+    itemAmount: money((Number(product.unitAmount) + Number(optionUnitAmount)) * qty)
+  };
 }
 
 export function buildCheckoutProduct(sku, quantity) {

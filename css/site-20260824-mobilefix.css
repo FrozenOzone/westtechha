@@ -5517,10 +5517,108 @@ html[data-theme="dark"] .home-media-label{
 .home-coaster-media{
   min-height:300px;
 }
+
+/* Home coaster gateway: mirror the current custom-project direction. */
+.home-custom-coaster-media{
+  background:
+    linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px),
+    radial-gradient(circle at 78% 20%,rgba(22,119,196,.3),transparent 38%),
+    #101827;
+  background-size:30px 30px,30px 30px,auto,auto;
+}
+.home-custom-coaster-disc{
+  position:absolute;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  aspect-ratio:1;
+  border-radius:50%;
+  border:6px solid #f7f1e5;
+  box-shadow:0 22px 44px rgba(0,0,0,.32);
+  color:#fff;
+}
+.home-custom-coaster-disc-back{
+  width:190px;
+  left:7%;
+  top:22px;
+  background:#578873;
+  transform:rotate(-10deg);
+}
+.home-custom-coaster-disc-back b{
+  font-size:3.35rem;
+  line-height:1;
+  letter-spacing:-.08em;
+  transform:rotate(-18deg);
+}
+.home-custom-coaster-disc-front{
+  width:230px;
+  right:6%;
+  bottom:17px;
+  z-index:2;
+  background:#e76c20;
+}
+.home-custom-coaster-disc-front::before{
+  content:"";
+  position:absolute;
+  inset:17px;
+  border:3px solid rgba(255,255,255,.9);
+  border-radius:50%;
+}
+.home-custom-coaster-disc-front strong,
+.home-custom-coaster-disc-front b,
+.home-custom-coaster-disc-front small{
+  position:relative;
+  z-index:1;
+}
+.home-custom-coaster-disc-front strong{
+  margin-bottom:12px;
+  font-size:.67rem;
+  letter-spacing:.28em;
+}
+.home-custom-coaster-disc-front b{
+  font-size:2.55rem;
+  line-height:1;
+  letter-spacing:-.055em;
+}
+.home-custom-coaster-disc-front small{
+  margin-top:34px;
+  font-size:.5rem;
+  font-weight:900;
+  letter-spacing:.16em;
+}
+.home-custom-coaster-media .home-media-label{
+  max-width:calc(100% - 36px);
+  color:#dce7f7;
+  background:rgba(13,24,40,.88);
+  border-color:rgba(148,163,184,.22);
+}
 @media (max-width:1060px){
   .home-path-card{
     grid-template-columns:1fr;
     grid-template-rows:auto minmax(280px,1fr);
   }
+}
+@media (max-width:520px){
+  .home-custom-coaster-disc-back{
+    width:165px;
+    left:-8px;
+  }
+  .home-custom-coaster-disc-front{
+    width:205px;
+    right:-8px;
+  }
+  .home-custom-coaster-disc-front b{font-size:2.2rem;}
+}
+
+/* Site-wide desktop canvas: a centered 1380px body beneath the unchanged 1200px header. */
+:root{
+  --maxw:1380px;
+  --header-maxw:1200px;
+}
+.nav-shell,
+.nav-stack{
+  width:min(var(--header-maxw),calc(100% - 32px));
 }
 \n\n/* ===== 2026-08-24 iPhone header hardening ===== */\n.nav-logo-fallback{\n  width:clamp(300px,31vw,500px);\n  min-width:0;\n  display:grid;\n  grid-template-columns:auto 1fr;\n  grid-template-rows:auto auto;\n  align-items:end;\n  column-gap:.45rem;\n  color:var(--accent);\n  line-height:.92;\n}\n.nav-logo-fallback[hidden]{display:none !important;}\n.nav-logo-fallback strong{\n  grid-row:1 / 3;\n  font-size:clamp(1.65rem,3vw,3.15rem);\n  letter-spacing:-.05em;\n}\n.nav-logo-fallback > span{\n  font-size:clamp(.8rem,1.6vw,1.5rem);\n  font-weight:650;\n}\n.nav-logo-fallback small{\n  margin-top:.25rem;\n  font-size:clamp(.44rem,.76vw,.72rem);\n  font-weight:850;\n  letter-spacing:.12em;\n  color:var(--muted);\n}\n@media (max-width:700px){\n  .nav-logo-fallback{\n    width:min(58vw,235px);\n    grid-template-columns:1fr;\n    grid-template-rows:auto auto auto;\n    row-gap:1px;\n    line-height:1;\n  }\n  .nav-logo-fallback strong{\n    grid-row:auto;\n    font-size:1.35rem;\n  }\n  .nav-logo-fallback > span{font-size:.68rem;}\n  .nav-logo-fallback small{font-size:.42rem;letter-spacing:.08em;}\n}\n@media (max-width:420px){\n  .nav-logo-fallback{width:min(54vw,205px);}\n}\n

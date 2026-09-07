@@ -1,2 +1,2 @@
-WestTechHA mobile header hardening v2 - 2026-08-24
-Unique site-shell, site CSS, and logo asset URLs added to defeat stale mobile/browser caches.
+WestTechHA Dev Loaded Enclosure Components v1 - 2026-09-06
+Model-compatible Loaded hardware choices, live pricing, and locked component terms.

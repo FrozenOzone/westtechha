@@ -7,7 +7,7 @@
   <meta name="description" content="Configure a WestTech Scout, Ranger, or Command enclosure and send it for final pricing and production review."/>
   <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
   <link href="../css/site-20260824-mobilefix.css" rel="stylesheet"/>
-  <link href="../css/enclosure-order.css" rel="stylesheet"/>
+  <link href="../css/enclosure-order.css?v=20260906-loaded2" rel="stylesheet"/>
 </head>
 <body class="enclosure-order-page">
 <div class="page">
@@ -33,6 +33,7 @@
               <div><dt>Color</dt><dd id="eo-color-summary">White</dd></div>
               <div><dt>Quantity</dt><dd id="eo-quantity-summary">1</dd></div>
             </dl>
+            <div class="eo-loaded-summary" id="eo-loaded-summary" hidden><span>LOADED COMPONENTS</span><ul id="eo-loaded-summary-list"></ul></div>
             <div class="eo-estimate"><span>Starting product subtotal</span><strong id="eo-price-summary">Loading…</strong><small>Final price, shipping or pickup terms, tax, and timing are confirmed during review.</small></div>
             <div class="eo-queue-note"><strong>Shared FIFO production queue</strong><span>Coasters and enclosures share the same two K2 printers. Approved paid orders are manufactured first in, first out, and your estimated production window is confirmed before payment.</span></div>
           </div>
@@ -55,7 +56,13 @@
             </div>
             <div class="eo-choice-grid eo-offers">
               <label class="eo-choice"><input type="radio" name="offer" value="Unloaded" checked/><span><strong>Unloaded</strong><small>Printed enclosure and standard enclosure hardware</small></span></label>
-              <label class="eo-choice"><input type="radio" name="offer" value="Loaded"/><span><strong>Loaded</strong><small>Selected electronics path prepared before shipment</small></span></label>
+              <label class="eo-choice"><input type="radio" name="offer" value="Loaded"/><span><strong>Loaded</strong><small>WestTech installs, wires, checks, and prepares the selected electronics</small></span></label>
+            </div>
+            <div class="eo-loaded-config" id="eo-loaded-config" hidden>
+              <div class="eo-loaded-head"><div><small>LOADED BUILD</small><strong>Choose the installed components</strong></div><span>Compatible with this enclosure</span></div>
+              <p>The WestTech Loaded core is included and locked. Choose Yes or No for each compatible add-on; your exact selections become part of the order terms.</p>
+              <div class="eo-loaded-group"><div class="eo-loaded-group-label">WESTTECH LOADED CORE • INCLUDED</div><div id="eo-loaded-core"></div></div>
+              <div class="eo-loaded-group" id="eo-loaded-options-group"><div class="eo-loaded-group-label">OPTIONAL COMPONENTS</div><div id="eo-loaded-options"></div><div class="eo-display-combination-status" id="eo-display-combination-status" hidden><strong>Two-display selection acknowledged</strong><span>The OLED and LCD2004 will both be included in this request.</span></div></div>
             </div>
           </section>
 
@@ -100,6 +107,15 @@
   </main>
   <div id="site-footer"></div>
 </div>
-<script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script><script src="../js/enclosure-order.js?v=20260904-1"></script>
+<div class="eo-display-modal" id="eo-display-modal" hidden>
+  <section class="eo-display-dialog" role="dialog" aria-modal="true" aria-labelledby="eo-display-title" aria-describedby="eo-display-description">
+    <div class="eo-display-dialog-kicker">TWO DISPLAY REQUEST</div>
+    <h2 id="eo-display-title">Add both displays?</h2>
+    <p id="eo-display-description">You already selected <strong id="eo-display-existing">another display</strong>. Command enclosures normally use one display. Continue only if you want <strong id="eo-display-additional">this display</strong> installed in addition to the display already selected.</p>
+    <label class="eo-display-ack"><input id="eo-display-ack" type="checkbox"/><span>I understand this display is being added in addition to the display already selected.</span></label>
+    <div class="eo-display-dialog-actions"><button id="eo-display-cancel" type="button">Cancel</button><button id="eo-display-confirm" type="button" disabled>Add Both Displays</button></div>
+  </section>
+</div>
+<script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script><script src="../js/enclosure-order.js?v=20260906-loaded2"></script>
 </body>
 </html>
