@@ -844,6 +844,20 @@ textarea {
   font-size: 16px;
 }
 
+/* Quote form: prevent fieldset/select intrinsic widths from pushing the
+   tablet layout wider than the viewport when DevTools or split view is open. */
+#quote-form,
+#quote-form .wt-fieldset,
+#quote-form .wt-grid,
+#quote-form .wt-grid > div {
+  min-width: 0;
+}
+
+#quote-form .wt-fieldset {
+  min-inline-size: 0;
+  width: 100%;
+}
+
 @media (max-width: 1180px) {
   .hero-band,
   .spotlight {
@@ -859,6 +873,11 @@ textarea {
 
   .metric-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+  #quote-form .wt-grid {
+    grid-template-columns: 1fr;
   }
 }
 
