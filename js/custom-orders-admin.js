@@ -12,7 +12,7 @@
   const readable=value=>String(value||'').replaceAll('_',' ').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
   const formatDate=value=>{const d=new Date(value);return !value||Number.isNaN(d.getTime())?'—':d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});};
   const headers=json=>({Accept:'application/json',Authorization:`Bearer ${token}`,...(json?{'Content-Type':'application/json'}:{})});
-  function setMessage(el,text,type=''){if(!el)return;el.hidden=!text;el.textContent=text;el.className=`ca-inline-message xo-message ${type}`.trim();}
+  function setMessage(el,text,type=''){if(!el)return;el.hidden=!text;el.textContent=text;const locationClass=el.id==='xo-order-message'?' xo-order-message':'';el.className=`ca-inline-message xo-message${locationClass}${type?' '+type:''}`;}
   function message(text,type=''){setMessage($('#xo-message'),text,type);}
   function orderMessage(text,type=''){setMessage($('#xo-order-message')||$('#xo-message'),text,type);}
   async function api(path,options={}){const response=await fetch(path,{...options,headers:{...headers(!!options.body),...(options.headers||{})}}),data=await response.json().catch(()=>({}));if(!response.ok||!data.ok)throw new Error(data.message||'The custom order could not be updated.');return data;}
