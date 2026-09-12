@@ -11,7 +11,7 @@
   <link href="../css/coaster-order-theme.css" rel="stylesheet"/>
   <link href="../css/coaster-theme-auto-admin.css" rel="stylesheet"/>
   <link href="../css/coaster-theme-light-admin.css" rel="stylesheet"/>
-  <link href="../css/unified-orders.css?v=20260905-pane1" rel="stylesheet"/>
+  <link href="../css/unified-orders.css?v=20260912-custom1" rel="stylesheet"/>
 </head>
 <body class="coaster-page custom-coasters-page unified-orders-page">
 <div class="page">
@@ -21,10 +21,11 @@
       <div>
         <div class="ca-eyebrow">WESTTECH • PRIVATE ORDER CONTROL</div>
         <h1>All WestTech <em>Orders.</em></h1>
-        <p>Coasters and enclosures together, in original request order.</p>
+        <p>Coasters, enclosures, and direct custom orders together in one control center.</p>
       </div>
       <nav class="uo-admin-links" aria-label="Order administration">
         <a class="active" href="orders.html">All Orders</a>
+        <a href="custom-orders.html">Custom Orders</a>
         <a href="work-orders.html">Manufacturing Queue</a>
       </nav>
     </header>
@@ -36,13 +37,13 @@
     </section>
 
     <section class="uo-summary" id="uo-summary" aria-label="Combined order summary" hidden>
-      <article><span>ACTIVE ORDERS</span><strong id="uo-active-count">—</strong><small>Coasters + enclosures</small></article>
+      <article><span>ACTIVE ORDERS</span><strong id="uo-active-count">—</strong><small>All three order types</small></article>
       <article><span>AWAITING ACTION</span><strong id="uo-action-count">—</strong><small>Review or customer step</small></article>
       <article><span>IN MANUFACTURING</span><strong id="uo-manufacturing-count">—</strong><small>Released to shared FIFO</small></article>
       <article><span>PRINTER TIME LEFT</span><strong id="uo-hours-left">—</strong><small>Across both K2 printers</small></article>
     </section>
 
-    <section class="uo-shell" aria-label="Combined coaster and enclosure orders">
+    <section class="uo-shell" aria-label="All WestTech orders">
       <aside class="uo-sidebar">
         <div class="uo-sidebar-head"><div><strong>Orders</strong><span id="uo-count">0 orders</span></div><button id="uo-refresh" type="button">Reload</button></div>
         <label class="uo-filter-label" for="uo-filter">Show</label>
@@ -50,6 +51,7 @@
           <option value="ACTIVE">All Active</option>
           <option value="COASTER">Coasters</option>
           <option value="ENCLOSURE">Enclosures</option>
+          <option value="CUSTOM">Custom Orders</option>
           <option value="REVIEW">Awaiting Review</option>
           <option value="CUSTOMER">Awaiting Customer</option>
           <option value="PAYMENT">Awaiting Payment</option>
@@ -67,7 +69,7 @@
         <div class="uo-empty-detail" id="uo-empty-detail">
           <span>ALL WESTTECH ORDERS</span>
           <strong>Select an order</strong>
-          <p>The full coaster or enclosure workflow will open here without changing its familiar layout.</p>
+          <p>The full coaster, enclosure, or custom-order workflow opens here.</p>
         </div>
         <div class="uo-frame-loading" id="uo-frame-loading" hidden>Loading order…</div>
         <iframe id="uo-order-frame" title="Selected WestTech order" hidden></iframe>
@@ -79,6 +81,6 @@
 </div>
 <script src="../js/theme.js"></script>
 <script src="../js/site-shell-20260824-mobilefix.js"></script>
-<script src="../js/orders.js?v=20260905-parity1"></script>
+<script src="../js/orders.js?v=20260912-custom1"></script>
 </body>
 </html>

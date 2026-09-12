@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" data-site-root="../" data-site-section="enclosures">
+<head>
+  <meta charset="utf-8"/>
+  <title>Customers & Custom Orders – WestTech Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="noindex,nofollow,noarchive"/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="../css/site-20260824-mobilefix.css" rel="stylesheet"/>
+  <link href="../css/coaster-admin.css" rel="stylesheet"/>
+  <link href="../css/coaster-order-theme.css" rel="stylesheet"/>
+  <link href="../css/coaster-theme-auto-admin.css" rel="stylesheet"/>
+  <link href="../css/coaster-theme-light-admin.css" rel="stylesheet"/>
+  <link href="../css/custom-orders.css?v=20260912-1" rel="stylesheet"/>
+</head>
+<body class="coaster-page custom-coasters-page custom-orders-page">
+<div class="page"><div id="site-header"></div>
+<main class="xo-main">
+  <header class="xo-topbar">
+    <div><div class="ca-eyebrow">WESTTECH • DIRECT CUSTOM SALES</div><h1>Customers & <em>Custom Orders.</em></h1><p>Create the order, set the price, send it for approval, and keep payment and production in one system.</p></div>
+    <nav class="xo-admin-links" aria-label="Order administration"><a href="orders.html">All Orders</a><a class="active" href="custom-orders.html">Custom Orders</a><a href="work-orders.html">Manufacturing Queue</a></nav>
+  </header>
+
+  <section class="xo-auth ca-card" id="xo-auth"><label>WestTech Admin Token <span><input id="xo-token" type="password" autocomplete="current-password"/><button class="ca-primary" id="xo-connect" type="button">Connect</button></span></label></section>
+  <div class="ca-inline-message xo-message" id="xo-message" role="status" hidden></div>
+
+  <section class="xo-actions ca-card">
+    <div><strong>Direct order tools</strong><span>Repeat customers, special pricing, and one-off custom work.</span></div>
+    <div class="xo-create-tools"><select id="xo-new-order-customer" aria-label="Customer for new custom order"><option value="">Choose customer</option></select><button class="ca-secondary" id="xo-new-customer" type="button">New Customer</button><button class="ca-primary" id="xo-new-order" type="button">Create Custom Order</button><button class="ca-secondary" id="xo-reload" type="button">Reload</button></div>
+  </section>
+
+  <section class="xo-customer ca-card" id="xo-customer-card" hidden>
+    <div class="xo-section-head"><div><span class="ca-eyebrow">CUSTOMER RECORD</span><h2 id="xo-customer-heading">New customer</h2></div><button class="xo-close" id="xo-close-customer" type="button" aria-label="Close">×</button></div>
+    <form id="xo-customer-form">
+      <input id="xo-customer-id" type="hidden"/>
+      <div class="xo-grid xo-grid-3"><label>Customer / account name<input id="xo-customer-name" maxlength="180" required/></label><label>Company or organization<input id="xo-company-name" maxlength="160"/></label><label>Contact name<input id="xo-contact-name" maxlength="160"/></label><label>Email<input id="xo-customer-email" type="email" maxlength="254" required/></label><label>Phone<input id="xo-customer-phone" maxlength="60"/></label><label>Default fulfillment<select id="xo-customer-fulfillment"><option value="UNSET">Choose per order</option><option value="SHIP">Ship Order</option><option value="LOCAL_PICKUP">Local Pickup</option></select></label></div>
+      <div class="xo-grid xo-grid-2"><label>Pricing notes<textarea id="xo-pricing-notes" maxlength="2500" placeholder="Sideways Seven rate, partner pricing, repeat-order notes…"></textarea></label><label>Internal customer notes<textarea id="xo-customer-internal" maxlength="4000"></textarea></label></div>
+      <label class="xo-check"><input id="xo-customer-active" type="checkbox" checked/> Active customer</label>
+      <div class="xo-button-row"><button class="ca-primary" type="submit">Save Customer</button></div>
+    </form>
+  </section>
+
+  <section class="xo-shell">
+    <aside class="xo-sidebar">
+      <div class="xo-sidebar-head"><div><strong>Custom Orders</strong><span id="xo-count">0 orders</span></div></div>
+      <select id="xo-filter"><option value="ACTIVE">All Active</option><option value="DRAFT">Drafts</option><option value="CUSTOMER">Awaiting Customer</option><option value="PAYMENT">Awaiting Payment</option><option value="PRODUCTION">Production + Fulfillment</option><option value="COMPLETED">Completed</option><option value="ARCHIVED">Archived</option><option value="ALL">All Orders</option></select>
+      <input id="xo-search" type="search" placeholder="Search order or customer"/>
+      <div class="xo-order-list" id="xo-order-list"><div class="xo-empty">Connect to load custom orders.</div></div>
+    </aside>
+
+    <section class="xo-editor">
+      <div class="xo-empty xo-empty-editor" id="xo-empty-editor"><strong>Create or select a custom order</strong><span>The customer never needs to use a public product form.</span></div>
+      <form id="xo-order-form" hidden>
+        <header class="xo-editor-head"><div><span class="ca-eyebrow">CUSTOM WORK ORDER</span><h2 id="xo-order-id">—</h2><p id="xo-order-lock">Draft terms are editable.</p></div><div class="xo-editor-actions"><button class="ca-secondary" id="xo-repeat" type="button">Repeat Order</button><button class="ca-secondary" id="xo-refresh-link" type="button" hidden>Refresh Customer Link</button></div></header>
+
+        <section class="ca-card"><div class="xo-section-head"><div><span class="ca-eyebrow">CUSTOMER + PROJECT</span><h3>Who and what this order is for</h3></div><button class="ca-secondary" id="xo-edit-customer" type="button">Edit Customer</button></div>
+          <div class="xo-grid xo-grid-3"><label>Customer<select id="xo-order-customer" required></select></label><label class="xo-span-2">Order title<input id="xo-title" maxlength="200" required placeholder="Sideways Seven custom coaster order"/></label></div>
+        </section>
+
+        <section class="ca-card"><div class="xo-section-head"><div><span class="ca-eyebrow">LINE ITEMS</span><h3>Build the customer’s order</h3></div><button class="ca-secondary" id="xo-add-line" type="button">Add Line</button></div><div class="xo-lines" id="xo-lines"></div></section>
+
+        <section class="ca-card"><div class="ca-eyebrow">SPECIAL PRICING + FULFILLMENT</div><div class="xo-grid xo-grid-3"><label>Discount / special pricing<input id="xo-discount" type="number" min="0" step="0.01" value="0"/></label><label>Shipping<input id="xo-shipping" type="number" min="0" step="0.01" value="0"/></label><label>Fulfillment<select id="xo-fulfillment"><option value="UNSET">Not selected</option><option value="SHIP">Ship Order</option><option value="LOCAL_PICKUP">Local Pickup</option></select></label></div><label class="xo-check xo-payment"><input id="xo-payment-required" type="checkbox" checked/><span><strong>Payment required</strong><small>Turn off only for a deliberate gift or no-charge release.</small></span></label>
+          <div class="xo-totals"><span>Line-item subtotal <strong id="xo-subtotal">$0.00</strong></span><span>Special pricing <strong id="xo-discount-total">−$0.00</strong></span><span>Shipping <strong id="xo-shipping-total">$0.00</strong></span><span class="primary">Approved subtotal before tax <strong id="xo-final">$0.00</strong></span><small>Colorado destination tax is calculated from the PayPal-confirmed shipping address or the locked WestTech pickup address.</small></div>
+        </section>
+
+        <section class="ca-card"><div class="ca-eyebrow">CUSTOMER TERMS + INTERNAL NOTES</div><div class="xo-grid xo-grid-2"><label>Customer-facing note<textarea id="xo-customer-note" maxlength="3000" placeholder="Order details, agreed scope, finish, artwork, or special instructions"></textarea></label><label>WestTech internal notes<textarea id="xo-admin-notes" maxlength="5000"></textarea></label></div></section>
+
+        <section class="ca-card"><div class="ca-eyebrow">PRODUCTION + STATUS</div><div class="xo-grid xo-grid-3"><label>Estimated printer minutes<input id="xo-printer-minutes" type="number" min="1" max="1000000" step="1" value="360"/></label><label>Printer assignment<select id="xo-printer"><option value="UNASSIGNED">Unassigned</option><option value="K2_1">K2 #1</option><option value="K2_2">K2 #2</option><option value="BOTH">Both K2s</option></select></label><label>Order status<select id="xo-status"></select></label><label class="xo-span-3">Estimated production window<input id="xo-window" maxlength="160" placeholder="Sep 18–22, 2026"/></label><label>Tracking carrier<select id="xo-carrier"><option value="">Not assigned</option><option value="USPS">USPS</option><option value="UPS">UPS</option><option value="FedEx">FedEx</option><option value="DHL">DHL</option></select></label><label class="xo-span-2">Tracking number<input id="xo-tracking" maxlength="180"/></label></div></section>
+
+        <section class="xo-footer-actions ca-card"><div><strong id="xo-state">Draft</strong><span id="xo-payment-state">Payment not requested</span></div><div><button class="ca-secondary" id="xo-sync-paypal" type="button" hidden>Sync PayPal</button><button class="ca-secondary" id="xo-archive" type="button" hidden>Archive</button><button class="ca-secondary" id="xo-restore" type="button" hidden>Restore</button><button class="ca-primary" id="xo-save" type="submit">Save Order</button><button class="ca-primary" id="xo-send" type="button">Send to Customer</button></div></section>
+      </form>
+    </section>
+  </section>
+</main><div id="site-footer"></div></div>
+<script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script><script src="../js/custom-orders-admin.js?v=20260912-1"></script>
+</body></html>

@@ -1,6 +1,6 @@
 import { requireOrdersDb } from './orders.js';
 
-const SOURCE_TYPES=new Set(['COASTER','ENCLOSURE']);
+const SOURCE_TYPES=new Set(['COASTER','ENCLOSURE','CUSTOM']);
 const PRINTERS=new Set(['UNASSIGNED','K2_1','K2_2','BOTH']);
 const PRINTING_STATUSES=new Set(['PRODUCTION_QUEUE','IN_PRODUCTION']);
 
@@ -8,9 +8,9 @@ function clean(value,max=500){return String(value??'').trim().slice(0,max);}
 function integer(value,min=0,max=999999){const n=Math.round(Number(value));return Number.isFinite(n)?Math.min(max,Math.max(min,n)):min;}
 function bool(value){return value===true||value===1||String(value).toLowerCase()==='true';}
 function makeError(message,status=400){return Object.assign(new Error(message),{status});}
-function sourceType(value){const type=clean(value,30).toUpperCase();if(!SOURCE_TYPES.has(type))throw makeError('Choose Coaster or Enclosure.');return type;}
+function sourceType(value){const type=clean(value,30).toUpperCase();if(!SOURCE_TYPES.has(type))throw makeError('Choose Coaster, Enclosure, or Custom.');return type;}
 function printer(value){const normalized=clean(value,30).toUpperCase().replaceAll('#','').replace(/[ -]/g,'_');const mapped=normalized==='K2_1'||normalized==='K21'?'K2_1':normalized==='K2_2'||normalized==='K22'?'K2_2':normalized==='BOTH'?'BOTH':'UNASSIGNED';if(!PRINTERS.has(mapped))return 'UNASSIGNED';return mapped;}
-function fallbackMinutes(type,order){if(type==='COASTER')return Math.max(1,Number(order?.setCount||1))*360;return Math.max(1,Number(order?.quantity||1))*480;}
+function fallbackMinutes(type,order){if(type==='COASTER')return Math.max(1,Number(order?.setCount||1))*360;if(type==='ENCLOSURE')return Math.max(1,Number(order?.quantity||1))*480;return 360;}
 
 async function settings(db){
   const row=await db.prepare(`SELECT active_printers,productive_minutes_per_printer_day,handling_business_days,window_span_business_days,updated_at FROM manufacturing_capacity_settings WHERE id=1`).first();
@@ -34,8 +34,9 @@ async function workload(db){
     FROM manufacturing_work_orders w
     LEFT JOIN coaster_orders c ON w.source_type='COASTER' AND c.order_id=w.source_order_id
     LEFT JOIN enclosure_orders e ON w.source_type='ENCLOSURE' AND e.order_id=w.source_order_id
+    LEFT JOIN custom_orders x ON w.source_type='CUSTOM' AND x.order_id=w.source_order_id
     WHERE w.is_paused=0
-      AND COALESCE(c.status,e.status) IN ('PRODUCTION_QUEUE','IN_PRODUCTION')
+      AND COALESCE(c.status,e.status,x.status) IN ('PRODUCTION_QUEUE','IN_PRODUCTION')
   `).first();
   return {activeOrderCount:Number(row?.active_count||0),remainingPrinterMinutes:Number(row?.remaining_minutes||0)};
 }
@@ -86,13 +87,18 @@ export async function listManufacturingWorkOrders(env){
       e.status,e.customer_name,e.fulfillment_method,e.payment_status,e.paypal_paid_at,e.production_window,e.completed_at,
       NULL AS set_size,NULL AS set_count,NULL AS total_coasters,e.model,e.board_variant,e.offer_type,e.quantity
     FROM manufacturing_work_orders w JOIN enclosure_orders e ON w.source_type='ENCLOSURE' AND e.order_id=w.source_order_id
+    UNION ALL
+    SELECT w.id AS work_order_id,w.source_type,w.source_order_id,w.queued_at,w.estimated_printer_minutes,w.remaining_printer_minutes,w.printer_assignment,w.is_paused,w.pause_reason,w.created_at,w.updated_at,
+      x.status,x.customer_name,x.fulfillment_method,x.payment_status,x.paypal_paid_at,x.production_window,x.completed_at,
+      NULL AS set_size,NULL AS set_count,NULL AS total_coasters,x.title AS model,NULL AS board_variant,NULL AS offer_type,1 AS quantity
+    FROM manufacturing_work_orders w JOIN custom_orders x ON w.source_type='CUSTOM' AND x.order_id=w.source_order_id
     ORDER BY queued_at,work_order_id
   `).all();
   let cumulative=0,position=0;
   return (result?.results||[]).map(row=>{
     const status=String(row.status||''),printing=PRINTING_STATUSES.has(status),paused=!!Number(row.is_paused);let projection=null,queuePosition=null;
     if(printing&&!paused){position++;queuePosition=position;cumulative+=Number(row.remaining_printer_minutes||0);projection=projectedWindow(config,cumulative);}
-    const itemSummary=row.source_type==='COASTER'?`${Number(row.set_count||1)} × ${Number(row.set_size||4)}-Coaster Set${Number(row.set_count||1)===1?'':'s'}`:`${Number(row.quantity||1)} × ${row.model} ${row.board_variant}-pin ${row.offer_type}`;
+    const itemSummary=row.source_type==='COASTER'?`${Number(row.set_count||1)} × ${Number(row.set_size||4)}-Coaster Set${Number(row.set_count||1)===1?'':'s'}`:row.source_type==='CUSTOM'?String(row.model||'Custom Order'):`${Number(row.quantity||1)} × ${row.model} ${row.board_variant}-pin ${row.offer_type}`;
     return {id:row.work_order_id,sourceType:row.source_type,sourceOrderId:row.source_order_id,queuedAt:row.queued_at,estimatedPrinterMinutes:Number(row.estimated_printer_minutes||0),remainingPrinterMinutes:Number(row.remaining_printer_minutes||0),printerAssignment:row.printer_assignment||'UNASSIGNED',isPaused:paused,pauseReason:row.pause_reason||'',status,customerName:row.customer_name||'',fulfillmentMethod:row.fulfillment_method||'',paymentStatus:row.payment_status||'',paidAt:row.paypal_paid_at||'',promisedWindow:row.production_window||'',completedAt:row.completed_at||'',itemSummary,queuePosition,projectedWindow:projection?.label||'',projectedShipStart:projection?.earliest||'',projectedShipEnd:projection?.latest||'',createdAt:row.created_at,updatedAt:row.updated_at};
   });
 }
@@ -102,8 +108,8 @@ export async function updateManufacturingWorkOrder(env,body={}){
   const estimated=integer(body.estimatedPrinterMinutes,0,1000000),remaining=integer(body.remainingPrinterMinutes,0,1000000),assignment=printer(body.printerAssignment),paused=bool(body.isPaused),reason=clean(body.pauseReason,500);
   if(paused&&!reason)throw makeError('Add a brief reason before pausing this work order.');
   await db.prepare(`UPDATE manufacturing_work_orders SET estimated_printer_minutes=?,remaining_printer_minutes=?,printer_assignment=?,is_paused=?,pause_reason=?,updated_at=CURRENT_TIMESTAMP WHERE id=?`).bind(estimated,remaining,assignment,paused?1:0,reason||null,existing.id).run();
-  const sourceTable=type==='COASTER'?'coaster_orders':'enclosure_orders';
-  const eventTable=type==='COASTER'?'coaster_order_events':'enclosure_order_events';
+  const sourceTable=type==='COASTER'?'coaster_orders':type==='ENCLOSURE'?'enclosure_orders':'custom_orders';
+  const eventTable=type==='COASTER'?'coaster_order_events':type==='ENCLOSURE'?'enclosure_order_events':'custom_order_events';
   await db.prepare(`UPDATE ${sourceTable} SET estimated_printer_minutes=?,printer_assignment=?,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(estimated,assignment,orderId).run();
   await db.prepare(`INSERT INTO ${eventTable} (order_id,event_type,detail) VALUES (?,?,?)`).bind(orderId,'SHARED_WORK_ORDER_UPDATED',JSON.stringify({estimatedPrinterMinutes:estimated,remainingPrinterMinutes:remaining,printerAssignment:assignment,isPaused:paused,pauseReason:reason||'',queuedAt:existing.queued_at})).run();
   return getManufacturingWorkOrder(env,type,orderId);

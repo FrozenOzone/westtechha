@@ -26,13 +26,14 @@
     if(status==='ARCHIVED')return 'Archived record';
     if(status==='COMPLETED')return 'Ready to archive';
     if(status==='CANCELLED')return 'Cancelled';
-    if(status==='CHANGES_REQUESTED')return order.sourceType==='COASTER'?'Review proof changes':'Update configuration';
+    if(status==='CHANGES_REQUESTED')return order.sourceType==='COASTER'?'Review proof changes':order.sourceType==='CUSTOM'?'Revise customer terms':'Update configuration';
+    if(status==='DRAFT')return 'Finish custom order';
     if(['DESIGN_REVIEW','PROOF_READY'].includes(status))return order.sourceType==='COASTER'?'Review design and terms':'Review request';
     if(['REQUEST_RECEIVED','UNDER_REVIEW'].includes(status))return 'Complete order review';
     if(status==='NEEDS_CUSTOMER_INFO')return 'Contact customer';
     if(status==='ON_HOLD')return 'Review order hold';
-    if(['PROOF_SENT','CONFIGURATION_SENT'].includes(status))return 'Waiting for customer approval';
-    if(['PROOF_APPROVED','CONFIGURATION_APPROVED','AWAITING_PAYMENT'].includes(status))return order.paymentRequired===false?'Release to production':'Waiting for payment';
+    if(['PROOF_SENT','CONFIGURATION_SENT','ORDER_SENT'].includes(status))return 'Waiting for customer approval';
+    if(['PROOF_APPROVED','CONFIGURATION_APPROVED','ORDER_APPROVED','AWAITING_PAYMENT'].includes(status))return order.paymentRequired===false?'Release to production':'Waiting for payment';
     if(status==='PRODUCTION_QUEUE')return 'Ready for production';
     if(status==='IN_PRODUCTION')return 'Currently printing';
     if(status==='PREPARING_TO_SHIP')return 'Prepare shipment';
@@ -44,9 +45,9 @@
 
   function stage(order){
     const status=String(order.status||'').toUpperCase();
-    if(['DESIGN_REVIEW','PROOF_READY','REQUEST_RECEIVED','UNDER_REVIEW','NEEDS_CUSTOMER_INFO','ON_HOLD','CHANGES_REQUESTED'].includes(status))return 'REVIEW';
-    if(['PROOF_SENT','CONFIGURATION_SENT'].includes(status))return 'CUSTOMER';
-    if(['PROOF_APPROVED','CONFIGURATION_APPROVED','AWAITING_PAYMENT'].includes(status))return 'PAYMENT';
+    if(['DRAFT','DESIGN_REVIEW','PROOF_READY','REQUEST_RECEIVED','UNDER_REVIEW','NEEDS_CUSTOMER_INFO','ON_HOLD','CHANGES_REQUESTED'].includes(status))return 'REVIEW';
+    if(['PROOF_SENT','CONFIGURATION_SENT','ORDER_SENT'].includes(status))return 'CUSTOMER';
+    if(['PROOF_APPROVED','CONFIGURATION_APPROVED','ORDER_APPROVED','AWAITING_PAYMENT'].includes(status))return 'PAYMENT';
     if(productionStatus(status))return 'PRODUCTION';
     if(status==='COMPLETED')return 'COMPLETED';
     if(status==='ARCHIVED')return 'ARCHIVED';
@@ -56,8 +57,8 @@
   function filtered(){
     const filter=$('#uo-filter').value,q=$('#uo-search').value.trim().toLowerCase();
     return orders.filter(order=>{
-      const filterMatch=filter==='ALL'||(filter==='ACTIVE'&&active(order))||(filter==='COASTER'&&order.sourceType==='COASTER'&&active(order))||(filter==='ENCLOSURE'&&order.sourceType==='ENCLOSURE'&&active(order))||stage(order)===filter;
-      const detail=order.sourceType==='COASTER'?`${order.topText||''} ${order.bottomText||''}`:`${order.model||''} ${order.sku||''} ${order.offerType||''}`;
+      const filterMatch=filter==='ALL'||(filter==='ACTIVE'&&active(order))||(['COASTER','ENCLOSURE','CUSTOM'].includes(filter)&&order.sourceType===filter&&active(order))||stage(order)===filter;
+      const detail=order.sourceType==='COASTER'?`${order.topText||''} ${order.bottomText||''}`:order.sourceType==='CUSTOM'?`${order.title||''} ${(order.lineItems||[]).map(line=>line.description).join(' ')}`:`${order.model||''} ${order.sku||''} ${order.offerType||''}`;
       return filterMatch&&(!q||[order.orderId,order.customerName,order.customerEmail,order.status,detail].join(' ').toLowerCase().includes(q));
     });
   }
@@ -71,12 +72,12 @@
     return `${root}command/standard/${board}/${board}-Command-angled-side1-inserts-hero.jpg`;
   }
 
-  function itemSummary(order){return order.sourceType==='COASTER'?`${Number(order.setCount||1)} × ${Number(order.setSize||4)}-coaster set`:`${Number(order.quantity||1)} × ${order.model} ${order.boardVariant}-pin ${order.offerType}`;}
+  function itemSummary(order){if(order.sourceType==='COASTER')return `${Number(order.setCount||1)} × ${Number(order.setSize||4)}-coaster set`;if(order.sourceType==='CUSTOM')return order.title||'Custom WestTech order';return `${Number(order.quantity||1)} × ${order.model} ${order.boardVariant}-pin ${order.offerType}`;}
   function manufacturingLine(order){const work=workFor(order);if(!work)return '<span class="uo-manufacturing muted">Not released to manufacturing</span>';if(work.isPaused)return `<span class="uo-manufacturing">Paused • ${esc(hours(work.remainingPrinterMinutes))} left</span>`;if(['COMPLETED','ARCHIVED'].includes(String(work.status||'')))return '<span class="uo-manufacturing muted">Manufacturing complete</span>';return `<span class="uo-manufacturing">FIFO #${esc(work.queuePosition||'—')} • ${esc(hours(work.remainingPrinterMinutes))} left</span>`;}
 
   function cardHtml(order){
-    const work=workFor(order),image=order.sourceType==='ENCLOSURE'?`<img src="${esc(enclosureImage(order))}" alt=""/>`:'<span class="uo-thumb-fallback">DESIGN</span>';
-    return `<button class="uo-order-card${selectedKey===keyFor(order)?' active':''}" type="button" data-key="${esc(keyFor(order))}" data-source="${esc(order.sourceType)}"><span class="uo-thumb" data-thumb="${esc(keyFor(order))}">${image}</span><span class="uo-card-copy"><span class="uo-card-top"><b class="uo-source">${order.sourceType==='COASTER'?'COASTER':'ENCLOSURE'}</b><time class="uo-request-date">${esc(formatDate(order.createdAt))}</time></span><strong>${esc(order.orderId)}</strong><span>${esc(order.customerName)}</span><span>${esc(itemSummary(order))}</span><span class="uo-next">Next: ${esc(nextAction(order))}</span>${manufacturingLine(order)}</span></button>`;
+    const work=workFor(order),image=order.sourceType==='ENCLOSURE'?`<img src="${esc(enclosureImage(order))}" alt=""/>`:`<span class="uo-thumb-fallback">${order.sourceType==='CUSTOM'?'CUSTOM':'DESIGN'}</span>`;
+    return `<button class="uo-order-card${selectedKey===keyFor(order)?' active':''}" type="button" data-key="${esc(keyFor(order))}" data-source="${esc(order.sourceType)}"><span class="uo-thumb" data-thumb="${esc(keyFor(order))}">${image}</span><span class="uo-card-copy"><span class="uo-card-top"><b class="uo-source">${esc(order.sourceType)}</b><time class="uo-request-date">${esc(formatDate(order.createdAt))}</time></span><strong>${esc(order.orderId)}</strong><span>${esc(order.customerName)}</span><span>${esc(itemSummary(order))}</span><span class="uo-next">Next: ${esc(nextAction(order))}</span>${manufacturingLine(order)}</span></button>`;
   }
 
   function renderSummary(){
@@ -86,7 +87,7 @@
 
   function renderList(){
     const rows=filtered(),list=$('#uo-order-list');$('#uo-count').textContent=`${rows.length} order${rows.length===1?'':'s'}`;
-    list.innerHTML=rows.length?rows.map(cardHtml).join(''):'<div class="ca-empty">No coaster or enclosure orders match this view.</div>';
+    list.innerHTML=rows.length?rows.map(cardHtml).join(''):'<div class="ca-empty">No WestTech orders match this view.</div>';
     list.querySelectorAll('[data-key]').forEach(button=>button.addEventListener('click',()=>selectOrder(button.dataset.key)));
     loadCoasterThumbnails(rows.filter(order=>order.sourceType==='COASTER'));
   }
@@ -99,7 +100,7 @@
     }));
   }
 
-  function frameUrl(order){const page=order.sourceType==='COASTER'?'coaster-orders.html':'enclosure-orders.html',layout=order.sourceType==='ENCLOSURE'?'&layout=20260905-parity1':'';return `${page}?pane=1&order=${encodeURIComponent(order.orderId)}${layout}`;}
+  function frameUrl(order){const page=order.sourceType==='COASTER'?'coaster-orders.html':order.sourceType==='CUSTOM'?'custom-orders.html':'enclosure-orders.html',layout=order.sourceType==='ENCLOSURE'?'&layout=20260905-parity1':'';return `${page}?pane=1&order=${encodeURIComponent(order.orderId)}${layout}`;}
   function selectOrder(key){
     const order=orders.find(row=>keyFor(row)===key);if(!order)return;selectedKey=key;renderList();
     const frame=$('#uo-order-frame');$('#uo-empty-detail').hidden=true;$('#uo-frame-loading').hidden=false;frame.hidden=true;frame.src=frameUrl(order);
@@ -109,8 +110,8 @@
   async function load(){
     message('');$('#uo-order-list').innerHTML='<div class="ca-empty">Loading all WestTech orders…</div>';
     try{
-      const [coasters,enclosures,work]=await Promise.all([fetchJson('/api/admin/coasters/orders'),fetchJson('/api/admin/enclosures/orders'),fetchJson('/api/admin/work-orders')]);
-      manufacturing=work;orders=[...(coasters.orders||[]).map(row=>normalize('COASTER',row)),...(enclosures.orders||[]).map(row=>normalize('ENCLOSURE',row))].sort((a,b)=>new Date(a.createdAt||0)-new Date(b.createdAt||0)||a.orderId.localeCompare(b.orderId));
+      const [coasters,enclosures,custom,work]=await Promise.all([fetchJson('/api/admin/coasters/orders'),fetchJson('/api/admin/enclosures/orders'),fetchJson('/api/admin/custom-orders'),fetchJson('/api/admin/work-orders')]);
+      manufacturing=work;orders=[...(coasters.orders||[]).map(row=>normalize('COASTER',row)),...(enclosures.orders||[]).map(row=>normalize('ENCLOSURE',row)),...(custom.orders||[]).map(row=>normalize('CUSTOM',row))].sort((a,b)=>new Date(a.createdAt||0)-new Date(b.createdAt||0)||a.orderId.localeCompare(b.orderId));
       $('#uo-auth').hidden=true;renderSummary();renderList();
       const params=new URLSearchParams(location.search),wantedType=params.get('type'),wantedOrder=params.get('order'),wanted=orders.find(row=>row.sourceType===wantedType&&row.orderId===wantedOrder),first=filtered()[0];if(wanted||first)selectOrder(keyFor(wanted||first));
     }catch(error){message(error.message,'error');$('#uo-order-list').innerHTML='<div class="ca-empty">Connect with the WestTech admin token.</div>';$('#uo-auth').hidden=false;}

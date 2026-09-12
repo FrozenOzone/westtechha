@@ -156,10 +156,14 @@ export async function buildTaxQuote(env, inputAddress, options = {}) {
 
   const address = validateShippingAddress(inputAddress);
   const taxableAmount = Number(options.taxableAmount ?? PRODUCT.itemAmount);
+  const itemAmount = Number(options.itemAmount ?? taxableAmount);
   const shippingAmount = Number(options.shippingAmount ?? PRODUCT.shippingAmount);
 
   if (!Number.isFinite(taxableAmount) || taxableAmount < 0) {
     throw new Error("Invalid taxable amount.");
+  }
+  if (!Number.isFinite(itemAmount) || itemAmount < 0 || itemAmount < taxableAmount) {
+    throw new Error("Invalid item amount.");
   }
   if (!Number.isFinite(shippingAmount) || shippingAmount < 0) {
     throw new Error("Invalid shipping amount.");
@@ -184,7 +188,7 @@ export async function buildTaxQuote(env, inputAddress, options = {}) {
   }
 
   const taxAmount = Number((taxableAmount * taxRate).toFixed(2));
-  const subtotal = Number((taxableAmount + shippingAmount).toFixed(2));
+  const subtotal = Number((itemAmount + shippingAmount).toFixed(2));
   const totalAmount = Number((subtotal + taxAmount).toFixed(2));
 
   const quote = {
@@ -197,6 +201,7 @@ export async function buildTaxQuote(env, inputAddress, options = {}) {
     productService,
     taxRate,
     taxableAmount: taxableAmount.toFixed(2),
+    itemAmount: itemAmount.toFixed(2),
     shippingAmount: shippingAmount.toFixed(2),
     subtotal: subtotal.toFixed(2),
     taxAmount: taxAmount.toFixed(2),

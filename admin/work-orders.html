@@ -17,8 +17,8 @@
 <div class="page"><div id="site-header"></div>
 <main class="wo-main">
   <header class="wo-topbar">
-    <div><div class="ca-eyebrow">SHARED MANUFACTURING CONTROL</div><h1>Manufacturing <em>Queue.</em></h1><p>Coasters and enclosures compete for the same two K2 printers. Paid and approved work enters this list in FIFO order.</p></div>
-    <nav class="wo-admin-links" aria-label="Order administration"><a href="orders.html">All Orders</a><a href="coaster-orders.html">Coaster Only</a><a href="enclosure-orders.html">Enclosure Only</a></nav>
+    <div><div class="ca-eyebrow">SHARED MANUFACTURING CONTROL</div><h1>Manufacturing <em>Queue.</em></h1><p>Coasters, enclosures, and custom work share the same two K2 printers. Paid or deliberately released work enters this list in FIFO order.</p></div>
+    <nav class="wo-admin-links" aria-label="Order administration"><a href="orders.html">All Orders</a><a href="custom-orders.html">Custom Orders</a><a href="coaster-orders.html">Coaster Only</a><a href="enclosure-orders.html">Enclosure Only</a></nav>
   </header>
 
   <section class="wo-auth ca-card" id="wo-auth"><label>Admin token <span><input id="wo-token" type="password" autocomplete="current-password"/><button class="ca-primary" id="wo-connect" type="button">Connect</button></span></label></section>
@@ -32,7 +32,7 @@
 
   <section class="wo-controls ca-card">
     <div><div class="ca-eyebrow">QUEUE VIEW</div><h2>What gets manufactured next</h2></div>
-    <div class="wo-control-row"><label>Show<select id="wo-filter"><option value="ACTIVE">Active manufacturing</option><option value="ALL">All work orders</option><option value="COASTER">Coasters</option><option value="ENCLOSURE">Enclosures</option><option value="PAUSED">Paused</option><option value="COMPLETED">Completed</option></select></label><label>Search<input id="wo-search" type="search" placeholder="Order or customer"/></label><button class="ca-secondary" id="wo-refresh" type="button">Reload</button></div>
+    <div class="wo-control-row"><label>Show<select id="wo-filter"><option value="ACTIVE">Active manufacturing</option><option value="ALL">All work orders</option><option value="COASTER">Coasters</option><option value="ENCLOSURE">Enclosures</option><option value="CUSTOM">Custom Orders</option><option value="PAUSED">Paused</option><option value="COMPLETED">Completed</option></select></label><label>Search<input id="wo-search" type="search" placeholder="Order or customer"/></label><button class="ca-secondary" id="wo-refresh" type="button">Reload</button></div>
   </section>
 
   <div class="wo-message ca-inline-message" id="wo-message" hidden role="status"></div>
@@ -44,5 +44,5 @@
     <p>Default capacity assumes two K2 printers with 20 productive hours each per day. The calculation adds handling time, skips weekends, and never changes a customer-approved promised window.</p>
   </details>
 </main><div id="site-footer"></div></div>
-<script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script><script src="../js/work-orders.js?v=20260905-1"></script>
+<script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script><script src="../js/work-orders.js?v=20260912-custom1"></script>
 </body></html>

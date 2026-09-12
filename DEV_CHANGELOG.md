@@ -2,6 +2,24 @@
 
 This file records accepted Dev checkpoints and the recovery point created before each complex workflow change. Production remains separate until a Dev version is explicitly accepted and promoted.
 
+## 2026-09-12 — Customers and direct custom orders
+
+- Verified recovery baseline: `WestTechHA-Dev-Command-Display-Sensor-Options-2026-09-06(2).zip`.
+- Recovery baseline SHA-256: `5c12488e2c3a37ed44a5cfb3644e0520135b1892498495de3b8f3d8d08fefc49`.
+- Baseline verification: all 610 packaged files match both GitHub `main` and `coasters-v30-preview` at commit `626600002a8094e8ea286dddb95f0f0cec1f5120`.
+- Admin scope: add reusable customer records and a Customers & Custom Orders workspace. WestTech controls line items, taxable flags, quantities, unit prices, special-pricing discounts, shipping, fulfillment, payment-required status, customer terms, internal notes, printer time, production window, and tracking.
+- Repeat work: any prior custom order can create a new editable draft without changing or deleting the original order.
+- Customer scope: each sent order receives a private, expiring review link. The customer can approve the exact version or request changes; customer-facing terms lock after approval.
+- Payment: approval automatically creates PayPal Checkout when payment is required. Deliberate no-charge orders bypass PayPal only after customer approval and are clearly recorded as `NOT_REQUIRED`.
+- Colorado tax: taxable and non-taxable line items are supported. Discounts are allocated proportionally for the taxable base. Colorado destination tax uses the PayPal-confirmed shipping address, or the locked WestTech pickup address, and capture is blocked until the customer confirms the calculated address and total.
+- Manufacturing: paid and deliberately released custom orders join the existing shared FIFO as source type `CUSTOM`; existing coaster and enclosure queue rows retain their queue timestamps and printer state.
+- Lifecycle: custom orders use forward-only production and fulfillment status changes, then Completion, Archive, and Restore. There is no destructive delete action.
+- Database impact: migration `017_custom_customers_and_orders.sql` adds customer, custom-order, event, and work-log tables, and rebuilds only the shared work-order CHECK constraint to admit `CUSTOM` while copying existing rows unchanged.
+- Verification: full migration sequence, migration row preservation, JavaScript syntax and module imports, customer/order creation, mixed-taxability pricing, discounts, repeatable locking rules, no-charge release, mocked PayPal create/capture, out-of-state tax handling, Colorado confirmation gate, and FIFO integration passed locally.
+- External impact at package time: Production and live D1 remain untouched. Apply migration 017 to Preview D1 before updating the Preview branch because the unified Orders workspace now reads custom orders.
+
+Rollback boundary: source can return to commit `626600002a8094e8ea286dddb95f0f0cec1f5120`. If migration 017 has been applied, leave the new tables and expanded shared-work CHECK in place during a source rollback; existing coaster/enclosure behavior and rows remain compatible. Export Preview D1 immediately before applying migration 017.
+
 ## 2026-09-06 — Command display and sensor options
 
 - Pre-change source package: `WestTechHA-Dev-Loaded-Component-Selector-2026-09-06.zip`
