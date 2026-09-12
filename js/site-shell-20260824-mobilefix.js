@@ -5,14 +5,7 @@
   // Nested sections can set data-site-root on <html> (for example ../ from /coasters/).
   const siteRoot = document.documentElement.dataset.siteRoot || '';
   const siteSection = document.documentElement.dataset.siteSection || '';
-  function cleanRoute(href) {
-    const value = String(href || '');
-    const clean = value
-      .replace(/index\.html(?=([?#]|$))/i, '')
-      .replace(/\.html(?=([?#]|$))/i, '');
-    return clean || './';
-  }
-  const siteHref = (href) => `${siteRoot}${cleanRoute(href)}`;
+  const siteHref = (href) => `${siteRoot}${href}`;
 
   const primaryLinks = [
     { href: 'index.html',    label: 'Home' },
