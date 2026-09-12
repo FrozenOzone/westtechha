@@ -75,9 +75,9 @@
   function itemSummary(order){if(order.sourceType==='COASTER')return `${Number(order.setCount||1)} × ${Number(order.setSize||4)}-coaster set`;if(order.sourceType==='CUSTOM')return order.title||'Custom WestTech order';return `${Number(order.quantity||1)} × ${order.model} ${order.boardVariant}-pin ${order.offerType}`;}
   function manufacturingLine(order){const work=workFor(order);if(!work)return '<span class="uo-manufacturing muted">Not released to manufacturing</span>';if(work.isPaused)return `<span class="uo-manufacturing">Paused • ${esc(hours(work.remainingPrinterMinutes))} left</span>`;if(['COMPLETED','ARCHIVED'].includes(String(work.status||'')))return '<span class="uo-manufacturing muted">Manufacturing complete</span>';return `<span class="uo-manufacturing">FIFO #${esc(work.queuePosition||'—')} • ${esc(hours(work.remainingPrinterMinutes))} left</span>`;}
 
-  function cardHtml(order){
+  function cardHtml(order,isFirst=false){
     const work=workFor(order),image=order.sourceType==='ENCLOSURE'?`<img src="${esc(enclosureImage(order))}" alt=""/>`:`<span class="uo-thumb-fallback">${order.sourceType==='CUSTOM'?'CUSTOM':'DESIGN'}</span>`;
-    return `<button class="uo-order-card${selectedKey===keyFor(order)?' active':''}" type="button" data-key="${esc(keyFor(order))}" data-source="${esc(order.sourceType)}"><span class="uo-thumb" data-thumb="${esc(keyFor(order))}">${image}</span><span class="uo-card-copy"><span class="uo-card-top"><b class="uo-source">${esc(order.sourceType)}</b><time class="uo-request-date">${esc(formatDate(order.createdAt))}</time></span><strong>${esc(order.orderId)}</strong><span>${esc(order.customerName)}</span><span>${esc(itemSummary(order))}</span><span class="uo-next">Next: ${esc(nextAction(order))}</span>${manufacturingLine(order)}</span></button>`;
+    return `<button class="uo-order-card${selectedKey===keyFor(order)?' active':''}${isFirst?' fifo-first':''}" type="button" data-key="${esc(keyFor(order))}" data-source="${esc(order.sourceType)}"><span class="uo-thumb" data-thumb="${esc(keyFor(order))}">${image}</span><span class="uo-card-copy"><span class="uo-card-top"><span><b class="uo-source">${esc(order.sourceType)}</b>${isFirst?'<b class="uo-fifo-badge">FIRST IN</b>':''}</span><time class="uo-request-date">${esc(formatDate(order.createdAt))}</time></span><strong>${esc(order.orderId)}</strong><span>${esc(order.customerName)}</span><span>${esc(itemSummary(order))}</span><span class="uo-next">Next: ${esc(nextAction(order))}</span>${manufacturingLine(order)}</span></button>`;
   }
 
   function renderSummary(){
@@ -87,7 +87,8 @@
 
   function renderList(){
     const rows=filtered(),list=$('#uo-order-list');$('#uo-count').textContent=`${rows.length} order${rows.length===1?'':'s'}`;
-    list.innerHTML=rows.length?rows.map(cardHtml).join(''):'<div class="ca-empty">No WestTech orders match this view.</div>';
+    const firstActiveKey=keyFor(rows.find(active)||{});
+    list.innerHTML=rows.length?rows.map(order=>cardHtml(order,keyFor(order)===firstActiveKey)).join(''):'<div class="ca-empty">No WestTech orders match this view.</div>';
     list.querySelectorAll('[data-key]').forEach(button=>button.addEventListener('click',()=>selectOrder(button.dataset.key)));
     loadCoasterThumbnails(rows.filter(order=>order.sourceType==='COASTER'));
   }

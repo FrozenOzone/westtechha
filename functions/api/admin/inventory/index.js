@@ -1,19 +1,9 @@
 import { getInventoryDb } from "../../../_lib/inventory.js";
+import { requireWestTechAdmin } from "../../../_lib/admin-auth.js";
 import { jsonResponse, sanitizeEnvValue } from "../../../_lib/shared.js";
 
 function requireAdmin(context) {
-  const expected = sanitizeEnvValue(context.env.WESTTECH_ADMIN_TOKEN);
-  const header = sanitizeEnvValue(context.request.headers.get("Authorization"));
-  const provided = header.toLowerCase().startsWith("bearer ") ? header.slice(7).trim() : "";
-
-  if (!expected) {
-    throw new Error("Missing WESTTECH_ADMIN_TOKEN secret.");
-  }
-  if (!provided || provided !== expected) {
-    const error = new Error("Unauthorized inventory request.");
-    error.status = 401;
-    throw error;
-  }
+  return requireWestTechAdmin(context);
 }
 
 async function listInventory(db) {
