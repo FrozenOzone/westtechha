@@ -15,7 +15,7 @@
 </style>
 </head>
 <body class="coaster-page custom-coasters-page">
-<div class="page"><div id="site-header"></div>
+<div class="page"><div id="site-header"></div><script src="../js/site-shell-20260824-mobilefix.js"></script>
 <main class="cpt-wrap">
 <div class="cpt-head"><div><div class="ca-eyebrow">WESTTECH • PREVIEW TEST TOOL</div><h1>Payment <em>Bypass.</em></h1><p>Simulate payment so the shipping workflow can be tested without calling PayPal.</p></div><div class="ca-mode live">PREVIEW ONLY</div></div>
 <div class="cpt-warning"><strong>No money moves here.</strong> This tool is hard-blocked outside the coaster preview host. A simulated paid shipping order receives a clearly labeled test address and then enters the normal Production Queue workflow.</div>
@@ -24,7 +24,7 @@
 <div class="cpt-actions" style="margin:18px 0"><button class="ca-secondary" id="cpt-refresh" type="button">Reload Waiting Orders</button><a class="ca-secondary" href="coaster-orders.html">Back to Orders</a></div>
 <div class="cpt-list" id="cpt-list"><div class="cpt-empty">Loading…</div></div>
 </main><div id="site-footer"></div></div>
-<script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script>
+<script src="../js/theme.js"></script>
 <script>
 (function(){'use strict';
 const $=s=>document.querySelector(s);const allowed=location.hostname==='coasters-v30-preview.westtechha.pages.dev';let token=sessionStorage.getItem('westtechha-admin-token')||'';

@@ -185,5 +185,11 @@ ${items}
   function updateCartCount(){const count=cartTotalQuantity(readCartItems());document.querySelectorAll('[data-cart-count]').forEach(el=>{el.textContent=String(count);el.hidden=count<=0;el.setAttribute('aria-label',`${count} item${count===1?'':'s'} in cart`);});}
   window.WESTTECH_CART={read:readCartItems,write:writeCartItems,add:addCartItem,clear:clearCartItems,totalQuantity:cartTotalQuantity,updateCount:updateCartCount,storageKey:CART_STORAGE_KEY};
   updateCartCount();window.addEventListener('storage',event=>{if(event.key===CART_STORAGE_KEY)updateCartCount();});
-  const footerHost=document.getElementById('site-footer');if(footerHost)footerHost.innerHTML=footerHtml;
+  function finishShell(){
+    updateCartCount();
+    const footerHost=document.getElementById('site-footer');
+    if(footerHost&&!footerHost.hasChildNodes())footerHost.innerHTML=footerHtml;
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',finishShell,{once:true});
+  else finishShell();
 })();
