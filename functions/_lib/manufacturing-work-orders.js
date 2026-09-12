@@ -48,6 +48,7 @@ export async function estimateManufacturingWindow(env,candidateMinutes=0){
 
 export async function ensureManufacturingWorkOrder(env,typeValue,order,queuedAt=''){
   const db=requireOrdersDb(env),type=sourceType(typeValue),orderId=clean(order?.orderId,80);if(!orderId)throw makeError('The source order number is required.');
+  if(type==='CUSTOM'&&order?.productionRequired===false)return null;
   if(!['PAID','NOT_REQUIRED'].includes(String(order?.paymentStatus||'').toUpperCase()))return null;
   const estimated=integer(order?.estimatedPrinterMinutes,0,1000000)||fallbackMinutes(type,order),assignment=printer(order?.printerAssignment),when=clean(queuedAt||order?.paypalPaidAt||new Date().toISOString(),80);
   await db.prepare(`
@@ -64,6 +65,7 @@ export async function ensureManufacturingWorkOrder(env,typeValue,order,queuedAt=
 
 export async function syncManufacturingWorkOrder(env,typeValue,order){
   const db=requireOrdersDb(env),type=sourceType(typeValue),orderId=clean(order?.orderId,80);if(!orderId)return null;
+  if(type==='CUSTOM'&&order?.productionRequired===false)return null;
   let row=await db.prepare(`SELECT id FROM manufacturing_work_orders WHERE source_type=? AND source_order_id=?`).bind(type,orderId).first();
   if(!row&&['PAID','NOT_REQUIRED'].includes(String(order?.paymentStatus||'').toUpperCase())){await ensureManufacturingWorkOrder(env,type,order);row=await db.prepare(`SELECT id FROM manufacturing_work_orders WHERE source_type=? AND source_order_id=?`).bind(type,orderId).first();}
   if(!row)return null;
