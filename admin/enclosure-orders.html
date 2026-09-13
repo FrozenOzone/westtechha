@@ -15,6 +15,7 @@
   <link href="../css/enclosure-admin.css?v=20260906-loaded2" rel="stylesheet"/>
   <link href="../css/work-orders.css" rel="stylesheet"/>
   <link href="../css/admin-pane.css" rel="stylesheet"/>
+  <link href="../css/admin-production-fields.css?v=20260913-1" rel="stylesheet"/>
 </head>
 <body class="coaster-page custom-coasters-page enclosure-admin-page">
 <div class="page">
@@ -120,7 +121,7 @@
                 <div class="ca-field"><label for="ea-status">Order status</label><select id="ea-status"><option value="REQUEST_RECEIVED">Request Received</option><option value="UNDER_REVIEW">Under Review</option><option value="NEEDS_CUSTOMER_INFO">Needs Customer Info</option><option value="ON_HOLD">On Hold</option><option value="CHANGES_REQUESTED">Changes Requested</option></select></div>
                 <div class="ca-field"><label for="ea-printer-minutes">Estimated printer minutes</label><input id="ea-printer-minutes" type="number" min="0" max="100000" step="1" value="0"/></div>
                 <div class="ca-field"><label for="ea-printer">Printer assignment</label><select id="ea-printer"><option value="UNASSIGNED">Unassigned</option><option value="K2_1">K2 #1</option><option value="K2_2">K2 #2</option><option value="BOTH">Both K2s</option></select></div>
-                <div class="ca-field"><label for="ea-production-window">Estimated production / ship window</label><input id="ea-production-window" type="text" maxlength="160" placeholder="Calculated from the shared queue"/></div>
+                <div class="ca-field full wt-date-window" data-window-target="#ea-production-window"><span class="wt-date-window-title">Estimated production / ship window</span><div class="wt-date-window-inputs"><label>Date<input id="ea-production-window-start" data-window-start type="date"/></label><label>End date (optional)<input id="ea-production-window-end" data-window-end type="date"/></label></div><input id="ea-production-window" type="hidden"/><small class="wt-date-window-note" data-window-note>Choose a date or calculate a suggested range from the shared queue.</small></div>
                 <div class="ca-total ca-total-inline ea-total"><div><span>FINAL CUSTOMER PRICE</span></div><div><strong id="ea-total">$0.00</strong><small>Before destination tax</small></div></div>
               </div>
               <div class="mw-estimate-panel" data-manufacturing-estimate data-minutes-target="#ea-printer-minutes" data-window-target="#ea-production-window"><p data-estimate-result>Enter the expected printer minutes, then calculate a suggested customer window from the combined coaster + enclosure queue.</p><button class="ca-secondary" type="button" data-estimate-button>Calculate Shared Queue Window</button></div>
@@ -195,8 +196,9 @@
 <script src="../js/theme.js"></script>
 
 
-<script src="../js/enclosure-admin.js?v=20260906-loaded2"></script>
-<script src="../js/manufacturing-estimate.js?v=20260905-1"></script>
+<script src="../js/admin-production-fields.js?v=20260913-1"></script>
+<script src="../js/enclosure-admin.js?v=20260913-1"></script>
+<script src="../js/manufacturing-estimate.js?v=20260913-1"></script>
 <script src="../js/admin-pane-sync.js?v=20260905-1"></script>
 </body>
 </html>
