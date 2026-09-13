@@ -4,6 +4,9 @@
 /coasters/*
   Cache-Control: no-cache, must-revalidate
 
+/js/admin-access.js
+  Cache-Control: no-cache, must-revalidate
+
 /js/site-shell-20260824-mobilefix.js
   Cache-Control: no-cache, must-revalidate
 
