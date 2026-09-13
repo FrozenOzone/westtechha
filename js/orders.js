@@ -97,7 +97,7 @@
     await Promise.all(rows.map(async order=>{
       const key=keyFor(order),host=document.querySelector(`[data-thumb="${CSS.escape(key)}"]`);if(!host)return;
       if(imageUrls.has(key)){host.innerHTML=`<img src="${imageUrls.get(key)}" alt=""/>`;return;}
-      try{const response=await fetch(`/api/admin/coasters/orders/${encodeURIComponent(order.orderId)}/design`,{headers:headers()});if(!response.ok)throw new Error('missing');const svg=await response.text(),url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));imageUrls.set(key,url);if(host.isConnected)host.innerHTML=`<img src="${url}" alt=""/>`;}catch(error){if(host.isConnected)host.innerHTML='<span class="uo-thumb-fallback">DESIGN</span>';}
+      try{const response=await fetch(`/api/admin/coasters/orders/${encodeURIComponent(order.orderId)}/design`,{headers:headers()});if(!response.ok)throw new Error('missing');const svg=await response.text(),url=`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;imageUrls.set(key,url);if(host.isConnected)host.innerHTML=`<img src="${url}" alt=""/>`;}catch(error){if(host.isConnected)host.innerHTML='<span class="uo-thumb-fallback">DESIGN</span>';}
     }));
   }
 
