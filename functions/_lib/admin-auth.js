@@ -4,7 +4,9 @@ export function requireWestTechAdmin(context){
   const host=new URL(context.request.url).hostname.toLowerCase();
   const accessEmail=sanitizeEnvValue(context.request.headers.get('Cf-Access-Authenticated-User-Email')).toLowerCase();
   const accessAssertion=sanitizeEnvValue(context.request.headers.get('Cf-Access-Jwt-Assertion'));
-  if(host==='coasters-v30-preview.westtechha.pages.dev'&&accessEmail&&accessAssertion){
+  const accessHosts=new Set(['westtechha.com','www.westtechha.com']);
+  const accessEmails=new Set(['west.ed@gmail.com','ewest@westtechha.com']);
+  if(accessHosts.has(host)&&accessEmails.has(accessEmail)&&accessAssertion){
     return {authentication:'cloudflare-access',email:accessEmail};
   }
   const expected=sanitizeEnvValue(context.env.WESTTECH_ADMIN_TOKEN);
