@@ -13,6 +13,12 @@ export async function onRequest(context){
   if(branch === 'main' && host === PRODUCTION_PAGES_HOST && isAdminPath(requestUrl.pathname)){
     requestUrl.protocol = 'https:';
     requestUrl.hostname = CANONICAL_PRODUCTION_HOST;
+    if(requestUrl.pathname === '/admin')requestUrl.pathname = '/admin/login';
+    return Response.redirect(requestUrl.toString(), 302);
+  }
+
+  if(branch === 'main' && (host === CANONICAL_PRODUCTION_HOST || host === `www.${CANONICAL_PRODUCTION_HOST}`) && requestUrl.pathname === '/admin'){
+    requestUrl.pathname = '/admin/login';
     return Response.redirect(requestUrl.toString(), 302);
   }
 
