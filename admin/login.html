@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" data-site-root="../" data-site-section="enclosures">
+<head>
+  <meta charset="utf-8"/>
+  <title>Admin Login – WestTech Home Automation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="noindex,nofollow,noarchive"/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="../css/site-20260824-mobilefix.css" rel="stylesheet"/>
+  <link href="../css/coaster-admin.css?v=20260913-theme1" rel="stylesheet"/>
+  <link href="../css/coaster-order-theme.css" rel="stylesheet"/>
+  <link href="../css/coaster-theme-auto-admin.css" rel="stylesheet"/>
+  <link href="../css/coaster-theme-light-admin.css" rel="stylesheet"/>
+  <script src="../js/admin-access.js?v=20260913-login1"></script>
+  <style>
+    .admin-login-main{max-width:920px;margin:0 auto;padding:clamp(32px,6vw,72px) 24px 96px;min-height:55vh;display:grid;align-items:center}
+    .admin-login-card{border:1px solid rgba(93,169,239,.24);background:rgba(9,25,43,.78);border-radius:12px;padding:clamp(24px,4vw,44px);box-shadow:0 22px 60px rgba(0,0,0,.22)}
+    .admin-login-card h1{margin:.25rem 0 .5rem;font-size:clamp(2.2rem,5vw,4rem);line-height:.95}
+    .admin-login-card p{max-width:620px;color:#9fc7ee;font-size:1.05rem;line-height:1.6}
+    .admin-login-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+    .admin-login-note{margin-top:20px;color:#70a9dd;font-size:.9rem}
+  </style>
+</head>
+<body class="coaster-page custom-coasters-page">
+<div class="page">
+  <div id="site-header"></div><script src="../js/site-shell-20260824-mobilefix.js"></script>
+  <main class="admin-login-main">
+    <section class="admin-login-card">
+      <div class="ca-eyebrow">WESTTECH ADMIN</div>
+      <h1>Admin Login.</h1>
+      <p id="admin-login-copy">Cloudflare Access protects the WestTech admin area. After your approved WestTech account is verified, continue to the order dashboard.</p>
+      <div class="admin-login-actions">
+        <a class="ca-primary" href="orders.html">Open All Orders</a>
+        <a class="ca-secondary" href="custom-orders.html">Custom Orders</a>
+        <a class="ca-secondary" href="work-orders.html">Manufacturing Queue</a>
+      </div>
+      <div class="admin-login-note" id="admin-login-note">Production uses Cloudflare Access. Preview keeps the admin token prompt for testing.</div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+</div>
+<script src="../js/theme.js"></script>
+<script>
+(function(){
+  const productionHosts=new Set(['westtechha.com','www.westtechha.com']);
+  if(productionHosts.has(location.hostname.toLowerCase())){
+    sessionStorage.setItem('westtechha-admin-token','cloudflare-access');
+    document.getElementById('admin-login-note').textContent='Signed in through Cloudflare Access for this browser session.';
+  }
+})();
+</script>
+</body>
+</html>
