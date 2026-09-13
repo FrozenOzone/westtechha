@@ -43,7 +43,6 @@ export async function sendCoasterAdminProductionEmail(env,{order,requestUrl=''}=
     ['Order',order.orderId],['Customer',order.customerName||'—'],['Email',order.customerEmail||'—'],
     ['Production status','PRODUCTION QUEUE'],['Payment',paymentLine],['Fulfillment',fulfillment],
     ['Quantity',`${Math.max(1,Number(order.setCount||1))} × ${Math.max(1,Number(order.setSize||4))}-Coaster Set • ${Math.max(1,Number(order.totalCoasters||order.setSize||4))} coasters`],
-    ['Approved proof',`Version ${Math.max(1,Number(order.proofVersion||1))}`],
     ['PayPal capture',order.paypalCaptureId||order.paypalPaymentId||'(not applicable)']
   ];
   const rowHtml=rows.map(([label,value])=>`<tr><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-weight:700;color:#334155;vertical-align:top;">${esc(label)}</td><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;color:#0f172a;">${esc(value)}</td></tr>`).join('');

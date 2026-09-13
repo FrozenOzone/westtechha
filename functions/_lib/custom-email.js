@@ -18,19 +18,19 @@ function itemLines(order){return (order.lineItems||[]).map(item=>`${item.quantit
 function detailLines(order){const lines=[`Order: ${order.orderId}`,`Project: ${order.title}`,...itemLines(order),`Subtotal: ${money(order.subtotalAmount)}`];if(Number(order.discountAmount)>0)lines.push(`Discount / special pricing: −${money(order.discountAmount)}`);if(Number(order.shippingAmount)>0)lines.push(`Shipping: ${money(order.shippingAmount)}`);lines.push(`Approved subtotal before destination tax: ${money(order.finalAmount)}`,`Fulfillment: ${order.fulfillmentMethod==='LOCAL_PICKUP'?'Local Pickup':'Ship Order'}`);if(order.productionRequired===false)lines.push('Production: Already made — no production required');else if(order.productionWindow)lines.push(`Estimated production window: ${order.productionWindow}`);return lines;}
 function trackingUrl(carrier,number){const value=encodeURIComponent(clean(number,180)),name=clean(carrier,50).toUpperCase();if(!value)return '';if(name.includes('USPS'))return `https://tools.usps.com/go/TrackConfirmAction?tLabels=${value}`;if(name.includes('UPS'))return `https://www.ups.com/track?loc=en_US&tracknum=${value}`;if(name.includes('FEDEX'))return `https://www.fedex.com/fedextrack/?trknbr=${value}`;if(name.includes('DHL'))return `https://www.dhl.com/us-en/home/tracking.html?tracking-id=${value}`;return '';}
 function template(type,order,{approvalUrl=''}) {
-  const name=order.customerName||'there',version=Math.max(1,Number(order.orderVersion||1)),details=detailLines(order),alreadyMade=order.productionRequired===false;
+  const name=order.customerName||'there',details=detailLines(order),alreadyMade=order.productionRequired===false;
   let subject='',headline='',intro='',process='',action='',label='',url='';
   if(type==='CUSTOM_ORDER_READY'){
     subject=`Your WestTech custom order is ready to review — ${order.orderId}`;
     headline=`Your custom order is ready, ${name}.`;
-    intro=alreadyMade?`I’ve put together the order details and special pricing for your already-made item.`:`I’ve put together version ${version} of your custom WestTech order with the work, pricing, fulfillment method, and production estimate we discussed.`;
+    intro=alreadyMade?`I’ve put together the order details and special pricing for your already-made item.`:`I’ve put together your custom WestTech order with the work, pricing, fulfillment method, and production estimate we discussed.`;
     process='Please look everything over carefully. Once you approve it, the customer-facing terms become the locked reference for payment and fulfillment. If anything needs changing, use the change-request option instead of approving it.';
     action='Your next step is to review the order and either approve it or request a change. Nothing is charged until after approval.';
     label='Review Custom Order';url=approvalUrl;
   }else if(type==='CHANGES_REQUESTED'){
     subject=`I received your custom-order changes — ${order.orderId}`;
     headline=`Got it, ${name} — your changes are saved.`;
-    intro='I received the changes you requested, and the previous order version is no longer the active version.';
+    intro='I received the changes you requested, and the previous order details are no longer active.';
     process='I’ll review your notes, update the scope or pricing as needed, and send you a fresh private review link when it is ready.';
     action='There’s nothing else you need to do until the revised order arrives.';
     details.push(`Requested change: ${order.customerChangeRequest||'See your request'}`);

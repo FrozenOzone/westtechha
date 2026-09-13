@@ -59,10 +59,10 @@ function template(type,order,links={}){
   }else if(type==='CHANGES_REQUESTED'){
     subject=`I received your coaster changes — ${orderId}`;
     headline=`Got it, ${name} — your changes are saved.`;
-    intro='I received the changes you requested and the previous proof is no longer the active production version.';
+    intro='I received the changes you requested, and the previous proof will not be used for production.';
     process='I’ll review your notes, update the design as needed, and send you a fresh proof when it’s ready.';
     action='There’s nothing else you need to do until the updated proof arrives.';
-    details=[`Order: ${orderId}`,`Current proof version: ${Number(order?.proofVersion||1)}`];
+    details=[`Order: ${orderId}`];
   }else if(type==='PAYMENT_REQUIRED'){
     subject=`Design approved — one step left — ${orderId}`;
     headline=`Your design is approved, ${name}.`;

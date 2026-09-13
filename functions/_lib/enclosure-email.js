@@ -44,10 +44,10 @@ export async function sendEnclosureRequestEmails(env,{order,requestUrl=''}){
 }
 
 function customerTemplate(type,order,{approvalUrl='',siteUrl=''}){
-  const name=order.customerName||'there',item=summary(order),orderId=order.orderId,version=Math.max(1,Number(order.configurationVersion||1));
+  const name=order.customerName||'there',item=summary(order),orderId=order.orderId;
   let subject='',headline='',intro='',action='',label='',url='',lines=[`Order: ${orderId}`,`Configuration: ${item}`,...componentLines(order)];
   if(type==='CONFIGURATION_READY'){
-    subject=`Review your WestTech enclosure configuration — ${orderId}`;headline=`Your enclosure configuration is ready, ${name}.`;intro=`WestTech has reviewed your request and prepared configuration version ${version}, including the final subtotal, fulfillment method, and estimated production window.`;action='Please review and either approve the terms or request a change. No payment is collected until after approval.';label='Review Configuration & Terms';url=approvalUrl;lines.push(`Reviewed subtotal: ${money(order.finalAmount)}`,`Estimated production window: ${order.productionWindow}`);
+    subject=`Review your WestTech enclosure configuration — ${orderId}`;headline=`Your enclosure configuration is ready, ${name}.`;intro='WestTech has reviewed your request and prepared the configuration, including the final subtotal, fulfillment method, and estimated production window.';action='Please review and either approve the terms or request a change. No payment is collected until after approval.';label='Review Configuration & Terms';url=approvalUrl;lines.push(`Reviewed subtotal: ${money(order.finalAmount)}`,`Estimated production window: ${order.productionWindow}`);
   }else if(type==='CHANGES_REQUESTED'){
     subject=`We received your enclosure changes — ${orderId}`;headline=`Your requested changes are recorded, ${name}.`;intro='The current configuration is back with WestTech for review.';action='I’ll update the configuration, price, fulfillment details, or production window as needed and send you a fresh private review link.';lines.push(`Requested change: ${order.customerChangeRequest||'See your request'}`);
   }else if(type==='PAYMENT_REQUIRED'){
