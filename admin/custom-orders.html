@@ -7,11 +7,11 @@
   <meta name="robots" content="noindex,nofollow,noarchive"/>
   <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
   <link href="../css/site-20260824-mobilefix.css" rel="stylesheet"/>
-  <link href="../css/coaster-admin.css" rel="stylesheet"/>
+  <link href="../css/coaster-admin.css?v=20260913-2" rel="stylesheet"/>
   <link href="../css/coaster-order-theme.css" rel="stylesheet"/>
   <link href="../css/coaster-theme-auto-admin.css" rel="stylesheet"/>
   <link href="../css/coaster-theme-light-admin.css" rel="stylesheet"/>
-  <link href="../css/custom-orders.css?v=20260912-7" rel="stylesheet"/>
+  <link href="../css/custom-orders.css?v=20260913-2" rel="stylesheet"/>
   <link href="../css/admin-production-fields.css?v=20260913-1" rel="stylesheet"/>
 </head>
 <body class="coaster-page custom-coasters-page custom-orders-page">
@@ -68,10 +68,12 @@
 
         <section class="ca-card"><div class="ca-eyebrow">PRODUCTION + FULFILLMENT</div><label class="xo-check xo-ready-stock"><input id="xo-already-made" type="checkbox"/><span><strong>Already made — skip production queue</strong><small id="xo-production-mode-note">Use for finished inventory that should move directly to fulfillment after payment.</small></span></label><div class="xo-grid xo-grid-2"><label>Print-time preset<select id="xo-printer-preset"><option value="CUSTOM">Custom time</option><option value="650">4-coaster set — 10h 50m</option><option value="992">8-coaster set — 16h 32m</option><option class="wt-printer-placeholder" value="SCOUT" disabled>Scout — time placeholder</option><option class="wt-printer-placeholder" value="RANGER" disabled>Ranger — time placeholder</option><option class="wt-printer-placeholder" value="COMMAND" disabled>Command — time placeholder</option></select></label><label>Printer assignment<select id="xo-printer"><option value="UNASSIGNED">Unassigned</option><option value="K2_1">K2 #1</option><option value="K2_2">K2 #2</option><option value="BOTH">Both K2s</option></select></label><label class="wt-printer-minutes">Estimated printer minutes<input id="xo-printer-minutes" type="number" min="1" max="1000000" step="1" value="360"/></label><div class="xo-span-2 wt-date-window" data-window-target="#xo-window"><span class="wt-date-window-title">Estimated production window</span><div class="wt-date-window-inputs"><label>Date<input id="xo-window-start" data-window-start type="date"/></label><label>End date (optional)<input id="xo-window-end" data-window-end type="date"/></label></div><input id="xo-window" type="hidden"/><small class="wt-date-window-note" data-window-note>Choose a date. Add an optional end date only when you need a range.</small></div><label>Tracking carrier<select id="xo-carrier"><option value="">Not assigned</option><option value="USPS">USPS</option><option value="UPS">UPS</option><option value="FedEx">FedEx</option><option value="DHL">DHL</option></select></label><label>Tracking number<input id="xo-tracking" maxlength="180"/></label></div></section>
 
+        <section class="ca-card xo-history-card"><div class="ca-card-head"><div><span>ORDER HISTORY</span><strong>What has happened</strong></div><small>Newest activity first</small></div><div class="ca-timeline" id="xo-events"></div></section>
+
         <section class="xo-footer-actions ca-card"><div class="xo-footer-status"><label class="xo-workflow-field"><span id="xo-status-label">Internal workflow status</span><select id="xo-status"></select><small id="xo-status-help">Internal draft stage. This is not shown to the customer.</small></label><div class="xo-payment-summary"><span>Payment</span><strong id="xo-payment-state">Not requested</strong></div><div class="ca-inline-message xo-message xo-order-message" id="xo-order-message" role="status" aria-live="polite" hidden></div></div><div><button class="ca-secondary" id="xo-sync-paypal" type="button" hidden>Sync PayPal</button><button class="ca-secondary" id="xo-archive" type="button" hidden>Archive</button><button class="ca-secondary" id="xo-restore" type="button" hidden>Restore</button><button class="ca-primary" id="xo-save" type="submit">Save Order</button><button class="ca-primary" id="xo-send" type="button">Send to Customer</button></div></section>
       </form>
     </section>
   </section>
 </main><div id="site-footer"></div></div>
-<script src="../js/theme.js"></script><script src="../js/admin-production-fields.js?v=20260913-1"></script><script src="../js/custom-orders-admin.js?v=20260913-1"></script>
+<script src="../js/theme.js"></script><script src="../js/admin-production-fields.js?v=20260913-1"></script><script src="../js/custom-orders-admin.js?v=20260913-2"></script>
 </body></html>
