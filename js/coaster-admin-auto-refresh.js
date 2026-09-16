@@ -234,6 +234,7 @@
     if(status==='PREPARING_TO_SHIP')return 'Manufacturing is complete. Inspect, clean up, organize, and package the order before marking it Shipped.';
     return '';
   }
+  function shipmentDetailsLocked(status){return ['SHIPPED','COMPLETED'].includes(String(status||'').toUpperCase());}
 
   function applyExtendedView(order){
     const currentStatus=String(order?.status||'').toUpperCase();
@@ -282,8 +283,10 @@
       if($('#ca-prod-delivery-secondary'))$('#ca-prod-delivery-secondary').textContent=address?`${address} • ${stageHelp(currentStatus,false)}`:stageHelp(currentStatus,false)||'Shipping address is missing from this order.';
       if(tracking)tracking.hidden=false;delivery?.classList.toggle('missing',!address);
     }
-    if($('#ca-tracking-carrier')&&document.activeElement!==$('#ca-tracking-carrier'))setCarrierValue(order.trackingCarrier||'');
-    if($('#ca-tracking-number')&&document.activeElement!==$('#ca-tracking-number'))$('#ca-tracking-number').value=order.trackingNumber||'';
+    const shipmentLocked=shipmentDetailsLocked(currentStatus),carrier=ensureCarrierControl(),trackingNumber=$('#ca-tracking-number');
+    if(carrier){if(document.activeElement!==carrier)setCarrierValue(order.trackingCarrier||'');carrier.disabled=shipmentLocked;carrier.title=shipmentLocked?'Locked after shipment.':'';}
+    if(trackingNumber){if(document.activeElement!==trackingNumber)trackingNumber.value=order.trackingNumber||'';trackingNumber.disabled=shipmentLocked;trackingNumber.title=shipmentLocked?'Locked after shipment.':'';}
+    const carrierNote=carrier?.closest('.ca-field')?.querySelector('.ca-carrier-note');if(carrierNote)carrierNote.textContent=shipmentLocked?'Carrier and tracking number are locked after shipment.':'USPS, UPS, FedEx, and DHL create the customer tracking link automatically.';
     if($('#ca-production-notes')&&document.activeElement!==$('#ca-production-notes'))$('#ca-production-notes').value=order.adminNotes||'';
 
     if($('#ca-proof-eyebrow'))$('#ca-proof-eyebrow').textContent='APPROVED ORDER TERMS';

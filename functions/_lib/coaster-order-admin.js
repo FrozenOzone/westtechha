@@ -55,9 +55,12 @@ export async function updateCoasterOrderAdmin(env,orderId,payload={}){
     if(status==='READY_FOR_PICKUP'&&order.fulfillmentMethod!=='LOCAL_PICKUP')throw makeError('Ready for Pickup is only valid for Local Pickup orders.');
     if(status==='PREPARING_TO_SHIP'&&order.fulfillmentMethod!=='SHIP')throw makeError('Preparing to Ship is only valid for shipped orders.');
     if(status==='SHIPPED'&&order.fulfillmentMethod!=='SHIP')throw makeError('Shipped is only valid for shipped orders.');
+    const currentStatus=String(order.status||'').toUpperCase(),shipmentLocked=['SHIPPED','COMPLETED'].includes(currentStatus),requestedCarrier=clean(payload.trackingCarrier,100),requestedTracking=clean(payload.trackingNumber,180);
+    if(shipmentLocked&&(requestedCarrier!==clean(order.trackingCarrier,100)||requestedTracking!==clean(order.trackingNumber,180)))throw makeError('Carrier and tracking number are locked after the order is shipped.',409);
+    const trackingCarrier=shipmentLocked?clean(order.trackingCarrier,100):requestedCarrier,trackingNumber=shipmentLocked?clean(order.trackingNumber,180):requestedTracking;
     const now=nowIso();
-    await db.prepare(`UPDATE coaster_orders SET status=?,admin_notes=?,tracking_carrier=?,tracking_number=?,pickup_ready_at=CASE WHEN ?='READY_FOR_PICKUP' THEN COALESCE(pickup_ready_at,?) ELSE pickup_ready_at END,shipped_at=CASE WHEN ?='SHIPPED' THEN COALESCE(shipped_at,?) ELSE shipped_at END,completed_at=CASE WHEN ?='COMPLETED' THEN COALESCE(completed_at,?) ELSE completed_at END,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(status,clean(payload.adminNotes,4000),clean(payload.trackingCarrier,100),clean(payload.trackingNumber,180),status,now,status,now,status,now,order.orderId).run();
-    await logEvent(db,order.orderId,'PRODUCTION_UPDATED',{status,trackingCarrier:clean(payload.trackingCarrier,100),trackingNumber:clean(payload.trackingNumber,180),previousStatus:order.status});
+    await db.prepare(`UPDATE coaster_orders SET status=?,admin_notes=?,tracking_carrier=?,tracking_number=?,pickup_ready_at=CASE WHEN ?='READY_FOR_PICKUP' THEN COALESCE(pickup_ready_at,?) ELSE pickup_ready_at END,shipped_at=CASE WHEN ?='SHIPPED' THEN COALESCE(shipped_at,?) ELSE shipped_at END,completed_at=CASE WHEN ?='COMPLETED' THEN COALESCE(completed_at,?) ELSE completed_at END,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(status,clean(payload.adminNotes,4000),trackingCarrier,trackingNumber,status,now,status,now,status,now,order.orderId).run();
+    await logEvent(db,order.orderId,'PRODUCTION_UPDATED',{status,trackingCarrier,trackingNumber,previousStatus:order.status});
     const updated=await getCoasterOrderDetail(env,order.orderId);await syncManufacturingWorkOrder(env,'COASTER',updated);updated._statusChanged=order.status!==status;return updated;
   }
   if(frozen){
