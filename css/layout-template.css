@@ -245,7 +245,12 @@ body.wt-admin-template .xo-customer-manager {
     grid-template-columns: auto auto auto;
     align-items: center;
     justify-content: space-between;
-    gap: 36px;
+    gap: 28px;
+  }
+
+  body.wt-public-template .nav-logo-full,
+  body.wt-admin-template .nav-logo-full {
+    width: min(26vw, 480px);
   }
 
   body.wt-public-template .nav-menu,
