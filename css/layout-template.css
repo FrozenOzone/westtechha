@@ -4,11 +4,18 @@
 html.wt-layout-template {
   --wt-header-canvas: 1680px;
   --wt-public-canvas: 2300px;
+  --wt-feature-canvas: 2100px;
+  --wt-form-canvas: 1900px;
   --wt-admin-canvas: 2380px;
   --wt-public-inline-space: clamp(32px, 6vw, 144px);
   --wt-admin-inline-space: clamp(22px, 3vw, 72px);
   --wt-template-control-height: 48px;
   font-size: clamp(16px, calc(14px + .28vw), 18px);
+}
+
+/* Standard public pages share the same wide canvas through the existing token. */
+html.wt-layout-template {
+  --maxw: var(--wt-public-canvas);
 }
 
 body.wt-public-template .footer-shell,
@@ -110,6 +117,73 @@ body.wt-admin-template .footer-shell {
 body.wt-admin-template .xo-main {
   width: min(var(--wt-admin-canvas), calc(100% - var(--wt-admin-inline-space)));
   margin-top: clamp(22px, 2vw, 38px);
+}
+
+body.wt-admin-template .ca-main,
+body.wt-admin-template .uo-main,
+body.wt-admin-template .wo-main {
+  width: min(var(--wt-admin-canvas), calc(100% - var(--wt-admin-inline-space)));
+}
+
+body.wt-admin-template .cpt-wrap {
+  width: min(var(--wt-form-canvas), calc(100% - var(--wt-admin-inline-space)));
+  margin-inline: auto;
+}
+
+body.wt-admin-template .admin-login-main {
+  width: min(1200px, calc(100% - var(--wt-admin-inline-space)));
+  margin-inline: auto;
+}
+
+body.wt-admin-template :is(.ca-main, .uo-main, .wo-main, .cpt-wrap, .admin-login-main)
+  :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  min-height: 44px;
+  font-size: .88rem;
+}
+
+body.wt-admin-template :is(.ca-main, .uo-main, .wo-main, .cpt-wrap, .admin-login-main) label {
+  font-size: .78rem;
+  line-height: 1.35;
+}
+
+body.wt-admin-template :is(.ca-main, .uo-main, .wo-main, .cpt-wrap, .admin-login-main) small {
+  font-size: .7rem;
+  line-height: 1.45;
+}
+
+/* Product and builder pages keep their visual character while using the screen. */
+body.wt-public-template :is(
+  .coaster-subnav,
+  .coaster-hero,
+  .made-section,
+  .collection-grid,
+  .house-showcase,
+  .custom-band,
+  .holders-section,
+  .coaster-final-cta,
+  .hd-hero,
+  .hd-builder-shell,
+  .hd-info-grid,
+  .hd-how,
+  .hd-overview-support,
+  .st-hero
+) {
+  width: min(var(--wt-feature-canvas), calc(100% - var(--wt-public-inline-space)));
+}
+
+body.wt-public-template :is(
+  .cb-back,
+  .cb-builder,
+  .st-builder,
+  .st-builder-page-back-wrap,
+  .hd-builder-page-intro,
+  .hd-builder-integrated-shell,
+  .hd-builder-page-footer-note,
+  .hd-builder-page-back-wrap,
+  .eo-main,
+  .cap-main
+) {
+  width: min(var(--wt-form-canvas), calc(100% - var(--wt-public-inline-space)));
 }
 
 body.wt-admin-template .xo-topbar h1 {
