@@ -1,5 +1,6 @@
 import { requireOrdersDb } from '../../../_lib/orders.js';
 import { clean, logCustomEvent } from '../../../_lib/custom-orders.js';
+import { sendCustomAdminDeliveryFailureEmail } from '../../../_lib/custom-email.js';
 import { jsonResponse } from '../../../_lib/shared.js';
 
 const EVENT_CONFIG={
@@ -41,7 +42,7 @@ export async function onRequestPost(context){
   const db=requireOrdersDb(context.env),receivedAt=clean(payload?.created_at||payload?.data?.created_at,60)||new Date().toISOString();
   const inserted=await db.prepare(`INSERT OR IGNORE INTO custom_order_email_webhook_events (webhook_id,provider_email_id,event_type,received_at) VALUES (?,?,?,?)`).bind(webhookId,providerEmailId,type,receivedAt).run();
   if(Number(inserted?.meta?.changes||0)===0)return jsonResponse({ok:true,duplicate:true});
-  const receipt=await db.prepare(`SELECT id,order_id,email_type,recipient,status FROM custom_order_email_receipts WHERE provider_email_id=? LIMIT 1`).bind(providerEmailId).first();
+  const receipt=await db.prepare(`SELECT id,order_id,email_type,audience,recipient,status FROM custom_order_email_receipts WHERE provider_email_id=? LIMIT 1`).bind(providerEmailId).first();
   if(!receipt)return jsonResponse({ok:true,unmatched:true});
   const failure=eventError(payload?.data);
   const terminal=new Set(['BOUNCED','COMPLAINED','FAILED']);
@@ -50,6 +51,7 @@ export async function onRequestPost(context){
   if(type==='email.delivery_delayed'&&!['SENDING','SENT','DELIVERY_DELAYED'].includes(String(receipt.status||'').toUpperCase()))nextStatus=receipt.status;
   await db.prepare(`UPDATE custom_order_email_receipts SET status=?,${config.column}=COALESCE(${config.column},?),last_event_at=?,last_error=CASE WHEN ?<>'' THEN ? ELSE last_error END,updated_at=CURRENT_TIMESTAMP WHERE id=?`).bind(nextStatus,receivedAt,receivedAt,failure,failure,receipt.id).run();
   await logCustomEvent(db,receipt.order_id,config.eventType,{emailType:receipt.email_type,to:receipt.recipient,provider:'RESEND',providerId:providerEmailId,status:nextStatus,message:failure||undefined});
+  if(receipt.audience==='CUSTOMER'&&terminal.has(nextStatus))await sendCustomAdminDeliveryFailureEmail(context.env,{orderId:receipt.order_id,recipient:receipt.recipient,emailType:receipt.email_type,message:failure,providerEmailId,requestUrl:context.request.url}).catch(()=>{});
   return jsonResponse({ok:true});
 }
 
