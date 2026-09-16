@@ -239,6 +239,37 @@ body.wt-admin-template .xo-customer-manager {
   }
 }
 
+@media (min-width: 1700px) {
+  body.wt-public-template .nav-stack,
+  body.wt-admin-template .nav-stack {
+    grid-template-columns: auto auto auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 36px;
+  }
+
+  body.wt-public-template .nav-menu,
+  body.wt-admin-template .nav-menu {
+    display: contents;
+  }
+
+  body.wt-public-template .badge-nav,
+  body.wt-admin-template .badge-nav {
+    grid-column: 2;
+    justify-self: center;
+    align-self: center;
+    margin: 0;
+  }
+
+  body.wt-public-template .nav-primary,
+  body.wt-admin-template .nav-primary {
+    grid-column: 3;
+    justify-self: end;
+    justify-content: flex-end;
+    align-items: center;
+  }
+}
+
 @media (min-width: 1900px) {
   body.wt-admin-template .xo-grid-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
