@@ -1,5 +1,5 @@
 import { requireOrdersDb } from './orders.js';
-import { ART_TYPES, bool, clean, integer, jsonDetail, makeError, requireArtworkBucket, safeFilename, sanitizeSvgSnapshot, utcDate } from './coaster-order-util.js';
+import { ART_TYPES, bool, clean, coasterSetDefaults, integer, jsonDetail, makeError, requireArtworkBucket, safeFilename, sanitizeSvgSnapshot, utcDate } from './coaster-order-util.js';
 
 async function allocateOrderId(db){
   const date=utcDate();
@@ -38,14 +38,14 @@ export async function createCoasterOrder(env,form){
   if(Number(artwork.size||0)<=0||Number(artwork.size)>10*1024*1024)throw makeError('Artwork must be 10 MB or smaller.');
   const customerName=clean(form.get('customerName'),120),customerEmail=clean(form.get('customerEmail'),254).toLowerCase();if(customerName.length<2)throw makeError('Enter your name.');if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail))throw makeError('Enter a valid email address.');
   if(!bool(form.get('rightsConfirmed')))throw makeError('Artwork ownership or permission must be confirmed.');
-  const setSize=integer(form.get('setSize'),0,8);if(![4,8].includes(setSize))throw makeError('Choose a 4- or 8-coaster set.');
+  const setSize=integer(form.get('setSize'),0,8);if(![4,8].includes(setSize))throw makeError('Choose a 4- or 8-coaster set.');const defaults=coasterSetDefaults(setSize,1);
   const snapshot=sanitizeSvgSnapshot(form.get('designSnapshot'));
   const {orderId,orderDate,dailySequence}=await allocateOrderId(db);
   const filename=safeFilename(artwork.name,'customer-artwork'),key=`coasters/${orderId}/artwork/${crypto.randomUUID()}-${filename}`,designKey=`coasters/${orderId}/design/submitted-design.svg`;
   try{
     await bucket.put(key,await artwork.arrayBuffer(),{httpMetadata:{contentType},customMetadata:{orderId,kind:'customer-artwork',originalFilename:filename}});
     await bucket.put(designKey,new TextEncoder().encode(snapshot),{httpMetadata:{contentType:'image/svg+xml'},customMetadata:{orderId,kind:'submitted-design'}});
-    await db.prepare(`INSERT INTO coaster_orders (order_id,order_date,daily_sequence,status,customer_name,customer_email,customer_phone,set_size,set_count,total_coasters,top_text,bottom_text,field_color,accent_color,ring_color,text_color,customer_notes,rights_confirmed,artwork_filename,artwork_content_type,artwork_size_bytes,artwork_object_key,design_snapshot_object_key) VALUES (?,?,?,'DESIGN_REVIEW',?,?,?,?,1,?,?,?,?,?,?,?,?,1,?,?,?,?,?)`).bind(orderId,orderDate,dailySequence,customerName,customerEmail,clean(form.get('customerPhone'),60),setSize,setSize,clean(form.get('topText'),80),clean(form.get('bottomText'),80),clean(form.get('fieldColor'),40),clean(form.get('accentColor'),40),clean(form.get('ringColor'),40),clean(form.get('textColor'),40),clean(form.get('notes'),2000),filename,contentType,Number(artwork.size||0),key,designKey).run();
+    await db.prepare(`INSERT INTO coaster_orders (order_id,order_date,daily_sequence,status,customer_name,customer_email,customer_phone,set_size,set_count,total_coasters,base_price,final_amount,estimated_printer_minutes,top_text,bottom_text,field_color,accent_color,ring_color,text_color,customer_notes,rights_confirmed,artwork_filename,artwork_content_type,artwork_size_bytes,artwork_object_key,design_snapshot_object_key) VALUES (?,?,?,'DESIGN_REVIEW',?,?,?,?,1,?,?,?,?,?,?,?,?,?,?,?,1,?,?,?,?,?)`).bind(orderId,orderDate,dailySequence,customerName,customerEmail,clean(form.get('customerPhone'),60),setSize,setSize,defaults.basePrice,defaults.basePrice,defaults.printerMinutes,clean(form.get('topText'),80),clean(form.get('bottomText'),80),clean(form.get('fieldColor'),40),clean(form.get('accentColor'),40),clean(form.get('ringColor'),40),clean(form.get('textColor'),40),clean(form.get('notes'),2000),filename,contentType,Number(artwork.size||0),key,designKey).run();
     await logEvent(db,orderId,'REQUEST_SUBMITTED',{status:'DESIGN_REVIEW',totalCoasters:setSize,artworkFilename:filename});
   }catch(error){try{await bucket.delete(key);await bucket.delete(designKey);}catch(e){}throw error;}
   return getCoasterOrderDetail(env,orderId);

@@ -148,7 +148,7 @@
           <section class="ca-card ca-commercial-card" id="ca-review-commercial">
             <div class="ca-card-head"><div><span>WESTTECH CONTROL</span><strong>Pricing + order terms</strong></div><small id="ca-commercial-lock">Customer cannot edit these</small></div>
             <div class="ca-fields ca-fields-three">
-              <div class="ca-field"><label for="ca-base-price">Base price per set</label><div class="ca-money"><input id="ca-base-price" type="number" min="0" step="0.01" value="0.00"/></div></div>
+              <div class="ca-field"><label for="ca-base-price">Starting price per set</label><div class="ca-money"><input id="ca-base-price" type="number" min="0" step="0.01" value="0.00"/></div><small id="ca-base-price-note">Standard set price is filled automatically and remains editable.</small></div>
               <div class="ca-field"><label for="ca-art-charge">Artwork / design charge</label><div class="ca-money"><input id="ca-art-charge" type="number" min="0" step="0.01" value="0.00"/></div></div>
               <div class="ca-field"><label for="ca-billable-work">Billable work logged</label><div class="ca-money"><input id="ca-billable-work" type="number" value="0.00" readonly aria-readonly="true"/></div><small>Calculated from the Work Log below.</small></div>
               <div class="ca-field"><label for="ca-other-charge">Other charge</label><div class="ca-money"><input id="ca-other-charge" type="number" min="0" step="0.01" value="0.00"/></div></div>
@@ -157,7 +157,7 @@
               <div class="ca-field"><label for="ca-set-count">Number of sets</label><input id="ca-set-count" type="number" min="1" max="125" step="1" value="1"/></div>
               <div class="ca-field"><label for="ca-total-coasters">Total coasters</label><input id="ca-total-coasters" type="number" value="4" readonly aria-readonly="true"/></div>
               <div class="ca-field"><label for="ca-status">Order status</label><select id="ca-status"><option value="DESIGN_REVIEW">Design Review</option><option value="PROOF_READY">Proof Ready</option><option value="PROOF_SENT">Proof Sent</option><option value="CHANGES_REQUESTED">Changes Requested</option><option value="PROOF_APPROVED">Proof Approved</option><option value="AWAITING_PAYMENT">Awaiting Payment</option><option value="IN_PRODUCTION">In Production</option><option value="READY_FOR_PICKUP">Ready for Pickup</option><option value="SHIPPED">Shipped</option><option value="COMPLETED">Completed</option><option value="CANCELLED">Cancelled</option></select></div>
-              <div class="ca-field"><label for="ca-printer-minutes">Estimated printer minutes</label><input id="ca-printer-minutes" type="number" min="0" max="1000000" step="1" value="0"/></div>
+              <div class="ca-field"><label for="ca-printer-minutes">Estimated printer minutes</label><input id="ca-printer-minutes" type="number" min="0" max="1000000" step="1" value="0"/><small id="ca-printer-minutes-note">Standard total is filled automatically and remains editable.</small></div>
               <div class="ca-field"><label for="ca-printer-assignment">Printer assignment</label><select id="ca-printer-assignment"><option value="UNASSIGNED">Unassigned</option><option value="K2_1">K2 #1</option><option value="K2_2">K2 #2</option><option value="BOTH">Both K2s</option></select></div>
               <div class="ca-field full wt-date-window" data-window-target="#ca-production-window"><span class="wt-date-window-title">Estimated production / ship window</span><div class="wt-date-window-inputs"><label>Date<input id="ca-production-window-start" data-window-start type="date"/></label><label>End date (optional)<input id="ca-production-window-end" data-window-end type="date"/></label></div><input id="ca-production-window" type="hidden"/><small class="wt-date-window-note" data-window-note>Choose a date or calculate a suggested range from the shared queue.</small></div>
               <div class="ca-total ca-total-inline"><div><span>FINAL CUSTOMER PRICE</span></div><div><strong id="ca-final-total">$0.00</strong><small id="ca-total-detail">1 set • 4 coasters</small></div></div>
@@ -238,6 +238,6 @@
   </main>
   <div id="site-footer"></div>
 </div>
-<script src="../js/theme.js"></script><script src="../js/admin-production-fields.js?v=20260913-2"></script><script src="../js/coaster-admin.js?v=20260913-1"></script><script src="../js/manufacturing-estimate.js?v=20260913-1"></script><script src="../js/coaster-admin-auto-refresh.js"></script><script src="../js/coaster-admin-archive.js?v=20260904-archive3"></script><script src="../js/admin-pane-sync.js?v=20260905-1"></script>
+<script src="../js/theme.js"></script><script src="../js/admin-production-fields.js?v=20260913-2"></script><script src="../js/coaster-admin.js?v=20260916-defaults1"></script><script src="../js/manufacturing-estimate.js?v=20260913-1"></script><script src="../js/coaster-admin-auto-refresh.js"></script><script src="../js/coaster-admin-archive.js?v=20260904-archive3"></script><script src="../js/admin-pane-sync.js?v=20260905-1"></script>
 </body>
 </html>

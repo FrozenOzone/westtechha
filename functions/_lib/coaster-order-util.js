@@ -2,6 +2,10 @@ const PRODUCTION_STATUSES = new Set(['PRODUCTION_QUEUE','IN_PRODUCTION','PREPARI
 const FROZEN_STATUSES = new Set(['PROOF_SENT','PROOF_APPROVED','AWAITING_PAYMENT','PRODUCTION_QUEUE','IN_PRODUCTION','PREPARING_TO_SHIP','PREPARING_FOR_PICKUP','READY_FOR_PICKUP','SHIPPED','COMPLETED']);
 export const ART_TYPES = new Set(['image/png','image/jpeg','image/webp','image/svg+xml']);
 export const PROOF_TYPES = new Set(['image/png','image/jpeg','image/webp','image/svg+xml','application/pdf']);
+export const COASTER_SET_DEFAULTS = Object.freeze({
+  4: Object.freeze({basePrice:29.99,printerMinutes:650}),
+  8: Object.freeze({basePrice:39.99,printerMinutes:992})
+});
 
 export function clean(value,max=1000){return String(value??'').trim().slice(0,max);}
 export function number(value,min=0,max=1e9){const n=Number(value);if(!Number.isFinite(n))return min;return Math.min(max,Math.max(min,n));}
@@ -12,6 +16,7 @@ export function utcDate(){const d=new Date();return `${d.getUTCFullYear()}${Stri
 export function safeFilename(value,fallback='file'){return clean(value,180).replace(/[\\/:*?"<>|\r\n]+/g,'_').replace(/^\.+/,'').trim()||fallback;}
 export function jsonDetail(value){try{return JSON.stringify(value);}catch(e){return String(value??'');}}
 export function makeError(message,status=400){const e=new Error(message);e.status=status;return e;}
+export function coasterSetDefaults(setSize,setCount=1){const size=integer(setSize,0,8),count=integer(setCount,1,125),preset=COASTER_SET_DEFAULTS[size];if(!preset)throw makeError('Choose a 4- or 8-coaster set.');return {basePrice:preset.basePrice,printerMinutes:preset.printerMinutes*count};}
 export function requireArtworkBucket(env){if(!env?.COASTER_ARTWORK)throw new Error('Missing COASTER_ARTWORK R2 binding.');return env.COASTER_ARTWORK;}
 export function isLocked(order){return String(order?.paymentStatus||'').toUpperCase()==='PAID'||PRODUCTION_STATUSES.has(String(order?.status||'').toUpperCase());}
 export function termsFrozen(order){if(isLocked(order))return true;const status=String(order?.status||'').toUpperCase();const proof=String(order?.proofStatus||'').toUpperCase();if(status==='CHANGES_REQUESTED'||proof==='CHANGES_REQUESTED')return false;return FROZEN_STATUSES.has(status)||['SENT','APPROVED'].includes(proof);}
