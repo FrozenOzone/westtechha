@@ -2,6 +2,7 @@
    Pilot pages: Quote (public) and Custom Orders (admin). */
 
 html.wt-layout-template {
+  --wt-header-canvas: 1680px;
   --wt-public-canvas: 2300px;
   --wt-admin-canvas: 2380px;
   --wt-public-inline-space: clamp(32px, 6vw, 144px);
@@ -10,8 +11,6 @@ html.wt-layout-template {
   font-size: clamp(16px, calc(14px + .28vw), 18px);
 }
 
-body.wt-public-template .nav-shell,
-body.wt-public-template .nav-stack,
 body.wt-public-template .footer-shell,
 body.wt-public-template .page-header,
 body.wt-public-template .section,
@@ -21,6 +20,13 @@ body.wt-public-template .cta-band,
 body.wt-public-template .forum-hero,
 body.wt-public-template .forum-section {
   width: min(var(--wt-public-canvas), calc(100% - var(--wt-public-inline-space)));
+}
+
+body.wt-public-template .nav-shell,
+body.wt-public-template .nav-stack,
+body.wt-admin-template .nav-shell,
+body.wt-admin-template .nav-stack {
+  width: min(var(--wt-header-canvas), calc(100% - 32px));
 }
 
 body.wt-public-template .page-header {
@@ -97,8 +103,6 @@ body.wt-public-template #quote-form .btn-submit {
   font-size: 1rem;
 }
 
-body.wt-admin-template .nav-shell,
-body.wt-admin-template .nav-stack,
 body.wt-admin-template .footer-shell {
   width: min(var(--wt-public-canvas), calc(100% - var(--wt-admin-inline-space)));
 }
