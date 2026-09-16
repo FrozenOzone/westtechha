@@ -1,0 +1,278 @@
+/* WestTech responsive layout template
+   Pilot pages: Quote (public) and Custom Orders (admin). */
+
+html.wt-layout-template {
+  --wt-public-canvas: 2300px;
+  --wt-admin-canvas: 2380px;
+  --wt-public-inline-space: clamp(32px, 6vw, 144px);
+  --wt-admin-inline-space: clamp(22px, 3vw, 72px);
+  --wt-template-control-height: 48px;
+  font-size: clamp(16px, calc(14px + .28vw), 18px);
+}
+
+body.wt-public-template .nav-shell,
+body.wt-public-template .nav-stack,
+body.wt-public-template .footer-shell,
+body.wt-public-template .page-header,
+body.wt-public-template .section,
+body.wt-public-template .hero-band,
+body.wt-public-template .spotlight,
+body.wt-public-template .cta-band,
+body.wt-public-template .forum-hero,
+body.wt-public-template .forum-section {
+  width: min(var(--wt-public-canvas), calc(100% - var(--wt-public-inline-space)));
+}
+
+body.wt-public-template .page-header {
+  padding-top: clamp(34px, 3vw, 64px);
+}
+
+body.wt-public-template .page-header h1 {
+  max-width: 20ch;
+  font-size: clamp(3rem, 4.2vw, 4.75rem);
+}
+
+body.wt-public-template .page-header .tagline {
+  max-width: 82ch;
+  font-size: 1.08rem;
+  line-height: 1.75;
+}
+
+body.wt-public-template .section {
+  padding: clamp(24px, 2vw, 38px);
+}
+
+body.wt-public-template .section-header {
+  display: grid;
+  grid-template-columns: minmax(260px, .55fr) minmax(420px, 1.45fr);
+  gap: clamp(20px, 3vw, 64px);
+  align-items: start;
+}
+
+body.wt-public-template .section-header p {
+  max-width: 82ch;
+  font-size: 1rem;
+}
+
+body.wt-public-template .product-card {
+  padding: clamp(22px, 1.7vw, 34px);
+}
+
+body.wt-public-template .product-name {
+  font-size: 1.28rem;
+}
+
+body.wt-public-template .product-body {
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+body.wt-public-template #quote-form {
+  gap: 20px;
+}
+
+body.wt-public-template #quote-form .wt-fieldset {
+  padding: clamp(20px, 1.6vw, 30px);
+}
+
+body.wt-public-template #quote-form label,
+body.wt-public-template #quote-form legend {
+  font-size: .92rem;
+}
+
+body.wt-public-template #quote-form input,
+body.wt-public-template #quote-form select,
+body.wt-public-template #quote-form textarea {
+  min-height: var(--wt-template-control-height);
+  font-size: 1rem;
+}
+
+body.wt-public-template #quote-form textarea {
+  min-height: 170px;
+}
+
+body.wt-public-template #quote-form .btn-submit {
+  min-height: var(--wt-template-control-height);
+  padding-inline: 22px;
+  font-size: 1rem;
+}
+
+body.wt-admin-template .nav-shell,
+body.wt-admin-template .nav-stack,
+body.wt-admin-template .footer-shell {
+  width: min(var(--wt-public-canvas), calc(100% - var(--wt-admin-inline-space)));
+}
+
+body.wt-admin-template .xo-main {
+  width: min(var(--wt-admin-canvas), calc(100% - var(--wt-admin-inline-space)));
+  margin-top: clamp(22px, 2vw, 38px);
+}
+
+body.wt-admin-template .xo-topbar h1 {
+  font-size: clamp(2.5rem, 3.4vw, 4rem);
+}
+
+body.wt-admin-template .xo-topbar p {
+  max-width: 80ch;
+  font-size: .9rem;
+  line-height: 1.6;
+}
+
+body.wt-admin-template .xo-admin-links a {
+  min-height: 42px;
+  padding: 11px 15px;
+  font-size: .78rem;
+}
+
+body.wt-admin-template .xo-auth {
+  max-width: 760px;
+}
+
+body.wt-admin-template .xo-actions {
+  padding: clamp(18px, 1.4vw, 26px);
+}
+
+body.wt-admin-template .xo-actions span,
+body.wt-admin-template .xo-customer-manager .xo-section-head p {
+  font-size: .78rem;
+  line-height: 1.5;
+}
+
+body.wt-admin-template .xo-shell {
+  grid-template-columns: clamp(310px, 18vw, 390px) minmax(0, 1fr);
+}
+
+body.wt-admin-template .xo-sidebar {
+  padding: clamp(17px, 1.35vw, 25px);
+}
+
+body.wt-admin-template .xo-editor {
+  padding: clamp(20px, 1.6vw, 30px);
+}
+
+body.wt-admin-template .xo-main label,
+body.wt-admin-template .xo-auth label {
+  font-size: .78rem;
+  line-height: 1.35;
+}
+
+body.wt-admin-template .xo-main input,
+body.wt-admin-template .xo-main select,
+body.wt-admin-template .xo-main textarea {
+  min-height: 44px;
+  font: inherit;
+  font-size: .92rem;
+  line-height: 1.35;
+}
+
+body.wt-admin-template .xo-main textarea {
+  min-height: 106px;
+}
+
+body.wt-admin-template .xo-main .ca-card {
+  padding: clamp(18px, 1.35vw, 25px);
+}
+
+body.wt-admin-template .xo-main .ca-eyebrow,
+body.wt-admin-template .xo-main .ca-card-head span {
+  font-size: .68rem;
+}
+
+body.wt-admin-template .xo-sidebar-head strong {
+  font-size: .96rem;
+}
+
+body.wt-admin-template .xo-sidebar-head span,
+body.wt-admin-template .xo-order-card span,
+body.wt-admin-template .xo-empty,
+body.wt-admin-template .xo-editor-head p,
+body.wt-admin-template .xo-totals small,
+body.wt-admin-template .xo-history-card .ca-event span {
+  font-size: .72rem;
+  line-height: 1.45;
+}
+
+body.wt-admin-template .xo-order-card strong,
+body.wt-admin-template .xo-customer-row strong,
+body.wt-admin-template .xo-history-card .ca-event strong {
+  font-size: .82rem;
+}
+
+body.wt-admin-template .xo-totals > span,
+body.wt-admin-template .xo-footer-actions span,
+body.wt-admin-template .xo-payment-summary span {
+  font-size: .76rem;
+}
+
+body.wt-admin-template .ca-primary,
+body.wt-admin-template .ca-secondary,
+body.wt-admin-template .xo-remove-line {
+  min-height: 42px;
+  font-size: .82rem;
+}
+
+body.wt-admin-template .xo-grid {
+  gap: clamp(12px, 1vw, 18px);
+}
+
+body.wt-admin-template .xo-editor .ca-card,
+body.wt-admin-template .xo-customer,
+body.wt-admin-template .xo-customer-manager {
+  margin-bottom: 16px;
+}
+
+@media (min-width: 1400px) {
+  body.wt-public-template .product-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  body.wt-public-template #quote-form .wt-fieldset:nth-of-type(1) .wt-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  body.wt-public-template #quote-form .wt-fieldset:nth-of-type(2) .wt-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1900px) {
+  body.wt-admin-template .xo-grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  body.wt-admin-template .xo-line {
+    grid-template-columns: minmax(320px, 1fr) 110px 160px 100px 120px 46px;
+  }
+}
+
+@media (max-width: 1100px) {
+  body.wt-public-template .section-header {
+    grid-template-columns: 1fr;
+  }
+
+  body.wt-admin-template .xo-shell {
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  html.wt-layout-template {
+    font-size: 16px;
+    --wt-public-inline-space: 18px;
+    --wt-admin-inline-space: 18px;
+  }
+
+  body.wt-public-template .section-header,
+  body.wt-public-template .product-grid,
+  body.wt-public-template #quote-form .wt-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body.wt-public-template .page-header h1 {
+    font-size: clamp(2.15rem, 10vw, 3.1rem);
+  }
+
+  body.wt-admin-template .xo-shell {
+    display: block;
+  }
+}
