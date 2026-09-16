@@ -186,6 +186,14 @@ body.wt-public-template :is(
   width: min(var(--wt-form-canvas), calc(100% - var(--wt-public-inline-space)));
 }
 
+body.wt-public-template .eo-choice input,
+body.wt-public-template .eo-component-choice input,
+body.wt-admin-template .ca-option input,
+body.wt-admin-template .ca-proof-option input {
+  width: 1px;
+  height: 1px;
+}
+
 body.wt-admin-template .xo-topbar h1 {
   font-size: clamp(2.5rem, 3.4vw, 4rem);
 }
