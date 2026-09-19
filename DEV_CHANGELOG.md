@@ -2,6 +2,18 @@
 
 This file records accepted Dev checkpoints and the recovery point created before each complex workflow change. Production remains separate until a Dev version is explicitly accepted and promoted.
 
+## 2026-09-19 — Editable prior pricing on customer reorders
+
+- Customer-portal reorders now copy the original order's editable price, discount, shipping, fulfillment, payment-required setting, and product details into the new review draft.
+- Coaster reorders fall back to the standard 4-set price/time (`$29.99`, 650 minutes) or 8-set price/time (`$39.99`, 992 minutes) only when the original values are missing.
+- Enclosure reorders fall back to the shared Scout/Ranger/Command product catalog and shared shipping tiers only when the original values are missing.
+- Custom/special reorders retain the exact prior line-item pricing as a starting estimate and clearly state that WestTech will review it before customer approval.
+- Reorder drafts remain editable, uncharged, outside manufacturing, and free of prior PayPal references.
+- The customer dashboard now states plainly that SMS is not active yet: the preference and consent are recorded, while security, reorder confirmations, and receipts continue by email.
+- Preview data repair is limited to zero-dollar Draft `WTX-20260919-1001`; sent/approved reorder `WTX-20260919-1002` is intentionally unchanged.
+
+Rollback boundary: restore source commit `ecf2fd44ec9575b845dc5e31bc512213afe40d2d`. Preview D1 bookmark before the one-draft repair: `000000cb-00000000-000050eb-6dbc31988c64d12cbee99405f04b5520`. No schema rollback is required.
+
 ## 2026-09-19 — Customer reorder confirmation and dashboard width
 
 - Reorders remain review drafts and do not enter manufacturing until the normal approval/payment or no-charge release workflow completes.
