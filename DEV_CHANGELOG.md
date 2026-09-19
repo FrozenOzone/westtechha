@@ -2,6 +2,20 @@
 
 This file records accepted Dev checkpoints and the recovery point created before each complex workflow change. Production remains separate until a Dev version is explicitly accepted and promoted.
 
+## 2026-09-19 — Customer accounts and all-order dashboard
+
+- Source baseline: Preview and Production commit `c753a0d65e29efbf161624faf5a89d09b3efe694`.
+- Customer authentication: separate passwordless customer accounts with 20-minute one-time email links and seven-day HTTP-only sessions. Customer authentication does not share Cloudflare Admin Access or the legacy admin token.
+- Contact capture: email and mobile phone are required for new Coaster, Enclosure, and admin-created Custom customers. Email or Text message is a required preference; selecting Text requires a separately recorded transactional-SMS consent.
+- Customer dashboard: verified customers can see linked Store, Coaster, Enclosure, and Custom orders; edit contact, delivery, and preference data; request verified email changes; sign out; and start a reorder.
+- Reorder safety: Custom, Coaster, and Enclosure reorders create fresh review drafts with old PayPal references removed and pricing requiring reconfirmation. Direct Store orders rebuild the cart from preserved SKU, color, and quantity so current catalog pricing is used.
+- PayPal boundary: WestTech stores order/payment references only. Card and PayPal credentials remain with PayPal.
+- Account activation: a successful PayPal capture creates or links the customer account and sends a one-time activation invitation. Existing order customers can also request a secure sign-in link using the email already recorded on an order.
+- Database impact: additive migration `020_customer_accounts.sql` adds contact-preference columns, customer account/session/token/order-link/event tables, and exact Store order item snapshots. Existing order and payment values are not rewritten.
+- Local verification: all JavaScript syntax checks, the full 001–020 migration sequence, contact validation, four-source order linking, profile updates, activation/session issuance, fresh-draft reorders, and exact Store Buy Again cart reconstruction passed against an in-memory D1-compatible test harness.
+
+Rollback boundary: restore source commit `c753a0d65e29efbf161624faf5a89d09b3efe694`. Migration 020 is additive and its new tables/columns may remain unused during a source rollback; do not drop them if customer accounts have been activated.
+
 ## 2026-09-12 — Customers and direct custom orders
 
 - Verified recovery baseline: `WestTechHA-Dev-Command-Display-Sensor-Options-2026-09-06(2).zip`.

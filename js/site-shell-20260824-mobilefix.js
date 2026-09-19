@@ -44,6 +44,7 @@
     { href: 'returns.html',       label: 'Returns & Warranty' },
     { href: 'legal-notice.html',  label: 'Legal Notice' },
     { href: 'about.html',         label: 'About' },
+    { href: 'account/login.html', label: 'My Orders' },
     { href: 'forum.html',         label: 'Forum' }
   ];
 
@@ -54,7 +55,8 @@
     { href: 'returns.html',                 label: 'Returns & Warranty' },
     { href: 'contact.html?coaster=idea',    label: 'Contact' },
     { href: 'legal-notice.html',            label: 'Legal Notice' },
-    { href: 'about.html',                   label: 'About' }
+    { href: 'about.html',                   label: 'About' },
+    { href: 'account/login.html',           label: 'My Orders' }
   ];
 
   const footerLinks = siteSection === 'coasters' ? coasterFooterLinks : companyFooterLinks;
@@ -146,7 +148,7 @@ ${items}
       </div>
       <button class="nav-mobile-toggle" type="button" aria-expanded="false" aria-controls="site-primary-menu"><span class="nav-mobile-toggle-text">Menu</span><span class="nav-mobile-toggle-icon" aria-hidden="true"><span></span><span></span><span></span></span></button>
       <div class="nav-menu" id="site-primary-menu">
-        <div class="badge badge-nav"><span></span>${siteSection === 'coasters' ? 'CUSTOM COASTERS • CREATIVE DESIGNS' : (isProductSectionPage() ? 'ESP32 ENCLOSURES' : (sharedCompanyPages.has(currentPage) ? 'ESP32 ENCLOSURES • CUSTOM COASTERS' : 'SCOUT • RANGER • COMMAND'))}</div>
+        <div class="badge badge-nav"><span></span>${siteSection === 'coasters' ? 'CUSTOM COASTERS • CREATIVE DESIGNS' : (siteSection === 'account' ? 'CUSTOMER ORDERS • PRIVATE ACCOUNT' : (isProductSectionPage() ? 'ESP32 ENCLOSURES' : (sharedCompanyPages.has(currentPage) ? 'ESP32 ENCLOSURES • CUSTOM COASTERS' : 'SCOUT • RANGER • COMMAND')))}</div>
         <div class="nav-links nav-primary">${primaryLinks.map(link => linkHtml(link, 'nav-link')).join('')}</div>
       </div>
     </nav>`;

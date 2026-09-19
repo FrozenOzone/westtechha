@@ -146,11 +146,13 @@
     event.preventDefault();setMessage('');
     const form=$('#eo-order-form');
     if(!form.reportValidity())return;
+    if($('#eo-phone').value.replace(/\D/g,'').length<10){setMessage('Enter a valid mobile phone number.','error');$('#eo-phone').focus();return;}
+    if($('#eo-communication').value==='SMS'&&!$('#eo-sms-consent').checked){setMessage('Consent to receive text messages is required when Text message is selected.','error');$('#eo-sms-consent').focus();return;}
     if(!$('#eo-confirm').checked){setMessage('Check the confirmation box before sending your enclosure request.','error');$('#eo-confirm').focus();return;}
     const model=$('#eo-model').value,board=selected('board'),offer=selected('offer');
     const payload={
       sku:skuFor(model,board,offer),modelLabel:modelLabel(),color:$('#eo-color').value,quantity:quantity(),loadedComponentSkus:offer==='Loaded'?selectedOptionalSkus():[],displayCombinationAcknowledged:offer==='Loaded'&&bothDisplaysSelected()?displayCombinationAcknowledged:false,fulfillmentPreference:selected('fulfillment'),
-      customerName:$('#eo-name').value.trim(),customerEmail:$('#eo-email').value.trim(),customerPhone:$('#eo-phone').value.trim(),customerNotes:$('#eo-notes').value.trim(),website:$('#eo-website').value,requestConfirmed:true
+      customerName:$('#eo-name').value.trim(),customerEmail:$('#eo-email').value.trim(),customerPhone:$('#eo-phone').value.trim(),communicationPreference:$('#eo-communication').value,smsConsent:$('#eo-sms-consent').checked,customerNotes:$('#eo-notes').value.trim(),website:$('#eo-website').value,requestConfirmed:true
     };
     const button=$('#eo-submit');button.disabled=true;button.textContent='Sending Request…';
     try{
@@ -170,6 +172,7 @@
   const radioGroups=['board','offer','fulfillment'];
   radioGroups.forEach(name=>document.querySelectorAll(`input[name="${name}"]`).forEach(input=>input.addEventListener('change',refreshSummary)));
   ['eo-color','eo-quantity'].forEach(id=>$('#'+id).addEventListener('input',refreshSummary));
+  $('#eo-communication').addEventListener('change',()=>{$('#eo-sms-consent').required=$('#eo-communication').value==='SMS';});
   $('#eo-display-ack').addEventListener('change',()=>{$('#eo-display-confirm').disabled=!$('#eo-display-ack').checked;});
   $('#eo-display-cancel').addEventListener('click',()=>closeDisplayModal(false));
   $('#eo-display-confirm').addEventListener('click',()=>{if($('#eo-display-ack').checked)closeDisplayModal(true);});

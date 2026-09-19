@@ -1,0 +1,44 @@
+<!doctype html>
+<html class="wt-layout-template" lang="en" data-site-root="../" data-site-section="account">
+<head>
+  <meta charset="utf-8"/>
+  <script src="../js/theme-init.js?v=20260916-1"></script>
+  <title>My Orders – WestTech Home Automation</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="robots" content="noindex,nofollow,noarchive"/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="../css/site-20260824-mobilefix.css" rel="stylesheet"/>
+  <link href="../css/customer-account.css?v=20260919-1" rel="stylesheet"/>
+  <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
+</head>
+<body class="wt-public-template customer-account-page">
+<div class="page"><div id="site-header"></div><script src="../js/site-shell-20260824-mobilefix.js"></script>
+  <main class="customer-account-main">
+    <header class="customer-account-head"><div><div class="customer-eyebrow">WESTTECH CUSTOMER DASHBOARD</div><h1>My orders.</h1><p id="customer-welcome">Loading your customer account…</p></div><button class="customer-secondary" id="customer-logout" type="button">Sign Out</button></header>
+    <div class="customer-message" id="customer-account-message" role="status" hidden></div>
+    <section class="customer-account-card">
+      <div class="customer-section-head"><div><div class="customer-eyebrow">ORDER HISTORY</div><h2>Your WestTech products and projects</h2><p>Reorder creates a new review draft. WestTech reconfirms current pricing, production time, and availability before payment.</p></div></div>
+      <div class="customer-order-grid" id="customer-orders"><div class="customer-empty">Loading orders…</div></div>
+    </section>
+    <section class="customer-account-card">
+      <div class="customer-section-head"><div><div class="customer-eyebrow">CONTACT + DELIVERY</div><h2>Account information</h2><p>Email and mobile number are both required. Security links and payment receipts always use email.</p></div></div>
+      <form id="customer-profile-form" class="customer-profile-grid">
+        <label>Full name<input id="customer-name" maxlength="180" autocomplete="name" required/></label>
+        <label>Email<input id="customer-email" type="email" maxlength="254" autocomplete="email" required/><small id="customer-email-help">Changing this sends a verification link to the new address.</small></label>
+        <label>Mobile phone<input id="customer-phone" type="tel" maxlength="40" autocomplete="tel" inputmode="tel" required/></label>
+        <label>Preferred communication<select id="customer-preference" required><option value="EMAIL">Email</option><option value="SMS">Text message</option></select><small>Text delivery will be activated separately; account security and receipts remain email-based.</small></label>
+        <label>Default fulfillment<select id="customer-fulfillment"><option value="UNSET">Choose per order</option><option value="SHIP">Ship Order</option><option value="LOCAL_PICKUP">Local Pickup</option></select></label>
+        <label>Address<input id="customer-address1" maxlength="180" autocomplete="address-line1"/></label>
+        <label>Address line 2<input id="customer-address2" maxlength="180" autocomplete="address-line2"/></label>
+        <label>City<input id="customer-city" maxlength="100" autocomplete="address-level2"/></label>
+        <label>State / region<input id="customer-region" maxlength="80" autocomplete="address-level1"/></label>
+        <label>Postal code<input id="customer-postal" maxlength="30" autocomplete="postal-code"/></label>
+        <label class="customer-sms-consent"><input id="customer-sms-consent" type="checkbox"/><span>I agree to receive transactional WestTech text messages about my orders. Message and data rates may apply. Reply STOP to opt out once texting is active.</span></label>
+        <div class="customer-profile-actions"><button type="submit">Save Account Information</button></div>
+      </form>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+</div>
+<script src="../js/theme.js"></script><script src="../js/customer-account.js?v=20260919-1"></script>
+</body></html>

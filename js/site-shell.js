@@ -45,6 +45,7 @@
     { href: 'returns.html',       label: 'Returns & Warranty' },
     { href: 'legal-notice.html',  label: 'Legal Notice' },
     { href: 'about.html',         label: 'About' },
+    { href: 'account/login.html', label: 'My Orders' },
     { href: 'forum.html',         label: 'Forum' }
   ];
 

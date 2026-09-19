@@ -38,7 +38,9 @@
   function updateReady(){
     const rights=$('#cb-rights');
     const busy=submit.dataset.busy==='true';
-    const ready=!!$('#cb-file').files[0] && rights.checked && $('#cb-name').value.trim().length>=2 && emailLooksValid($('#cb-email').value) && !!selectedSetSize();
+    const sms=$('#cb-communication').value==='SMS';
+    $('#cb-sms-consent').required=sms;
+    const ready=!!$('#cb-file').files[0] && rights.checked && $('#cb-name').value.trim().length>=2 && emailLooksValid($('#cb-email').value) && $('#cb-phone').value.replace(/\D/g,'').length>=10 && (!sms||$('#cb-sms-consent').checked) && !!selectedSetSize();
     submit.disabled=!ready || busy;
     if(!busy){
       const rightsMissing=!rights.checked;
@@ -128,6 +130,8 @@
     data.append('customerName',$('#cb-name').value.trim());
     data.append('customerEmail',$('#cb-email').value.trim());
     data.append('customerPhone',$('#cb-phone').value.trim());
+    data.append('communicationPreference',$('#cb-communication').value);
+    data.append('smsConsent',$('#cb-sms-consent').checked?'true':'false');
     data.append('setSize',selectedSetSize());
     data.append('topText',$('#cb-top').value.trim());
     data.append('bottomText',$('#cb-bottom').value.trim());
@@ -149,7 +153,7 @@
   function saveLocalTest(orderId){
     const file=$('#cb-file').files[0]||null;
     const record={
-      orderId,status:'LOCAL_TEST_ONLY',createdAt:new Date().toISOString(),customerName:$('#cb-name').value.trim(),customerEmail:$('#cb-email').value.trim(),customerPhone:$('#cb-phone').value.trim(),setSize:Number(selectedSetSize()),topText:$('#cb-top').value.trim(),bottomText:$('#cb-bottom').value.trim(),fieldColor:$('#cb-field-color').value,accentColor:$('#cb-accent-color').value,ringColor:$('#cb-ring-color').value,textColor:$('#cb-text-color').value,notes:$('#cb-notes').value.trim(),artworkFilename:file?.name||'',artworkSizeBytes:file?.size||0,artworkContentType:file?.type||''
+      orderId,status:'LOCAL_TEST_ONLY',createdAt:new Date().toISOString(),customerName:$('#cb-name').value.trim(),customerEmail:$('#cb-email').value.trim(),customerPhone:$('#cb-phone').value.trim(),communicationPreference:$('#cb-communication').value,smsConsent:$('#cb-sms-consent').checked,setSize:Number(selectedSetSize()),topText:$('#cb-top').value.trim(),bottomText:$('#cb-bottom').value.trim(),fieldColor:$('#cb-field-color').value,accentColor:$('#cb-accent-color').value,ringColor:$('#cb-ring-color').value,textColor:$('#cb-text-color').value,notes:$('#cb-notes').value.trim(),artworkFilename:file?.name||'',artworkSizeBytes:file?.size||0,artworkContentType:file?.type||''
     };
     if(originalArtworkDataUrl.startsWith('data:') && originalArtworkDataUrl.length<2500000)record.artworkOriginalUrl=originalArtworkDataUrl;
     const previewUrl=previewArtworkDataUrl || $('#cb-art').getAttribute('href')||'';
@@ -167,7 +171,7 @@
   }
 
   $('#cb-top').addEventListener('input',updateText);$('#cb-bottom').addEventListener('input',updateText);$('#cb-rights').addEventListener('change',updateReady);
-  ['cb-name','cb-email','cb-phone','cb-notes'].forEach(id=>{
+  ['cb-name','cb-email','cb-phone','cb-notes','cb-communication','cb-sms-consent'].forEach(id=>{
     const el=$('#'+id);
     ['input','change','blur'].forEach(evt=>el.addEventListener(evt,updateReady));
     el.addEventListener('focus',()=>{setTimeout(updateReady,150);setTimeout(updateReady,700);});

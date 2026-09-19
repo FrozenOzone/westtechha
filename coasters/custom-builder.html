@@ -55,7 +55,9 @@
             <div class="cb-contact-grid">
               <label class="cb-field-control"><span>Name</span><input id="cb-name" name="name" type="text" maxlength="120" autocomplete="name" placeholder="Your name" required/></label>
               <label class="cb-field-control"><span>Email</span><input id="cb-email" name="email" type="email" maxlength="254" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" placeholder="you@example.com" required/></label>
-              <label class="cb-field-control"><span>Phone <small>(optional)</small></span><input id="cb-phone" name="tel" type="tel" maxlength="40" autocomplete="tel" inputmode="tel" placeholder="(555) 555-5555"/></label>
+              <label class="cb-field-control"><span>Mobile phone</span><input id="cb-phone" name="tel" type="tel" maxlength="40" autocomplete="tel" inputmode="tel" placeholder="(555) 555-5555" required/></label>
+              <label class="cb-field-control"><span>Preferred communication</span><select id="cb-communication" required><option value="EMAIL">Email</option><option value="SMS">Text message</option></select></label>
+              <label class="cb-field-control cb-contact-notes"><span><input id="cb-sms-consent" type="checkbox"/> I agree to receive transactional WestTech text messages about my orders. Message and data rates may apply. Reply STOP to opt out once texting is active.</span></label>
               <label class="cb-field-control cb-contact-notes"><span>Notes <small>(optional)</small></span><textarea id="cb-notes" name="notes" maxlength="400" autocomplete="off" placeholder="Anything WestTech should know about this project, timing, pickup discussion, special quantity, or other request."></textarea></label>
             </div>
             <input class="cb-honey" id="cb-website" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true"/>
