@@ -2,6 +2,19 @@
 
 This file records accepted Dev checkpoints and the recovery point created before each complex workflow change. Production remains separate until a Dev version is explicitly accepted and promoted.
 
+## 2026-09-20 — Transactional SMS across every customer order path
+
+- Source baseline: Preview commit `3e5e0719fa0270f2e9826cfb771149697b641ad8`; Production remains unchanged at `c753a0d65e29efbf161624faf5a89d09b3efe694`.
+- One shared Twilio delivery module now serves Coaster, Enclosure, Custom, and customer-portal reorder notifications instead of page-specific placeholder behavior.
+- Texting occurs only when the customer selected Text message, recorded explicit transactional consent, and has a valid mobile number. Duplicate provider sends are prevented with per-event idempotency keys.
+- Email remains mandatory for secure links, approvals, receipts, and delivery fallback. An SMS failure never suppresses the corresponding email.
+- Accepted, delivered, undelivered, provider-failed, invalid-number, and provider-not-configured outcomes are written to each order's existing history table. Signed Twilio status callbacks record final carrier delivery results.
+- Customer Portal, Coaster request, Enclosure request, and admin-managed Custom customer wording now use the same preference and consent language.
+- Preview activation requires `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and either `TWILIO_FROM_NUMBER` or `TWILIO_MESSAGING_SERVICE_SID`. `TWILIO_STATUS_CALLBACK_BASE_URL` may be set explicitly; otherwise the configured public site URL is used.
+- Database impact: none. Existing consent, order, and event tables are reused; no order rows are modified by deployment.
+
+Rollback boundary: restore source commit `3e5e0719fa0270f2e9826cfb771149697b641ad8`. No database rollback is required.
+
 ## 2026-09-19 — Editable prior pricing on customer reorders
 
 - Customer-portal reorders now copy the original order's editable price, discount, shipping, fulfillment, payment-required setting, and product details into the new review draft.

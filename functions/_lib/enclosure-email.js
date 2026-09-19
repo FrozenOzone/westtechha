@@ -1,4 +1,5 @@
 import { requireOrdersDb } from './orders.js';
+import { sendTransactionalSms, transactionalSmsText } from './sms.js';
 
 const CUSTOMER_TYPES=new Set(['CONFIGURATION_READY','CHANGES_REQUESTED','PAYMENT_REQUIRED','PRODUCTION_QUEUED','IN_PRODUCTION','PREPARING_TO_SHIP','PREPARING_FOR_PICKUP','READY_FOR_PICKUP','SHIPPED','COMPLETED']);
 function clean(value,max=500){return typeof value==='string'?value.trim().slice(0,max):'';}
@@ -36,11 +37,11 @@ function trackingUrl(carrier,number){const n=encodeURIComponent(clean(number,180
 export async function sendEnclosureRequestEmails(env,{order,requestUrl=''}){
   const item=summary(order),customerSubject=`We received your enclosure request — ${order.orderId}`;
   const components=componentLines(order),customerContent=`<p style="font-size:15px;line-height:1.65;color:#42526a;">Thanks, ${esc(order.customerName)}. Your enclosure request is in and ready for review.</p><p style="font-size:15px;line-height:1.65;color:#42526a;">I’ll confirm the configuration, current production workload, final price, shipping or pickup terms, and an estimated production window before payment is requested.</p>${detailRows([`Order: ${order.orderId}`,`Configuration: ${item}`,...components,`Starting product subtotal: ${money(order.startingSubtotal)}`])}<p style="font-size:15px;line-height:1.65;color:#42526a;"><strong>No payment has been collected.</strong> You don’t need to do anything until WestTech sends the reviewed configuration and terms.</p>`;
-  const customer=await send(env,{to:order.customerEmail,subject:customerSubject,html:frame(`Your enclosure request is in, ${order.customerName}.`,customerContent),text:`Your enclosure request is in.\n\nOrder: ${order.orderId}\nConfiguration: ${item}\n${components.join('\n')}${components.length?'\n':''}Starting product subtotal: ${money(order.startingSubtotal)}\n\nWestTech will review the configuration, final price, workload, and estimated production window before payment. No payment has been collected.`,replyToAddress:replyTo(env),idempotencyKey:`enclosure-customer-request-${order.orderId}`,orderId:order.orderId,emailType:'REQUEST_RECEIVED'});
+  const customerKey=`enclosure-customer-request-${order.orderId}`,customer=await send(env,{to:order.customerEmail,subject:customerSubject,html:frame(`Your enclosure request is in, ${order.customerName}.`,customerContent),text:`Your enclosure request is in.\n\nOrder: ${order.orderId}\nConfiguration: ${item}\n${components.join('\n')}${components.length?'\n':''}Starting product subtotal: ${money(order.startingSubtotal)}\n\nWestTech will review the configuration, final price, workload, and estimated production window before payment. No payment has been collected.`,replyToAddress:replyTo(env),idempotencyKey:customerKey,orderId:order.orderId,emailType:'REQUEST_RECEIVED'}),sms=await sendTransactionalSms(env,{sourceType:'ENCLOSURE',order,eventType:'REQUEST_RECEIVED',message:transactionalSmsText({subject:customerSubject,orderId:order.orderId}),idempotencyKey:`sms-${customerKey}`});
   const root=siteBase(env,requestUrl),adminUrl=`${root}/admin/enclosure-orders.html?order=${encodeURIComponent(order.orderId)}`;
   const adminContent=`<p style="font-size:15px;line-height:1.65;color:#42526a;">A new enclosure request was submitted. No payment has been collected.</p>${detailRows([`Order: ${order.orderId}`,`Customer: ${order.customerName} — ${order.customerEmail}`,`Configuration: ${item}`,...components,`Customer notes: ${order.customerNotes||'None'}`])}${button('Open Enclosure Request',adminUrl)}`;
   const admin=await send(env,{to:adminTo(env),subject:`NEW ENCLOSURE REQUEST — ${order.orderId} — ${order.customerName}`,html:frame('New enclosure request',adminContent),text:`NEW ENCLOSURE REQUEST\n\nOrder: ${order.orderId}\nCustomer: ${order.customerName} — ${order.customerEmail}\nConfiguration: ${item}\n${components.join('\n')}${components.length?'\n':''}Notes: ${order.customerNotes||'None'}\n\nOpen: ${adminUrl}`,replyToAddress:order.customerEmail,idempotencyKey:`enclosure-admin-request-${order.orderId}`,orderId:order.orderId,emailType:'ADMIN_NEW_ORDER'});
-  return {customer,admin};
+  return {customer:{...customer,sms},admin};
 }
 
 function customerTemplate(type,order,{approvalUrl='',siteUrl=''}){
@@ -69,7 +70,7 @@ function customerTemplate(type,order,{approvalUrl='',siteUrl=''}){
   }
   const paragraphs=[intro,action].filter(Boolean).map(v=>`<p style="font-size:15px;line-height:1.65;color:#42526a;">${esc(v)}</p>`).join('');
   const html=frame(headline,`${paragraphs}${detailRows(lines)}${button(label,url)}`,siteUrl);
-  const text=[headline,'',intro,'',action,'',...lines,'',url?`${label}: ${url}`:''].filter(Boolean).join('\n');return {subject,html,text};
+  const text=[headline,'',intro,'',action,'',...lines,'',url?`${label}: ${url}`:''].filter(Boolean).join('\n');return {subject,html,text,smsUrl:url};
 }
 
 export async function sendEnclosureCustomerEmail(env,{type,order,approvalUrl='',requestUrl=''}){
@@ -77,7 +78,7 @@ export async function sendEnclosureCustomerEmail(env,{type,order,approvalUrl='',
   const to=clean(order.customerEmail,254).toLowerCase();if(!to)return {sent:false,skipped:true,reason:'customer-email-missing'};
   const versioned=['CONFIGURATION_READY','CHANGES_REQUESTED','PAYMENT_REQUIRED'].includes(normalized),delivery=normalized==='CONFIGURATION_READY'&&order.configurationSentAt?`-${String(order.configurationSentAt).replace(/[^A-Za-z0-9]/g,'')}`:'',key=`enclosure-${normalized.toLowerCase().replaceAll('_','-')}-${order.orderId}${versioned?`-v${Math.max(1,Number(order.configurationVersion||1))}`:''}${delivery}`.slice(0,240);
   const rendered=customerTemplate(normalized,order,{approvalUrl,siteUrl:`${siteBase(env,requestUrl)}/enclosures/`});
-  return send(env,{to,subject:rendered.subject,html:rendered.html,text:rendered.text,replyToAddress:replyTo(env),idempotencyKey:key,orderId:order.orderId,emailType:normalized});
+  const email=await send(env,{to,subject:rendered.subject,html:rendered.html,text:rendered.text,replyToAddress:replyTo(env),idempotencyKey:key,orderId:order.orderId,emailType:normalized}),sms=await sendTransactionalSms(env,{sourceType:'ENCLOSURE',order,eventType:normalized,message:transactionalSmsText({subject:rendered.subject,orderId:order.orderId,url:rendered.smsUrl}),idempotencyKey:`sms-${key}`});return {...email,sms};
 }
 
 export async function sendEnclosureAdminProductionEmail(env,{order,requestUrl=''}){

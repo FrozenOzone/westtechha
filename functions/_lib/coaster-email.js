@@ -1,4 +1,5 @@
 import { requireOrdersDb } from './orders.js';
+import { sendTransactionalSms, transactionalSmsText } from './sms.js';
 
 const EMAIL_TYPES = new Set([
   'REQUEST_RECEIVED','PROOF_READY','CHANGES_REQUESTED','PAYMENT_REQUIRED',
@@ -139,7 +140,7 @@ function template(type,order,links={}){
   const paragraph=v=>v?`<p style="font-size:15px;line-height:1.65;color:#42526a;margin:0 0 16px;">${esc(v)}</p>`:'';
   const html=`<!doctype html><html><body style="margin:0;background:#f3f6fa;font-family:Arial,Helvetica,sans-serif;color:#152033;"><div style="max-width:640px;margin:0 auto;padding:28px 16px;"><div style="background:#071426;color:#fff;padding:22px 26px;border-radius:12px 12px 0 0;"><div style="font-size:22px;font-weight:800;color:#67aee8;">WestTech Home Automation</div><div style="font-size:11px;letter-spacing:1.5px;margin-top:4px;color:#aabbd0;">CUSTOM COASTERS • BUILT SMART • MADE CUSTOM</div></div><div style="background:#fff;padding:30px 26px;border:1px solid #dde6f0;border-top:0;border-radius:0 0 12px 12px;"><h1 style="font-size:24px;line-height:1.2;margin:0 0 18px;">${esc(headline)}</h1>${paragraph(intro)}${paragraph(process)}${paragraph(action)}<div style="border-top:1px solid #dfe7f1;margin-top:20px;">${detailHtml}</div>${button}<p style="font-size:14px;line-height:1.6;color:#42526a;margin:26px 0 0;">Thanks,<br><strong>Ed</strong><br>WestTech Home Automation</p><p style="font-size:12px;line-height:1.5;color:#74839a;margin:18px 0 0;">Questions? Reply to this email or contact orders@westtechha.com.<br><a href="${esc(siteUrl)}" style="color:#1677C4;">WestTech Custom Coasters</a></p></div></div></body></html>`;
   const text=[headline,'',intro,'',process,'',action,'',...details,'',buttonUrl?`${buttonLabel}: ${buttonUrl}`:'','Thanks,','Ed','WestTech Home Automation','','Questions: orders@westtechha.com',siteUrl].filter(v=>v!==undefined&&v!==null&&v!=='').join('\n');
-  return {subject,html,text};
+  return {subject,html,text,smsUrl:buttonUrl};
 }
 
 function idempotencyKey(type,order){const id=clean(order?.orderId,80).replace(/[^A-Za-z0-9_.:-]/g,'-');const suffix=(type==='PROOF_READY'||type==='CHANGES_REQUESTED'||type==='PAYMENT_REQUIRED')?`-v${Math.max(1,Number(order?.proofVersion||1))}`:'';return `coaster-${type.toLowerCase().replaceAll('_','-')}-${id}${suffix}`.slice(0,240);}
@@ -152,20 +153,9 @@ export async function sendCoasterCustomerEmail(env,{type,order,approvalUrl='',pa
   const to=clean(order.customerEmail,254).toLowerCase();
   if(!to)return {sent:false,skipped:true,reason:'customer-email-missing'};
   const key=idempotencyKey(normalized,order);
-  if(await hasSent(env,order.orderId,key))return {sent:true,duplicate:true,idempotencyKey:key};
   const rendered=template(normalized,order,{approvalUrl,paymentUrl,siteUrl:`${siteBase(env,requestUrl)}/coasters/`});
-  const apiKey=clean(env?.RESEND_API_KEY,400);
-  if(!apiKey){await logEvent(env,order.orderId,'EMAIL_NOT_CONFIGURED',{emailType:normalized,to,subject:rendered.subject,idempotencyKey:key});return {sent:false,skipped:true,reason:'RESEND_API_KEY not configured',idempotencyKey:key};}
-  const payload={from:fromAddress(env),to:[to],subject:rendered.subject,html:rendered.html,text:rendered.text,reply_to:replyTo(env)};
-  const bcc=bccList(env);if(bcc.length)payload.bcc=bcc;
-  try{
-    const response=await fetch('https://api.resend.com/emails',{method:'POST',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json','Idempotency-Key':key},body:JSON.stringify(payload)});
-    let data={};try{data=await response.json();}catch(e){}
-    if(!response.ok)throw new Error(data?.message||data?.name||`Email provider returned ${response.status}.`);
-    await logEvent(env,order.orderId,'EMAIL_SENT',{emailType:normalized,to,subject:rendered.subject,provider:'RESEND',providerId:data?.id||null,idempotencyKey:key});
-    return {sent:true,id:data?.id||null,idempotencyKey:key};
-  }catch(error){
-    await logEvent(env,order.orderId,'EMAIL_FAILED',{emailType:normalized,to,subject:rendered.subject,message:clean(error?.message,600),idempotencyKey:key});
-    return {sent:false,error:clean(error?.message,600)||'Email send failed.',idempotencyKey:key};
-  }
+  let email;
+  if(await hasSent(env,order.orderId,key))email={sent:true,duplicate:true,idempotencyKey:key};
+  else{const apiKey=clean(env?.RESEND_API_KEY,400);if(!apiKey){await logEvent(env,order.orderId,'EMAIL_NOT_CONFIGURED',{emailType:normalized,to,subject:rendered.subject,idempotencyKey:key});email={sent:false,skipped:true,reason:'RESEND_API_KEY not configured',idempotencyKey:key};}else{const payload={from:fromAddress(env),to:[to],subject:rendered.subject,html:rendered.html,text:rendered.text,reply_to:replyTo(env)},bcc=bccList(env);if(bcc.length)payload.bcc=bcc;try{const response=await fetch('https://api.resend.com/emails',{method:'POST',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json','Idempotency-Key':key},body:JSON.stringify(payload)});let data={};try{data=await response.json();}catch(e){}if(!response.ok)throw new Error(data?.message||data?.name||`Email provider returned ${response.status}.`);await logEvent(env,order.orderId,'EMAIL_SENT',{emailType:normalized,to,subject:rendered.subject,provider:'RESEND',providerId:data?.id||null,idempotencyKey:key});email={sent:true,id:data?.id||null,idempotencyKey:key};}catch(error){await logEvent(env,order.orderId,'EMAIL_FAILED',{emailType:normalized,to,subject:rendered.subject,message:clean(error?.message,600),idempotencyKey:key});email={sent:false,error:clean(error?.message,600)||'Email send failed.',idempotencyKey:key};}}}
+  const sms=await sendTransactionalSms(env,{sourceType:'COASTER',order,eventType:normalized,message:transactionalSmsText({subject:rendered.subject,orderId:order.orderId,url:rendered.smsUrl}),idempotencyKey:`sms-${key}`});return {...email,sms};
 }
