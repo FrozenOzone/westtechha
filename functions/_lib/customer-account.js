@@ -20,6 +20,7 @@ function esc(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&am
 function siteBase(env,requestUrl){const configured=clean(env?.PUBLIC_SITE_URL||env?.SITE_URL,300).replace(/\/+$/,'');if(configured)return configured;const url=new URL(requestUrl);return `${url.protocol}//${url.host}`;}
 function fromAddress(env){return clean(env?.COASTER_EMAIL_FROM||'WestTech Home Automation <orders@westtechha.com>',320);}
 function replyTo(env){return clean(env?.COASTER_EMAIL_REPLY_TO||env?.ORDERS_EMAIL||'orders@westtechha.com',254);}
+function adminAddress(env){return clean(env?.COASTER_ADMIN_EMAIL||env?.COASTER_EMAIL_REPLY_TO||env?.ORDERS_EMAIL||'orders@westtechha.com',254);}
 
 function validateContact({displayName,emailAddress,phoneNumber,communicationPreference,smsConsent}){
   const name=clean(displayName,180),mail=email(emailAddress),mobile=phone(phoneNumber),preference=clean(communicationPreference,20).toUpperCase();
@@ -78,6 +79,27 @@ async function sendPortalEmail(env,{account,rawToken,purpose,requestUrl}){
   const response=await fetch('https://api.resend.com/emails',{method:'POST',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},body:JSON.stringify({from:fromAddress(env),to:[to],subject,html,text,reply_to:replyTo(env)})}),data=await response.json().catch(()=>({}));
   if(!response.ok)return {sent:false,reason:clean(data?.message,500)||`Email provider returned ${response.status}.`};
   return {sent:true,id:data?.id||null};
+}
+
+async function deliverEmail(env,{to,subject,html,text,replyToAddress,idempotencyKey}){
+  const apiKey=clean(env?.RESEND_API_KEY,400);if(!apiKey)return {sent:false,skipped:true,reason:'RESEND_API_KEY not configured'};
+  try{const response=await fetch('https://api.resend.com/emails',{method:'POST',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json','Idempotency-Key':idempotencyKey},body:JSON.stringify({from:fromAddress(env),to:[to],subject,html,text,reply_to:replyToAddress})}),data=await response.json().catch(()=>({}));if(!response.ok)return {sent:false,reason:clean(data?.message,500)||`Email provider returned ${response.status}.`};return {sent:true,id:data?.id||null};}catch(error){return {sent:false,reason:clean(error?.message,500)||'Email delivery failed.'};}
+}
+
+function brandedEmail({headline,intro,details,buttonLabel,buttonUrl,closing='Thanks,\nEd\nWestTech Home Automation'}){
+  const rows=details.map(([label,value])=>`<tr><td style="padding:8px 12px 8px 0;color:#617187;font-size:13px">${esc(label)}</td><td style="padding:8px 0;color:#152033;font-size:13px;font-weight:700">${esc(value)}</td></tr>`).join('');
+  const html=`<!doctype html><html><body style="margin:0;background:#f3f6fa;font-family:Arial,Helvetica,sans-serif;color:#152033"><div style="max-width:650px;margin:0 auto;padding:28px 16px"><div style="background:#071426;color:#fff;padding:22px 26px;border-radius:12px 12px 0 0"><div style="font-size:22px;font-weight:800;color:#67aee8">WestTech Home Automation</div><div style="font-size:11px;letter-spacing:1.5px;margin-top:4px;color:#aabbd0">BUILT SMART • MADE CUSTOM</div></div><div style="background:#fff;padding:30px 26px;border:1px solid #dde6f0;border-top:0;border-radius:0 0 12px 12px"><h1 style="font-size:24px;line-height:1.25;margin:0 0 18px">${esc(headline)}</h1><p style="font-size:15px;line-height:1.65;color:#42526a">${esc(intro)}</p><table style="width:100%;border-collapse:collapse;border-top:1px solid #dfe7f1;border-bottom:1px solid #dfe7f1;margin:22px 0">${rows}</table><p style="margin:24px 0"><a href="${esc(buttonUrl)}" style="display:inline-block;background:#1677C4;color:#fff;text-decoration:none;font-weight:700;padding:13px 20px;border-radius:8px">${esc(buttonLabel)}</a></p><p style="font-size:14px;line-height:1.6;color:#42526a;white-space:pre-line">${esc(closing)}</p></div></div></body></html>`;
+  const text=[headline,'',intro,'',...details.map(([label,value])=>`${label}: ${value}`),'',`${buttonLabel}: ${buttonUrl}`,'',closing].join('\n');return {html,text};
+}
+
+async function sendReorderNotifications(env,{account,sourceType,sourceOrderId,newOrderId,requestUrl}){
+  const type=clean(sourceType,20).toUpperCase(),label=type==='COASTER'?'Coaster':type==='ENCLOSURE'?'Enclosure':'Custom',root=siteBase(env,requestUrl||'https://westtechha.com'),portalUrl=`${root}/account/`,adminPath=type==='COASTER'?'admin/coaster-orders':type==='ENCLOSURE'?'admin/enclosure-orders':'admin/custom-orders',adminUrl=`${root}/${adminPath}?order=${encodeURIComponent(newOrderId)}`;
+  const customerCopy=brandedEmail({headline:'We received your reorder request.',intro:`Hi ${account.displayName||'there'}, your new ${label.toLowerCase()} reorder request is ready for Ed to review. Nothing has been charged, and it has not entered production. WestTech will confirm current pricing, availability, and timing before sending anything for approval.`,details:[['New request',newOrderId],['Reordered from',sourceOrderId],['Current stage','Review draft — not in production']],buttonLabel:'View My Orders',buttonUrl:portalUrl});
+  const adminCopy=brandedEmail({headline:'A customer requested a reorder.',intro:`${account.displayName} created a new ${label.toLowerCase()} review draft from the customer portal. Review the request, confirm current pricing and timing, then send it through the normal approval process.`,details:[['Customer',account.displayName],['Customer email',account.email],['Customer phone',account.phone||'Not provided'],['New request',newOrderId],['Reordered from',sourceOrderId],['Current stage','Review draft — not in manufacturing']],buttonLabel:'Open Reorder Draft',buttonUrl:adminUrl,closing:'Customer portal notification\nWestTech Home Automation'});
+  const [customer,admin]=await Promise.all([
+    deliverEmail(env,{to:account.email,subject:`We received your WestTech reorder request — ${newOrderId}`,html:customerCopy.html,text:customerCopy.text,replyToAddress:replyTo(env),idempotencyKey:`customer-reorder-${newOrderId}`}),
+    deliverEmail(env,{to:adminAddress(env),subject:`Customer reorder request — ${newOrderId}`,html:adminCopy.html,text:adminCopy.text,replyToAddress:account.email,idempotencyKey:`admin-reorder-${newOrderId}`})
+  ]);return {customer,admin};
 }
 
 export async function requestCustomerLogin(env,emailAddress,requestUrl){
@@ -150,7 +172,7 @@ export async function updateCustomerProfile(env,account,body,requestUrl){
 
 async function allocate(db,counter,prefix){const date=now().slice(0,10).replaceAll('-',''),row=await db.prepare(`INSERT INTO ${counter} (order_date,last_value) VALUES (?,1001) ON CONFLICT(order_date) DO UPDATE SET last_value=last_value+1 RETURNING last_value`).bind(date).first(),sequence=Number(row?.last_value||1001);return {orderId:`${prefix}-${date}-${sequence}`,orderDate:date,sequence};}
 
-export async function reorderCustomerOrder(env,account,sourceType,sourceOrderId){
+export async function reorderCustomerOrder(env,account,sourceType,sourceOrderId,requestUrl=''){
   const db=requireOrdersDb(env),type=clean(sourceType,20).toUpperCase(),id=clean(sourceOrderId,80),owned=await db.prepare(`SELECT 1 AS ok FROM customer_account_orders WHERE account_id=? AND source_type=? AND source_order_id=? LIMIT 1`).bind(account.id,type,id).first();if(!owned)throw error('That order is not connected to your customer account.',404);
   let created;
   if(type==='COASTER'){
@@ -166,5 +188,5 @@ export async function reorderCustomerOrder(env,account,sourceType,sourceOrderId)
   }else if(type==='STORE'){
     const rows=await db.prepare(`SELECT product_sku,product_name,color,quantity FROM store_order_items WHERE invoice_id=? ORDER BY id`).bind(id).all(),items=(rows?.results||[]).map(row=>({sku:row.product_sku,name:row.product_name,color:row.color||'White',quantity:Number(row.quantity||1)}));if(!items.length)throw error('This older store order does not contain enough product detail for automatic Buy Again. Please open Enclosures and select the product again.',409);await log(db,account.id,'BUY_AGAIN_STARTED',{sourceType:type,sourceOrderId:id});return {cartItems:items};
   }else throw error('Choose a valid WestTech order type.');
-  await db.prepare(`INSERT INTO customer_account_orders (account_id,source_type,source_order_id) VALUES (?,?,?)`).bind(account.id,type,created).run();await log(db,account.id,'REORDER_REQUESTED',{sourceType:type,sourceOrderId:id,newOrderId:created});return {orderId:created};
+  await db.prepare(`INSERT INTO customer_account_orders (account_id,source_type,source_order_id) VALUES (?,?,?)`).bind(account.id,type,created).run();await log(db,account.id,'REORDER_REQUESTED',{sourceType:type,sourceOrderId:id,newOrderId:created});const notifications=await sendReorderNotifications(env,{account,sourceType:type,sourceOrderId:id,newOrderId:created,requestUrl});const eventTable=type==='COASTER'?'coaster_order_events':type==='ENCLOSURE'?'enclosure_order_events':'custom_order_events';await db.batch([db.prepare(`INSERT INTO ${eventTable} (order_id,event_type,detail) VALUES (?,?,?)`).bind(created,notifications.customer.sent?'EMAIL_SENT':'EMAIL_NOT_SENT',json({emailType:'CUSTOMER_REORDER_RECEIVED',to:account.email,providerId:notifications.customer.id||null,reason:notifications.customer.reason||null})),db.prepare(`INSERT INTO ${eventTable} (order_id,event_type,detail) VALUES (?,?,?)`).bind(created,notifications.admin.sent?'EMAIL_SENT':'EMAIL_NOT_SENT',json({emailType:'ADMIN_REORDER_REQUESTED',to:adminAddress(env),providerId:notifications.admin.id||null,reason:notifications.admin.reason||null}))]);await log(db,account.id,'REORDER_NOTIFICATIONS',{newOrderId:created,customerSent:notifications.customer.sent===true,adminSent:notifications.admin.sent===true});return {orderId:created,stage:'REVIEW_DRAFT',inManufacturing:false,charged:false,notifications:{customerSent:notifications.customer.sent===true,adminSent:notifications.admin.sent===true}};
 }

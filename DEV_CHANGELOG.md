@@ -2,6 +2,15 @@
 
 This file records accepted Dev checkpoints and the recovery point created before each complex workflow change. Production remains separate until a Dev version is explicitly accepted and promoted.
 
+## 2026-09-19 — Customer reorder confirmation and dashboard width
+
+- Reorders remain review drafts and do not enter manufacturing until the normal approval/payment or no-charge release workflow completes.
+- Each new Custom, Coaster, or Enclosure reorder now emails a receipt to the customer and a separate actionable notification to WestTech. Both emails identify the original and new order numbers and explicitly state that the draft is not charged or in production.
+- The customer dashboard reports email-delivery status immediately and now uses the same approximately 97%-wide application canvas as the admin workspaces.
+- Database impact: none. Existing reorder `WTX-20260919-1001` remains a Draft and was confirmed absent from `manufacturing_work_orders`.
+
+Rollback boundary: restore source commit `dc877dd62910f8850b97ed49a92ee5aa1cf070ac`. No database restore is required.
+
 ## 2026-09-19 — Customer accounts and all-order dashboard
 
 - Source baseline: Preview and Production commit `c753a0d65e29efbf161624faf5a89d09b3efe694`.
