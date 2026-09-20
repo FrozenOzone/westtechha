@@ -12,6 +12,11 @@
   const message=$('#cb-message');
   let originalArtworkDataUrl='';
   let previewArtworkDataUrl='';
+  const contactKey='westtechha-customer-contact-v1';
+  const gatewayCarriers=new Set(['VERIZON','TMOBILE','METRO','MINT','VISIBLE','XFINITY','BOOST','CRICKET','US_CELLULAR','GOOGLE_FI']);
+
+  function rememberContact(){try{localStorage.setItem(contactKey,JSON.stringify({name:$('#cb-name').value.trim(),email:$('#cb-email').value.trim(),phone:$('#cb-phone').value.trim(),mobileCarrier:$('#cb-mobile-carrier').value,communicationPreference:$('#cb-communication').value,smsConsent:$('#cb-sms-consent').checked}));}catch{}}
+  function restoreContact(){try{const saved=JSON.parse(localStorage.getItem(contactKey)||'null');if(!saved)return;$('#cb-name').value=saved.name||'';$('#cb-email').value=saved.email||'';$('#cb-phone').value=saved.phone||'';$('#cb-mobile-carrier').value=saved.mobileCarrier||'';$('#cb-communication').value=saved.communicationPreference||'EMAIL';$('#cb-sms-consent').checked=saved.smsConsent===true;}catch{}}
 
   function fillSelect(sel, selected){
     sel.innerHTML='';
@@ -40,7 +45,8 @@
     const busy=submit.dataset.busy==='true';
     const sms=$('#cb-communication').value==='SMS';
     $('#cb-sms-consent').required=sms;
-    const ready=!!$('#cb-file').files[0] && rights.checked && $('#cb-name').value.trim().length>=2 && emailLooksValid($('#cb-email').value) && $('#cb-phone').value.replace(/\D/g,'').length>=10 && (!sms||$('#cb-sms-consent').checked) && !!selectedSetSize();
+    const carrier=$('#cb-mobile-carrier').value;
+    const ready=!!$('#cb-file').files[0] && rights.checked && $('#cb-name').value.trim().length>=2 && emailLooksValid($('#cb-email').value) && $('#cb-phone').value.replace(/\D/g,'').length>=10 && !!carrier && (!sms||$('#cb-sms-consent').checked) && !!selectedSetSize();
     submit.disabled=!ready || busy;
     if(!busy){
       const rightsMissing=!rights.checked;
@@ -130,6 +136,7 @@
     data.append('customerName',$('#cb-name').value.trim());
     data.append('customerEmail',$('#cb-email').value.trim());
     data.append('customerPhone',$('#cb-phone').value.trim());
+    data.append('mobileCarrier',$('#cb-mobile-carrier').value);
     data.append('communicationPreference',$('#cb-communication').value);
     data.append('smsConsent',$('#cb-sms-consent').checked?'true':'false');
     data.append('setSize',selectedSetSize());
@@ -153,7 +160,7 @@
   function saveLocalTest(orderId){
     const file=$('#cb-file').files[0]||null;
     const record={
-      orderId,status:'LOCAL_TEST_ONLY',createdAt:new Date().toISOString(),customerName:$('#cb-name').value.trim(),customerEmail:$('#cb-email').value.trim(),customerPhone:$('#cb-phone').value.trim(),communicationPreference:$('#cb-communication').value,smsConsent:$('#cb-sms-consent').checked,setSize:Number(selectedSetSize()),topText:$('#cb-top').value.trim(),bottomText:$('#cb-bottom').value.trim(),fieldColor:$('#cb-field-color').value,accentColor:$('#cb-accent-color').value,ringColor:$('#cb-ring-color').value,textColor:$('#cb-text-color').value,notes:$('#cb-notes').value.trim(),artworkFilename:file?.name||'',artworkSizeBytes:file?.size||0,artworkContentType:file?.type||''
+      orderId,status:'LOCAL_TEST_ONLY',createdAt:new Date().toISOString(),customerName:$('#cb-name').value.trim(),customerEmail:$('#cb-email').value.trim(),customerPhone:$('#cb-phone').value.trim(),mobileCarrier:$('#cb-mobile-carrier').value,communicationPreference:$('#cb-communication').value,smsConsent:$('#cb-sms-consent').checked,setSize:Number(selectedSetSize()),topText:$('#cb-top').value.trim(),bottomText:$('#cb-bottom').value.trim(),fieldColor:$('#cb-field-color').value,accentColor:$('#cb-accent-color').value,ringColor:$('#cb-ring-color').value,textColor:$('#cb-text-color').value,notes:$('#cb-notes').value.trim(),artworkFilename:file?.name||'',artworkSizeBytes:file?.size||0,artworkContentType:file?.type||''
     };
     if(originalArtworkDataUrl.startsWith('data:') && originalArtworkDataUrl.length<2500000)record.artworkOriginalUrl=originalArtworkDataUrl;
     const previewUrl=previewArtworkDataUrl || $('#cb-art').getAttribute('href')||'';
@@ -171,7 +178,7 @@
   }
 
   $('#cb-top').addEventListener('input',updateText);$('#cb-bottom').addEventListener('input',updateText);$('#cb-rights').addEventListener('change',updateReady);
-  ['cb-name','cb-email','cb-phone','cb-notes','cb-communication','cb-sms-consent'].forEach(id=>{
+  ['cb-name','cb-email','cb-phone','cb-mobile-carrier','cb-notes','cb-communication','cb-sms-consent'].forEach(id=>{
     const el=$('#'+id);
     ['input','change','blur'].forEach(evt=>el.addEventListener(evt,updateReady));
     el.addEventListener('focus',()=>{setTimeout(updateReady,150);setTimeout(updateReady,700);});
@@ -181,7 +188,7 @@
   ['cb-field-color','cb-accent-color','cb-ring-color','cb-text-color'].forEach(id=>$('#'+id).addEventListener('change',applyColors));
 
   form.addEventListener('submit',async e=>{
-    e.preventDefault();updateReady();if(submit.disabled)return;
+    e.preventDefault();updateReady();if(submit.disabled)return;if($('#cb-communication').value==='SMS'&&!gatewayCarriers.has($('#cb-mobile-carrier').value)){showMessage('Email-to-text is not available for that carrier. Choose Email as your preferred communication method.','error');$('#cb-communication').focus();return;}
     submit.dataset.busy='true';submit.disabled=true;const original=submit.innerHTML;submit.textContent='Sending for Review…';message.hidden=true;
     try{
       let orderId='';let local=false;
@@ -190,10 +197,11 @@
       }else{
         orderId=await submitLiveOrder();
       }
+      rememberContact();
       const target=new URL('request-received.html',window.location.href);target.searchParams.set('order',orderId);if(local)target.searchParams.set('mode','local');
       window.location.href=target.href;
     }catch(err){showMessage(err?.message||'Could not submit the request. Please try again.','error');submit.dataset.busy='false';submit.innerHTML=original;updateReady();}
   });
 
-  updateText();applyColors();updateReady();
+  restoreContact();updateText();applyColors();updateReady();
 })();

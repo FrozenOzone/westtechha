@@ -56,8 +56,9 @@
               <label class="cb-field-control"><span>Name</span><input id="cb-name" name="name" type="text" maxlength="120" autocomplete="name" placeholder="Your name" required/></label>
               <label class="cb-field-control"><span>Email</span><input id="cb-email" name="email" type="email" maxlength="254" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" placeholder="you@example.com" required/></label>
               <label class="cb-field-control"><span>Mobile phone</span><input id="cb-phone" name="tel" type="tel" maxlength="40" autocomplete="tel" inputmode="tel" placeholder="(555) 555-5555" required/></label>
+              <label class="cb-field-control"><span>Mobile carrier</span><select id="cb-mobile-carrier" required><option value="">Choose carrier</option><option value="VERIZON">Verizon</option><option value="TMOBILE">T-Mobile</option><option value="METRO">Metro by T-Mobile</option><option value="MINT">Mint Mobile</option><option value="VISIBLE">Visible</option><option value="XFINITY">Xfinity Mobile</option><option value="BOOST">Boost Mobile</option><option value="CRICKET">Cricket Wireless</option><option value="US_CELLULAR">U.S. Cellular</option><option value="GOOGLE_FI">Google Fi</option><option value="ATT">AT&amp;T</option><option value="CONSUMER_CELLULAR">Consumer Cellular</option><option value="OTHER">Other / not listed</option></select></label>
               <label class="cb-field-control"><span>Preferred communication</span><select id="cb-communication" required><option value="EMAIL">Email</option><option value="SMS">Text message</option></select></label>
-              <label class="cb-field-control cb-contact-notes"><span><input id="cb-sms-consent" type="checkbox"/> I agree to receive transactional WestTech text messages about my orders. Message and data rates may apply. Reply STOP to opt out.</span><small>Email remains required for secure links, approvals, receipts, and delivery fallback.</small></label>
+              <label class="cb-field-control cb-contact-notes"><span><input id="cb-sms-consent" type="checkbox"/> I agree to receive short transactional WestTech order notices through my carrier’s email-to-text gateway.</span><small>Full order details, secure links, approvals, and receipts are always sent by email.</small></label>
               <label class="cb-field-control cb-contact-notes"><span>Notes <small>(optional)</small></span><textarea id="cb-notes" name="notes" maxlength="400" autocomplete="off" placeholder="Anything WestTech should know about this project, timing, pickup discussion, special quantity, or other request."></textarea></label>
             </div>
             <input class="cb-honey" id="cb-website" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true"/>
@@ -69,5 +70,5 @@
   </main>
   <div id="site-footer"></div>
 </div>
-<script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script><script src="../js/coasters.js"></script><script src="../js/custom-builder.js"></script>
+<script src="../js/theme.js"></script><script src="../js/site-shell-20260824-mobilefix.js"></script><script src="../js/coasters.js"></script><script src="../js/custom-builder.js?v=20260920-carrier1"></script>
 </body></html>

@@ -21,7 +21,12 @@
   };
   const MODEL_OPTIONS={scout:['buzzer'],'ranger-relay':['oled-096','buzzer'],'ranger-bucks':['oled-096','buzzer'],'command-core':['oled-096','lcd2004','dht11','buzzer'],'command-gp':['oled-096','lcd2004','dht11','buzzer']};
   const DISPLAY_COMPONENTS=['oled-096','lcd2004'];
+  const gatewayCarriers=new Set(['VERIZON','TMOBILE','METRO','MINT','VISIBLE','XFINITY','BOOST','CRICKET','US_CELLULAR','GOOGLE_FI']);
+  const contactKey='westtechha-customer-contact-v1';
   let componentSelections={},componentProfileKey='',displayCombinationAcknowledged=false,pendingDisplaySku='',displayReturnFocus=null;
+
+  function rememberContact(){try{localStorage.setItem(contactKey,JSON.stringify({name:$('#eo-name').value.trim(),email:$('#eo-email').value.trim(),phone:$('#eo-phone').value.trim(),mobileCarrier:$('#eo-mobile-carrier').value,communicationPreference:$('#eo-communication').value,smsConsent:$('#eo-sms-consent').checked}));}catch{}}
+  function restoreContact(){try{const saved=JSON.parse(localStorage.getItem(contactKey)||'null');if(!saved)return;$('#eo-name').value=saved.name||'';$('#eo-email').value=saved.email||'';$('#eo-phone').value=saved.phone||'';$('#eo-mobile-carrier').value=saved.mobileCarrier||'';$('#eo-communication').value=saved.communicationPreference||'EMAIL';$('#eo-sms-consent').checked=saved.smsConsent===true;}catch{}}
 
   function selected(name){return document.querySelector(`input[name="${name}"]:checked`)?.value||'';}
   function quantity(){return Math.min(50,Math.max(1,Math.round(Number($('#eo-quantity').value||1))));}
@@ -147,18 +152,20 @@
     const form=$('#eo-order-form');
     if(!form.reportValidity())return;
     if($('#eo-phone').value.replace(/\D/g,'').length<10){setMessage('Enter a valid mobile phone number.','error');$('#eo-phone').focus();return;}
+    if($('#eo-communication').value==='SMS'&&!gatewayCarriers.has($('#eo-mobile-carrier').value)){setMessage('Email-to-text is not available for that carrier. Choose Email as your preferred communication method.','error');$('#eo-communication').focus();return;}
     if($('#eo-communication').value==='SMS'&&!$('#eo-sms-consent').checked){setMessage('Consent to receive text messages is required when Text message is selected.','error');$('#eo-sms-consent').focus();return;}
     if(!$('#eo-confirm').checked){setMessage('Check the confirmation box before sending your enclosure request.','error');$('#eo-confirm').focus();return;}
     const model=$('#eo-model').value,board=selected('board'),offer=selected('offer');
     const payload={
       sku:skuFor(model,board,offer),modelLabel:modelLabel(),color:$('#eo-color').value,quantity:quantity(),loadedComponentSkus:offer==='Loaded'?selectedOptionalSkus():[],displayCombinationAcknowledged:offer==='Loaded'&&bothDisplaysSelected()?displayCombinationAcknowledged:false,fulfillmentPreference:selected('fulfillment'),
-      customerName:$('#eo-name').value.trim(),customerEmail:$('#eo-email').value.trim(),customerPhone:$('#eo-phone').value.trim(),communicationPreference:$('#eo-communication').value,smsConsent:$('#eo-sms-consent').checked,customerNotes:$('#eo-notes').value.trim(),website:$('#eo-website').value,requestConfirmed:true
+      customerName:$('#eo-name').value.trim(),customerEmail:$('#eo-email').value.trim(),customerPhone:$('#eo-phone').value.trim(),mobileCarrier:$('#eo-mobile-carrier').value,communicationPreference:$('#eo-communication').value,smsConsent:$('#eo-sms-consent').checked,customerNotes:$('#eo-notes').value.trim(),website:$('#eo-website').value,requestConfirmed:true
     };
     const button=$('#eo-submit');button.disabled=true;button.textContent='Sending Request…';
     try{
       const response=await fetch('/api/enclosures/orders',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)});
       const data=await response.json().catch(()=>({}));
       if(!response.ok||!data.ok)throw new Error(data.message||'Could not submit the enclosure request.');
+      rememberContact();
       location.href=`request-received.html?order=${encodeURIComponent(data.orderId)}`;
     }catch(error){setMessage(error.message||'Could not submit the enclosure request.','error');button.disabled=false;button.innerHTML='Send to WestTech for Review <span aria-hidden="true">→</span>';}
   }
@@ -179,5 +186,5 @@
   $('#eo-display-modal').addEventListener('click',event=>{if(event.target===$('#eo-display-modal'))closeDisplayModal(false);});
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('#eo-display-modal').hidden)closeDisplayModal(false);});
   $('#eo-order-form').addEventListener('submit',submit);
-  refreshSummary();
+  restoreContact();$('#eo-sms-consent').required=$('#eo-communication').value==='SMS';refreshSummary();
 })();

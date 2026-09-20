@@ -1,0 +1,7 @@
+ALTER TABLE custom_customers ADD COLUMN mobile_carrier TEXT NOT NULL DEFAULT 'OTHER';
+ALTER TABLE custom_orders ADD COLUMN mobile_carrier TEXT NOT NULL DEFAULT 'OTHER';
+ALTER TABLE coaster_orders ADD COLUMN mobile_carrier TEXT NOT NULL DEFAULT 'OTHER';
+ALTER TABLE enclosure_orders ADD COLUMN mobile_carrier TEXT NOT NULL DEFAULT 'OTHER';
+ALTER TABLE orders ADD COLUMN mobile_carrier TEXT NOT NULL DEFAULT 'OTHER';
+ALTER TABLE customer_accounts ADD COLUMN mobile_carrier TEXT NOT NULL DEFAULT 'OTHER';
+

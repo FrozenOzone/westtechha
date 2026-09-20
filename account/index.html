@@ -26,19 +26,20 @@
         <label>Full name<input id="customer-name" maxlength="180" autocomplete="name" required/></label>
         <label>Email<input id="customer-email" type="email" maxlength="254" autocomplete="email" required/><small id="customer-email-help">Changing this sends a verification link to the new address.</small></label>
         <label>Mobile phone<input id="customer-phone" type="tel" maxlength="40" autocomplete="tel" inputmode="tel" required/></label>
-        <label>Preferred communication<select id="customer-preference" required><option value="EMAIL">Email</option><option value="SMS">Text message</option></select><small id="customer-text-status">Email remains required for secure links, approvals, receipts, and delivery fallback. When Text message is selected, WestTech also sends transactional order updates by SMS.</small></label>
+        <label>Mobile carrier<select id="customer-mobile-carrier" required><option value="">Choose carrier</option><option value="VERIZON">Verizon</option><option value="TMOBILE">T-Mobile</option><option value="METRO">Metro by T-Mobile</option><option value="MINT">Mint Mobile</option><option value="VISIBLE">Visible</option><option value="XFINITY">Xfinity Mobile</option><option value="BOOST">Boost Mobile</option><option value="CRICKET">Cricket Wireless</option><option value="US_CELLULAR">U.S. Cellular</option><option value="GOOGLE_FI">Google Fi</option><option value="ATT">AT&amp;T</option><option value="CONSUMER_CELLULAR">Consumer Cellular</option><option value="OTHER">Other / not listed</option></select></label>
+        <label>Preferred communication<select id="customer-preference" required><option value="EMAIL">Email</option><option value="SMS">Text message</option></select><small id="customer-text-status">Full order details, secure links, approvals, and receipts are always sent by email. Text preference adds a short carrier-gateway notice when supported.</small></label>
         <label>Default fulfillment<select id="customer-fulfillment"><option value="UNSET">Choose per order</option><option value="SHIP">Ship Order</option><option value="LOCAL_PICKUP">Local Pickup</option></select></label>
         <label>Address<input id="customer-address1" maxlength="180" autocomplete="address-line1"/></label>
         <label>Address line 2<input id="customer-address2" maxlength="180" autocomplete="address-line2"/></label>
         <label>City<input id="customer-city" maxlength="100" autocomplete="address-level2"/></label>
         <label>State / region<input id="customer-region" maxlength="80" autocomplete="address-level1"/></label>
         <label>Postal code<input id="customer-postal" maxlength="30" autocomplete="postal-code"/></label>
-        <label class="customer-sms-consent"><input id="customer-sms-consent" type="checkbox"/><span>I agree to receive transactional WestTech text messages about my orders. Message and data rates may apply. Reply STOP to opt out.</span></label>
+        <label class="customer-sms-consent"><input id="customer-sms-consent" type="checkbox"/><span>I agree to receive short transactional WestTech order notices through my carrier’s email-to-text gateway. Full details are always sent by email.</span></label>
         <div class="customer-profile-actions"><button type="submit">Save Account Information</button></div>
       </form>
     </section>
   </main>
   <div id="site-footer"></div>
 </div>
-<script src="../js/theme.js"></script><script src="../js/customer-account.js?v=20260919-3"></script>
+<script src="../js/theme.js"></script><script src="../js/customer-account.js?v=20260920-carrier1"></script>
 </body></html>

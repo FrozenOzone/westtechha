@@ -2,18 +2,17 @@
 
 This file records accepted Dev checkpoints and the recovery point created before each complex workflow change. Production remains separate until a Dev version is explicitly accepted and promoted.
 
-## 2026-09-20 — Transactional SMS across every customer order path
+## 2026-09-20 — Low-volume carrier email-to-text notifications
 
-- Source baseline: Preview commit `3e5e0719fa0270f2e9826cfb771149697b641ad8`; Production remains unchanged at `c753a0d65e29efbf161624faf5a89d09b3efe694`.
-- One shared Twilio delivery module now serves Coaster, Enclosure, Custom, and customer-portal reorder notifications instead of page-specific placeholder behavior.
-- Texting occurs only when the customer selected Text message, recorded explicit transactional consent, and has a valid mobile number. Duplicate provider sends are prevented with per-event idempotency keys.
-- Email remains mandatory for secure links, approvals, receipts, and delivery fallback. An SMS failure never suppresses the corresponding email.
-- Accepted, delivered, undelivered, provider-failed, invalid-number, and provider-not-configured outcomes are written to each order's existing history table. Signed Twilio status callbacks record final carrier delivery results.
-- Customer Portal, Coaster request, Enclosure request, and admin-managed Custom customer wording now use the same preference and consent language.
-- Preview activation requires `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and either `TWILIO_FROM_NUMBER` or `TWILIO_MESSAGING_SERVICE_SID`. `TWILIO_STATUS_CALLBACK_BASE_URL` may be set explicitly; otherwise the configured public site URL is used.
-- Database impact: none. Existing consent, order, and event tables are reused; no order rows are modified by deployment.
+- Source baseline: Preview commit `23ed8e1`; Production remains untouched during this Dev pass.
+- Email, mobile number, mobile carrier, communication preference, and explicit text-notice consent are required and stored across Customer Portal, Coaster requests, Enclosure requests, and admin-managed Custom customers.
+- The public request forms remember the submitted name, email, mobile number, carrier, preference, and consent in that browser. Customer Portal profiles retain the same fields for future reorders.
+- Full customer emails remain authoritative for secure links, approvals, order details, receipts, and delivery fallback.
+- When Text is preferred and the selected carrier supports an email-to-text gateway, the existing Resend account sends a short notification to that gateway. No Twilio or other paid SMS API is used.
+- Gateway sends are idempotent and are recorded honestly as `TEXT_GATEWAY_SENT`, `TEXT_GATEWAY_FAILED`, `TEXT_GATEWAY_UNSUPPORTED`, or configuration/phone skips. The system does not claim carrier delivery or handset reads.
+- Migration `021_mobile_carrier_gateway.sql` adds only a `mobile_carrier` snapshot column to customer/account and order tables. Existing rows default to `OTHER`; no prior order, payment, or production value is rewritten.
 
-Rollback boundary: restore source commit `3e5e0719fa0270f2e9826cfb771149697b641ad8`. No database rollback is required.
+Rollback boundary: restore source commit `23ed8e1`. Migration 021 is additive and may remain in place during a source rollback.
 
 ## 2026-09-19 — Editable prior pricing on customer reorders
 
