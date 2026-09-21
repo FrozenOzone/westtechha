@@ -162,3 +162,9 @@ Rollback boundary: restore the Dev branch to `d3356eff465c5bdbe5d981360fe32ce26b
 3. Export Preview D1 when the change touches database schema, data, or workflow state.
 4. Deploy one coherent Dev commit.
 5. Record what changed, what stayed untouched, and the exact rollback boundary here.
+
+## 2026-09-21 — Customer email inbox/spam reminder
+- Added a customer-facing footer reminding customers to check Junk/Spam or search for `orders@westtechha.com` if a WestTech message is missing.
+- Applied to coaster, enclosure, direct custom-order, customer portal/sign-in, and customer reorder emails.
+- Admin-only emails are unchanged.
+- No database migration required.
