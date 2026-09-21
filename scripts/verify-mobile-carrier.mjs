@@ -19,7 +19,7 @@ class Statement{
 }
 const db={prepare:sql=>new Statement(sql),batch:statements=>Promise.all(statements.map(statement=>statement.run()))};
 const bucket={put:async()=>{},delete:async()=>{},get:async()=>null};
-const env={ORDERS_DB:db,COASTER_ARTWORK:bucket,RESEND_API_KEY:'test-key'};
+const env={ORDERS_DB:db,COASTER_ARTWORK:bucket,RESEND_API_KEY:'test-key',GMAIL_SMTP_USER:'gateway-test@gmail.com',GMAIL_SMTP_APP_PASSWORD:'test-app-password'};
 
 const customer=await saveCustomCustomer(env,{displayName:'Carrier Test',email:'carrier@example.com',phone:'7205550100',mobileCarrier:'VERIZON',communicationPreference:'SMS',smsConsent:true});
 assert.equal(customer.mobileCarrier,'VERIZON');
@@ -43,7 +43,8 @@ assert.equal(profile.profile.mobileCarrier,'TMOBILE');account=profile.profile;
 await db.prepare(`INSERT INTO customer_account_orders (account_id,source_type,source_order_id) VALUES (?,?,?)`).bind(accountId,'CUSTOM',custom.orderId).run();
 
 const previousFetch=globalThis.fetch;let gatewayRecipient='';
-globalThis.fetch=async(_url,options)=>{gatewayRecipient=JSON.parse(options.body).to[0];return new Response(JSON.stringify({id:'gateway-test-id'}),{status:200,headers:{'Content-Type':'application/json'}});};
+env.__TEXT_GATEWAY_TEST_SEND=async({to})=>{gatewayRecipient=to;return {sent:true,providerId:'gateway-test-id'};};
+globalThis.fetch=async()=>new Response(JSON.stringify({id:'resend-test-id'}),{status:200,headers:{'Content-Type':'application/json'}});
 const reorder=await reorderCustomerOrder(env,account,'CUSTOM',custom.orderId,'https://preview.example/account/');
 const reordered=await db.prepare(`SELECT mobile_carrier,communication_preference,sms_consent FROM custom_orders WHERE order_id=?`).bind(reorder.orderId).first();
 assert.equal(reordered.mobile_carrier,'TMOBILE');assert.equal(reordered.communication_preference,'SMS');assert.equal(reordered.sms_consent,1);
@@ -53,6 +54,7 @@ const duplicate=await sendTransactionalSms(env,{sourceType:'CUSTOM',order:{...cu
 assert.equal(duplicate.duplicate,true);
 const unsupported=await sendTransactionalSms(env,{sourceType:'CUSTOM',order:{...custom,customerPhone:'7205550100',mobileCarrier:'ATT',communicationPreference:'SMS',smsConsent:true},eventType:'TEST',message:'WestTech test',idempotencyKey:'gateway-unsupported'});
 assert.equal(unsupported.reason,'carrier-gateway-unavailable');
+delete env.__TEXT_GATEWAY_TEST_SEND;
 globalThis.fetch=previousFetch;
 
 console.log('PASS migrations 001-021');

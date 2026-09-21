@@ -8,7 +8,8 @@ This file records accepted Dev checkpoints and the recovery point created before
 - Email, mobile number, mobile carrier, communication preference, and explicit text-notice consent are required and stored across Customer Portal, Coaster requests, Enclosure requests, and admin-managed Custom customers.
 - The public request forms remember the submitted name, email, mobile number, carrier, preference, and consent in that browser. Customer Portal profiles retain the same fields for future reorders.
 - Full customer emails remain authoritative for secure links, approvals, order details, receipts, and delivery fallback.
-- When Text is preferred and the selected carrier supports an email-to-text gateway, the existing Resend account sends a short notification to that gateway. No Twilio or other paid SMS API is used.
+- When Text is preferred and the selected carrier supports an email-to-text gateway, the short gateway notification is submitted through Gmail SMTP (`smtp.gmail.com:465`) using an app password. Resend remains unchanged for normal customer/admin email and is not used for the carrier-gateway message. No Twilio or other paid SMS API is used.
+- Gateway SMTP requires `GMAIL_SMTP_USER` and secret `GMAIL_SMTP_APP_PASSWORD` in the deployed environment. Optional generic aliases `TEXT_GATEWAY_SMTP_USER`, `TEXT_GATEWAY_SMTP_PASSWORD`, `TEXT_GATEWAY_SMTP_HOST`, and `TEXT_GATEWAY_SMTP_PORT` are also supported. No database change is required for this transport correction.
 - Gateway sends are idempotent and are recorded honestly as `TEXT_GATEWAY_SENT`, `TEXT_GATEWAY_FAILED`, `TEXT_GATEWAY_UNSUPPORTED`, or configuration/phone skips. The system does not claim carrier delivery or handset reads.
 - Migration `021_mobile_carrier_gateway.sql` adds only a `mobile_carrier` snapshot column to customer/account and order tables. Existing rows default to `OTHER`; no prior order, payment, or production value is rewritten.
 
