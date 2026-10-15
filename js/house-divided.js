@@ -287,20 +287,16 @@
   $('#side-two-house-accent')?.addEventListener('change',event=>setHouseAccent('two',event.target.value));
   $('#swap-teams').addEventListener('click',()=>{const tmp=state.one;state.one=state.two;state.two=tmp;const tmpAccent=houseAccentSelections.one;houseAccentSelections.one=houseAccentSelections.two;houseAccentSelections.two=tmpAccent;updatePreview();showBuildMessage('Sides swapped.',false);});
   $('#reset-build').addEventListener('click',()=>{activeSport='NFL';activeLogoStyle='custom';activeArtworkStyle='standard';blackoutColoredCenter=false;const defs=defaultsForSport('NFL');state.one={...defs[0],kind:'standard'};state.two={...defs[1],kind:'standard'};houseAccentSelections.one=null;houseAccentSelections.two=null;$$('.hd-sport-option').forEach(btn=>{const selected=btn.dataset.sport==='NFL';btn.classList.toggle('is-selected',selected);btn.setAttribute('aria-checked',selected?'true':'false');});sportNote.textContent='NFL Team Art is available now. More sports are coming soon.';closePicker();updatePreview();showBuildMessage('Example matchup reset to Denver Broncos + Dallas Cowboys.',false);});
-  $('#continue-build').addEventListener('click',()=>{
+  $('#continue-build').addEventListener('click',async()=>{
     const centerMode=activeArtworkStyle==='blackout'?(blackoutColoredCenter?'team-color':'blackout'):'team-color';
-    const params=new URLSearchParams({coaster:'house-divided',sport:activeSport,side1:fullName(state.one),side2:fullName(state.two),logoStyle:activeLogoStyle,artworkStyle:activeArtworkStyle,hdCenterMode:centerMode,blackoutColoredCenter:blackoutColoredCenter?'1':'0'});
-    if(['NFL','NHL'].includes(activeSport)){
-      const oneId=houseAccentSelections.one,twoId=houseAccentSelections.two,centers=resolvedCenterBands();
-      params.set('side1CenterBandId',centers.oneBandId);params.set('side1CenterBand',paletteLabel(centers.oneBandId));params.set('side1CenterTextId',centers.oneTextId);params.set('side1CenterText',paletteLabel(centers.oneTextId));
-      params.set('side2CenterBandId',centers.twoBandId);params.set('side2CenterBand',paletteLabel(centers.twoBandId));params.set('side2CenterTextId',centers.twoTextId);params.set('side2CenterText',paletteLabel(centers.twoTextId));
-      if(oneId){params.set('side1HouseAccentId',oneId);params.set('side1HouseAccent',houseAccentOrderLabel('one'));}
-      if(twoId){params.set('side2HouseAccentId',twoId);params.set('side2HouseAccent',houseAccentOrderLabel('two'));}
-      const oneDividerId=dividerColorId(state.one),twoDividerId=dividerColorId(state.two);
-      if(oneDividerId!=='petg-black'){params.set('side1DividerId',oneDividerId);params.set('side1Divider',`${paletteLabel(oneDividerId)} (PETG)`);}
-      if(twoDividerId!=='petg-black'){params.set('side2DividerId',twoDividerId);params.set('side2Divider',`${paletteLabel(twoDividerId)} (PETG)`);}
-    }
-    window.location.href=`../contact.html?${params.toString()}`;
+    const centers=resolvedCenterBands();
+    await window.WestTechSportsOrder.begin({kind:'house',sport:activeSport,
+      side1:fullName(state.one),side2:fullName(state.two),side1Id:state.one.id,side2Id:state.two.id,
+      artworkStyle:activeArtworkStyle,centerMode,setSize:4, // House Divided quantity is confirmed with customer at checkout.
+      side1Band:paletteLabel(centers.oneBandId),side1BandId:centers.oneBandId,
+      side2Band:paletteLabel(centers.twoBandId),side2BandId:centers.twoBandId,
+      side1HouseAccent:houseAccentOrderLabel('one'),side2HouseAccent:houseAccentOrderLabel('two'),
+      preview:'#preview-disc',returnUrl:'house-divided-builder.html',button:'#continue-build',message:'#build-message'});
   });
   $$('.hd-sport-option').forEach(btn=>btn.addEventListener('click',()=>{const sport=btn.dataset.sport;if(sport!=='NFL'){sportNote.textContent=`${sport} Team Art is coming soon.`;showBuildMessage(`${sport} team options are coming soon. NFL is available now.`,true);return;}activeSport='NFL';activeLogoStyle='custom';activeArtworkStyle='standard';blackoutColoredCenter=false;const defs=defaultsForSport('NFL');state.one={...defs[0],kind:'standard'};state.two={...defs[1],kind:'standard'};houseAccentSelections.one=null;houseAccentSelections.two=null;$$('.hd-sport-option').forEach(other=>{const selected=other===btn;other.classList.toggle('is-selected',selected);other.setAttribute('aria-checked',selected?'true':'false');});sportNote.textContent='NFL Team Art is available now. Choose both sides and a house accent for each team.';closePicker();updatePreview();showBuildMessage(`${sport} selected.`,false);}));
   updatePreview();

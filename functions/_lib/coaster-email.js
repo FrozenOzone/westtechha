@@ -1,5 +1,6 @@
 import { requireOrdersDb } from './orders.js';
 import { sendTransactionalSms, transactionalSmsText } from './sms.js';
+import { coasterOrderEmailContext } from './coaster-order-email-context.js';
 
 const EMAIL_TYPES = new Set([
   'REQUEST_RECEIVED','PROOF_READY','CHANGES_REQUESTED','PAYMENT_REQUIRED',
@@ -32,6 +33,7 @@ function template(type,order,links={}){
   const name=clean(order?.customerName,120)||'there';
   const orderId=clean(order?.orderId,80)||'WestTech order';
   const summary=setSummary(order);
+  const orderContext=coasterOrderEmailContext(order);
   const finalTotal=money(String(order?.paymentStatus||'').toUpperCase()==='PAID'&&Number(order?.paymentTotal)>0?order.paymentTotal:order?.finalAmount);
   const approvalUrl=safeLink(links.approvalUrl);
   const paymentUrl=safeLink(links.paymentUrl||order?.paypalApprovalUrl);
@@ -43,12 +45,12 @@ function template(type,order,links={}){
   let subject='',headline='',intro='',process='',action='',details=[],buttonLabel='',buttonUrl='';
 
   if(type==='REQUEST_RECEIVED'){
-    subject=`We received your custom coaster request — ${orderId}`;
+    subject=`${orderContext.customerSubject} — ${orderId}`;
     headline=`Thanks, ${name} — your coaster request is in.`;
-    intro='I’ve got your artwork and order details, and I’ll review everything before anything moves into production.';
+    intro=orderContext.kind==='custom'?'I’ve got your artwork and order details, and I’ll review everything before anything moves into production.':'I’ve got your selected WestTech Team Art and order details, and I’ll review everything before anything moves into production.';
     process='Next I’ll check the artwork, wording, colors, quantity, and whether anything needs to be adjusted for a clean manufactured result. When that review is finished, I’ll send you a proof with the final order terms.';
     action='You don’t need to do anything right now. No payment has been collected.';
-    details=[`Order: ${orderId}`,summary];
+    details=[`Order: ${orderId}`,...orderContext.details,summary];
   }else if(type==='PROOF_READY'){
     subject=`Your WestTech coaster proof is ready — ${orderId}`;
     headline=`Your proof is ready, ${name}.`;

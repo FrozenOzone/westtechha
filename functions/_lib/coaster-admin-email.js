@@ -1,4 +1,5 @@
 import { requireOrdersDb } from './orders.js';
+import { coasterOrderEmailContext } from './coaster-order-email-context.js';
 
 function clean(value,max=500){return typeof value==='string'?value.trim().slice(0,max):'';}
 function esc(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -38,7 +39,8 @@ export async function sendCoasterAdminNewOrderEmail(env,{order,requestUrl=''}={}
   const setCount=Math.max(1,Number(order.setCount||1));
   const setSize=Math.max(1,Number(order.setSize||4));
   const total=Math.max(1,Number(order.totalCoasters||setCount*setSize));
-  const subject=`NEW CUSTOM COASTER REQUEST — ${order.orderId} — ${clean(order.customerName,120)}`;
+  const orderContext=coasterOrderEmailContext(order);
+  const subject=`${orderContext.adminSubject} — ${order.orderId} — ${clean(order.customerName,120)}`;
   const rows=[
     ['Order',order.orderId],
     ['Customer',order.customerName],
@@ -46,21 +48,23 @@ export async function sendCoasterAdminNewOrderEmail(env,{order,requestUrl=''}={}
     ['Phone',order.customerPhone||'—'],
     ['Contact preference',`${order.communicationPreference||'EMAIL'} • ${order.mobileCarrier||'OTHER'}`],
     ['Request',`${setCount} × ${setSize}-Coaster Set${setCount===1?'':'s'} • ${total} coasters`],
+    ...orderContext.adminRows,
     ['Artwork',order.artworkFilename||'—'],
     ['Top text',order.topText||'(none)'],
     ['Bottom text',order.bottomText||'(none)'],
     ['Customer notes',order.customerNotes||'(none)']
   ];
   const rowHtml=rows.map(([label,value])=>`<tr><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-weight:700;color:#334155;vertical-align:top;">${esc(label)}</td><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;color:#0f172a;">${esc(value)}</td></tr>`).join('');
-  const html=`<!doctype html><html><body style="margin:0;background:#f3f6fa;font-family:Arial,Helvetica,sans-serif;color:#152033;"><div style="max-width:680px;margin:0 auto;padding:28px 16px;"><div style="background:#071426;color:#fff;padding:22px 26px;border-radius:12px 12px 0 0;"><div style="font-size:22px;font-weight:800;color:#67aee8;">WestTech Home Automation</div><div style="font-size:11px;letter-spacing:1.5px;margin-top:4px;color:#aabbd0;">INTERNAL ORDER ALERT</div></div><div style="background:#fff;padding:28px 26px;border:1px solid #dde6f0;border-top:0;border-radius:0 0 12px 12px;"><h1 style="font-size:24px;margin:0 0 8px;">New custom coaster request</h1><p style="margin:0 0 20px;color:#475569;">A customer just submitted a new Custom Coaster request. No payment has been collected.</p><table style="width:100%;border-collapse:collapse;font-size:14px;">${rowHtml}</table><div style="margin:26px 0 6px;"><a href="${esc(adminUrl)}" style="display:inline-block;background:#1677C4;color:#fff;text-decoration:none;font-weight:700;padding:13px 20px;border-radius:8px;">Open Order in WestTech Admin</a></div></div></div></body></html>`;
+  const html=`<!doctype html><html><body style="margin:0;background:#f3f6fa;font-family:Arial,Helvetica,sans-serif;color:#152033;"><div style="max-width:680px;margin:0 auto;padding:28px 16px;"><div style="background:#071426;color:#fff;padding:22px 26px;border-radius:12px 12px 0 0;"><div style="font-size:22px;font-weight:800;color:#67aee8;">WestTech Home Automation</div><div style="font-size:11px;letter-spacing:1.5px;margin-top:4px;color:#aabbd0;">INTERNAL ORDER ALERT</div></div><div style="background:#fff;padding:28px 26px;border:1px solid #dde6f0;border-top:0;border-radius:0 0 12px 12px;"><h1 style="font-size:24px;margin:0 0 8px;">${esc(orderContext.adminHeading)}</h1><p style="margin:0 0 20px;color:#475569;">${esc(orderContext.adminDescription)} No payment has been collected.</p><table style="width:100%;border-collapse:collapse;font-size:14px;">${rowHtml}</table><div style="margin:26px 0 6px;"><a href="${esc(adminUrl)}" style="display:inline-block;background:#1677C4;color:#fff;text-decoration:none;font-weight:700;padding:13px 20px;border-radius:8px;">Open Order in WestTech Admin</a></div></div></div></body></html>`;
   const text=[
-    'NEW CUSTOM COASTER REQUEST','',
+    orderContext.adminSubject,'',
     `Order: ${order.orderId}`,
     `Customer: ${order.customerName}`,
     `Email: ${order.customerEmail}`,
     `Phone: ${order.customerPhone||'—'}`,
     `Contact preference: ${order.communicationPreference||'EMAIL'} • ${order.mobileCarrier||'OTHER'}`,
     `Request: ${setCount} x ${setSize}-Coaster Set${setCount===1?'':'s'} • ${total} coasters`,
+    ...orderContext.adminRows.map(([label,value])=>`${label}: ${value}`),
     `Artwork: ${order.artworkFilename||'—'}`,
     `Top text: ${order.topText||'(none)'}`,
     `Bottom text: ${order.bottomText||'(none)'}`,

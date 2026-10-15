@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html class="wt-layout-template" lang="en" data-site-root="../" data-site-section="coasters">
+<head>
+  <meta charset="utf-8"/><script src="../js/theme-init.js?v=20260916-1"></script>
+  <title>Request Your Coaster Set – WestTech Home Automation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="icon" href="../icons/Westtech_Icon_BrainW_Blue_128.png" type="image/png"/>
+  <link rel="stylesheet" href="../css/site.css"/>
+  <link rel="stylesheet" href="../css/layout-template.css?v=20260916-site1"/>
+  <link rel="stylesheet" href="../css/sports-order.css?v=20261015-1"/>
+</head>
+<body class="wt-public-template"><div class="page"><div id="site-header"></div>
+<main class="so-main">
+  <header><span class="so-kicker">CUSTOM COASTERS · ORDER REQUEST</span><h1>Review your coaster request.</h1>
+  <p>The artwork, selected team and style travel with your order. WestTech reviews your request, sends a final proof and price for approval, then releases PayPal payment. <strong>No payment is collected here.</strong></p></header>
+  <div class="so-grid">
+    <section class="so-card so-preview"><h2>Your selected artwork</h2><img id="so-art" alt="Customer-selected WestTech coaster design"/><h3 id="so-title">Loading your coaster…</h3><p id="so-detail"></p><a id="so-back" href="your-team-builder.html">← Change my design</a></section>
+    <form class="so-card so-form" id="so-form" novalidate>
+      <h2>Contact &amp; order details</h2>
+      <div class="so-fields">
+        <label>Full name<input id="so-name" type="text" maxlength="120" autocomplete="name" required/></label>
+        <label>Email<input id="so-email" type="email" maxlength="254" autocomplete="email" required/></label>
+        <label>Mobile phone<input id="so-phone" type="tel" maxlength="40" autocomplete="tel" required/></label>
+        <label>Mobile carrier<select id="so-carrier" required><option value="">Choose carrier</option><option value="VERIZON">Verizon</option><option value="TMOBILE">T-Mobile</option><option value="METRO">Metro by T-Mobile</option><option value="MINT">Mint Mobile</option><option value="VISIBLE">Visible</option><option value="XFINITY">Xfinity Mobile</option><option value="BOOST">Boost Mobile</option><option value="CRICKET">Cricket Wireless</option><option value="US_CELLULAR">U.S. Cellular</option><option value="GOOGLE_FI">Google Fi</option><option value="ATT">AT&amp;T</option><option value="CONSUMER_CELLULAR">Consumer Cellular</option><option value="OTHER">Other / not listed</option></select></label>
+        <label>Preferred communication<select id="so-communication"><option value="EMAIL">Email</option><option value="SMS">Text message</option></select></label>
+        <label>Coaster set<select id="so-set-size"><option value="4">4-coaster set — $29.99 starting price</option><option value="8">8-coaster set — $39.99 starting price</option></select></label>
+      </div>
+      <label class="so-check"><input type="checkbox" id="so-sms-consent"/>I agree to receive transactional order notices through my carrier's email-to-text gateway. Complete order details and approvals are always emailed.</label>
+      <label class="so-notes">Order notes (optional)<textarea id="so-notes" maxlength="800" placeholder="Shipping or pickup preferences, deadlines, or special instructions"></textarea></label>
+      <input class="so-honey" type="text" id="so-website" autocomplete="off" tabindex="-1" aria-hidden="true"/>
+      <p class="so-note">The design uses WestTech's own Team Art; you do not need to claim ownership of it. WestTech confirms the final total, delivery terms, and proof before payment.</p>
+      <button class="so-submit" id="so-submit" type="submit">Send to WestTech for Review →</button>
+      <p class="so-feedback" role="status" id="so-feedback" hidden></p>
+    </form>
+  </div>
+</main><div id="site-footer"></div></div>
+<script src="../js/theme.js"></script><script src="../js/site-shell.js"></script><script src="../js/sports-order-checkout.js?v=20261015-1"></script>
+</body></html>
