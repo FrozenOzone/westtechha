@@ -1,0 +1,18 @@
+/* Isolated admin pickup styles: do not override the existing coaster order UI. */
+#wt-pickup-panel[hidden]{display:none!important}
+#wt-pickup-panel .wt-pickup-note{line-height:1.65;opacity:.85;margin:0 0 18px}
+#wt-pickup-panel .wt-pickup-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:12px;align-items:end}
+#wt-pickup-panel .wt-pickup-fields .ca-field{min-width:0}
+#wt-pickup-panel .wt-pickup-fields input{box-sizing:border-box;width:100%;min-width:0}
+#wt-pickup-panel .wt-pickup-fields button{white-space:nowrap;min-height:48px}
+#wt-pickup-panel .wt-pickup-status{min-height:24px;margin:12px 0;font-size:.88rem}
+#wt-pickup-panel .wt-pickup-status.error{color:#f39f9f}
+#wt-pickup-panel .wt-pickup-status.success{color:#90d7aa}
+#wt-pickup-panel .wt-pickup-list{display:grid;gap:10px}
+#wt-pickup-panel .wt-pickup-row{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--border,#35516e);border-radius:12px;padding:12px}
+#wt-pickup-panel .wt-pickup-row strong{display:block}
+#wt-pickup-panel .wt-pickup-row small{display:block;margin-top:4px;opacity:.8}
+#wt-pickup-panel .wt-pickup-row button{white-space:nowrap}
+#wt-pickup-panel .wt-pickup-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px}
+#wt-pickup-panel .wt-pickup-footer span{font-size:.82rem;line-height:1.5;opacity:.8}
+@media(max-width:750px){#wt-pickup-panel .wt-pickup-fields{grid-template-columns:repeat(2,minmax(0,1fr))}#wt-pickup-panel .wt-pickup-fields button{grid-column:1/-1}#wt-pickup-panel .wt-pickup-footer{flex-direction:column;align-items:stretch}}

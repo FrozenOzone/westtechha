@@ -17,6 +17,7 @@
   <link href="../css/admin-production-fields.css?v=20260913-2" rel="stylesheet"/>
   <script src="../js/admin-access.js?v=20260913-prod1"></script>
   <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/coaster-pickup-admin.css?v=20261015-stage1"/>
 </head>
 <body class="coaster-page custom-coasters-page wt-admin-template">
 <div class="page">
@@ -145,6 +146,19 @@
             <p class="ca-production-rule"><strong>Production mode.</strong> Customer-approved design, price, set count, fulfillment terms, and payment are frozen. Work Log and internal production tracking remain available.</p>
           </section>
 
+          <section class="ca-card wt-pickup-panel" id="wt-pickup-panel" hidden>
+            <div class="ca-card-head"><div><span>LOCAL PICKUP • SCHEDULING</span><strong>Offer pickup times for this order</strong></div><small>ADMIN CONTROL</small></div>
+            <p class="wt-pickup-note">Pick the specific appointment times you want to offer. Monday–Friday, 9 AM–5 PM, Mountain Time. Each pickup lasts 15 minutes. No weekend pickups.</p>
+            <div class="wt-pickup-fields">
+              <div class="ca-field"><label for="wt-pickup-date">Pickup date</label><input id="wt-pickup-date" type="date"/></div>
+              <div class="ca-field"><label for="wt-pickup-time">Pickup time</label><input id="wt-pickup-time" type="time" value="10:00" min="09:00" max="16:45" step="900"/></div>
+              <button id="wt-pickup-add" class="ca-secondary" type="button">+ Add Offered Time</button>
+            </div>
+            <div id="wt-pickup-status" class="wt-pickup-status" role="status" aria-live="polite"></div>
+            <div id="wt-pickup-list" class="wt-pickup-list"></div>
+            <div class="wt-pickup-footer"><span>Stage 1: Stored in D1 only. Customer scheduling links, emails, and the pickup address are not enabled yet.</span><button id="wt-pickup-reload" class="ca-secondary" type="button">Refresh Times</button></div>
+          </section>
+
           <div class="ca-production-save-row" id="ca-production-save-row" hidden>
             <button class="ca-primary ca-production-save" id="ca-save-top" type="button">Save Production Update</button>
           </div>
@@ -243,5 +257,6 @@
   <div id="site-footer"></div>
 </div>
 <script src="../js/theme.js"></script><script src="../js/admin-production-fields.js?v=20260913-2"></script><script src="../js/coaster-admin.js?v=20260920-carrier1"></script><script src="../js/manufacturing-estimate.js?v=20260913-1"></script><script src="../js/coaster-admin-auto-refresh.js?v=20260916-shippedlock1"></script><script src="../js/coaster-admin-archive.js?v=20260904-archive3"></script><script src="../js/admin-pane-sync.js?v=20260905-1"></script>
+<script src="../js/coaster-pickup-admin.js?v=20261015-stage1"></script>
 </body>
 </html>
