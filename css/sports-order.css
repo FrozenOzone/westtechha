@@ -15,7 +15,16 @@
 .so-form select option{background:#071526;color:#fff}
 .so-form textarea{min-height:95px;resize:vertical}.so-notes{margin-top:18px}
 .so-form .so-check{display:flex;gap:10px;margin:20px 0;align-items:flex-start;line-height:1.5;font-weight:500}
-.so-check input{margin-top:4px;flex-shrink:0}
+/* Site-wide input{width:100%} must never expand this checkbox. */
+.so-form .so-check input[type="checkbox"]{
+  width:18px;
+  height:18px;
+  min-width:18px;
+  flex:0 0 18px;
+  margin:2px 0 0;
+  padding:0;
+  accent-color:#1677c4;
+}
 .so-honey{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none}
 .so-submit{width:100%;background:#1677c4;border:0;border-radius:10px;color:white;font:inherit;font-weight:850;padding:15px;cursor:pointer;margin-top:12px}
 .so-submit:disabled{opacity:.65;cursor:wait}.so-feedback{background:#49252a;border-radius:9px;padding:12px;color:#fff}
