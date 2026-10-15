@@ -7,11 +7,17 @@
 /js/admin-access.js
   Cache-Control: no-cache, must-revalidate
 
-/js/site-shell-20260824-mobilefix.js
+/js/site-shell.js
   Cache-Control: no-cache, must-revalidate
 
-/css/site-20260824-mobilefix.css
+/css/site.css
   Cache-Control: no-cache, must-revalidate
 
-/images/WestTech_Logo_BuiltSmart_MadeCustom_20260824.png
+/images/WestTech_Logo_BuiltSmart_MadeCustom.png
   Cache-Control: public, max-age=31536000, immutable
+
+/checkout/*
+  Cache-Control: no-cache, must-revalidate
+
+/products/*
+  Cache-Control: no-cache, must-revalidate

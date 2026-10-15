@@ -7,12 +7,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="description" content="WestTech Home Automation designs and builds clean, serviceable ESP32 enclosures and custom 3D-printed coasters, including House Divided, team, and custom designs."/>
   <link href="icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
-  <link href="css/site-20260824-mobilefix.css?v=20260906-globalbody1" rel="stylesheet"/>
+  <link href="css/site.css?v=20261012-home-enclosures-professional1" rel="stylesheet"/>
   <link href="css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
 </head>
 <body class="wt-public-template">
 <div class="page">
-  <div id="site-header"></div><script src="js/site-shell-20260824-mobilefix.js"></script>
+  <div id="site-header"></div><script src="js/site-shell.js"></script>
 
   <header class="page-header home-page-header home-brand-hero">
     <div class="eyebrow"><span class="dot"></span>Veteran Owned • WestTech Home Automation</div>
@@ -22,16 +22,27 @@
 
   <section class="home-paths" aria-label="Explore WestTech product lines">
     <article class="home-path-card home-path-enclosures">
-      <div class="home-path-copy">
+      <div class="home-path-copy home-enclosure-copy">
         <div class="section-tag">ESP32 Enclosures</div>
         <h2>A cleaner way to mount, protect, and deploy your ESP32 projects.</h2>
-        <p>Choose from Scout, Ranger, and Command enclosure families built to make ESP32 projects cleaner, easier to mount, and easier to service.</p>
-        <div class="home-path-pills" aria-label="Enclosure families"><span>Scout</span><span>Ranger</span><span>Command</span></div>
-        <div class="home-path-actions"><a class="btn btn-primary" href="products.html">Explore Enclosures</a></div>
+        <p>Purpose-built enclosure families for cleaner mounting, protected wiring, and easier long-term service.</p>
+        <div class="home-enclosure-family-list" aria-label="Enclosure families">
+          <div><strong>Scout</strong><span>Small enclosure family</span></div>
+          <div><strong>Ranger</strong><span>Medium enclosure family</span></div>
+          <div><strong>Command</strong><span>Large enclosure family</span></div>
+        </div>
+        <div class="home-path-actions"><a class="btn btn-primary" href="products.html">View Enclosure Families</a></div>
       </div>
-      <a class="home-path-media home-enclosure-media" href="products.html" aria-label="Explore ESP32 Enclosures">
-        <img src="images/products/ranger/relay/30/30-ranger-relay-angled-side1-inserts-hero.jpg" alt="WestTech Ranger ESP32 enclosure with lid and inserts installed"/>
-        <span class="home-media-label">Built Smart</span>
+      <a class="home-path-media home-enclosure-media" href="products.html" aria-label="View ESP32 enclosure families">
+        <div class="home-enclosure-product-stage">
+          <span class="home-enclosure-kicker">Representative Configuration</span>
+          <img src="images/products/ranger/relay/30/30-ranger-relay-angled-side1-inserts-hero.jpg" alt="WestTech Ranger ESP32 enclosure with lid and inserts installed"/>
+        </div>
+        <div class="home-enclosure-specbar" aria-hidden="true">
+          <span><small>Family</small><b>Ranger</b></span>
+          <span><small>Board</small><b>30-pin</b></span>
+          <span><small>Example</small><b>Relay</b></span>
+        </div>
       </a>
     </article>
 
@@ -43,9 +54,13 @@
         <div class="home-path-pills" aria-label="Custom coaster highlights"><span>Made to Order</span><span>Proof Before Production</span><span>Small-Batch Friendly</span></div>
         <div class="home-path-actions"><a class="btn btn-primary" href="coasters/index.html#start">Start a Custom Project</a></div>
       </div>
-      <a class="home-path-media home-coaster-media home-custom-coaster-media" href="coasters/index.html#start" aria-label="Start a custom coaster project">
-        <span class="home-custom-coaster-disc home-custom-coaster-disc-back" aria-hidden="true"><b>WT</b></span>
-        <span class="home-custom-coaster-disc home-custom-coaster-disc-front" aria-hidden="true"><strong>YOUR</strong><b>DESIGN</b><small>MADE BY WESTTECH</small></span>
+      <a class="home-path-media home-coaster-media home-custom-coaster-media" href="coasters/index.html#start" aria-label="Explore WestTech custom coaster designs">
+        <div class="home-coaster-showcase" aria-hidden="true">
+          <img class="home-showcase-coaster home-showcase-house" src="images/coasters/house-divided/house-divided-westtech-team-art.png?v=20261014-home1" alt=""/>
+          <img class="home-showcase-coaster home-showcase-single" src="images/coasters/your-team/single-team-westtech-team-art.png?v=20261014-home1" alt=""/>
+          <img class="home-showcase-coaster home-showcase-custom" src="images/coasters/custom/westtech-custom-logo-coaster.png?v=20261014-home1" alt=""/>
+        </div>
+        <span class="home-showcase-caption" aria-hidden="true"><b>YOUR IDEA</b><span>Custom • Team • House Divided</span></span>
         <span class="home-media-label">Designed One Project at a Time</span>
       </a>
     </article>

@@ -7,13 +7,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="description" content="Configure a WestTech Scout, Ranger, or Command enclosure and send it for final pricing and production review."/>
   <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
-  <link href="../css/site-20260824-mobilefix.css" rel="stylesheet"/>
+  <link href="../css/site.css" rel="stylesheet"/>
   <link href="../css/enclosure-order.css?v=20260906-loaded2" rel="stylesheet"/>
   <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
 </head>
 <body class="enclosure-order-page wt-public-template">
 <div class="page">
-  <div id="site-header"></div><script src="../js/site-shell-20260824-mobilefix.js"></script>
+  <div id="site-header"></div><script src="../js/site-shell.js"></script>
   <main class="eo-main">
     <div class="eo-back"><a href="../products.html"><span aria-hidden="true">←</span> Enclosures</a></div>
     <section class="eo-shell" aria-label="Enclosure order request">
@@ -91,7 +91,10 @@
             <div class="eo-fields">
               <label><span>Name</span><input id="eo-name" type="text" maxlength="120" autocomplete="name" placeholder="Your name" required/></label>
               <label><span>Email</span><input id="eo-email" type="email" maxlength="254" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" placeholder="you@example.com" required/></label>
-              <label><span>Phone <small>(optional)</small></span><input id="eo-phone" type="tel" maxlength="60" autocomplete="tel" inputmode="tel" placeholder="(555) 555-5555"/></label>
+              <label><span>Mobile phone</span><input id="eo-phone" type="tel" maxlength="60" autocomplete="tel" inputmode="tel" placeholder="(555) 555-5555" required/></label>
+              <label><span>Mobile carrier</span><select id="eo-mobile-carrier" required><option value="">Choose carrier</option><option value="VERIZON">Verizon</option><option value="TMOBILE">T-Mobile</option><option value="METRO">Metro by T-Mobile</option><option value="MINT">Mint Mobile</option><option value="VISIBLE">Visible</option><option value="XFINITY">Xfinity Mobile</option><option value="BOOST">Boost Mobile</option><option value="CRICKET">Cricket Wireless</option><option value="US_CELLULAR">U.S. Cellular</option><option value="GOOGLE_FI">Google Fi</option><option value="ATT">AT&amp;T</option><option value="CONSUMER_CELLULAR">Consumer Cellular</option><option value="OTHER">Other / not listed</option></select></label>
+              <label><span>Preferred communication</span><select id="eo-communication" required><option value="EMAIL">Email</option><option value="SMS">Text message</option></select></label>
+              <label class="eo-notes"><span><input id="eo-sms-consent" type="checkbox"/> I agree to receive short transactional WestTech order notices through my carrier’s email-to-text gateway.</span><small>Full order details, secure links, approvals, and receipts are always sent by email.</small></label>
               <label class="eo-notes"><span>Project notes <small>(optional)</small></span><textarea id="eo-notes" maxlength="2500" placeholder="Hardware fit questions, insert or opening needs, timing, quantity, pickup discussion, or anything else WestTech should review."></textarea></label>
             </div>
             <input class="eo-honey" id="eo-website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true"/>
@@ -118,6 +121,6 @@
     <div class="eo-display-dialog-actions"><button id="eo-display-cancel" type="button">Cancel</button><button id="eo-display-confirm" type="button" disabled>Add Both Displays</button></div>
   </section>
 </div>
-<script src="../js/theme.js"></script><script src="../js/enclosure-order.js?v=20260906-loaded2"></script>
+<script src="../js/theme.js"></script><script src="../js/enclosure-order.js?v=20260920-carrier1"></script>
 </body>
 </html>

@@ -2,6 +2,7 @@ import { generateAccessToken, paypalBaseUrl } from "../../../../_lib/paypal.js";
 import { jsonResponse, readJsonSafe } from "../../../../_lib/shared.js";
 import { markOrderCaptured, requireOrdersDb } from "../../../../_lib/orders.js";
 import { captureInventoryHold, releaseInventoryHold } from "../../../../_lib/inventory.js";
+import { inviteCustomerForOrder } from "../../../../_lib/customer-account.js";
 
 function extractShippingAddress(data) {
   const shipping = data?.purchase_units?.[0]?.shipping || {};
@@ -97,6 +98,7 @@ export async function onRequestPost(context) {
     const ordersDb = requireOrdersDb(context.env);
     const orderRecord = await markOrderCaptured(ordersDb, { paypalOrderId: orderID, captureData: data });
     await captureInventoryHold(context.env, { paypalOrderId: orderID, invoiceId: orderRecord?.invoiceId || null }).catch(() => {});
+    await inviteCustomerForOrder(context.env,{sourceType:'STORE',order:{orderId:orderRecord?.invoiceId,customerName:orderRecord?.customerName,customerEmail:orderRecord?.customerEmail,customerPhone:orderRecord?.customerPhone,communicationPreference:'EMAIL',smsConsent:false},requestUrl:context.request.url}).catch(()=>{});
 
     return jsonResponse({
       ok: true,

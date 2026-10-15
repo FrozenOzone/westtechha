@@ -1,0 +1,95 @@
+(function(){
+  'use strict';
+
+  // WestTech physical filament inventory for internal coaster Color Labs.
+  // Swatch hex values are screen approximations for preview only; the exact
+  // manufacturer color/material name is the production source of truth.
+  const inventory = [
+    // PETG — physically separated from the PLA family.
+    {id:'petg-bone-white', color:'Bone White', label:'Bone White', material:'PETG', family:'PETG', hex:'#e9e2d4', filament:'SUNLU PETG — Bone White', filamentStatus:'on-hand'},
+    {id:'petg-oak', color:'Oak', label:'Oak', material:'PETG', family:'PETG', hex:'#9a7452', filament:'SUNLU PETG — Oak', filamentStatus:'on-hand'},
+    {id:'petg-coffee-brown', color:'Coffee Brown', label:'Coffee Brown', material:'PETG', family:'PETG', hex:'#6f4a2c', filament:'SUNLU PETG — Coffee Brown', filamentStatus:'on-hand'},
+    {id:'petg-cherry-red', color:'Cherry Red', label:'Cherry Red', material:'PETG', family:'PETG', hex:'#d9232e', filament:'SUNLU PETG — Cherry Red', filamentStatus:'on-hand'},
+    {id:'petg-magenta', color:'Magenta', label:'Magenta', material:'PETG', family:'PETG', hex:'#c83cb9', filament:'SUNLU PETG — Magenta', filamentStatus:'on-hand'},
+    {id:'petg-purple', color:'Purple', label:'Purple', material:'PETG', family:'PETG', hex:'#5f3ba8', filament:'SUNLU PETG — Purple', filamentStatus:'on-hand'},
+    {id:'petg-white', color:'White', label:'White', material:'PETG', family:'PETG', hex:'#f5f5f2', filament:'SUNLU PETG — White', filamentStatus:'on-hand'},
+    {id:'petg-black', color:'Black', label:'Black', material:'PETG', family:'PETG', hex:'#111317', filament:'SUNLU PETG — Black', filamentStatus:'on-hand'},
+    {id:'petg-grey', color:'Grey', label:'Grey', material:'PETG', family:'PETG', hex:'#8d949b', filament:'SUNLU PETG — Grey', filamentStatus:'on-hand'},
+    {id:'petg-cyan', color:'Cyan', label:'Cyan', material:'PETG', family:'PETG', hex:'#27b8cf', filament:'SUNLU PETG — Cyan', filamentStatus:'on-hand'},
+    {id:'petg-green', color:'Green', label:'Green', material:'PETG', family:'PETG', hex:'#168b55', filament:'SUNLU PETG — Green', filamentStatus:'on-hand'},
+    {id:'petg-mint-green', color:'Mint Green', label:'Mint Green', material:'PETG', family:'PETG', hex:'#65bfa6', filament:'SUNLU PETG — Mint Green', filamentStatus:'on-hand'},
+    {id:'petg-sky-blue', color:'Sky Blue', label:'Sky Blue', material:'PETG', family:'PETG', hex:'#67aee8', filament:'SUNLU PETG — Sky Blue', filamentStatus:'on-hand'},
+    {id:'petg-yellow', color:'Yellow', label:'Yellow', material:'PETG', family:'PETG', hex:'#f4c430', filament:'SUNLU PETG — Yellow', filamentStatus:'on-hand'},
+    {id:'petg-red', color:'Red', label:'Red', material:'PETG', family:'PETG', hex:'#8b1e2d', filament:'SUNLU PETG — Red', filamentStatus:'on-hand'},
+    {id:'petg-olive-green', color:'Olive Green', label:'Olive Green', material:'PETG', family:'PETG', hex:'#1e4c3b', filament:'SUNLU PETG — Olive Green', filamentStatus:'on-hand'},
+    {id:'petg-sunny-orange', color:'Sunny Orange', label:'Sunny Orange', material:'PETG', family:'PETG', hex:'#f26a21', filament:'SUNLU PETG — Sunny Orange', filamentStatus:'on-hand'},
+    {id:'petg-klein-blue', color:'Klein Blue', label:'Klein Blue', material:'PETG', family:'PETG', hex:'#2447b8', filament:'SUNLU PETG — Klein Blue', filamentStatus:'on-hand'},
+
+    // Regular PLA / PLA Matte.
+    {id:'pla-black', color:'Black', label:'Black', material:'PLA', family:'PLA_FAMILY', hex:'#111317', filament:'SUNLU PLA Matte — Black', filamentStatus:'on-hand'},
+    {id:'pla-white', color:'White', label:'White', material:'PLA', family:'PLA_FAMILY', hex:'#f5f5f2', filament:'SUNLU PLA Matte — White', filamentStatus:'on-hand'},
+    {id:'pla-grey', color:'Grey', label:'Grey', material:'PLA', family:'PLA_FAMILY', hex:'#8d949b', filament:'SUNLU PLA Matte — Grey', filamentStatus:'on-hand'},
+    {id:'pla-red', color:'Red', label:'Red', material:'PLA', family:'PLA_FAMILY', hex:'#a52a32', filament:'SUNLU PLA Matte — Red', filamentStatus:'on-hand'},
+    {id:'pla-blue', color:'Blue', label:'Blue', material:'PLA', family:'PLA_FAMILY', hex:'#315cba', filament:'SUNLU PLA Matte — Blue', filamentStatus:'on-hand'},
+    {id:'pla-olive-green', color:'Olive Green', label:'Olive Green', material:'PLA', family:'PLA_FAMILY', hex:'#536846', filament:'SUNLU PLA Matte — Olive Green', filamentStatus:'on-hand'},
+    {id:'pla-sunny-orange', color:'Sunny Orange', label:'Sunny Orange', material:'PLA', family:'PLA_FAMILY', hex:'#f26a21', filament:'SUNLU PLA Matte — Sunny Orange', filamentStatus:'on-hand'},
+    {id:'pla-bone-white', color:'Bone White', label:'Bone White', material:'PLA', family:'PLA_FAMILY', hex:'#e9e2d4', filament:'SUNLU PLA Matte — Bone White', filamentStatus:'on-hand'},
+    {id:'pla-purple', color:'Purple', label:'Purple', material:'PLA', family:'PLA_FAMILY', hex:'#5f3ba8', filament:'SUNLU PLA Matte — Purple', filamentStatus:'on-hand'},
+    {id:'pla-oak-wood', color:'Oak Wood', label:'Oak Wood', material:'PLA', family:'PLA_FAMILY', hex:'#98704b', filament:'SUNLU PLA Matte — Oak Wood', filamentStatus:'on-hand'},
+    {id:'pla-klein-blue', color:'Klein Blue', label:'Klein Blue', material:'PLA', family:'PLA_FAMILY', hex:'#2447b8', filament:'SUNLU PLA Matte — Klein Blue', filamentStatus:'on-hand'},
+
+    // PLA+.
+    {id:'pla-plus-coffee-brown', color:'Coffee Brown', label:'Coffee Brown', material:'PLA+', family:'PLA_FAMILY', hex:'#6f4a2c', filament:'SUNLU PLA+ — Coffee Brown', filamentStatus:'on-hand'},
+    {id:'pla-plus-cherry-red', color:'Cherry Red', label:'Cherry Red', material:'PLA+', family:'PLA_FAMILY', hex:'#d9232e', filament:'SUNLU PLA+ — Cherry Red', filamentStatus:'on-hand'},
+    {id:'pla-plus-sunny-orange', color:'Sunny Orange', label:'Sunny Orange', material:'PLA+', family:'PLA_FAMILY', hex:'#f26a21', filament:'SUNLU PLA+ — Sunny Orange', filamentStatus:'on-hand'},
+    {id:'pla-plus-light-gold', color:'Gold (Light Gold)', label:'Gold (Light Gold)', material:'PLA+', family:'PLA_FAMILY', hex:'#c7a43b', filament:'SUNLU PLA+ — Gold (Light Gold)', filamentStatus:'on-hand'},
+    {id:'pla-plus-oliver-green', color:'Oliver Green', label:'Oliver Green', material:'PLA+', family:'PLA_FAMILY', hex:'#526747', filament:'SUNLU PLA+ — Oliver Green', filamentStatus:'on-hand'},
+    {id:'pla-plus-sky-blue', color:'Sky Blue', label:'Sky Blue', material:'PLA+', family:'PLA_FAMILY', hex:'#67aee8', filament:'SUNLU PLA+ — Sky Blue', filamentStatus:'on-hand'},
+    {id:'pla-plus-silver', color:'Silver', label:'Silver', material:'PLA+', family:'PLA_FAMILY', hex:'#c4c8cc', filament:'SUNLU PLA+ — Silver', filamentStatus:'on-hand'},
+    {id:'pla-plus-green', color:'Green', label:'Green', material:'PLA+', family:'PLA_FAMILY', hex:'#168b55', filament:'SUNLU PLA+ — Green', filamentStatus:'on-hand'},
+    {id:'pla-plus-yellow', color:'Yellow', label:'Yellow', material:'PLA+', family:'PLA_FAMILY', hex:'#f4c430', filament:'SUNLU PLA+ — Yellow', filamentStatus:'on-hand'},
+    {id:'pla-plus-mint-green', color:'Mint Green', label:'Mint Green', material:'PLA+', family:'PLA_FAMILY', hex:'#65bfa6', filament:'SUNLU PLA+ — Mint Green', filamentStatus:'on-hand'},
+    {id:'pla-plus-bone-white', color:'Bone White', label:'Bone White', material:'PLA+', family:'PLA_FAMILY', hex:'#e9e2d4', filament:'SUNLU PLA+ — Bone White', filamentStatus:'on-hand'},
+    {id:'pla-plus-tan', color:'Tan', label:'Tan', material:'PLA+', family:'PLA_FAMILY', hex:'#c6a56f', filament:'SUNLU PLA+ — Tan', filamentStatus:'on-hand'},
+    {id:'pla-plus-purple', color:'Purple', label:'Purple', material:'PLA+', family:'PLA_FAMILY', hex:'#5f3ba8', filament:'SUNLU PLA+ — Purple', filamentStatus:'on-hand'},
+    {id:'pla-plus-klein-blue', color:'Klein Blue', label:'Klein Blue', material:'PLA+', family:'PLA_FAMILY', hex:'#2447b8', filament:'SUNLU PLA+ — Klein Blue', filamentStatus:'on-hand'},
+    {id:'pla-plus-sakura-pink', color:'Sakura Pink', label:'Sakura Pink', material:'PLA+', family:'PLA_FAMILY', hex:'#e88abf', filament:'SUNLU PLA+ — Sakura Pink', filamentStatus:'on-hand'},
+
+    // PLA+ 2.0 — small stock set.
+    {id:'pla2-black', color:'Black', label:'Black', material:'PLA+ 2.0', family:'PLA_FAMILY', hex:'#111317', filament:'SUNLU PLA+ 2.0 — Black', filamentStatus:'on-hand'},
+    {id:'pla2-white', color:'White', label:'White', material:'PLA+ 2.0', family:'PLA_FAMILY', hex:'#f5f5f2', filament:'SUNLU PLA+ 2.0 — White', filamentStatus:'on-hand'},
+    {id:'pla2-grey', color:'Grey', label:'Grey', material:'PLA+ 2.0', family:'PLA_FAMILY', hex:'#8d949b', filament:'SUNLU PLA+ 2.0 — Grey', filamentStatus:'on-hand'}
+  ];
+
+  // Migration map for the generic Color Lab IDs used before the physical
+  // inventory picker. Existing drafts/baselines are migrated automatically.
+  const legacyMap = {
+    'white':'petg-white',
+    'warm-white':'petg-bone-white',
+    'light-gray':'pla-plus-silver',
+    'gray':'petg-grey',
+    'dark-gray':'petg-grey',
+    'black':'petg-black',
+    'red':'petg-cherry-red',
+    'dark-red':'petg-red',
+    'orange':'petg-sunny-orange',
+    'yellow':'petg-yellow',
+    'lime':'petg-green',
+    'green':'petg-green',
+    'dark-green':'petg-olive-green',
+    'royal-blue':'petg-klein-blue',
+    'navy':'petg-klein-blue',
+    'light-blue':'petg-sky-blue',
+    'cyan':'petg-cyan',
+    'teal':'petg-cyan',
+    'purple':'petg-purple',
+    'violet':'petg-purple',
+    'pink':'pla-plus-sakura-pink',
+    'magenta':'petg-magenta',
+    'brown':'petg-coffee-brown',
+    'tan':'pla-plus-tan'
+  };
+
+  window.WestTechFilamentInventory = inventory;
+  window.WestTechLegacyColorMap = legacyMap;
+})();

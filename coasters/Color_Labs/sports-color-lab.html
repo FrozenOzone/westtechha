@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html class="wt-layout-template" lang="en" data-site-root="../" data-site-section="coasters">
+<head>
+  <meta charset="utf-8"/>
+  <base href="../"/>
+  <script src="../js/theme-init.js?v=20260916-1"></script>
+  <title>WestTech Single Team Color Lab</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Internal WestTech Single Team Color Lab for team colors, logo fit, approvals, and production baseline exports."/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="../css/site.css" rel="stylesheet"/>
+  <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
+  <link href="Color_Labs/assets/css/sports-color-lab.css" rel="stylesheet"/>
+</head>
+<body class="wt-public-template sports-color-lab-page">
+<div class="page">
+  <div id="site-header"></div>
+  <main>
+    <section class="lab-header">
+      <img src="../images/WestTech_Logo_BuiltSmart_MadeCustom.png" alt="WestTech Home Automation"/>
+      <div><span>INTERNAL COASTER TOOL · 1 OF 5</span><h1>Single Team Color Lab</h1><p>Single Team only: choose a sport, tune team colors and logo fit, approve the team, and export that sport’s production baseline.</p></div>
+    </section>
+
+    <div class="lab-shell">
+      <nav class="lab-mode-nav" aria-label="WestTech coaster color tools">
+        <a class="is-current" href="Color_Labs/sports-color-lab.html" aria-current="page">Single Team Color Lab</a>
+        <a href="Color_Labs/house-divided-color-lab.html">House Divided Color Lab</a>
+        <a href="Color_Labs/house-accent-review.html">House Accent Review</a>
+        <a href="Color_Labs/blackout-color-lab.html">House Blackout</a>
+        <a href="Color_Labs/single-blackout-color-lab.html">Single Blackout</a>
+      </nav>
+      <section class="lab-toolbar">
+        <div class="lab-status"><b id="lab-status-title">NFL · Single Team</b><span id="lab-status-subtitle">Loaded from the approved WestTech production baseline.</span></div>
+        <div class="lab-actions">
+          <label class="buttonlike" for="lab-import-file">Load export</label><input id="lab-import-file" type="file" accept=".js,.json" hidden/>
+          <button id="lab-save-draft" type="button">Save browser draft</button>
+          <button id="lab-reset-baseline" type="button">Reset sport</button>
+          <button class="primary" id="lab-download-js" type="button">Download JS export</button>
+        </div>
+      </section>
+
+      <section class="lab-sports-panel">
+        <div><span class="eyebrow">SPORT</span><h2>Choose the league</h2></div>
+        <div class="lab-sport-grid" id="lab-sport-grid"></div>
+      </section>
+
+      <section class="lab-logo-mode-panel" id="lab-logo-mode-panel">
+        <div><span class="eyebrow">ARTWORK</span><h2>Logo source</h2><p id="lab-logo-mode-note">NFL can preview either WestTech Team Art or the real NFL Team Logo.</p></div>
+        <div class="lab-logo-mode-options" id="lab-logo-mode-options"></div>
+      </section>
+
+      <section class="lab-material-filter-panel">
+        <div><span class="eyebrow">FILAMENT FAMILY</span><h2>Physical inventory picker</h2><p id="lab-material-filter-note">Stocked filament choices shown. Use the filter to narrow the picker.</p></div>
+        <div class="lab-material-filter" id="lab-material-filter" role="group" aria-label="Filament family filter">
+          <button type="button" data-material-filter="all" aria-pressed="true">All</button>
+          <button type="button" data-material-filter="PETG" aria-pressed="false">PETG</button>
+          <button type="button" data-material-filter="PLA_FAMILY" aria-pressed="false">PLA Family</button>
+        </div>
+        <small>PLA Family includes PLA, PLA+, and PLA+ 2.0. Exact material variant stays visible in every color choice.</small>
+        <div class="lab-material-status" id="lab-material-status" aria-live="polite"></div>
+      </section>
+
+      <section class="progress-panel">
+        <div><span>TEAM PROGRESS</span><h2 id="lab-progress-title">Approved teams: 0 / 0</h2></div>
+        <div class="team-status" id="lab-team-status"></div>
+      </section>
+
+      <section class="lab-workspace">
+        <div class="editor-panel">
+          <div class="editor-head">
+            <div><span>PROFILE EDITOR</span><h2>Edit team color roles</h2></div>
+            <label><span class="sr-only">Active team</span><select id="lab-team-select" aria-label="Active team"></select></label>
+          </div>
+
+          <article class="active-team" id="lab-active-team-card">
+            <div class="team-top">
+              <div class="team-icon"><img id="lab-team-icon" alt=""/></div>
+              <div class="team-name"><strong id="lab-team-name">Team</strong><span id="lab-team-code">CODE</span></div>
+              <label class="approve"><input id="lab-approved" type="checkbox"/> Approved</label>
+            </div>
+
+            <div class="role-grid">
+              <div class="role"><label for="lab-role-field">Field</label><div class="select-wrap"><span class="swatch" id="swatch-field"></span><select id="lab-role-field"></select></div><div class="filament-ref" id="filament-field"></div></div>
+              <div class="role"><label for="lab-role-nameRing">Name ring</label><div class="select-wrap"><span class="swatch" id="swatch-nameRing"></span><select id="lab-role-nameRing"></select></div><div class="filament-ref" id="filament-nameRing"></div></div>
+              <div class="role"><label for="lab-role-ringText">Ring text</label><div class="select-wrap"><span class="swatch" id="swatch-ringText"></span><select id="lab-role-ringText"></select></div><div class="filament-ref" id="filament-ringText"></div></div>
+              <div class="role"><label for="lab-role-accentRing">Accent ring</label><div class="select-wrap"><span class="swatch" id="swatch-accentRing"></span><select id="lab-role-accentRing"></select></div><div class="filament-ref" id="filament-accentRing"></div></div>
+              <div class="role"><label for="lab-role-outline">Outer outline</label><div class="select-wrap"><span class="swatch" id="swatch-outline"></span><select id="lab-role-outline"></select></div><div class="filament-ref" id="filament-outline"></div></div>
+              <div class="role logo-outline-role" id="lab-logo-outline-wrap"><label class="outline-toggle" for="lab-role-logoOutlineEnabled"><input id="lab-role-logoOutlineEnabled" type="checkbox"/> Enable whole-logo outline</label><div class="select-wrap"><span class="swatch" id="swatch-logoOutline"></span><select id="lab-role-logoOutline"></select></div><div class="filament-ref" id="filament-logoOutline"></div><small id="lab-logo-outline-note">Available for WestTech Team Art preview.</small></div>
+            </div>
+
+            <div class="logo-size-control" id="lab-logo-size-control">
+              <div class="logo-size-head">
+                <div><span>LOGO SIZE</span><strong>Fit the artwork inside the inner ring</strong></div>
+                <button id="lab-logo-size-reset" type="button">Reset 100%</button>
+              </div>
+              <div class="logo-size-inputs">
+                <input id="lab-logo-size-slider" type="range" min="30" max="120" step="1" value="100" aria-label="Logo size percent"/>
+                <label for="lab-logo-size-number"><input id="lab-logo-size-number" type="number" min="30" max="120" step="1" value="100"/><span>%</span></label>
+              </div>
+              <p>100% is the current default. Reduce the value when a logo crosses the inner ring. NFL remembers separate sizes for Team Logo and WestTech Team Art.</p>
+            </div>
+
+            <div class="role lab-notes-role"><label for="lab-notes">Notes</label><textarea id="lab-notes" rows="3" placeholder="Optional internal note for this team"></textarea></div>
+
+            <div class="team-foot"><div class="step-buttons"><button id="lab-prev-team" type="button">Previous team</button><button id="lab-next-team" type="button">Next team</button><button id="lab-reset-team" type="button">Reset this team</button></div><div class="mapping-note" id="lab-draft-state">Working from loaded baseline.</div></div>
+          </article>
+        </div>
+
+        <aside class="preview-sticky">
+          <div class="preview-topline"><div><span class="eyebrow">LIVE PREVIEW</span><div class="preview-name" id="lab-preview-name">Team Preview</div></div><b id="lab-preview-sport">NFL</b></div>
+          <svg class="lab-coaster" id="lab-coaster" viewBox="0 0 1000 1000" role="img" aria-labelledby="lab-preview-title lab-preview-desc">
+            <title id="lab-preview-title">Sports coaster preview</title><desc id="lab-preview-desc">Live preview of the active team coaster profile.</desc>
+            <circle class="lab-outer" cx="500" cy="500" r="470"/><circle class="lab-rim" cx="500" cy="500" r="445"/><circle class="lab-field" cx="500" cy="500" r="350"/><circle class="lab-inner-line" cx="500" cy="500" r="355"/>
+            <g class="lab-ring-letters" id="lab-top-text"></g><g class="lab-ring-letters" id="lab-bottom-text"></g>
+            <svg class="lab-team-logo-outline" id="lab-team-logo-outline" x="185" y="185" width="630" height="630" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet" overflow="visible"><g id="lab-team-logo-outline-paths"></g></svg>
+            <image id="lab-team-logo" x="150" y="150" width="700" height="700" preserveAspectRatio="xMidYMid meet"/>
+            <text id="lab-logo-fallback" x="500" y="545" text-anchor="middle">TEAM</text>
+          </svg>
+          <p class="preview-help" id="lab-preview-help">Real team logos are previewed from your existing WestTech sports asset library. The color controls affect the coaster structure around the logo; the logo artwork itself is not recolored.</p>
+          <div class="palette-key"><span>PHYSICAL FILAMENT PALETTE</span><div id="lab-palette-key"></div></div>
+        </aside>
+      </section>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+</div>
+<script src="../js/theme.js"></script>
+<script src="../js/site-shell.js"></script>
+<script src="Color_Labs/assets/js/westtech-filament-catalog.js"></script>
+<script src="../js/nfl-single-team-color-baseline.js"></script>
+<script src="../js/nfl-team-art-color-baseline.js"></script>
+<script src="../js/nhl-single-team-color-baseline.js"></script>
+<script src="Color_Labs/assets/js/sports-color-lab-data.js"></script>
+<script src="../js/team-logo-context.js"></script>
+<script src="Color_Labs/assets/js/sports-color-lab.js"></script>
+<script src="Color_Labs/assets/js/lab-svg-asset-map.js"></script>
+<script src="Color_Labs/assets/js/lab-preview-download.js"></script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html class="wt-layout-template" lang="en" data-site-root="../" data-site-section="coasters">
+<head>
+  <meta charset="utf-8"/>
+  <base href="../"/>
+  <script src="../js/theme-init.js?v=20260916-1"></script>
+  <title>WestTech NFL Single Team Blackout Color Lab</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Internal WestTech NFL Single Team Blackout review and production baseline editor."/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="../css/site.css" rel="stylesheet"/>
+  <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
+  <link href="Color_Labs/assets/css/sports-color-lab.css" rel="stylesheet"/>
+  <link href="Color_Labs/assets/css/single-blackout-color-lab.css" rel="stylesheet"/>
+</head>
+<body class="wt-public-template sports-color-lab-page single-blackout-color-lab-page">
+<div class="page">
+  <div id="site-header"></div>
+  <main>
+    <section class="lab-header single-blackout-header">
+      <img src="../images/WestTech_Logo_BuiltSmart_MadeCustom.png" alt="WestTech Home Automation"/>
+      <div>
+        <span>INTERNAL COASTER TOOL · 5 OF 5</span>
+        <h1>NFL Single Team Blackout Color Lab</h1>
+        <p>Single Team Blackout review. The field is fixed Black; tune the rings, WestTech Team Art outline, and full-size logo fit independently from Standard and House Divided.</p>
+      </div>
+    </section>
+
+    <div class="lab-shell">
+      <nav class="lab-mode-nav" aria-label="WestTech coaster color tools">
+        <a href="Color_Labs/sports-color-lab.html">Single Team Color Lab</a>
+        <a href="Color_Labs/house-divided-color-lab.html">House Divided Color Lab</a>
+        <a href="Color_Labs/house-accent-review.html">House Accent Review</a>
+        <a href="Color_Labs/blackout-color-lab.html">House Blackout</a>
+        <a class="is-current" href="Color_Labs/single-blackout-color-lab.html" aria-current="page">Single Blackout</a>
+      </nav>
+
+      <section class="lab-toolbar">
+        <div class="lab-status">
+          <b id="lab-status-title">NFL · WestTech Team Art · Single Blackout Pass 1</b>
+          <span id="lab-status-subtitle">First-pass suggestions are loaded. Standard Single Team and House Blackout baselines remain separate.</span>
+        </div>
+        <div class="lab-actions">
+          <label class="buttonlike" for="lab-import-file">Load export</label><input id="lab-import-file" type="file" accept=".js,.json" hidden/>
+          <button id="lab-save-draft" type="button">Save browser draft</button>
+          <button id="lab-reset-baseline" type="button">Reset Pass 1</button>
+          <button class="primary" id="lab-download-js" type="button">Download Blackout + shared Single exports</button>
+        </div>
+      </section>
+
+      <section class="single-blackout-standard-card">
+        <div>
+          <span class="eyebrow">SINGLE BLACKOUT STANDARD</span>
+          <h2>Black field. Full-color WestTech identity.</h2>
+          <p>The center field is fixed Black. Team identity comes from WestTech Team Art, the name/ring colors, accent ring, and whole-logo outline. This profile is independent from both Standard Single Team and House Divided Blackout.</p>
+        </div>
+        <div class="single-blackout-standard-swatches" aria-label="Fixed Blackout colors">
+          <div><i style="--sw:#111317"></i><b>Field</b><span>Black · fixed</span></div>
+          <div><i style="--sw:#f5f5f2"></i><b>Starting ring</b><span>White</span></div>
+        </div>
+      </section>
+
+      <section class="lab-material-filter-panel">
+        <div><span class="eyebrow">FILAMENT FAMILY</span><h2>Physical inventory picker</h2><p id="lab-material-filter-note">Stocked filament choices shown. Use the filter to narrow the picker.</p></div>
+        <div class="lab-material-filter" id="lab-material-filter" role="group" aria-label="Filament family filter">
+          <button type="button" data-material-filter="all" aria-pressed="true">All</button>
+          <button type="button" data-material-filter="PETG" aria-pressed="false">PETG</button>
+          <button type="button" data-material-filter="PLA_FAMILY" aria-pressed="false">PLA Family</button>
+        </div>
+        <small>Pass 1 starts from your approved Standard Pass 2 ring colors and your approved House Blackout outline choices. Nothing is approved yet.</small>
+        <div class="lab-material-status" id="lab-material-status" aria-live="polite"></div>
+      </section>
+
+      <section class="progress-panel">
+        <div><span>SINGLE BLACKOUT REVIEW</span><h2 id="lab-progress-title">Approved teams: 0 / 32</h2></div>
+        <div class="team-status" id="lab-team-status"></div>
+      </section>
+
+      <section class="lab-workspace single-blackout-workspace">
+        <div class="editor-panel">
+          <div class="editor-head">
+            <div><span>PROFILE EDITOR</span><h2>Edit Single Team Blackout</h2></div>
+            <label><span class="sr-only">Active team</span><select id="lab-team-select" aria-label="Active team"></select></label>
+          </div>
+
+          <article class="active-team" id="lab-active-team-card">
+            <div class="team-top">
+              <div class="team-icon"><img id="lab-team-icon" alt=""/></div>
+              <div class="team-name"><strong id="lab-team-name">Team</strong><span id="lab-team-code">CODE</span></div>
+              <label class="approve"><input id="lab-approved" type="checkbox"/> Approved</label>
+            </div>
+
+            <div class="single-blackout-fixed-row">
+              <span>FIELD</span><b>Black · fixed</b><span id="lab-standard-reference">Standard field reference</span>
+            </div>
+
+            <div class="role-grid">
+              <div class="role"><label for="lab-role-nameRing">Name ring</label><div class="select-wrap"><span class="swatch" id="swatch-nameRing"></span><select id="lab-role-nameRing"></select></div><div class="filament-ref" id="filament-nameRing"></div></div>
+              <div class="role"><label for="lab-role-ringText">Ring text</label><div class="select-wrap"><span class="swatch" id="swatch-ringText"></span><select id="lab-role-ringText"></select></div><div class="filament-ref" id="filament-ringText"></div></div>
+              <div class="role"><label for="lab-role-accentRing">Accent ring</label><div class="select-wrap"><span class="swatch" id="swatch-accentRing"></span><select id="lab-role-accentRing"></select></div><div class="filament-ref" id="filament-accentRing"></div></div>
+              <div class="role"><label for="lab-role-outline">Outer outline</label><div class="select-wrap"><span class="swatch" id="swatch-outline"></span><select id="lab-role-outline"></select></div><div class="filament-ref" id="filament-outline"></div></div>
+              <div class="role logo-outline-role" id="lab-logo-outline-wrap"><label class="outline-toggle" for="lab-role-logoOutlineEnabled"><input id="lab-role-logoOutlineEnabled" type="checkbox"/> Enable whole-logo outline</label><div class="select-wrap"><span class="swatch" id="swatch-logoOutline"></span><select id="lab-role-logoOutline"></select></div><div class="filament-ref" id="filament-logoOutline"></div><small>Independent Single Blackout outline choice.</small></div>
+            </div>
+
+            <div class="logo-size-control is-custom-mode" id="lab-logo-size-control">
+              <div class="logo-size-head">
+                <div><span>LOGO SIZE</span><strong>Shared Single Team fit</strong></div>
+                <button id="lab-logo-size-reset" type="button">Reset shared size</button>
+              </div>
+              <div class="logo-size-inputs">
+                <input id="lab-logo-size-slider" type="range" min="30" max="120" step="1" value="100" aria-label="Shared Single Team logo size percent"/>
+                <label for="lab-logo-size-number"><input id="lab-logo-size-number" type="number" min="30" max="120" step="1" value="100"/><span>%</span></label>
+              </div>
+              <p>Logo size is shared only between Single Team Standard and Single Team Blackout. You may resize here; the export also includes the updated Single Standard baseline so both stay matched.</p>
+            </div>
+
+            <div class="role lab-notes-role"><label for="lab-notes">Notes</label><textarea id="lab-notes" rows="3" placeholder="Optional internal note for this team"></textarea></div>
+
+            <div class="team-foot">
+              <div class="step-buttons"><button id="lab-prev-team" type="button">Previous team</button><button id="lab-next-team" type="button">Next team</button><button id="lab-next-unapproved" type="button">Next unapproved</button><button id="lab-reset-team" type="button">Reset this team</button></div>
+              <div class="mapping-note" id="lab-draft-state">Working from Single Blackout Pass 1.</div>
+            </div>
+          </article>
+        </div>
+
+        <aside class="preview-sticky single-blackout-preview">
+          <div class="preview-topline"><div><span class="eyebrow">LIVE PREVIEW</span><div class="preview-name" id="lab-preview-name">Team Preview</div></div><b>BLACKOUT</b></div>
+          <svg class="lab-coaster" id="lab-coaster" viewBox="0 0 1000 1000" role="img" aria-labelledby="lab-preview-title lab-preview-desc">
+            <title id="lab-preview-title">Single Team Blackout coaster preview</title><desc id="lab-preview-desc">Live preview of the active NFL Single Team Blackout profile.</desc>
+            <circle class="lab-outer" cx="500" cy="500" r="470"/><circle class="lab-rim" cx="500" cy="500" r="445"/><circle class="lab-field" cx="500" cy="500" r="350"/><circle class="lab-inner-line" cx="500" cy="500" r="355"/>
+            <g class="lab-ring-letters" id="lab-top-text"></g><g class="lab-ring-letters" id="lab-bottom-text"></g>
+            <svg class="lab-team-logo-outline" id="lab-team-logo-outline" x="185" y="185" width="630" height="630" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet" overflow="visible"><g id="lab-team-logo-outline-paths"></g></svg>
+            <image id="lab-team-logo" x="185" y="185" width="630" height="630" preserveAspectRatio="xMidYMid meet"/>
+            <text id="lab-logo-fallback" x="500" y="545" text-anchor="middle">TEAM</text>
+          </svg>
+          <p class="preview-help" id="lab-preview-help">Black field is fixed. WestTech Team Art remains full color; tune the surrounding rings and logo outline for the Blackout version. Logo size stays shared with Single Team Standard only.</p>
+          <div class="palette-key"><span>ACTIVE PHYSICAL FILAMENTS</span><div id="lab-palette-key"></div></div>
+        </aside>
+      </section>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+</div>
+<script src="../js/theme.js"></script>
+<script src="../js/site-shell.js"></script>
+<script src="Color_Labs/assets/js/westtech-filament-catalog.js"></script>
+<script src="../js/nfl-team-art-color-baseline.js"></script>
+<script src="../js/nfl-team-art-single-blackout-baseline.js"></script>
+<script src="Color_Labs/assets/js/sports-color-lab-data.js"></script>
+<script src="../js/nfl-team-art-outline-data.js"></script>
+<script src="Color_Labs/assets/js/single-blackout-color-lab.js"></script>
+<script src="Color_Labs/assets/js/lab-svg-asset-map.js"></script>
+<script src="Color_Labs/assets/js/lab-preview-download.js"></script>
+</body>
+</html>

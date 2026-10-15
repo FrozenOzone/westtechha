@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html class="wt-layout-template" lang="en" data-site-root="../" data-site-section="coasters">
+<head>
+  <meta charset="utf-8"/>
+  <base href="../"/>
+  <script src="../js/theme-init.js?v=20260916-1"></script>
+  <title>WestTech NFL House Divided Blackout Color Lab</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Internal WestTech NFL Team Art House Divided Blackout review and production baseline editor."/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="../css/site.css" rel="stylesheet"/>
+  <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
+  <link href="Color_Labs/assets/css/house-divided-color-lab.css" rel="stylesheet"/>
+  <link href="Color_Labs/assets/css/blackout-color-lab.css" rel="stylesheet"/>
+</head>
+<body class="wt-public-template blackout-color-lab-page">
+<div class="page">
+  <div id="site-header"></div>
+  <main>
+    <section class="lab-header blackout-header">
+      <img src="../images/WestTech_Logo_BuiltSmart_MadeCustom.png" alt="WestTech Home Automation"/>
+      <div>
+        <span>INTERNAL COASTER TOOL · 4 OF 5</span>
+        <h1>NFL House Divided Blackout Color Lab</h1>
+        <p>WestTech Team Art Blackout review. Team fields stay Black; the colored HOUSE / DIVIDED center treatment is shared with Standard, while separators and whole-logo outlines remain Blackout-specific.</p>
+      </div>
+    </section>
+
+    <div class="lab-shell">
+      <nav class="lab-mode-nav" aria-label="WestTech coaster color tools">
+        <a href="Color_Labs/sports-color-lab.html">Single Team Color Lab</a>
+        <a href="Color_Labs/house-divided-color-lab.html">House Divided Color Lab</a>
+        <a href="Color_Labs/house-accent-review.html">House Accent Review</a>
+        <a class="is-current" href="Color_Labs/blackout-color-lab.html" aria-current="page">House Blackout</a>
+        <a href="Color_Labs/single-blackout-color-lab.html">Single Blackout</a>
+      </nav>
+
+      <section class="lab-toolbar">
+        <div class="lab-status">
+          <b id="lab-status-title">NFL · WestTech Team Art · House Blackout Approved</b>
+          <span id="lab-status-subtitle">Approved House Blackout is loaded. Center color/text and logo size are shared with House Standard; Blackout field/outline treatment stays separate.</span>
+        </div>
+        <div class="lab-actions">
+          <label class="buttonlike" for="lab-import-file">Load export</label><input id="lab-import-file" type="file" accept=".js,.json" hidden/>
+          <button id="lab-save-draft" type="button">Save browser draft</button>
+          <button id="lab-reset" type="button">Reset approved baseline</button>
+          <button class="primary" id="lab-download-js" type="button">Download Blackout + shared House exports</button>
+        </div>
+      </section>
+
+      <section class="blackout-standard-card">
+        <div>
+          <span class="eyebrow">BLACKOUT STANDARD</span>
+          <h2>Black fields. Shared colored center.</h2>
+          <p>Both team fields stay Black. Each team keeps the same approved center color and White/Black contrast lettering used by Standard. Separators and whole-logo outlines remain Blackout-specific, and approved divided-house accents still resolve collisions automatically.</p>
+        </div>
+        <div class="blackout-standard-swatches" aria-label="Fixed Blackout colors">
+          <div><i style="--sw:#111317"></i><b>Fields</b><span>Black</span></div>
+          <div><i style="--sw:#2447b8"></i><b>Center</b><span>Shared team color</span></div>
+          <div><i style="--sw:#f5f5f2"></i><b>Text</b><span>White / Black contrast</span></div>
+        </div>
+      </section>
+
+      <section class="lab-material-filter-panel">
+        <div><span class="eyebrow">FILAMENT FAMILY</span><h2>Physical inventory picker</h2><p>Blackout suggestions start from stocked PETG colors. Filter only changes the picker, not stored values.</p></div>
+        <div class="lab-material-filter" id="lab-material-filter" role="group" aria-label="Filament family filter">
+          <button type="button" data-material-filter="all" aria-pressed="true">All</button>
+          <button type="button" data-material-filter="PETG" aria-pressed="false">PETG</button>
+          <button type="button" data-material-filter="PLA_FAMILY" aria-pressed="false">PLA Family</button>
+        </div>
+        <small>For production consistency, the first-pass Blackout profiles use your existing Team Art PETG palette.</small>
+        <div class="lab-material-status" id="lab-material-status" aria-live="polite"></div>
+      </section>
+
+      <section class="approval-overview">
+        <div class="approval-overview-head">
+          <div><span>BLACKOUT REVIEW</span><h2 id="lab-progress-title">Approved teams: 0 / 32</h2></div>
+          <p>The approved House Blackout baseline is loaded. Click a team chip to review or revise it on Side 1.</p>
+        </div>
+        <div class="approval-chips" id="lab-team-status"></div>
+      </section>
+
+      <section class="lab-workspace compact-workspace blackout-workspace">
+        <div class="active-editor-panel">
+          <div class="active-editor-heading">
+            <span>MATCHUP EDITOR</span>
+            <h2>Review two Blackout profiles together</h2>
+            <p>The Black team fields are fixed. Center band color, center text, and logo size are shared with House Standard; separator and whole-logo outline remain Blackout-specific.</p>
+          </div>
+
+          <div class="preview-selects main-team-selects">
+            <label>SIDE 1 / TOP<select id="lab-team-one"></select></label>
+            <label>SIDE 2 / BOTTOM<select id="lab-team-two"></select></label>
+          </div>
+
+          <div class="active-team-editors main-active-editors">
+            <article class="active-team-card blackout-team-card" data-editor-side="one">
+              <div class="active-team-top">
+                <div class="team-icon"><img id="lab-icon-one" alt=""/></div>
+                <div class="active-team-name"><span class="active-side-badge"><i></i>SIDE 1 / TOP</span><strong id="lab-name-one">Team</strong><span id="lab-code-one">CODE</span></div>
+                <label class="active-approve"><input id="lab-approved-one" type="checkbox"/> Approved</label>
+              </div>
+              <div class="blackout-fixed-row"><span>FIELD</span><b>Black · fixed</b><span id="lab-reference-one">Standard field reference</span></div>
+              <div class="active-role-grid blackout-role-grid">
+                <div class="role"><label for="lab-one-band">Shared center band</label><div class="select-wrap"><span class="swatch" id="swatch-one-band"></span><select id="lab-one-band"></select></div><div class="filament-ref" id="filament-one-band"></div></div>
+                <div class="role"><label for="lab-one-text">Shared center text</label><div class="select-wrap"><span class="swatch" id="swatch-one-text"></span><select id="lab-one-text"></select></div><div class="filament-ref" id="filament-one-text"></div></div>
+                <div class="role"><label for="lab-one-separator">Separator color</label><div class="select-wrap"><span class="swatch" id="swatch-one-separator"></span><select id="lab-one-separator"></select></div><div class="filament-ref" id="filament-one-separator"></div></div>
+                <div class="role logo-outline-role" id="lab-logo-outline-wrap-one"><label class="outline-toggle"><input id="lab-one-logoOutlineEnabled" type="checkbox"/> Whole-logo outline</label><div class="select-wrap"><span class="swatch" id="swatch-one-logoOutline"></span><select id="lab-one-logoOutline"></select></div><div class="filament-ref" id="filament-one-logoOutline"></div></div>
+              </div>
+              <div class="hd-logo-size-control">
+                <div class="logo-size-head"><div><span>LOGO SIZE</span><strong>Shared House Divided fit</strong></div><button data-reset-logo-size="one" type="button">Reset shared size</button></div>
+                <div class="logo-size-inputs"><input id="lab-logo-size-one" type="range" min="30" max="120" step="1" value="100"/><label><input id="lab-logo-size-number-one" type="number" min="30" max="120" step="1" value="100"/><span>%</span></label></div>
+              </div>
+              <div class="blackout-house-readout" id="lab-house-one"></div>
+              <div class="role lab-notes-role"><label for="lab-notes-one">Notes</label><textarea id="lab-notes-one" rows="2" placeholder="Optional internal note"></textarea></div>
+            </article>
+
+            <article class="active-team-card blackout-team-card" data-editor-side="two">
+              <div class="active-team-top">
+                <div class="team-icon"><img id="lab-icon-two" alt=""/></div>
+                <div class="active-team-name"><span class="active-side-badge"><i></i>SIDE 2 / BOTTOM</span><strong id="lab-name-two">Team</strong><span id="lab-code-two">CODE</span></div>
+                <label class="active-approve"><input id="lab-approved-two" type="checkbox"/> Approved</label>
+              </div>
+              <div class="blackout-fixed-row"><span>FIELD</span><b>Black · fixed</b><span id="lab-reference-two">Standard field reference</span></div>
+              <div class="active-role-grid blackout-role-grid">
+                <div class="role"><label for="lab-two-band">Shared center band</label><div class="select-wrap"><span class="swatch" id="swatch-two-band"></span><select id="lab-two-band"></select></div><div class="filament-ref" id="filament-two-band"></div></div>
+                <div class="role"><label for="lab-two-text">Shared center text</label><div class="select-wrap"><span class="swatch" id="swatch-two-text"></span><select id="lab-two-text"></select></div><div class="filament-ref" id="filament-two-text"></div></div>
+                <div class="role"><label for="lab-two-separator">Separator color</label><div class="select-wrap"><span class="swatch" id="swatch-two-separator"></span><select id="lab-two-separator"></select></div><div class="filament-ref" id="filament-two-separator"></div></div>
+                <div class="role logo-outline-role" id="lab-logo-outline-wrap-two"><label class="outline-toggle"><input id="lab-two-logoOutlineEnabled" type="checkbox"/> Whole-logo outline</label><div class="select-wrap"><span class="swatch" id="swatch-two-logoOutline"></span><select id="lab-two-logoOutline"></select></div><div class="filament-ref" id="filament-two-logoOutline"></div></div>
+              </div>
+              <div class="hd-logo-size-control">
+                <div class="logo-size-head"><div><span>LOGO SIZE</span><strong>Shared House Divided fit</strong></div><button data-reset-logo-size="two" type="button">Reset shared size</button></div>
+                <div class="logo-size-inputs"><input id="lab-logo-size-two" type="range" min="30" max="120" step="1" value="100"/><label><input id="lab-logo-size-number-two" type="number" min="30" max="120" step="1" value="100"/><span>%</span></label></div>
+              </div>
+              <div class="blackout-house-readout" id="lab-house-two"></div>
+              <div class="role lab-notes-role"><label for="lab-notes-two">Notes</label><textarea id="lab-notes-two" rows="2" placeholder="Optional internal note"></textarea></div>
+            </article>
+          </div>
+
+          <div class="hd-editor-actions">
+            <button id="lab-swap-teams" type="button">Swap sides</button>
+            <button id="lab-next-unapproved" type="button">Load next unapproved</button>
+            <span id="lab-draft-state">Working from Blackout Pass 1.</span>
+          </div>
+        </div>
+
+        <aside class="preview-panel">
+          <div class="preview-sticky blackout-preview-sticky">
+            <div class="preview-topline"><div><span class="eyebrow">LIVE BLACKOUT PREVIEW</span><h3 class="preview-matchup" id="lab-preview-matchup">Denver Broncos + Dallas Cowboys</h3></div><b>NFL</b></div>
+            <svg class="lab-hd-coaster blackout-coaster" id="lab-hd-coaster" viewBox="0 0 1000 1000" role="img" aria-labelledby="lab-preview-title lab-preview-desc">
+              <title id="lab-preview-title">Blackout House Divided coaster preview</title>
+              <desc id="lab-preview-desc">WestTech Team Art Blackout preview.</desc>
+              <defs><clipPath id="blackout-hd-clip"><circle cx="500" cy="500" r="430"/></clipPath></defs>
+              <circle class="lab-hd-outer" cx="500" cy="500" r="470"/>
+              <circle class="lab-hd-rim" cx="500" cy="500" r="441"/>
+              <g clip-path="url(#blackout-hd-clip)">
+                <rect class="blackout-field" x="70" y="70" width="860" height="860"/>
+                <rect class="lab-hd-band-left" x="70" y="452" width="430" height="98"/>
+                <rect class="lab-hd-band-right" x="500" y="452" width="430" height="98"/>
+                <line class="blackout-separator" id="lab-separator-one" x1="70" y1="452" x2="930" y2="452"/>
+                <line class="blackout-separator" id="lab-separator-two" x1="70" y1="550" x2="930" y2="550"/>
+
+                <svg class="blackout-logo-outline" id="lab-logo-one-outline" x="70" y="70" width="860" height="385" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet"><g id="lab-logo-one-outline-paths"></g></svg>
+                <image id="lab-logo-one" x="70" y="70" width="860" height="385" preserveAspectRatio="xMidYMid meet"/>
+                <text class="lab-hd-logo-fallback" id="lab-logo-fallback-one" x="500" y="285" text-anchor="middle">DEN</text>
+
+                <svg class="blackout-logo-outline" id="lab-logo-two-outline" x="70" y="545" width="860" height="385" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet"><g id="lab-logo-two-outline-paths"></g></svg>
+                <image id="lab-logo-two" x="70" y="545" width="860" height="385" preserveAspectRatio="xMidYMid meet"/>
+                <text class="lab-hd-logo-fallback" id="lab-logo-fallback-two" x="500" y="785" text-anchor="middle">DAL</text>
+              </g>
+              <text class="lab-hd-band-text lab-hd-band-text-left" x="262" y="503" text-anchor="middle" textLength="332" lengthAdjust="spacingAndGlyphs">HOUSE</text>
+              <text class="lab-hd-band-text lab-hd-band-text-right" x="738" y="503" text-anchor="middle" textLength="332" lengthAdjust="spacingAndGlyphs">DIVIDED</text>
+              <polygon class="lab-hd-house-left" id="lab-house-left" points="500,460 452,496 452,537 500,537"/>
+              <polygon class="lab-hd-house-right" id="lab-house-right" points="500,460 548,496 548,537 500,537"/>
+              <line class="lab-hd-band-center-line" x1="500" y1="452" x2="500" y2="550"/>
+            </svg>
+            <p class="preview-help">Black team fields + the same approved colored center used by Standard, White/Black contrast text, team-color separators, approved divided-house accents, and independent Blackout outlines. House logo size is shared with House Standard; Single Team sizing is separate.</p>
+            <div class="palette-key"><span>COLORS USED IN THIS MATCHUP</span><div id="lab-palette-key"></div></div>
+          </div>
+        </aside>
+      </section>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+</div>
+<script src="../js/theme.js"></script>
+<script src="../js/site-shell.js"></script>
+<script src="Color_Labs/assets/js/westtech-filament-catalog.js"></script>
+<script src="Color_Labs/assets/js/sports-color-lab-data.js"></script>
+<script src="../js/nfl-team-art-color-baseline.js"></script>
+<script src="../js/nfl-house-divided-color-baseline.js"></script>
+<script src="../js/nfl-team-art-outline-data.js"></script>
+<script src="../js/westtech-house-accent-baseline.js"></script>
+<script src="../js/nfl-team-art-blackout-baseline.js"></script>
+<script src="Color_Labs/assets/js/blackout-color-lab.js"></script>
+<script src="Color_Labs/assets/js/lab-svg-asset-map.js"></script>
+<script src="Color_Labs/assets/js/lab-preview-download.js"></script>
+</body>
+</html>

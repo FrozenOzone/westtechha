@@ -7,10 +7,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="description" content="Contact WestTech Home Automation for general questions, product support, quotes, shipping questions, and order-related help."/>
   <link href="icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
-  <link href="css/site-20260824-mobilefix.css" rel="stylesheet"/>
+  <link href="css/site.css" rel="stylesheet"/>
   <link href="css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
 </head>
-<body class="wt-public-template"><div class="page"><div id="site-header"></div><script src="js/site-shell-20260824-mobilefix.js"></script>
+<body class="wt-public-template"><div class="page"><div id="site-header"></div><script src="js/site-shell.js"></script>
 <header class="page-header"><div class="eyebrow"><span class="dot"></span>Contact • Quotes • Community</div><h1>Get in touch with WestTechHA.</h1><p class="tagline">Use the contact path that best matches your question: contact for basic questions, support for product and policy help, orders for quotes and purchases, or the forum for shared discussion.</p></header>
 
 <section class="section"><div class="section-header"><div><div class="section-tag">Contact Options</div><div class="section-title">Four clear ways to get help.</div></div><p>Start with the email path that best matches your question, or use the forum when the discussion may help other customers too.</p></div>
@@ -70,8 +70,82 @@
   const topic = document.getElementById('topic');
   const subject = document.getElementById('contact-subject');
   const next = document.getElementById('contact-next');
+  const product = document.getElementById('product');
+  const message = document.getElementById('message');
 
   if (!form || !topic || !subject || !next) return;
+
+  function applyCoasterPrefill() {
+    const params = new URLSearchParams(window.location.search);
+    const coaster = String(params.get('coaster') || '').toLowerCase();
+    const design = String(params.get('design') || '').trim();
+    if (!coaster) return;
+
+    if (product && !product.value) product.value = 'Custom Coasters';
+    if (coaster === 'your-team') {
+      const sport = String(params.get('sport') || 'NFL').trim();
+      const team = String(params.get('team') || '').trim();
+      const logoStyle = String(params.get('logoStyle') || 'custom').trim().toLowerCase();
+      const artworkStyle = String(params.get('artworkStyle') || 'standard').trim().toLowerCase();
+      const setSize = String(params.get('setSize') || '4').trim();
+      const hasCustom = params.get('custom') === '1';
+      const logoStyleLabel = hasCustom ? 'Custom uploaded artwork' : (sport === 'NHL' ? 'NHL Team Logo' : (logoStyle === 'official' ? 'NFL Team Logo' : 'WestTech Team Art'));
+      const artworkStyleLabel = artworkStyle === 'blackout' ? 'Blackout' : 'Standard';
+      const setLabel = setSize === '8' ? '8-Coaster Set — $39.99' : '4-Coaster Set — $29.99';
+      topic.value = 'Order';
+      if (product) product.value = `Coasters — Team Set (${sport})`;
+      if (message && !message.value) {
+        message.value = `I would like to order a WestTech ${sport} team coaster set.\n\nSport: ${sport}\nTeam: ${team || 'Team not specified'}\nLogo style: ${logoStyleLabel}\nArtwork style: ${artworkStyleLabel}\nSet size: ${setLabel}${hasCustom ? '\n\nThis selection uses custom artwork. Please contact me about artwork review.' : ''}`;
+      }
+    } else if (coaster === 'house-divided') {
+      const sport = String(params.get('sport') || 'NFL').trim();
+      const side1 = String(params.get('side1') || '').trim();
+      const side2 = String(params.get('side2') || '').trim();
+      const logoStyle = String(params.get('logoStyle') || 'custom').trim().toLowerCase();
+      const artworkStyle = String(params.get('artworkStyle') || 'standard').trim().toLowerCase();
+      const logoStyleLabel = sport === 'NHL' ? 'NHL Team Logos' : (logoStyle === 'official' ? 'NFL Team Logos' : 'WestTech Team Art');
+      const artworkStyleLabel = artworkStyle === 'blackout' ? 'Blackout' : 'Standard';
+      const hasCustom = params.get('custom') === '1';
+      const side1HouseAccent = String(params.get('side1HouseAccent') || '').trim();
+      const side2HouseAccent = String(params.get('side2HouseAccent') || '').trim();
+      const side1Divider = String(params.get('side1Divider') || '').trim();
+      const side2Divider = String(params.get('side2Divider') || '').trim();
+      const side1CenterBand = String(params.get('side1CenterBand') || '').trim();
+      const side1CenterText = String(params.get('side1CenterText') || '').trim();
+      const side2CenterBand = String(params.get('side2CenterBand') || '').trim();
+      const side2CenterText = String(params.get('side2CenterText') || '').trim();
+      const hdCenterMode = String(params.get('hdCenterMode') || (artworkStyle === 'blackout' ? 'blackout' : 'team-color')).trim().toLowerCase();
+      const centerStandardNote = artworkStyle === 'blackout' && hdCenterMode === 'blackout'
+        ? '\n\nCenter treatment: Blackout center — Black with White lettering.'
+        : (side1CenterBand || side2CenterBand
+          ? `\n\nCenter treatment: Team colors — ${side1 || 'Side 1'}: ${side1CenterBand || 'team color'} with ${side1CenterText || 'contrast'} text; ${side2 || 'Side 2'}: ${side2CenterBand || 'team color'} with ${side2CenterText || 'contrast'} text.`
+          : '\n\nCenter treatment: Team colors with contrast lettering.');
+      const houseAccentNote = side1HouseAccent || side2HouseAccent
+        ? `\nDivided house accents: ${side1 || 'Side 1'} — ${side1HouseAccent || 'team accent'}; ${side2 || 'Side 2'} — ${side2HouseAccent || 'team accent'}.`
+        : '\nDivided house accents: Team accent colors.';
+      const dividerNote = side1Divider || side2Divider
+        ? `\nHouse Divided separator override: ${side1Divider ? `${side1 || 'Side 1'} — ${side1Divider}` : ''}${side1Divider && side2Divider ? '; ' : ''}${side2Divider ? `${side2 || 'Side 2'} — ${side2Divider}` : ''}.`
+        : '';
+      const customArtworkNote = hasCustom ? '\n\nOne or both sides use custom artwork. Please contact me about artwork review.' : '';
+      topic.value = 'Order';
+      if (product) product.value = `Coasters — House Divided (${sport})`;
+      if (message && !message.value) {
+        const matchup = side1 && side2 ? `${side1} + ${side2}` : 'House Divided matchup';
+        message.value = `I would like to order a WestTech House Divided coaster set.\n\nSport: ${sport}\nMatchup: ${matchup}\nLogo style: ${logoStyleLabel}\nArtwork style: ${artworkStyleLabel}${centerStandardNote}${houseAccentNote}${dividerNote}${customArtworkNote}\n\nSet size / quantity:`;
+      }
+    } else if (coaster === 'design' && design) {
+      topic.value = 'Order';
+      if (product) product.value = 'Coasters — WestTech Design';
+      if (message && !message.value) message.value = `I would like to start with the WestTech design: ${design}.\n\nPlease contact me about personalization, colors, set size, pricing, and the design-review process.`;
+    } else if (coaster === 'idea') {
+      topic.value = 'Order';
+      if (message && !message.value) message.value = 'I have a custom coaster idea I would like WestTech to review.\n\nMy idea:';
+    } else if (coaster === 'business') {
+      topic.value = 'Order';
+      if (product) product.value = 'Coasters — Business / Group Run';
+      if (message && !message.value) message.value = 'I would like to discuss a business, group, club, event, or quantity coaster order.\n\nProject / quantity details:';
+    }
+  }
 
   function applyRouting() {
     const value = String(topic.value || '').toLowerCase();
@@ -91,6 +165,7 @@
   }
 
   next.value = new URL('thank-you.html', window.location.href).href;
+  applyCoasterPrefill();
   applyRouting();
   topic.addEventListener('change', applyRouting);
   form.addEventListener('submit', applyRouting);

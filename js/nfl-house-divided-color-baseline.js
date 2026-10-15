@@ -1,449 +1,803 @@
 (function(){
   'use strict';
-  // Approved WestTech NFL House Divided production color baseline.
-  // Standardized from the approved Single Team baseline generated: 2026-08-16T13:35:52.419Z
-  // Mapping: field <- Center Field; band <- Accent Rings; text <- Ring Text (white fallback); house <- Center Field (accent fallback on white).
-  // Palette entries include the current physical production filament reference.
-  window.WestTechNFLHouseDividedFrame = {"outer":"white","inner":"black"};
+  // WestTech NFL House Divided production color baseline.
+  // 2026-10-14 sync: approved NFL WestTech Single Team Art field + accent colors seed House Divided Standard.
+  // House logo sizes and divided-house accent selections remain House-specific. Center text is White/Black by contrast.
+  window.WestTechNFLHouseDividedFrame = {"outer":"petg-white","inner":"petg-black"};
 
   window.WestTechNFLPrintPalette = [
   {
-    "id": "white",
-    "label": "White",
-    "hex": "#f5f5f2",
-    "filament": "SUNLU White",
-    "filamentStatus": "on-hand"
-  },
-  {
-    "id": "warm-white",
-    "label": "Warm White",
+    "id": "petg-bone-white",
+    "color": "Bone White",
+    "label": "Bone White",
+    "material": "PETG",
+    "family": "PETG",
     "hex": "#e9e2d4",
-    "filament": "SUNLU Bone White",
+    "filament": "SUNLU PETG — Bone White",
     "filamentStatus": "on-hand"
   },
   {
-    "id": "light-gray",
-    "label": "Light Gray",
-    "hex": "#c4c8cc",
-    "filament": "SUNLU Silver",
+    "id": "petg-oak",
+    "color": "Oak",
+    "label": "Oak",
+    "material": "PETG",
+    "family": "PETG",
+    "hex": "#9a7452",
+    "filament": "SUNLU PETG — Oak",
     "filamentStatus": "on-hand"
   },
   {
-    "id": "gray",
-    "label": "Gray",
-    "hex": "#8d949b",
-    "filament": "SUNLU Grey",
-    "filamentStatus": "on-hand"
-  },
-  {
-    "id": "dark-gray",
-    "label": "Dark Gray",
-    "hex": "#4d5258",
-    "filament": "SUNLU Grey",
-    "filamentStatus": "on-hand",
-    "filamentNote": "Closest stocked dark neutral"
-  },
-  {
-    "id": "black",
-    "label": "Black",
-    "hex": "#111317",
-    "filament": "SUNLU Black",
-    "filamentStatus": "on-hand"
-  },
-  {
-    "id": "red",
-    "label": "Red",
-    "hex": "#d9232e",
-    "filament": "SUNLU Cherry Red",
-    "filamentStatus": "on-hand",
-    "filamentNote": "Lighter/brighter red"
-  },
-  {
-    "id": "dark-red",
-    "label": "Dark Red",
-    "hex": "#8b1e2d",
-    "filament": "SUNLU Red",
-    "filamentStatus": "on-hand",
-    "filamentNote": "Darker red"
-  },
-  {
-    "id": "orange",
-    "label": "Orange",
-    "hex": "#f26a21",
-    "filament": "SUNLU Sunny Orange",
-    "filamentStatus": "on-hand"
-  },
-  {
-    "id": "yellow",
-    "label": "Yellow",
-    "hex": "#f4c430",
-    "filament": "SUNLU Yellow",
-    "filamentStatus": "on-hand"
-  },
-  {
-    "id": "lime",
-    "label": "Lime",
-    "hex": "#77c043",
-    "filament": "Lime Green \u2014 not stocked",
-    "filamentStatus": "missing",
-    "filamentNote": "ELEGOO Apple Green candidate"
-  },
-  {
-    "id": "green",
-    "label": "Green",
-    "hex": "#168b55",
-    "filament": "SUNLU Green",
-    "filamentStatus": "on-hand"
-  },
-  {
-    "id": "dark-green",
-    "label": "Dark Green",
-    "hex": "#1e4c3b",
-    "filament": "SUNLU Olive Green",
-    "filamentStatus": "on-hand",
-    "filamentNote": "Current dark/forest green"
-  },
-  {
-    "id": "royal-blue",
-    "label": "Royal Blue",
-    "hex": "#2447b8",
-    "filament": "SUNLU Blue (Klein Blue)",
-    "filamentStatus": "on-hand",
-    "filamentNote": "Current blue; physical print is darker than the name"
-  },
-  {
-    "id": "navy",
-    "label": "Navy",
-    "hex": "#15294d",
-    "filament": "SUNLU Blue (Klein Blue)",
-    "filamentStatus": "on-hand",
-    "filamentNote": "Same current physical blue used for darker blue roles"
-  },
-  {
-    "id": "light-blue",
-    "label": "Light Blue",
-    "hex": "#67aee8",
-    "filament": "SUNLU Sky Blue",
-    "filamentStatus": "on-hand"
-  },
-  {
-    "id": "cyan",
-    "label": "Cyan",
-    "hex": "#27b8cf",
-    "filament": "ELEGOO PLA Basic Cyan",
-    "filamentStatus": "ordered",
-    "filamentNote": "Ordered; fit/print test pending"
-  },
-  {
-    "id": "teal",
-    "label": "Teal",
-    "hex": "#168f94",
-    "filament": "ELEGOO PLA Basic Cyan",
-    "filamentStatus": "ordered",
-    "filamentNote": "Planned cyan/teal production filament; test pending"
-  },
-  {
-    "id": "purple",
-    "label": "Purple",
-    "hex": "#5f3ba8",
-    "filament": "SUNLU Purple",
-    "filamentStatus": "on-hand"
-  },
-  {
-    "id": "violet",
-    "label": "Violet",
-    "hex": "#7a4bd8",
-    "filament": "SUNLU Purple",
-    "filamentStatus": "on-hand",
-    "filamentNote": "Closest stocked violet"
-  },
-  {
-    "id": "pink",
-    "label": "Pink",
-    "hex": "#e88abf",
-    "filament": "Pink \u2014 not stocked",
-    "filamentStatus": "missing"
-  },
-  {
-    "id": "magenta",
-    "label": "Magenta",
-    "hex": "#c83cb9",
-    "filament": "SUNLU Red",
-    "filamentStatus": "substitute",
-    "filamentNote": "Current closest stocked substitute"
-  },
-  {
-    "id": "brown",
-    "label": "Brown",
+    "id": "petg-coffee-brown",
+    "color": "Coffee Brown",
+    "label": "Coffee Brown",
+    "material": "PETG",
+    "family": "PETG",
     "hex": "#6f4a2c",
-    "filament": "SUNLU Coffee Brown",
+    "filament": "SUNLU PETG — Coffee Brown",
     "filamentStatus": "on-hand"
   },
   {
-    "id": "tan",
+    "id": "petg-cherry-red",
+    "color": "Cherry Red",
+    "label": "Cherry Red",
+    "material": "PETG",
+    "family": "PETG",
+    "hex": "#d9232e",
+    "filament": "SUNLU PETG — Cherry Red",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "petg-magenta",
+    "color": "Magenta",
+    "label": "Magenta",
+    "material": "PETG",
+    "family": "PETG",
+    "hex": "#c83cb9",
+    "filament": "SUNLU PETG — Magenta",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "petg-purple",
+    "color": "Purple",
+    "label": "Purple",
+    "material": "PETG",
+    "family": "PETG",
+    "hex": "#5f3ba8",
+    "filament": "SUNLU PETG — Purple",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "petg-white",
+    "color": "White",
+    "label": "White",
+    "material": "PETG",
+    "family": "PETG",
+    "hex": "#f5f5f2",
+    "filament": "SUNLU PETG — White",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "petg-black",
+    "color": "Black",
+    "label": "Black",
+    "material": "PETG",
+    "family": "PETG",
+    "hex": "#111317",
+    "filament": "SUNLU PETG — Black",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "petg-grey",
+    "color": "Grey",
+    "label": "Grey",
+    "material": "PETG",
+    "family": "PETG",
+    "hex": "#8d949b",
+    "filament": "SUNLU PETG — Grey",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "petg-cyan",
+    "color": "Cyan",
+    "label": "Cyan",
+    "material": "PETG",
+    "family": "PETG",
+    "hex": "#27b8cf",
+    "filament": "SUNLU PETG — Cyan",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "petg-green",
+    "color": "Green",
+    "label": "Green",
+    "material": "PETG",
+    "family": "PETG",
+    "hex": "#168b55",
+    "filament": "SUNLU PETG — Green",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "petg-mint-green",
+    "color": "Mint Green",
+    "label": "Mint Green",
+    "material": "PETG",
+    "family": "PETG",
+    "hex": "#65bfa6",
+    "filament": "SUNLU PETG — Mint Green",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "petg-sky-blue",
+    "color": "Sky Blue",
+    "label": "Sky Blue",
+    "material": "PETG",
+    "family": "PETG",
+    "hex": "#67aee8",
+    "filament": "SUNLU PETG — Sky Blue",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "petg-yellow",
+    "color": "Yellow",
+    "label": "Yellow",
+    "material": "PETG",
+    "family": "PETG",
+    "hex": "#f4c430",
+    "filament": "SUNLU PETG — Yellow",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "petg-red",
+    "color": "Red",
+    "label": "Red",
+    "material": "PETG",
+    "family": "PETG",
+    "hex": "#8b1e2d",
+    "filament": "SUNLU PETG — Red",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "petg-olive-green",
+    "color": "Olive Green",
+    "label": "Olive Green",
+    "material": "PETG",
+    "family": "PETG",
+    "hex": "#1e4c3b",
+    "filament": "SUNLU PETG — Olive Green",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "petg-sunny-orange",
+    "color": "Sunny Orange",
+    "label": "Sunny Orange",
+    "material": "PETG",
+    "family": "PETG",
+    "hex": "#f26a21",
+    "filament": "SUNLU PETG — Sunny Orange",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "petg-klein-blue",
+    "color": "Klein Blue",
+    "label": "Klein Blue",
+    "material": "PETG",
+    "family": "PETG",
+    "hex": "#2447b8",
+    "filament": "SUNLU PETG — Klein Blue",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-black",
+    "color": "Black",
+    "label": "Black",
+    "material": "PLA",
+    "family": "PLA_FAMILY",
+    "hex": "#111317",
+    "filament": "SUNLU PLA Matte — Black",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-white",
+    "color": "White",
+    "label": "White",
+    "material": "PLA",
+    "family": "PLA_FAMILY",
+    "hex": "#f5f5f2",
+    "filament": "SUNLU PLA Matte — White",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-grey",
+    "color": "Grey",
+    "label": "Grey",
+    "material": "PLA",
+    "family": "PLA_FAMILY",
+    "hex": "#8d949b",
+    "filament": "SUNLU PLA Matte — Grey",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-red",
+    "color": "Red",
+    "label": "Red",
+    "material": "PLA",
+    "family": "PLA_FAMILY",
+    "hex": "#a52a32",
+    "filament": "SUNLU PLA Matte — Red",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-blue",
+    "color": "Blue",
+    "label": "Blue",
+    "material": "PLA",
+    "family": "PLA_FAMILY",
+    "hex": "#315cba",
+    "filament": "SUNLU PLA Matte — Blue",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-olive-green",
+    "color": "Olive Green",
+    "label": "Olive Green",
+    "material": "PLA",
+    "family": "PLA_FAMILY",
+    "hex": "#536846",
+    "filament": "SUNLU PLA Matte — Olive Green",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-sunny-orange",
+    "color": "Sunny Orange",
+    "label": "Sunny Orange",
+    "material": "PLA",
+    "family": "PLA_FAMILY",
+    "hex": "#f26a21",
+    "filament": "SUNLU PLA Matte — Sunny Orange",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-bone-white",
+    "color": "Bone White",
+    "label": "Bone White",
+    "material": "PLA",
+    "family": "PLA_FAMILY",
+    "hex": "#e9e2d4",
+    "filament": "SUNLU PLA Matte — Bone White",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-purple",
+    "color": "Purple",
+    "label": "Purple",
+    "material": "PLA",
+    "family": "PLA_FAMILY",
+    "hex": "#5f3ba8",
+    "filament": "SUNLU PLA Matte — Purple",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-oak-wood",
+    "color": "Oak Wood",
+    "label": "Oak Wood",
+    "material": "PLA",
+    "family": "PLA_FAMILY",
+    "hex": "#98704b",
+    "filament": "SUNLU PLA Matte — Oak Wood",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-klein-blue",
+    "color": "Klein Blue",
+    "label": "Klein Blue",
+    "material": "PLA",
+    "family": "PLA_FAMILY",
+    "hex": "#2447b8",
+    "filament": "SUNLU PLA Matte — Klein Blue",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-plus-coffee-brown",
+    "color": "Coffee Brown",
+    "label": "Coffee Brown",
+    "material": "PLA+",
+    "family": "PLA_FAMILY",
+    "hex": "#6f4a2c",
+    "filament": "SUNLU PLA+ — Coffee Brown",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-plus-cherry-red",
+    "color": "Cherry Red",
+    "label": "Cherry Red",
+    "material": "PLA+",
+    "family": "PLA_FAMILY",
+    "hex": "#d9232e",
+    "filament": "SUNLU PLA+ — Cherry Red",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-plus-sunny-orange",
+    "color": "Sunny Orange",
+    "label": "Sunny Orange",
+    "material": "PLA+",
+    "family": "PLA_FAMILY",
+    "hex": "#f26a21",
+    "filament": "SUNLU PLA+ — Sunny Orange",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-plus-light-gold",
+    "color": "Gold (Light Gold)",
+    "label": "Gold (Light Gold)",
+    "material": "PLA+",
+    "family": "PLA_FAMILY",
+    "hex": "#c7a43b",
+    "filament": "SUNLU PLA+ — Gold (Light Gold)",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-plus-oliver-green",
+    "color": "Oliver Green",
+    "label": "Oliver Green",
+    "material": "PLA+",
+    "family": "PLA_FAMILY",
+    "hex": "#526747",
+    "filament": "SUNLU PLA+ — Oliver Green",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-plus-sky-blue",
+    "color": "Sky Blue",
+    "label": "Sky Blue",
+    "material": "PLA+",
+    "family": "PLA_FAMILY",
+    "hex": "#67aee8",
+    "filament": "SUNLU PLA+ — Sky Blue",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-plus-silver",
+    "color": "Silver",
+    "label": "Silver",
+    "material": "PLA+",
+    "family": "PLA_FAMILY",
+    "hex": "#c4c8cc",
+    "filament": "SUNLU PLA+ — Silver",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-plus-green",
+    "color": "Green",
+    "label": "Green",
+    "material": "PLA+",
+    "family": "PLA_FAMILY",
+    "hex": "#168b55",
+    "filament": "SUNLU PLA+ — Green",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-plus-yellow",
+    "color": "Yellow",
+    "label": "Yellow",
+    "material": "PLA+",
+    "family": "PLA_FAMILY",
+    "hex": "#f4c430",
+    "filament": "SUNLU PLA+ — Yellow",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-plus-mint-green",
+    "color": "Mint Green",
+    "label": "Mint Green",
+    "material": "PLA+",
+    "family": "PLA_FAMILY",
+    "hex": "#65bfa6",
+    "filament": "SUNLU PLA+ — Mint Green",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-plus-bone-white",
+    "color": "Bone White",
+    "label": "Bone White",
+    "material": "PLA+",
+    "family": "PLA_FAMILY",
+    "hex": "#e9e2d4",
+    "filament": "SUNLU PLA+ — Bone White",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-plus-tan",
+    "color": "Tan",
     "label": "Tan",
+    "material": "PLA+",
+    "family": "PLA_FAMILY",
     "hex": "#c6a56f",
-    "filament": "SUNLU Tan",
+    "filament": "SUNLU PLA+ — Tan",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-plus-purple",
+    "color": "Purple",
+    "label": "Purple",
+    "material": "PLA+",
+    "family": "PLA_FAMILY",
+    "hex": "#5f3ba8",
+    "filament": "SUNLU PLA+ — Purple",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-plus-klein-blue",
+    "color": "Klein Blue",
+    "label": "Klein Blue",
+    "material": "PLA+",
+    "family": "PLA_FAMILY",
+    "hex": "#2447b8",
+    "filament": "SUNLU PLA+ — Klein Blue",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla-plus-sakura-pink",
+    "color": "Sakura Pink",
+    "label": "Sakura Pink",
+    "material": "PLA+",
+    "family": "PLA_FAMILY",
+    "hex": "#e88abf",
+    "filament": "SUNLU PLA+ — Sakura Pink",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla2-black",
+    "color": "Black",
+    "label": "Black",
+    "material": "PLA+ 2.0",
+    "family": "PLA_FAMILY",
+    "hex": "#111317",
+    "filament": "SUNLU PLA+ 2.0 — Black",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla2-white",
+    "color": "White",
+    "label": "White",
+    "material": "PLA+ 2.0",
+    "family": "PLA_FAMILY",
+    "hex": "#f5f5f2",
+    "filament": "SUNLU PLA+ 2.0 — White",
+    "filamentStatus": "on-hand"
+  },
+  {
+    "id": "pla2-grey",
+    "color": "Grey",
+    "label": "Grey",
+    "material": "PLA+ 2.0",
+    "family": "PLA_FAMILY",
+    "hex": "#8d949b",
+    "filament": "SUNLU PLA+ 2.0 — Grey",
     "filamentStatus": "on-hand"
   }
 ];
 
   window.WestTechNFLHouseDividedProfiles = {
   "ARI": {
-    "field": "white",
-    "band": "red",
-    "text": "white",
-    "house": "red",
+    "field": "petg-white",
+    "band": "petg-cherry-red",
+    "text": "petg-white",
+    "house": "petg-cherry-red",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 70,
+    "logoScaleCustom": 80
   },
   "ATL": {
-    "field": "red",
-    "band": "black",
-    "text": "red",
-    "house": "red",
+    "field": "petg-cherry-red",
+    "band": "petg-grey",
+    "text": "petg-black",
+    "house": "petg-cherry-red",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 80,
+    "logoScaleCustom": 75
   },
   "BAL": {
-    "field": "purple",
-    "band": "black",
-    "text": "purple",
-    "house": "purple",
+    "field": "petg-purple",
+    "band": "petg-purple",
+    "text": "petg-white",
+    "house": "petg-purple",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 87,
+    "logoScaleCustom": 70
   },
   "BUF": {
-    "field": "royal-blue",
-    "band": "red",
-    "text": "royal-blue",
-    "house": "royal-blue",
+    "field": "petg-white",
+    "band": "petg-cherry-red",
+    "text": "petg-white",
+    "house": "petg-klein-blue",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 80,
+    "logoScaleCustom": 80
   },
   "CAR": {
-    "field": "gray",
-    "band": "black",
-    "text": "light-blue",
-    "house": "gray",
+    "field": "petg-sky-blue",
+    "band": "petg-sky-blue",
+    "text": "petg-black",
+    "house": "petg-grey",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 85,
+    "logoScaleCustom": 75
   },
   "CHI": {
-    "field": "white",
-    "band": "orange",
-    "text": "black",
-    "house": "orange",
+    "field": "petg-cherry-red",
+    "band": "petg-sunny-orange",
+    "text": "petg-black",
+    "house": "petg-black",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 85,
+    "logoScaleCustom": 80
   },
   "CIN": {
-    "field": "orange",
-    "band": "black",
-    "text": "orange",
-    "house": "orange",
+    "field": "petg-sunny-orange",
+    "band": "petg-black",
+    "text": "petg-white",
+    "house": "petg-sunny-orange",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 85,
+    "logoScaleCustom": 80
   },
   "CLE": {
-    "field": "orange",
-    "band": "black",
-    "text": "orange",
-    "house": "orange",
+    "field": "petg-sunny-orange",
+    "band": "petg-black",
+    "text": "petg-white",
+    "house": "petg-sunny-orange",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 100,
+    "logoScaleCustom": 85
   },
   "DAL": {
-    "field": "royal-blue",
-    "band": "gray",
-    "text": "royal-blue",
-    "house": "royal-blue",
+    "field": "petg-klein-blue",
+    "band": "petg-grey",
+    "text": "petg-black",
+    "house": "petg-klein-blue",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 80,
+    "logoScaleCustom": 85
   },
   "DEN": {
-    "field": "orange",
-    "band": "royal-blue",
-    "text": "white",
-    "house": "orange",
+    "field": "petg-sunny-orange",
+    "band": "petg-klein-blue",
+    "text": "petg-white",
+    "house": "petg-sunny-orange",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 85,
+    "logoScaleCustom": 75
   },
   "DET": {
-    "field": "royal-blue",
-    "band": "gray",
-    "text": "royal-blue",
-    "house": "royal-blue",
+    "field": "petg-klein-blue",
+    "band": "petg-grey",
+    "text": "petg-black",
+    "house": "petg-klein-blue",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 85,
+    "logoScaleCustom": 80
   },
   "GB": {
-    "field": "dark-green",
-    "band": "yellow",
-    "text": "dark-green",
-    "house": "dark-green",
+    "field": "petg-olive-green",
+    "band": "petg-yellow",
+    "text": "petg-black",
+    "house": "petg-olive-green",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 85,
+    "logoScaleCustom": 85
   },
   "HOU": {
-    "field": "white",
-    "band": "dark-red",
-    "text": "navy",
-    "house": "dark-red",
+    "field": "petg-klein-blue",
+    "band": "petg-red",
+    "text": "petg-white",
+    "house": "petg-red",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 75,
+    "logoScaleCustom": 80
   },
   "IND": {
-    "field": "white",
-    "band": "royal-blue",
-    "text": "white",
-    "house": "royal-blue",
+    "field": "petg-white",
+    "band": "petg-klein-blue",
+    "text": "petg-white",
+    "house": "petg-klein-blue",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 77,
+    "logoScaleCustom": 80
   },
   "JAX": {
-    "field": "teal",
-    "band": "black",
-    "text": "white",
-    "house": "teal",
+    "field": "petg-cyan",
+    "band": "petg-cyan",
+    "text": "petg-black",
+    "house": "petg-cyan",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 75,
+    "logoScaleCustom": 65
   },
   "KC": {
-    "field": "red",
-    "band": "yellow",
-    "text": "red",
-    "house": "red",
+    "field": "petg-cherry-red",
+    "band": "petg-yellow",
+    "text": "petg-black",
+    "house": "petg-cherry-red",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 85,
+    "logoScaleCustom": 80
   },
   "LV": {
-    "field": "gray",
-    "band": "black",
-    "text": "white",
-    "house": "gray",
+    "field": "petg-grey",
+    "band": "petg-black",
+    "text": "petg-white",
+    "house": "petg-grey",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 75,
+    "logoScaleCustom": 80
   },
   "LAC": {
-    "field": "light-blue",
-    "band": "yellow",
-    "text": "light-blue",
-    "house": "light-blue",
+    "field": "petg-sky-blue",
+    "band": "petg-yellow",
+    "text": "petg-black",
+    "house": "petg-sky-blue",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 78,
+    "logoScaleCustom": 70
   },
   "LAR": {
-    "field": "royal-blue",
-    "band": "yellow",
-    "text": "royal-blue",
-    "house": "royal-blue",
+    "field": "petg-klein-blue",
+    "band": "petg-yellow",
+    "text": "petg-black",
+    "house": "petg-klein-blue",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 85,
+    "logoScaleCustom": 75
   },
   "MIA": {
-    "field": "white",
-    "band": "orange",
-    "text": "teal",
-    "house": "orange",
+    "field": "petg-white",
+    "band": "petg-sunny-orange",
+    "text": "petg-black",
+    "house": "petg-sunny-orange",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 85,
+    "logoScaleCustom": 75
   },
   "MIN": {
-    "field": "purple",
-    "band": "black",
-    "text": "purple",
-    "house": "purple",
+    "field": "petg-purple",
+    "band": "petg-black",
+    "text": "petg-white",
+    "house": "petg-purple",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 85,
+    "logoScaleCustom": 80
   },
   "NE": {
-    "field": "white",
-    "band": "red",
-    "text": "navy",
-    "house": "red",
+    "field": "petg-white",
+    "band": "petg-cherry-red",
+    "text": "petg-white",
+    "house": "petg-cherry-red",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 85,
+    "logoScaleCustom": 75
   },
   "NO": {
-    "field": "black",
-    "band": "yellow",
-    "text": "black",
-    "house": "black",
+    "field": "petg-yellow",
+    "band": "petg-black",
+    "text": "petg-white",
+    "house": "petg-black",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 90,
+    "logoScaleCustom": 75
   },
   "NYG": {
-    "field": "navy",
-    "band": "dark-red",
-    "text": "navy",
-    "house": "navy",
+    "field": "petg-klein-blue",
+    "band": "petg-red",
+    "text": "petg-white",
+    "house": "petg-klein-blue",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 70,
+    "logoScaleCustom": 80
   },
   "NYJ": {
-    "field": "white",
-    "band": "dark-green",
-    "text": "white",
-    "house": "dark-green",
+    "field": "petg-white",
+    "band": "petg-olive-green",
+    "text": "petg-white",
+    "house": "petg-olive-green",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 90,
+    "logoScaleCustom": 65
   },
   "PHI": {
-    "field": "dark-green",
-    "band": "gray",
-    "text": "dark-green",
-    "house": "dark-green",
+    "field": "petg-olive-green",
+    "band": "petg-grey",
+    "text": "petg-black",
+    "house": "petg-olive-green",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 75,
+    "logoScaleCustom": 80
   },
   "PIT": {
-    "field": "black",
-    "band": "yellow",
-    "text": "black",
-    "house": "black",
+    "field": "petg-yellow",
+    "band": "petg-black",
+    "text": "petg-white",
+    "house": "petg-black",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 100,
+    "logoScaleCustom": 80
   },
   "SF": {
-    "field": "dark-red",
-    "band": "yellow",
-    "text": "dark-red",
-    "house": "dark-red",
+    "field": "petg-red",
+    "band": "petg-yellow",
+    "text": "petg-black",
+    "house": "petg-red",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 85,
+    "logoScaleCustom": 80
   },
   "SEA": {
-    "field": "gray",
-    "band": "lime",
-    "text": "dark-green",
-    "house": "gray",
+    "field": "petg-olive-green",
+    "band": "petg-green",
+    "text": "petg-black",
+    "house": "petg-grey",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 85,
+    "logoScaleCustom": 65
   },
   "TB": {
-    "field": "red",
-    "band": "black",
-    "text": "orange",
-    "house": "red",
+    "field": "petg-cherry-red",
+    "band": "petg-black",
+    "text": "petg-white",
+    "house": "petg-cherry-red",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 73,
+    "logoScaleCustom": 80
   },
   "TEN": {
-    "field": "navy",
-    "band": "light-blue",
-    "text": "navy",
-    "house": "navy",
+    "field": "petg-klein-blue",
+    "band": "petg-sky-blue",
+    "text": "petg-black",
+    "house": "petg-klein-blue",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 75,
+    "logoScaleCustom": 80
   },
   "WAS": {
-    "field": "dark-red",
-    "band": "yellow",
-    "text": "dark-red",
-    "house": "dark-red",
+    "field": "petg-red",
+    "band": "petg-yellow",
+    "text": "petg-black",
+    "house": "petg-red",
     "approved": true,
-    "notes": ""
+    "notes": "",
+    "logoScaleOfficial": 87,
+    "logoScaleCustom": 65
   }
 };
 })();

@@ -69,6 +69,21 @@ export async function createInitialOrderRecord(db, { invoiceId, customId, orderD
     totalAmount
   ).run();
 
+  const lines = Array.isArray(product?.items) && product.items.length ? product.items : [product];
+  for (const line of lines) {
+    await db.prepare(`
+      INSERT INTO store_order_items (invoice_id, product_sku, product_name, color, quantity, unit_amount)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).bind(
+      invoiceId,
+      String(line?.sku || customId || "").trim().toLowerCase(),
+      String(line?.name || line?.description || customId || "WestTech Product").trim(),
+      String(line?.color || "").trim() || null,
+      Math.max(1, Number.parseInt(line?.quantity || 1, 10) || 1),
+      money(line?.unitAmount)
+    ).run();
+  }
+
   return { invoiceId, customId, itemAmount, shippingAmount, taxAmount, totalAmount };
 }
 
@@ -160,6 +175,7 @@ export async function markOrderCaptured(db, { paypalOrderId, captureData }) {
   const payerName = payer?.name || {};
   const customerName = [payerName.given_name, payerName.surname].filter(Boolean).join(" ") || extractShipping(captureData).fullName || "";
   const customerEmail = payer?.email_address || "";
+  const customerPhone = payer?.phone?.phone_number?.national_number || "";
   const shippingAddress = extractShipping(captureData);
   const amounts = extractPurchaseUnitAmount(captureData);
   const status = captureData?.status || capture?.status || "COMPLETED";
@@ -168,7 +184,7 @@ export async function markOrderCaptured(db, { paypalOrderId, captureData }) {
     UPDATE orders
     SET paypal_capture_id = ?, status = ?,
         item_amount = ?, shipping_amount = ?, tax_amount = ?, total_amount = ?,
-        customer_name = ?, customer_email = ?, shipping_address_json = ?,
+        customer_name = ?, customer_email = ?, customer_phone = ?, shipping_address_json = ?,
         updated_at = CURRENT_TIMESTAMP
     WHERE paypal_order_id = ?
   `).bind(
@@ -180,6 +196,7 @@ export async function markOrderCaptured(db, { paypalOrderId, captureData }) {
     amounts.totalAmount,
     customerName,
     customerEmail,
+    customerPhone,
     JSON.stringify(shippingAddress),
     paypalOrderId
   ).run();
@@ -188,6 +205,9 @@ export async function markOrderCaptured(db, { paypalOrderId, captureData }) {
     captureId: capture?.id || null,
     invoiceId: captureData?.purchase_units?.[0]?.invoice_id || null,
     customId: captureData?.purchase_units?.[0]?.custom_id || null,
-    status
+    status,
+    customerName,
+    customerEmail,
+    customerPhone
   };
 }

@@ -844,6 +844,20 @@ textarea {
   font-size: 16px;
 }
 
+/* Quote form: prevent fieldset/select intrinsic widths from pushing the
+   tablet layout wider than the viewport when DevTools or split view is open. */
+#quote-form,
+#quote-form .wt-fieldset,
+#quote-form .wt-grid,
+#quote-form .wt-grid > div {
+  min-width: 0;
+}
+
+#quote-form .wt-fieldset {
+  min-inline-size: 0;
+  width: 100%;
+}
+
 @media (max-width: 1180px) {
   .hero-band,
   .spotlight {
@@ -859,6 +873,11 @@ textarea {
 
   .metric-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+  #quote-form .wt-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -5517,9 +5536,407 @@ html[data-theme="dark"] .home-media-label{
 .home-coaster-media{
   min-height:300px;
 }
+
+/* Home coaster gateway: mirror the current custom-project direction. */
+.home-custom-coaster-media{
+  background:
+    linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px),
+    radial-gradient(circle at 78% 20%,rgba(22,119,196,.3),transparent 38%),
+    #101827;
+  background-size:30px 30px,30px 30px,auto,auto;
+}
+.home-custom-coaster-disc{
+  position:absolute;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  aspect-ratio:1;
+  border-radius:50%;
+  border:6px solid #f7f1e5;
+  box-shadow:0 22px 44px rgba(0,0,0,.32);
+  color:#fff;
+}
+.home-custom-coaster-disc-back{
+  width:190px;
+  left:7%;
+  top:22px;
+  background:#578873;
+  transform:rotate(-10deg);
+}
+.home-custom-coaster-disc-back b{
+  font-size:3.35rem;
+  line-height:1;
+  letter-spacing:-.08em;
+  transform:rotate(-18deg);
+}
+.home-custom-coaster-disc-front{
+  width:230px;
+  right:6%;
+  bottom:17px;
+  z-index:2;
+  background:#e76c20;
+}
+.home-custom-coaster-disc-front::before{
+  content:"";
+  position:absolute;
+  inset:17px;
+  border:3px solid rgba(255,255,255,.9);
+  border-radius:50%;
+}
+.home-custom-coaster-disc-front strong,
+.home-custom-coaster-disc-front b,
+.home-custom-coaster-disc-front small{
+  position:relative;
+  z-index:1;
+}
+.home-custom-coaster-disc-front strong{
+  margin-bottom:12px;
+  font-size:.67rem;
+  letter-spacing:.28em;
+}
+.home-custom-coaster-disc-front b{
+  font-size:2.55rem;
+  line-height:1;
+  letter-spacing:-.055em;
+}
+.home-custom-coaster-disc-front small{
+  margin-top:34px;
+  font-size:.5rem;
+  font-weight:900;
+  letter-spacing:.16em;
+}
+.home-custom-coaster-media .home-media-label{
+  max-width:calc(100% - 36px);
+  color:#dce7f7;
+  background:rgba(13,24,40,.88);
+  border-color:rgba(148,163,184,.22);
+}
 @media (max-width:1060px){
   .home-path-card{
     grid-template-columns:1fr;
     grid-template-rows:auto minmax(280px,1fr);
   }
+}
+@media (max-width:520px){
+  .home-custom-coaster-disc-back{
+    width:165px;
+    left:-8px;
+  }
+  .home-custom-coaster-disc-front{
+    width:205px;
+    right:-8px;
+  }
+  .home-custom-coaster-disc-front b{font-size:2.2rem;}
+}
+
+/* Site-wide desktop canvas: a centered 1380px body beneath the unchanged 1200px header. */
+:root{
+  --maxw:1380px;
+  --header-maxw:1200px;
+}
+.nav-shell,
+.nav-stack{
+  width:min(var(--header-maxw),calc(100% - 32px));
+}
+\n\n/* ===== 2026-08-24 iPhone header hardening ===== */\n.nav-logo-fallback{\n  width:clamp(300px,31vw,500px);\n  min-width:0;\n  display:grid;\n  grid-template-columns:auto 1fr;\n  grid-template-rows:auto auto;\n  align-items:end;\n  column-gap:.45rem;\n  color:var(--accent);\n  line-height:.92;\n}\n.nav-logo-fallback[hidden]{display:none !important;}\n.nav-logo-fallback strong{\n  grid-row:1 / 3;\n  font-size:clamp(1.65rem,3vw,3.15rem);\n  letter-spacing:-.05em;\n}\n.nav-logo-fallback > span{\n  font-size:clamp(.8rem,1.6vw,1.5rem);\n  font-weight:650;\n}\n.nav-logo-fallback small{\n  margin-top:.25rem;\n  font-size:clamp(.44rem,.76vw,.72rem);\n  font-weight:850;\n  letter-spacing:.12em;\n  color:var(--muted);\n}\n@media (max-width:700px){\n  .nav-logo-fallback{\n    width:min(58vw,235px);\n    grid-template-columns:1fr;\n    grid-template-rows:auto auto auto;\n    row-gap:1px;\n    line-height:1;\n  }\n  .nav-logo-fallback strong{\n    grid-row:auto;\n    font-size:1.35rem;\n  }\n  .nav-logo-fallback > span{font-size:.68rem;}\n  .nav-logo-fallback small{font-size:.42rem;letter-spacing:.08em;}\n}\n@media (max-width:420px){\n  .nav-logo-fallback{width:min(54vw,205px);}\n}\n
+
+
+/* ===== Home enclosure gateway: professional / technical treatment ===== */
+.home-path-enclosures{
+  border-radius:16px;
+  border-color:color-mix(in srgb,var(--border) 78%,#1677c4 22%);
+  box-shadow:0 12px 28px rgba(15,23,42,.08);
+  background:var(--surface);
+}
+.home-path-enclosures .home-enclosure-copy{
+  padding:34px 34px 28px;
+  border-top:4px solid #1677c4;
+}
+.home-path-enclosures .home-enclosure-copy h2{
+  max-width:660px;
+  font-size:clamp(1.9rem,2.35vw,2.45rem);
+  line-height:1.08;
+  letter-spacing:-.032em;
+}
+.home-path-enclosures .home-enclosure-copy p{
+  max-width:650px;
+  margin-top:15px;
+  line-height:1.65;
+}
+.home-enclosure-family-list{
+  width:100%;
+  margin-top:22px;
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+.home-enclosure-family-list>div{
+  min-width:0;
+  padding:14px 14px 14px 0;
+  display:grid;
+  gap:3px;
+}
+.home-enclosure-family-list>div+div{
+  padding-left:16px;
+  border-left:1px solid var(--border);
+}
+.home-enclosure-family-list strong{
+  color:var(--text);
+  font-size:.9rem;
+  letter-spacing:.015em;
+}
+.home-enclosure-family-list span{
+  color:var(--muted);
+  font-size:.76rem;
+  line-height:1.35;
+}
+.home-path-enclosures .home-path-actions{
+  margin-top:22px;
+}
+.home-path-enclosures .btn{
+  border-radius:9px;
+  min-height:42px;
+  padding-inline:18px;
+}
+.home-path-enclosures .home-enclosure-media{
+  min-height:300px;
+  padding:0;
+  display:grid;
+  grid-template-rows:minmax(0,1fr) auto;
+  align-items:stretch;
+  justify-content:stretch;
+  background:
+    linear-gradient(rgba(22,119,196,.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(22,119,196,.055) 1px,transparent 1px),
+    linear-gradient(180deg,#eef4fa,#e6edf5);
+  background-size:28px 28px,28px 28px,auto;
+  border-top:1px solid var(--border);
+}
+.home-path-enclosures .home-enclosure-media::before{
+  display:none;
+}
+.home-enclosure-product-stage{
+  min-height:0;
+  padding:22px 28px 18px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  position:relative;
+}
+.home-enclosure-kicker{
+  position:absolute;
+  left:24px;
+  top:18px;
+  color:#45627f;
+  font-size:.65rem;
+  font-weight:850;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.home-path-enclosures .home-enclosure-media img{
+  width:min(360px,78%);
+  max-height:225px;
+  margin:24px auto 0;
+  object-fit:contain;
+  filter:drop-shadow(0 16px 20px rgba(15,23,42,.16));
+  transform:none;
+  position:relative;
+  z-index:1;
+}
+.home-enclosure-specbar{
+  min-height:66px;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  border-top:1px solid rgba(71,96,122,.22);
+  background:rgba(255,255,255,.68);
+  backdrop-filter:blur(6px);
+}
+.home-enclosure-specbar>span{
+  padding:12px 16px;
+  display:grid;
+  gap:3px;
+  align-content:center;
+}
+.home-enclosure-specbar>span+span{
+  border-left:1px solid rgba(71,96,122,.18);
+}
+.home-enclosure-specbar small{
+  color:#60758a;
+  font-size:.58rem;
+  font-weight:800;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+}
+.home-enclosure-specbar b{
+  color:#183d61;
+  font-size:.84rem;
+  letter-spacing:.01em;
+}
+html[data-theme="dark"] .home-path-enclosures{
+  border-color:#2d4058;
+  box-shadow:0 12px 28px rgba(0,0,0,.18);
+}
+html[data-theme="dark"] .home-path-enclosures .home-enclosure-media{
+  background:
+    linear-gradient(rgba(90,139,184,.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(90,139,184,.055) 1px,transparent 1px),
+    linear-gradient(180deg,#111d2e,#0c1726);
+  background-size:28px 28px,28px 28px,auto;
+}
+html[data-theme="dark"] .home-enclosure-kicker{
+  color:#8ba5bf;
+}
+html[data-theme="dark"] .home-enclosure-specbar{
+  background:rgba(9,20,34,.82);
+  border-top-color:#2d4058;
+}
+html[data-theme="dark"] .home-enclosure-specbar>span+span{
+  border-left-color:#2d4058;
+}
+html[data-theme="dark"] .home-enclosure-specbar small{
+  color:#8297ad;
+}
+html[data-theme="dark"] .home-enclosure-specbar b{
+  color:#e0eaf5;
+}
+@media (prefers-color-scheme:dark){
+  html:not([data-theme]) .home-path-enclosures{
+    border-color:#2d4058;
+    box-shadow:0 12px 28px rgba(0,0,0,.18);
+  }
+  html:not([data-theme]) .home-path-enclosures .home-enclosure-media{
+    background:
+      linear-gradient(rgba(90,139,184,.055) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(90,139,184,.055) 1px,transparent 1px),
+      linear-gradient(180deg,#111d2e,#0c1726);
+    background-size:28px 28px,28px 28px,auto;
+  }
+  html:not([data-theme]) .home-enclosure-kicker{color:#8ba5bf;}
+  html:not([data-theme]) .home-enclosure-specbar{
+    background:rgba(9,20,34,.82);
+    border-top-color:#2d4058;
+  }
+  html:not([data-theme]) .home-enclosure-specbar>span+span{border-left-color:#2d4058;}
+  html:not([data-theme]) .home-enclosure-specbar small{color:#8297ad;}
+  html:not([data-theme]) .home-enclosure-specbar b{color:#e0eaf5;}
+}
+@media (max-width:700px){
+  .home-enclosure-family-list{grid-template-columns:1fr;}
+  .home-enclosure-family-list>div{
+    padding:11px 0;
+  }
+  .home-enclosure-family-list>div+div{
+    padding-left:0;
+    border-left:0;
+    border-top:1px solid var(--border);
+  }
+  .home-enclosure-product-stage{padding-inline:18px;}
+  .home-path-enclosures .home-enclosure-media img{width:min(340px,88%);}
+}
+
+
+/* 2026-10-14 — Home coaster gateway uses actual WestTech product artwork. */
+.home-custom-coaster-media{
+  isolation:isolate;
+}
+.home-custom-coaster-media::after{
+  content:"";
+  position:absolute;
+  inset:auto -8% -42% 18%;
+  height:72%;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(22,119,196,.24),rgba(22,119,196,0) 68%);
+  pointer-events:none;
+  z-index:0;
+}
+.home-coaster-showcase{
+  position:absolute;
+  inset:0;
+  z-index:1;
+}
+.home-showcase-coaster{
+  position:absolute;
+  display:block;
+  aspect-ratio:1;
+  object-fit:contain;
+  filter:drop-shadow(0 20px 22px rgba(0,0,0,.34));
+  transition:transform .22s ease,filter .22s ease;
+}
+.home-showcase-custom{
+  width:min(45%,255px);
+  left:31%;
+  top:20px;
+  z-index:3;
+  transform:rotate(-4deg);
+}
+.home-showcase-single{
+  width:min(31%,176px);
+  left:7%;
+  bottom:31px;
+  z-index:2;
+  transform:rotate(-10deg);
+}
+.home-showcase-house{
+  width:min(34%,194px);
+  right:5%;
+  bottom:27px;
+  z-index:2;
+  transform:rotate(9deg);
+}
+.home-custom-coaster-media:hover .home-showcase-custom,
+.home-custom-coaster-media:focus-visible .home-showcase-custom{
+  transform:translateY(-4px) rotate(-2deg) scale(1.025);
+  filter:drop-shadow(0 25px 26px rgba(0,0,0,.38));
+}
+.home-custom-coaster-media:hover .home-showcase-single,
+.home-custom-coaster-media:focus-visible .home-showcase-single{
+  transform:translate(-5px,2px) rotate(-12deg);
+}
+.home-custom-coaster-media:hover .home-showcase-house,
+.home-custom-coaster-media:focus-visible .home-showcase-house{
+  transform:translate(5px,2px) rotate(11deg);
+}
+.home-showcase-caption{
+  position:absolute;
+  right:18px;
+  top:16px;
+  z-index:5;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:2px;
+  padding:8px 10px;
+  border-radius:11px;
+  background:rgba(8,16,29,.72);
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 10px 22px rgba(0,0,0,.16);
+  backdrop-filter:blur(8px);
+  color:#fff;
+}
+.home-showcase-caption b{
+  font-size:.64rem;
+  letter-spacing:.18em;
+}
+.home-showcase-caption span{
+  color:#bcd5ea;
+  font-size:.56rem;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+@media (max-width:820px){
+  .home-showcase-custom{width:min(42%,235px);left:30%;top:16px;}
+  .home-showcase-single{width:min(29%,160px);left:8%;bottom:24px;}
+  .home-showcase-house{width:min(31%,172px);right:6%;bottom:22px;}
+}
+@media (max-width:520px){
+  .home-showcase-caption{right:12px;top:12px;}
+  .home-showcase-caption span{display:none;}
+  .home-showcase-custom{width:48%;left:27%;top:28px;}
+  .home-showcase-single{width:34%;left:2%;bottom:28px;}
+  .home-showcase-house{width:36%;right:1%;bottom:28px;}
 }

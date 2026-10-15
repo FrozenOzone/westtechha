@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html class="wt-layout-template" lang="en" data-site-root="../" data-site-section="coasters">
+<head>
+  <meta charset="utf-8"/>
+  <base href="../"/>
+  <script src="../js/theme-init.js?v=20260916-1"></script>
+  <title>WestTech House Accent Review</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Internal WestTech review tool for House Divided preferred and alternate team accents."/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="../css/site.css" rel="stylesheet"/>
+  <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
+  <link href="Color_Labs/assets/css/house-accent-review.css" rel="stylesheet"/>
+</head>
+<body class="wt-public-template house-accent-review-page">
+<div class="page">
+  <div id="site-header"></div>
+  <main>
+    <section class="har-header">
+      <img src="../images/WestTech_Logo_BuiltSmart_MadeCustom.png" alt="WestTech Home Automation"/>
+      <div>
+        <span>INTERNAL COASTER TOOL · 3 OF 5</span>
+        <h1>House Accent Review</h1>
+        <p>Approve two printable PETG accents for each active NFL and NHL team. These become the only two colors offered for that team’s half of the divided house.</p>
+        <p class="har-roster-note"><strong>NHL roster refreshed for 2026-27:</strong> 32 active clubs. Arizona Coyotes removed; Seattle Kraken and Utah Mammoth added. Seattle/Utah use official NHL web logos in this dev review until their local production SVG assets are imported.</p>
+      </div>
+    </section>
+
+    <div class="har-shell">
+      <nav class="har-mode-nav" aria-label="WestTech coaster color tools">
+        <a href="Color_Labs/sports-color-lab.html">Single Team Color Lab</a>
+        <a href="Color_Labs/house-divided-color-lab.html">House Divided Color Lab</a>
+        <a class="is-current" href="Color_Labs/house-accent-review.html" aria-current="page">House Accent Review</a>
+        <a href="Color_Labs/blackout-color-lab.html">House Blackout</a>
+        <a href="Color_Labs/single-blackout-color-lab.html">Single Blackout</a>
+      </nav>
+
+      <section class="har-standard">
+        <div>
+          <span class="eyebrow">HOUSE DIVIDED STANDARD</span>
+          <h2>Controlled center treatment</h2>
+          <p>The center band stays black and HOUSE / DIVIDED stays white. Only the two divided-house halves use team accents.</p>
+        </div>
+        <div class="har-standard-pills">
+          <span><i style="background:#111317"></i>Band: Black</span>
+          <span><i style="background:#f5f5f2"></i>Text: White</span>
+          <span><i class="split-swatch"></i>House: Team accents</span>
+        </div>
+      </section>
+
+      <section class="har-toolbar">
+        <div class="har-leagues" role="group" aria-label="League filter">
+          <button type="button" data-league="NFL" class="is-selected">NFL</button>
+          <button type="button" data-league="NHL">NHL</button>
+        </div>
+        <label class="har-search">Search teams <input id="har-search" type="search" placeholder="Broncos, DEN, Eagles…"/></label>
+        <label class="har-needs"><input id="har-needs-only" type="checkbox"/> Needs review only</label>
+        <div class="har-actions">
+          <label class="buttonlike" for="har-import-file">Load review export</label><input id="har-import-file" type="file" accept=".js,.json" hidden/>
+          <button id="har-save-draft" type="button">Save browser draft</button>
+          <button id="har-reset-league" type="button">Reset league</button>
+          <button id="har-download-js" class="primary" type="button">Download approved accents</button>
+        </div>
+      </section>
+
+      <section class="har-progress" aria-live="polite">
+        <div><span>REVIEW PROGRESS</span><strong id="har-progress">NFL: 0 / 32 approved</strong></div>
+        <div id="har-readiness" class="har-readiness">Approve the Preferred accent. Alternate is optional; White is reserved for collision fallback.</div>
+      </section>
+
+      <section class="har-matchup-check">
+        <div class="har-matchup-copy">
+          <span class="eyebrow">MATCHUP CHECK</span>
+          <h2>See the automatic collision rule</h2>
+          <p>The site starts Preferred vs Preferred. If they match, it uses an approved Alternate when available. If neither team has one, White is used only as the collision fallback. You still review the final design before printing.</p>
+        </div>
+        <div class="har-matchup-controls">
+          <label>Side 1<select id="har-match-one"></select></label>
+          <span class="har-vs">VS</span>
+          <label>Side 2<select id="har-match-two"></select></label>
+        </div>
+        <div id="har-match-result" class="har-match-result"></div>
+      </section>
+
+      <section class="har-team-review">
+        <div class="har-table-head">
+          <div>Team</div><div>Preferred House Accent</div><div>Alternate House Accent <small>(optional)</small></div><div>House Preview</div><div>Approved</div>
+        </div>
+        <div id="har-team-list" class="har-team-list"></div>
+      </section>
+
+      <section class="har-footer-actions">
+        <div>
+          <strong id="har-draft-state">Working from current House Divided profiles.</strong>
+          <span>The downloaded file is the handoff we can later wire into the public builder.</span>
+        </div>
+        <button id="har-next-unapproved" type="button">Jump to next unapproved</button>
+      </section>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+</div>
+<script src="../js/theme.js"></script>
+<script src="../js/site-shell.js"></script>
+<script src="Color_Labs/assets/js/westtech-filament-catalog.js"></script>
+<script src="Color_Labs/assets/js/sports-color-lab-data.js"></script>
+<script src="../js/nfl-house-divided-color-baseline.js"></script>
+<script src="../js/nhl-house-divided-color-baseline.js"></script>
+<script src="../js/westtech-house-accent-baseline.js"></script>
+<script src="Color_Labs/assets/js/house-accent-review.js"></script>
+</body>
+</html>

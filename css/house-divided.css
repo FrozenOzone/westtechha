@@ -1156,6 +1156,8 @@ html[data-theme="light"] .house-divided-builder-page .hd-side-card-integrated{
   --hd-side-two-band-text:#f5f5f2;
   --hd-side-one-house:#f26a21;
   --hd-side-two-house:#2447b8;
+  --hd-side-one-divider:#111317;
+  --hd-side-two-divider:#111317;
   display:block;
   width:min(92%,430px);
   margin:16px auto 12px;
@@ -1167,7 +1169,12 @@ html[data-theme="light"] .house-divided-builder-page .hd-side-card-integrated{
 .hd-svg-bottom-field{fill:var(--hd-side-two-field)}
 .hd-svg-band-left{fill:var(--hd-side-two-band)}
 .hd-svg-band-right{fill:var(--hd-side-one-band)}
-.hd-svg-divider{stroke:#111317;stroke-width:5}
+.hd-svg-divider{stroke-width:5}
+/* Standard House Divided uses the center colors themselves as the boundary.
+   Blackout keeps the top/bottom separator lines for definition against black fields. */
+.hd-preview-svg[data-artwork-style="standard"] .hd-svg-divider{display:none}
+.hd-svg-divider-one{stroke:var(--hd-side-one-divider,#111317)}
+.hd-svg-divider-two{stroke:var(--hd-side-two-divider,#111317)}
 #preview-logo-one,#preview-logo-two{pointer-events:none}
 #preview-mark-one,#preview-mark-two{
   font-family:Inter,Arial,sans-serif;
@@ -1227,4 +1234,200 @@ html:not([data-theme]) .house-divided-builder-page .hd-integrated-preview .hd-pr
   .hd-hero-placeholder{padding:24px}
   .hd-preview-disc-sample{width:min(92%,390px)}
   .hd-hero-placeholder .hd-preview-art-note{margin:14px auto 58px;font-size:.62rem}
+}
+
+
+/* 2026-10-04 — House Divided NFL logo-style switch */
+.hd-logo-style-row{
+  max-width:850px;
+  margin:18px auto 4px;
+  padding:14px 16px;
+  display:grid;
+  grid-template-columns:minmax(180px,.7fr) minmax(340px,1.3fr);
+  gap:10px 18px;
+  align-items:center;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;
+  background:rgba(13,28,48,.72);
+}
+.hd-logo-style-copy{display:grid;gap:3px}
+.hd-logo-style-copy small{font-size:.58rem;letter-spacing:.16em;font-weight:950;color:#79b9ee}
+.hd-logo-style-copy strong{font-size:.86rem;line-height:1.3;color:#fff}
+.hd-logo-style-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.hd-logo-style-option{
+  width:100%;
+  min-height:58px;
+  padding:9px 12px;
+  font:inherit;
+  display:grid;
+  gap:2px;
+  align-content:center;
+  text-align:left;
+  border:1px solid #30445f;
+  border-radius:12px;
+  background:#132238;
+  color:#fff;
+  cursor:pointer;
+}
+.hd-logo-style-option:hover{border-color:#6ba9df}
+.hd-logo-style-option.is-selected{background:#17365a;border-color:#4e9be0;box-shadow:inset 0 0 0 1px #4e9be0}
+.hd-logo-style-title{font-size:.78rem;font-weight:900}
+.hd-logo-style-option small{font-size:.64rem;line-height:1.25;color:#9fb0c6}
+.hd-blackout-center-option{grid-column:2;display:grid;gap:3px;padding:8px 10px;border:1px solid #30445f;border-radius:10px;background:rgba(10,22,38,.62)}
+.hd-blackout-center-option[hidden]{display:none}
+.hd-blackout-center-option label{display:flex;align-items:center;gap:8px;color:#fff;font-size:.72rem;font-weight:850;cursor:pointer}
+.hd-blackout-center-option input{width:16px;height:16px;margin:0;accent-color:#1677c4}
+.hd-blackout-center-option small{padding-left:24px;color:#9fb0c6;font-size:.62rem;line-height:1.3}
+.hd-logo-style-note{grid-column:2;margin:0;color:#8fa1b9;font-size:.68rem}
+html[data-theme="light"] .house-divided-builder-page .hd-logo-style-row{background:#f7fafc;border-color:#dbe5ef}
+html[data-theme="light"] .house-divided-builder-page .hd-logo-style-copy strong{color:#24364b}
+html[data-theme="light"] .house-divided-builder-page .hd-logo-style-copy small{color:#1677c4}
+html[data-theme="light"] .house-divided-builder-page .hd-logo-style-option{background:#fff;border-color:#ced9e6;color:#33465f}
+html[data-theme="light"] .house-divided-builder-page .hd-logo-style-option.is-selected{background:#e9f3fb;border-color:#1677c4;box-shadow:inset 0 0 0 1px #1677c4}
+html[data-theme="light"] .house-divided-builder-page .hd-logo-style-option small,
+html[data-theme="light"] .house-divided-builder-page .hd-logo-style-note{color:#60738b}
+html[data-theme="light"] .house-divided-builder-page .hd-blackout-center-option{background:#fff;border-color:#ced9e6}
+html[data-theme="light"] .house-divided-builder-page .hd-blackout-center-option label{color:#33465f}
+html[data-theme="light"] .house-divided-builder-page .hd-blackout-center-option small{color:#60738b}
+@media (max-width:760px){
+  .hd-logo-style-row{grid-template-columns:1fr}
+  .hd-blackout-center-option,.hd-logo-style-note{grid-column:1}
+}
+@media (max-width:520px){
+  .hd-logo-style-options{grid-template-columns:1fr}
+}
+
+
+/* 2026-10-11 — Customer-facing House Divided middle-color controls.
+   Uses stocked WestTech PETG only; internal Color Lab remains separate. */
+.hd-middle-colors{
+  max-width:850px;
+  margin:18px auto 0;
+  padding-top:18px;
+  border-top:1px solid var(--hd-builder-line,rgba(255,255,255,.12));
+}
+.hd-middle-colors-head{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:8px}
+.hd-middle-colors-actions{display:flex;align-items:center;gap:14px;color:var(--hd-builder-muted,#9caec5);font-size:.68rem}
+.hd-middle-colors-actions .hd-text-button{color:var(--hd-builder-link,#8fc5ef);white-space:nowrap}
+.hd-middle-colors-note{margin:0 0 12px;color:var(--hd-builder-muted,#9caec5);font-size:.72rem;line-height:1.55}
+.hd-middle-color-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.hd-middle-color-card{padding:13px 14px;border:1px solid var(--hd-middle-card-border,rgba(255,255,255,.12));border-radius:15px;background:var(--hd-middle-card-surface,rgba(13,28,48,.68))}
+.hd-middle-color-card-title{display:grid;gap:2px;padding-bottom:9px;margin-bottom:3px;border-bottom:1px solid var(--hd-middle-card-line,rgba(255,255,255,.09))}
+.hd-middle-color-card-title span{font-size:.56rem;letter-spacing:.14em;font-weight:950;color:#79b9ee}
+.hd-middle-color-card-title strong{font-size:.86rem;color:var(--hd-builder-text,#fff)}
+.hd-middle-color-control{display:grid;grid-template-columns:minmax(120px,.9fr) minmax(180px,1.1fr);align-items:center;gap:10px;padding:8px 0;font-size:.69rem;color:var(--hd-builder-muted,#a9b7c9)}
+.hd-color-input{display:grid;grid-template-columns:24px minmax(0,1fr);gap:7px;align-items:center}
+.hd-color-swatch{display:block;width:22px;height:22px;border-radius:7px;border:1px solid rgba(255,255,255,.35);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.hd-middle-color-control select{width:100%;min-width:0;padding:8px 30px 8px 9px;border-radius:9px;border:1px solid var(--hd-middle-select-border,#30445f);background:var(--hd-middle-select-surface,#132238);color:var(--hd-middle-select-text,#fff);font:inherit}
+.hd-color-fixed-value{display:grid;grid-template-columns:24px auto;grid-template-rows:auto auto;column-gap:7px;align-items:center}.hd-color-fixed-value .hd-color-swatch{grid-row:1/3}.hd-color-fixed-value strong{font-size:.72rem;color:var(--hd-builder-text,#fff);line-height:1.15}.hd-color-fixed-value small{font-size:.58rem;color:var(--hd-builder-muted,#8fa1b9);line-height:1.15}.hd-middle-color-fixed{cursor:default}
+html[data-theme="light"] .house-divided-builder-page .hd-color-fixed-value strong{color:#33465f}
+
+html[data-theme="light"] .house-divided-builder-page .hd-middle-color-card{--hd-middle-card-surface:#fff;--hd-middle-card-border:#dbe5ef;--hd-middle-card-line:#e5ebf1}
+html[data-theme="light"] .house-divided-builder-page .hd-middle-color-control select{--hd-middle-select-surface:#fff;--hd-middle-select-border:#ced9e6;--hd-middle-select-text:#33465f}
+html[data-theme="light"] .house-divided-builder-page .hd-color-swatch{border-color:rgba(20,32,54,.26)}
+@media(max-width:760px){
+  .hd-middle-colors-head{align-items:flex-start;flex-direction:column}
+  .hd-middle-colors-actions{width:100%;justify-content:space-between}
+  .hd-middle-color-grid{grid-template-columns:1fr}
+}
+@media(max-width:520px){
+  .hd-middle-color-control{grid-template-columns:1fr;gap:5px}
+  .hd-color-input{grid-template-columns:24px minmax(0,1fr)}
+}
+
+/* 2026-10-12 — Approved divided-house accent selectors.
+   The center band remains WestTech-controlled and uses the shared approved
+   per-team color/text treatment in both Standard and Blackout. Customers may
+   choose only between each NFL team's approved Preferred/Alternate accents.
+   Accent controls occupy their own full-width card row so they never squeeze
+   the existing team/logo/change-team layout. */
+.hd-side-card-integrated{
+  grid-template-areas:
+    "head head head"
+    "art copy button"
+    "accent accent accent";
+}
+.hd-side-card-integrated .hd-house-accent-control{
+  grid-area:accent;
+  width:100%;
+  box-sizing:border-box;
+  margin:2px 0 0;
+  padding-top:11px;
+  border-top:1px solid var(--hd-line);
+  display:grid;
+  gap:8px;
+}
+.hd-house-accent-control[hidden]{display:none!important}
+.hd-house-accent-control label{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:baseline;
+  gap:10px;
+  min-width:0;
+}
+.hd-house-accent-control label span{
+  font-size:.69rem;
+  font-weight:950;
+  color:var(--hd-ink);
+  line-height:1.2;
+}
+.hd-house-accent-control label small{
+  font-size:.58rem;
+  color:var(--hd-muted);
+  font-weight:750;
+  text-align:right;
+  line-height:1.2;
+  white-space:nowrap;
+}
+.hd-house-accent-input{
+  display:grid;
+  grid-template-columns:30px minmax(0,1fr);
+  gap:8px;
+  align-items:center;
+  min-width:0;
+}
+.hd-house-accent-swatch{
+  display:block;
+  width:28px;
+  height:28px;
+  border-radius:8px;
+  border:2px solid #111317;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.48);
+}
+.hd-house-accent-input select{
+  width:100%;
+  min-width:0;
+  border:1px solid var(--hd-line);
+  border-radius:9px;
+  background:#fff;
+  color:var(--hd-ink);
+  padding:7px 28px 7px 9px;
+  font:inherit;
+  font-size:.69rem;
+  font-weight:800;
+  cursor:pointer;
+}
+.hd-house-accent-input select:focus{
+  outline:2px solid rgba(22,119,196,.22);
+  border-color:#1677c4;
+}
+@media(max-width:900px){
+  .hd-side-card-integrated{
+    grid-template-columns:auto 1fr;
+    grid-template-areas:
+      "head head"
+      "art copy"
+      "button button"
+      "accent accent";
+  }
+}
+@media(max-width:700px){
+  .hd-house-accent-control label{
+    grid-template-columns:1fr;
+    gap:2px;
+  }
+  .hd-house-accent-control label small{
+    text-align:left;
+    white-space:normal;
+  }
 }
