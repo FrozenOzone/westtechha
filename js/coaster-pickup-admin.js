@@ -5,9 +5,11 @@
  const panel=$('#wt-pickup-panel');
  if(!panel||location.protocol==='file:'||new URLSearchParams(location.search).get('mode')==='local')return;
  const date=$('#wt-pickup-date'),time=$('#wt-pickup-time'),list=$('#wt-pickup-list'),status=$('#wt-pickup-status'),add=$('#wt-pickup-add'),reload=$('#wt-pickup-reload');
+ const linkButton=$('#wt-pickup-create-link'),linkState=$('#wt-pickup-link-state'),linkBox=$('#wt-pickup-link-box'),linkValue=$('#wt-pickup-link-value'),copyLink=$('#wt-pickup-copy-link'),requestHost=$('#wt-pickup-requests'),appointmentHost=$('#wt-pickup-appointment');
+ const decisionDialog=$('#wt-pickup-decision-dialog'),decisionTitle=$('#wt-pickup-decision-title'),decisionDescription=$('#wt-pickup-decision-description'),decisionCancel=$('#wt-pickup-decision-cancel'),decisionConfirm=$('#wt-pickup-decision-confirm');
  const withdrawDialog=$('#wt-pickup-withdraw-dialog'),withdrawDescription=$('#wt-pickup-withdraw-description'),withdrawCancel=$('#wt-pickup-withdraw-cancel'),withdrawConfirm=$('#wt-pickup-withdraw-confirm');
  let activeOrder='',lastKey='',serial=0,busy=false;
- let pendingWithdraw=null;
+ let pendingWithdraw=null,pendingDecision=null,linkedOrder='';
  function setStatus(value,error=false){status.textContent=value;status.className='wt-pickup-status'+(error?' error':'');}
  function todayMountain(){const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Denver',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const p=Object.fromEntries(parts.filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));return `${p.year}-${p.month}-${p.day}`;}
  date.min=todayMountain();
@@ -20,7 +22,7 @@
  async function request(orderId,method='GET',body=null){
   const token=(sessionStorage.getItem('westtechha-admin-token')||$('#ca-token')?.value||'').trim();
   const response=await fetch(`/api/admin/coasters/orders/${encodeURIComponent(orderId)}/pickup`,{method,credentials:'same-origin',headers:{Accept:'application/json',...(token?{Authorization:'Bearer '+token}:{}),...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify(body)}:{})});
-  const json=await response.json().catch(()=>({}));if(!response.ok||!json.ok)throw new Error(json.message||`Pickup request failed (${response.status}).`);return json.pickup;
+  const json=await response.json().catch(()=>({}));if(!response.ok||!json.ok)throw new Error(json.message||`Pickup request failed (${response.status}).`);return json;
  }
  function readableDate(localDate){return new Date(localDate+'T12:00:00Z').toLocaleDateString('en-US',{timeZone:'UTC',weekday:'short',month:'short',day:'numeric',year:'numeric'});}
  function readableTime(localTime){const [h,m]=localTime.split(':').map(Number);return `${h%12||12}:${String(m).padStart(2,'0')} ${h>=12?'PM':'AM'}`;}
@@ -38,7 +40,7 @@
  });
  withdrawDialog.addEventListener('close',()=>{pendingWithdraw=null;});
  function paint(pickup){
-  list.replaceChildren();add.disabled=!pickup.enabled;
+  list.replaceChildren();add.disabled=!pickup.enabled;renderStage2(pickup);
   if(!pickup.enabled)setStatus('Only active Local Pickup production orders can offer times.');
   else if(!(pickup.slots||[]).length)setStatus('No pickup times offered yet.');
   else setStatus(`${pickup.slots.length} time${pickup.slots.length===1?'':'s'} offered for this order.`);
@@ -53,17 +55,76 @@
  async function refresh(force=false){
   const shown=visibleOrder();panel.hidden=!shown;
   if(withdrawDialog.open&&(!shown||shown.id!==pendingWithdraw?.orderId))withdrawDialog.close();
-  if(!shown){activeOrder='';lastKey='';serial++;return;}
+  if(decisionDialog.open&&(!shown||shown.id!==pendingDecision?.orderId))decisionDialog.close();
+  if(!shown){activeOrder='';lastKey='';serial++;linkedOrder='';linkValue.value='';linkBox.hidden=true;return;}
+  if(linkedOrder&&linkedOrder!==shown.id){linkedOrder='';linkValue.value='';linkBox.hidden=true;}
   activeOrder=shown.id;if(!force&&shown.key===lastKey)return;
   lastKey=shown.key;const requestId=++serial;setStatus('Loading pickup times…');
-  try{const pickup=await request(shown.id);if(requestId===serial&&activeOrder===shown.id)paint(pickup);}catch(e){if(requestId===serial&&activeOrder===shown.id)setStatus(e.message,true);}
+  try{const result=await request(shown.id);if(requestId===serial&&activeOrder===shown.id)paint(result.pickup);}catch(e){if(requestId===serial&&activeOrder===shown.id)setStatus(e.message,true);}
  }
  async function change(method,body){
   if(busy||!activeOrder)return;busy=true;add.disabled=reload.disabled=true;setStatus('Saving pickup times…');const order=activeOrder;
-  try{const pickup=await request(order,method,body);if(activeOrder===order)paint(pickup);}catch(e){if(activeOrder===order)setStatus(e.message,true);}finally{busy=false;reload.disabled=false;add.disabled=false;}
+  try{const result=await request(order,method,body);if(activeOrder===order)paint(result.pickup);}catch(e){if(activeOrder===order)setStatus(e.message,true);}finally{busy=false;reload.disabled=false;add.disabled=false;}
  }
  add.addEventListener('click',()=>{if(!date.value||!time.value){setStatus('Choose a date and time.',true);return;}change('POST',{date:date.value,time:time.value});});
  reload.addEventListener('click',()=>refresh(true));
+ function renderStage2(pickup){
+   linkButton.disabled=!pickup.canCreateLink;
+   linkButton.textContent=pickup.linkActive?'Generate New Link':'Generate Private Link';
+   linkState.textContent=pickup.linkActive?`An active link exists (expires ${pickup.linkExpiresAt?.slice(0,10)||'soon'}). Generate New invalidates the old link.`:'No active private link.';
+   const a=pickup.appointment;
+   appointmentHost.hidden=!a;
+   appointmentHost.textContent=a?`Confirmed pickup: ${readableDate(a.localDate)} at ${readableTime(a.localTime)} (Mountain Time). Address and invitations are not yet enabled.`:'';
+   requestHost.replaceChildren();
+   const recent=(pickup.requests||[]).filter(x=>x.status==='PENDING'||x.status==='COUNTER_OFFERED');
+   if(!recent.length){const p=document.createElement('p');p.textContent='No active alternate-time requests.';requestHost.appendChild(p);return;}
+   for(const item of recent){
+     const box=document.createElement('div'),title=document.createElement('strong'),one=document.createElement('small');box.className='wt-pickup-request';
+     title.textContent=item.status==='PENDING'?'Awaiting your approval':'Different times offered — awaiting customer';
+     one.textContent=`First: ${readableDate(item.firstDate)} at ${readableTime(item.firstTime)}`;
+     box.append(title,one);
+     if(item.secondDate){const two=document.createElement('small');two.textContent=`Second: ${readableDate(item.secondDate)} at ${readableTime(item.secondTime)}`;box.appendChild(two);}
+     if(item.status==='PENDING'&&!a){
+       const actions=document.createElement('div');actions.className='wt-pickup-request-actions';
+       for(const [decision,label,available] of [['first','Approve First Choice',true],['second','Approve Second Choice',!!item.secondDate],['counter','Offer Different Times',true]]){
+         if(!available)continue;
+         const b=document.createElement('button');b.type='button';b.className='ca-secondary';b.textContent=label;
+         b.addEventListener('click',()=>askDecision(item,decision));actions.appendChild(b);
+       }box.appendChild(actions);
+     }requestHost.appendChild(box);
+   }
+ }
+ function askDecision(item,decision){
+   if(busy||decisionDialog.open||!activeOrder)return;
+   pendingDecision={orderId:activeOrder,requestId:item.id,decision};
+   if(decision==='counter'){
+     decisionTitle.textContent='Offer different pickup times?';
+     decisionDescription.textContent='First, add your proposed weekday slots above. This will mark the alternative request as counter-offered. No email is sent in Stage 2.';
+   }else{
+     const d=decision==='first'?item.firstDate:item.secondDate,t=decision==='first'?item.firstTime:item.secondTime;
+     decisionTitle.textContent='Confirm this pickup appointment?';
+     decisionDescription.textContent=`Approve ${readableDate(d)} at ${readableTime(t)} (Mountain Time)? This books the requested time, including after-hours only by your approval.`;
+   }
+   decisionDialog.showModal();
+ }
+ decisionCancel.addEventListener('click',()=>decisionDialog.close());
+ decisionConfirm.addEventListener('click',()=>{
+   const p=pendingDecision;decisionDialog.close();
+   if(p&&p.orderId===activeOrder&&!busy)change('POST',{action:'decide',requestId:p.requestId,decision:p.decision});
+ });
+ decisionDialog.addEventListener('close',()=>{pendingDecision=null;});
+ linkButton.addEventListener('click',async()=>{
+   if(busy||!activeOrder)return;busy=true;linkButton.disabled=true;setStatus('Preparing private link…');const id=activeOrder;
+   try{const result=await request(id,'POST',{action:'createLink'});
+     if(activeOrder===id){paint(result.pickup);linkedOrder=id;linkValue.value=result.link||'';linkBox.hidden=!linkValue.value;setStatus('Private link created. Copy and share only with this customer. No email has been sent.');}
+   }catch(e){if(activeOrder===id)setStatus(e.message,true);}
+   finally{busy=false;linkButton.disabled=false;}
+ });
+ copyLink.addEventListener('click',async()=>{
+   if(!linkValue.value)return;
+   try{await navigator.clipboard.writeText(linkValue.value);setStatus('Private link copied. No automatic email has been sent.');}
+   catch(e){linkValue.select();setStatus('Link selected — press Ctrl+C to copy.');}
+ });
  const observer=new MutationObserver(()=>refresh());
  // Only observe existing admin state indicators. Do not observe this add-on's own
  // panel: writing its content must never retrigger the observer.

@@ -17,7 +17,7 @@
   <link href="../css/admin-production-fields.css?v=20260913-2" rel="stylesheet"/>
   <script src="../js/admin-access.js?v=20260913-prod1"></script>
   <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
-<link rel="stylesheet" href="../css/coaster-pickup-admin.css?v=20261015-dialog1"/>
+<link rel="stylesheet" href="../css/coaster-pickup-admin.css?v=20261016-stage2"/>
 </head>
 <body class="coaster-page custom-coasters-page wt-admin-template">
 <div class="page">
@@ -156,10 +156,27 @@
             </div>
             <div id="wt-pickup-status" class="wt-pickup-status" role="status" aria-live="polite"></div>
             <div id="wt-pickup-list" class="wt-pickup-list"></div>
-            <div class="wt-pickup-footer"><span>Stage 1: Stored in D1 only. Customer scheduling links, emails, and the pickup address are not enabled yet.</span><button id="wt-pickup-reload" class="ca-secondary" type="button">Refresh Times</button></div>
+            <section class="wt-pickup-stage2" aria-label="Customer pickup scheduling">
+              <h3>Private customer scheduling</h3>
+              <p>Generate a private link for this order. Stage 2 does not send emails automatically. Generating a new link invalidates the previous one.</p>
+              <div class="wt-pickup-link-actions"><button class="ca-secondary" type="button" id="wt-pickup-create-link">Generate Private Link</button><small id="wt-pickup-link-state">No link created yet.</small></div>
+              <div id="wt-pickup-link-box" hidden><label for="wt-pickup-link-value">Private scheduling link — copy and share only with this customer</label><div class="wt-pickup-link-row"><input id="wt-pickup-link-value" type="text" readonly/><button class="ca-secondary" id="wt-pickup-copy-link" type="button">Copy Link</button></div></div>
+              <div id="wt-pickup-appointment" class="wt-pickup-booking" hidden></div>
+              <h3>Alternative pickup requests</h3>
+              <div id="wt-pickup-requests" class="wt-pickup-requests"><p>No requests yet.</p></div>
+              <p class="wt-pickup-stage2-note">To counter-offer, add different offered slots above, then select Offer Different Times. Customer emails, directions, address, and calendar invites come in Stage 3.</p>
+            </section>
+            <div class="wt-pickup-footer"><span>Stage 2 Preview: Private scheduling and approvals are stored in D1. No pickup address or automatic customer notifications yet.</span><button id="wt-pickup-reload" class="ca-secondary" type="button">Refresh Scheduling</button></div>
           </section>
 
           <!-- WestTech-styled confirmation (replaces the browser's confirm() dialog). -->
+          <dialog id="wt-pickup-decision-dialog" aria-labelledby="wt-pickup-decision-title" aria-describedby="wt-pickup-decision-description">
+            <div class="wt-pickup-dialog-body"><div class="wt-pickup-dialog-eyebrow">LOCAL PICKUP • SCHEDULING</div>
+              <h2 id="wt-pickup-decision-title">Review pickup request</h2><p id="wt-pickup-decision-description"></p>
+              <p class="wt-pickup-dialog-note">The coaster order and payment status do not change. No automatic customer email is sent in Stage 2.</p>
+              <div class="wt-pickup-dialog-actions"><button type="button" id="wt-pickup-decision-cancel">Go Back</button><button type="button" id="wt-pickup-decision-confirm">Confirm</button></div>
+            </div>
+          </dialog>
           <dialog id="wt-pickup-withdraw-dialog" aria-labelledby="wt-pickup-withdraw-title" aria-describedby="wt-pickup-withdraw-description">
             <div class="wt-pickup-dialog-body">
               <div class="wt-pickup-dialog-eyebrow">LOCAL PICKUP • SCHEDULING</div>
@@ -271,6 +288,6 @@
   <div id="site-footer"></div>
 </div>
 <script src="../js/theme.js"></script><script src="../js/admin-production-fields.js?v=20260913-2"></script><script src="../js/coaster-admin.js?v=20260920-carrier1"></script><script src="../js/manufacturing-estimate.js?v=20260913-1"></script><script src="../js/coaster-admin-auto-refresh.js?v=20260916-shippedlock1"></script><script src="../js/coaster-admin-archive.js?v=20260904-archive3"></script><script src="../js/admin-pane-sync.js?v=20260905-1"></script>
-<script src="../js/coaster-pickup-admin.js?v=20261015-dialog1"></script>
+<script src="../js/coaster-pickup-admin.js?v=20261016-stage2"></script>
 </body>
 </html>

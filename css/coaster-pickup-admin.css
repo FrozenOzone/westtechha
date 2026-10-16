@@ -32,3 +32,34 @@
 #wt-pickup-withdraw-dialog button:hover{filter:brightness(1.12)}
 #wt-pickup-withdraw-dialog button:focus-visible{outline:3px solid #79c6ff;outline-offset:3px}
 @media(max-width:480px){#wt-pickup-withdraw-dialog .wt-pickup-dialog-body{padding:21px}#wt-pickup-withdraw-dialog .wt-pickup-dialog-actions{flex-direction:column-reverse}#wt-pickup-withdraw-dialog button{width:100%}}
+
+/* Stage 2 private scheduling admin UI; safely scoped to the pickup panel. */
+#wt-pickup-panel .wt-pickup-stage2{margin:22px 0 0;padding:19px;border:1px solid #35516e;border-radius:14px;background:rgba(10,26,43,.52)}
+#wt-pickup-panel .wt-pickup-stage2 h3{color:#e7f4ff;font-size:1.04rem;margin:0 0 8px}
+#wt-pickup-panel .wt-pickup-stage2 h3:not(:first-child){margin-top:22px}
+#wt-pickup-panel .wt-pickup-stage2 p,#wt-pickup-panel .wt-pickup-stage2-note{font-size:.86rem;line-height:1.65;color:#b7cce1;margin:8px 0 12px}
+#wt-pickup-panel .wt-pickup-link-actions,#wt-pickup-panel .wt-pickup-link-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+#wt-pickup-panel .wt-pickup-link-actions small{color:#bdd2e5;line-height:1.5}
+#wt-pickup-panel #wt-pickup-link-box{margin-top:15px;min-width:0}
+#wt-pickup-panel #wt-pickup-link-box[hidden],#wt-pickup-panel #wt-pickup-appointment[hidden]{display:none!important}
+#wt-pickup-panel #wt-pickup-link-box label{font-size:.84rem;margin-bottom:8px}
+#wt-pickup-panel #wt-pickup-link-value{min-width:0;flex:1 1 280px;padding:10px;border-radius:8px}
+#wt-pickup-panel .wt-pickup-requests{display:grid;gap:10px}
+#wt-pickup-panel .wt-pickup-request{padding:14px;border-radius:12px;border:1px solid #3f5f7c;background:#0d1c31}
+#wt-pickup-panel .wt-pickup-request strong{display:block;color:#ecf7ff}
+#wt-pickup-panel .wt-pickup-request small{display:block;color:#bad1e5;margin-top:5px}
+#wt-pickup-panel .wt-pickup-request-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+#wt-pickup-panel .wt-pickup-request-actions button{min-height:40px;font-size:.84rem}
+#wt-pickup-panel .wt-pickup-booking{background:#143b49;border:1px solid #457b8c;color:#fff;border-radius:10px;padding:14px;margin:16px 0}
+#wt-pickup-decision-dialog{box-sizing:border-box;width:min(460px,calc(100vw - 32px));max-height:calc(100dvh - 36px);margin:auto;padding:0;border:1px solid #395675;border-radius:18px;background:#0c1b30;color:#edf5ff;box-shadow:0 28px 70px rgba(0,0,0,.55);font-family:inherit}
+#wt-pickup-decision-dialog::backdrop{background:rgba(3,10,21,.72);backdrop-filter:blur(4px)}
+#wt-pickup-decision-dialog .wt-pickup-dialog-body{padding:26px}
+#wt-pickup-decision-dialog .wt-pickup-dialog-eyebrow{color:#77bded;font-size:.69rem;font-weight:800;letter-spacing:.14em}
+#wt-pickup-decision-dialog h2{margin:10px 0 12px;color:#fff;font-size:1.32rem}
+#wt-pickup-decision-dialog p{margin:0 0 12px;color:#d3e2f4;line-height:1.6;font-size:.91rem}
+#wt-pickup-decision-dialog .wt-pickup-dialog-note{color:#9eb3cb;font-size:.82rem}
+#wt-pickup-decision-dialog .wt-pickup-dialog-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:22px}
+#wt-pickup-decision-dialog button{min-height:44px;padding:10px 16px;border-radius:10px;font:inherit;font-weight:750;cursor:pointer}
+#wt-pickup-decision-cancel{color:#e8f3ff;background:#172a44;border:1px solid #4a6482}
+#wt-pickup-decision-confirm{color:white;background:#1677c4;border:1px solid #77bff0}
+@media(max-width:610px){#wt-pickup-panel .wt-pickup-stage2{padding:12px}#wt-pickup-panel .wt-pickup-request-actions{flex-direction:column}#wt-pickup-decision-dialog .wt-pickup-dialog-actions{flex-direction:column-reverse}}

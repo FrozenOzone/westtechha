@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" class="wt-layout-template" data-site-root="../" data-site-section="coasters">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow,noarchive"/><meta name="referrer" content="no-referrer"/>
+<title>Schedule Your WestTech Coaster Pickup</title>
+<link rel="icon" href="../icons/Westtech_Icon_BrainW_Blue_128.png" type="image/png"/>
+<script src="../js/theme-init.js?v=20260916-1"></script>
+<link rel="stylesheet" href="../css/site.css"/>
+<link rel="stylesheet" href="../css/layout-template.css?v=20260916-site1"/>
+<link rel="stylesheet" href="../css/coaster-pickup-customer.css?v=20261016-stage2"/>
+</head>
+<body class="wt-public-template pickup-scheduling-page">
+<div class="page"><div id="site-header"></div>
+<main class="pc-main">
+ <div class="pc-heading"><span class="pc-kicker">WESTTECH HOME AUTOMATION · LOCAL PICKUP</span><h1>Schedule your coaster pickup.</h1>
+  <p>Choose one of the offered pickup appointments. If none work, suggest another weekday date and time for WestTech to review.</p>
+ </div>
+ <section class="pc-card" id="pc-loading" role="status">Loading your private scheduling link…</section>
+ <section class="pc-card" id="pc-content" hidden>
+   <div class="pc-orderline"><strong id="pc-order">Your order</strong><span>Mountain Time · 15-minute pickup</span></div>
+   <div class="pc-message" id="pc-message" role="status" aria-live="polite" hidden></div>
+   <div id="pc-waiting" hidden><h2>Scheduling will open when your order is ready.</h2><p>WestTech will mark your coasters Ready for Pickup when manufacturing and inspection are complete. Please return to this private link then.</p></div>
+   <div id="pc-confirmed" hidden><h2><span aria-hidden="true">✓</span> Your pickup appointment is reserved</h2><p id="pc-confirmed-when"></p><p class="pc-note">This is Stage 2 Preview testing. No address, directions, calendar invitation, or automatic confirmation email is sent yet.</p></div>
+   <div id="pc-pending" hidden><h2>We received your alternate pickup request.</h2><p id="pc-pending-text"></p><p class="pc-note">This is a request, not a confirmed appointment. WestTech will review your preferred times. Return to this private link to see whether an appointment is confirmed or other times are offered.</p></div>
+   <div id="pc-chooser" hidden>
+    <h2>Available appointments</h2>
+    <p class="pc-muted">You may choose one of the times WestTech has offered for your order.</p>
+    <div id="pc-slot-list" class="pc-slot-list" role="radiogroup" aria-label="Offered pickup times"></div>
+    <label class="pc-other"><input type="radio" name="pc-choice" value="other" id="pc-other"/><span><strong>None of these times work for me</strong></span></label>
+    <div id="pc-alternatives" class="pc-alternatives" hidden>
+      <h3>Request a different pickup time</h3>
+      <p>What day and time would work better for you?</p>
+      <div class="pc-field-grid">
+        <label>Preferred date <input id="pc-first-date" type="date"/></label>
+        <label>Preferred time <input id="pc-first-time" type="time" step="900"/></label>
+      </div>
+      <p>Have another time that would work? <span class="pc-muted">(Optional)</span></p>
+      <div class="pc-field-grid">
+        <label>Second-choice date <input id="pc-second-date" type="date"/></label>
+        <label>Second-choice time <input id="pc-second-time" type="time" step="900"/></label>
+      </div>
+      <p class="pc-note">Monday–Friday only; no weekend pickups. Alternative times are subject to WestTech approval.</p>
+    </div>
+    <button id="pc-submit" type="button" class="pc-primary" disabled>Choose a pickup appointment</button>
+    <p class="pc-note">Pickup location and calendar details will be provided only after confirmation when the complete notification system is enabled.</p>
+   </div>
+ </section>
+ <section class="pc-card pc-error" id="pc-error" role="alert" hidden><h2>Scheduling link unavailable</h2><p id="pc-error-text"></p><p>Please reply to your WestTech order email for assistance.</p></section>
+</main><div id="site-footer"></div></div>
+<script src="../js/theme.js"></script><script src="../js/site-shell.js"></script>
+<script src="../js/coaster-pickup-customer.js?v=20261016-stage2"></script>
+</body></html>
