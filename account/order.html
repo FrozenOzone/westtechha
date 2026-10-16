@@ -9,7 +9,7 @@
   <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
   <link href="../css/site.css" rel="stylesheet"/>
   <link href="../css/customer-account.css?v=20261016-order-detail1" rel="stylesheet"/>
-  <link href="../css/customer-order.css?v=20261016-order-detail2" rel="stylesheet"/>
+  <link href="../css/customer-order.css?v=20261016-pickup-details1" rel="stylesheet"/>
   <link href="../css/coaster-pickup-customer.css?v=20261016-roundtrip1" rel="stylesheet"/>
   <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
 </head>
@@ -58,7 +58,23 @@
    <div class="pc-orderline"><strong id="pc-order">Your order</strong><span>Mountain Time · 15-minute pickup</span></div>
    <div class="pc-message" id="pc-message" role="status" aria-live="polite" hidden></div>
    <div id="pc-waiting" hidden><h2>Scheduling will open when your order is ready.</h2><p>WestTech will mark your coasters Ready for Pickup when manufacturing and inspection are complete. Please return to this private link then.</p></div>
-   <div id="pc-confirmed" hidden><h2><span aria-hidden="true">✓</span> Your pickup appointment is reserved</h2><p id="pc-confirmed-when"></p><p class="pc-note">Your confirmed appointment is recorded in WestTech. Private address, directions, and calendar options will be added in a later Stage 3 step.</p></div>
+   <div id="pc-confirmed" hidden><h2><span aria-hidden="true">✓</span> Your pickup appointment is reserved</h2><p id="pc-confirmed-when"></p><p class="pc-note">Your appointment is confirmed. Pickup details and calendar options are available below.</p>
+     <div id="pc-confirmed-tools" class="pc-confirmed-tools" hidden>
+       <div id="pc-confirmed-location" class="pc-confirmed-location" hidden>
+         <strong>Private pickup location</strong>
+         <p id="pc-confirmed-address"></p>
+         <p id="pc-confirmed-instructions" class="pc-note" hidden></p>
+       </div>
+       <p id="pc-confirmed-location-pending" class="pc-note" hidden>WestTech has not published the pickup address for this appointment yet. The location and directions will appear here once WestTech confirms them.</p>
+       <div class="pc-confirmed-actions">
+         <a id="pc-maps" class="pc-action" target="_blank" rel="noopener noreferrer" hidden>Google Maps Directions</a>
+         <a id="pc-google-calendar" class="pc-action" target="_blank" rel="noopener noreferrer">Add to Google Calendar</a>
+         <a id="pc-ics" class="pc-action">Download Calendar (.ics)</a>
+         <a id="pc-email" class="pc-action">Open Email Draft</a>
+         <button id="pc-print" type="button" class="pc-action pc-action-print">Print Details</button>
+       </div>
+       <p class="pc-note">Calendar and email links open in your own apps. Nothing is sent automatically.</p>
+     </div></div>
    <div id="pc-pending" hidden><h2>We received your alternate pickup request.</h2><p id="pc-pending-text"></p><p class="pc-note">This is a request, not a confirmed appointment. WestTech will review your preferred times. Return to your WestTech customer dashboard to see whether an appointment is confirmed or other times are offered.</p></div>
    <div id="pc-chooser" hidden>
     <h2>Available appointments</h2>
@@ -88,5 +104,5 @@
   </main>
   <div id="site-footer"></div>
 </div>
-<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-portal-pickup1"></script><script src="../js/customer-order.js?v=20261016-order-detail2"></script>
+<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-pickup-details1"></script><script src="../js/customer-order.js?v=20261016-pickup-details1"></script>
 </body></html>

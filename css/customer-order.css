@@ -39,3 +39,16 @@
 .customer-order-pickup .pc-error{margin-bottom:0}
 .customer-order-pickup .pc-card[hidden],.customer-order-pickup [hidden]{display:none!important}
 @media(max-width:610px){.customer-order-pickup{margin-top:18px;padding:16px}.customer-order-pickup .pc-card{padding:17px}.customer-order-pickup .pc-alternatives .pc-field-grid{grid-template-columns:1fr}}
+
+/* Stage 3 Step 3 – confirmed pickup location, directions, calendar and user-triggered email. */
+.pc-confirmed-tools{border-top:1px solid var(--customer-border);margin-top:22px;padding-top:18px}
+.pc-confirmed-location{background:var(--customer-card-2);border:1px solid var(--customer-border);border-radius:12px;padding:17px;margin-bottom:14px}
+.pc-confirmed-location strong{color:var(--customer-text);font-size:.94rem}
+.pc-confirmed-location p{overflow-wrap:anywhere;margin:7px 0 0}
+.pc-confirmed-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
+.pc-confirmed-actions .pc-action{display:inline-flex;align-items:center;justify-content:center;min-height:42px;box-sizing:border-box;padding:10px 14px;text-decoration:none!important;color:#f5faff!important;border:1px solid #5485ad;background:#174c78;border-radius:10px;font-size:.82rem;font-weight:850;cursor:pointer;font-family:inherit}
+.pc-confirmed-actions .pc-action:hover{background:#216697}
+.pc-confirmed-actions .pc-action:focus-visible{outline:3px solid #ffcf70;outline-offset:2px}
+.pc-confirmed-actions .pc-action[hidden]{display:none!important}
+@media(max-width:610px){.pc-confirmed-actions{flex-direction:column}.pc-confirmed-actions .pc-action{width:100%}}
+@media print{body *{visibility:hidden!important}#co-pickup,#co-pickup *{visibility:visible!important}#co-pickup{position:absolute;top:0;left:0;width:100%;padding:0;border:0;color:#000;background:white}.pc-confirmed-actions{display:none!important}.pc-confirmed-location{color:#000;background:white;border:1px solid #999}}

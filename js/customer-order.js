@@ -83,16 +83,18 @@
    if(!response.ok||data.ok!==true)throw new Error('Could not load your order details.');
    const order=(Array.isArray(data.orders)?data.orders:[]).find(x=>x.sourceType===source&&x.orderId===id);
    if(!order)throw new Error('This order is not available in your customer account.');
+   window.wtPortalPickupEmail=typeof data.profile?.email==='string'?data.profile.email:'';
    render(order);
   }catch(e){message.textContent=e.message||'Could not load your order details.';message.classList.add('error');message.hidden=false;}
  }
- window.wtPortalPickupConfirmed=appointment=>{
+ window.wtPortalPickupConfirmed=(appointment,pickupDetails)=>{
   const info=$('#co-delivery'),title=$('#co-delivery-title'),body=$('#co-delivery-details');
   if(!info||!appointment)return;
   const when=new Date(appointment.localDate+'T12:00:00Z').toLocaleDateString('en-US',{timeZone:'UTC',weekday:'long',month:'short',day:'numeric',year:'numeric'});
   const [hour,min]=appointment.localTime.split(':').map(Number);
   info.hidden=false;title.textContent='Confirmed pickup appointment';
-  body.textContent=`${when} at ${hour%12||12}:${String(min).padStart(2,'0')} ${hour>=12?'PM':'AM'} Mountain Time. Pickup address and calendar links are coming in a later Stage 3 step.`;
+  body.textContent=`${when} at ${hour%12||12}:${String(min).padStart(2,'0')} ${hour>=12?'PM':'AM'} Mountain Time.`+
+   (pickupDetails?.location?.address?` Private location: ${pickupDetails.location.address}.`:' Pickup location not yet provided.');
  };
  load();
 })();

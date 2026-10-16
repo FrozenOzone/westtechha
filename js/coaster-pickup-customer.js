@@ -51,11 +51,47 @@
  }
  addTimeChoices();
  function validWeekday(date){const d=new Date(date+'T12:00:00Z');return Number.isFinite(d.getTime())&&d.toISOString().slice(0,10)===date&&!([0,6].includes(d.getUTCDay()));}
+
+ function confirmedTools(){
+  if(!portalMode)return;
+  const tools=$('#pc-confirmed-tools');if(!tools)return;
+  const appointment=state?.appointment;
+  if(!appointment||appointment.status!=='CONFIRMED')return;
+  const location=state?.pickupDetails?.location||null;
+  const address=location?.address||'';
+  const loc=$('#pc-confirmed-location'),pending=$('#pc-confirmed-location-pending'),maps=$('#pc-maps');
+  loc.hidden=!address;pending.hidden=!!address;
+  $('#pc-confirmed-address').textContent=address;
+  const instructions=$('#pc-confirmed-instructions');instructions.textContent=location?.instructions||'';instructions.hidden=!location?.instructions;
+  maps.hidden=!address;
+  if(address)maps.href='https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(address);
+  else maps.removeAttribute('href');
+  const begin=new Date(appointment.startAtUtc);
+  if(!Number.isFinite(begin.getTime())){tools.hidden=true;return;}
+  const end=new Date(begin.getTime()+15*60000);
+  const stamp=d=>d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
+  const label='WestTech Coaster Pickup';
+  const body=[`Coaster order ${state.orderId}`,`Pickup: ${pretty(appointment.localDate,appointment.localTime)}`,
+    address?`Location: ${address}`:'Pickup location will be provided in your WestTech Customer Portal.',
+    location?.instructions||'', 'Your appointment is already confirmed with WestTech.'].filter(Boolean).join('\n');
+  const cal=new URL('https://calendar.google.com/calendar/render');
+  cal.searchParams.set('action','TEMPLATE');cal.searchParams.set('text',label);
+  cal.searchParams.set('dates',stamp(begin)+'/'+stamp(end));cal.searchParams.set('details',body);
+  if(address)cal.searchParams.set('location',address);
+  $('#pc-google-calendar').href=cal.href;
+  $('#pc-ics').href='/api/customer/orders/COASTER/'+encodeURIComponent(portalOrderId)+'/pickup?format=ics';
+  const to=window.wtPortalPickupEmail||'';
+  $('#pc-email').href='mailto:'+encodeURIComponent(to)+'?subject='+encodeURIComponent('My WestTech pickup appointment — '+state.orderId)+'&body='+encodeURIComponent(body);
+  $('#pc-email').title='Opens a draft in your email app; you choose whether to send it.';
+  const print=$('#pc-print');print.onclick=()=>window.print();
+  tools.hidden=false;
+ }
+
  function paint(){
   busyText.hidden=true;content.hidden=false;message.hidden=true;
   $('#pc-order').textContent='Coaster order '+state.orderId;
   $('#pc-waiting').hidden=true;$('#pc-confirmed').hidden=true;$('#pc-pending').hidden=true;$('#pc-chooser').hidden=true;
-  if(state.appointment){$('#pc-confirmed').hidden=false;$('#pc-confirmed-when').textContent=pretty(state.appointment.localDate,state.appointment.localTime);if(portalMode&&typeof window.wtPortalPickupConfirmed==='function')window.wtPortalPickupConfirmed(state.appointment);return;}
+  if(state.appointment){$('#pc-confirmed').hidden=false;$('#pc-confirmed-when').textContent=pretty(state.appointment.localDate,state.appointment.localTime);if(portalMode){confirmedTools();if(typeof window.wtPortalPickupConfirmed==='function')window.wtPortalPickupConfirmed(state.appointment,state.pickupDetails);}return;}
   if(!state.ready){$('#pc-waiting').hidden=false;return;}
   if(state.request?.status==='PENDING'){
    $('#pc-pending').hidden=false;
