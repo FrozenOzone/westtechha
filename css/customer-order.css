@@ -52,3 +52,19 @@
 .pc-confirmed-actions .pc-action[hidden]{display:none!important}
 @media(max-width:610px){.pc-confirmed-actions{flex-direction:column}.pc-confirmed-actions .pc-action{width:100%}}
 @media print{body *{visibility:hidden!important}#co-pickup,#co-pickup *{visibility:visible!important}#co-pickup{position:absolute;top:0;left:0;width:100%;padding:0;border:0;color:#000;background:white}.pc-confirmed-actions{display:none!important}.pc-confirmed-location{color:#000;background:white;border:1px solid #999}}
+
+/* Stage 3 — Show the customer's private coaster design next to pickup scheduling. */
+.customer-order-lower-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(290px,.85fr);gap:22px;align-items:start;margin-top:28px}
+.customer-order-lower-grid>.customer-order-pickup{margin:0;max-width:none;min-width:0}
+.customer-order-lower-grid>.customer-order-design{margin:0;min-width:0;box-sizing:border-box}
+.customer-order-lower-grid>#co-pickup[hidden]+.customer-order-design{grid-column:1/-1;max-width:690px}
+.customer-order-design[hidden],.customer-order-design-image[hidden],.customer-order-design-frame [hidden]{display:none!important}
+.customer-order-design h2{margin:10px 0 8px;font-size:clamp(1.35rem,2vw,1.7rem);color:var(--customer-text)}
+.customer-order-design-copy,.customer-order-design-caption{font-size:.87rem;color:var(--customer-muted);line-height:1.6}
+.customer-order-design-copy{margin:0 0 18px}
+.customer-order-design-caption{margin:12px 0 0}
+.customer-order-design-frame{width:100%;box-sizing:border-box;min-height:260px;display:flex;align-items:center;justify-content:center;background:var(--customer-card-2);border:1px solid var(--customer-border);border-radius:14px;overflow:hidden;padding:14px}
+.customer-order-design-frame img{display:block;max-width:100%;width:100%;max-height:450px;object-fit:contain}
+.customer-order-design-placeholder{color:var(--customer-muted);font-size:.92rem;text-align:center;padding:32px}
+@media(max-width:950px){.customer-order-lower-grid{grid-template-columns:1fr;margin-top:18px}.customer-order-lower-grid>#co-pickup[hidden]+.customer-order-design{grid-column:auto;max-width:none}}
+@media print{.customer-order-design{display:none!important}}

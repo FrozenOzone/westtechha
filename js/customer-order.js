@@ -70,7 +70,22 @@
    dbody.textContent='Review your pickup scheduling options below. Private pickup address and directions will appear after confirmation when that Stage 3 feature is enabled.';
   }else{detail.hidden=true;dbody.textContent='';}
   content.hidden=false;
+  renderCoasterDesign(order);
   if(typeof window.wtPickupPortalInit==='function')window.wtPickupPortalInit(order);
+ }
+ function renderCoasterDesign(order){
+  const host=$('#co-design'),image=$('#co-design-image'),placeholder=$('#co-design-placeholder'),caption=$('#co-design-caption');
+  if(!host||!image||!placeholder||!caption)return;
+  host.hidden=String(order.sourceType||'').toUpperCase()!=='COASTER';
+  if(host.hidden)return;
+  image.hidden=false;image.style.visibility='hidden';image.removeAttribute('src');
+  placeholder.hidden=false;placeholder.textContent='Loading your coaster design…';
+  caption.textContent='WestTech displays the current proof when available, or the design you submitted.';
+  const url='/api/customer/orders/COASTER/'+encodeURIComponent(order.orderId)+'/artwork';
+  image.alt='Coaster design for order '+order.orderId;
+  image.onload=()=>{image.style.visibility='visible';placeholder.hidden=true;};
+  image.onerror=()=>{image.hidden=true;placeholder.hidden=false;placeholder.textContent='Design preview is not available for this order yet.';};
+  image.src=url;
  }
  async function load(){
   if(!validSource.has(source)||!id||id.length>100){
