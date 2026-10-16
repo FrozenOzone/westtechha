@@ -147,6 +147,50 @@
    try{await navigator.clipboard.writeText(linkValue.value);setStatus('Private link copied. No automatic email has been sent.');}
    catch(e){linkValue.select();setStatus('Link selected — press Ctrl+C to copy.');}
  });
+
+ // Ready for Pickup: on selecting the status, guide the admin to scheduling;
+ // on Save, require future offered times or an explicit one-time override.
+ const readyDialog=$('#wt-pickup-ready-dialog');
+ const readyAdd=$('#wt-pickup-ready-add'),readyOverride=$('#wt-pickup-ready-override'),readyCancel=$('#wt-pickup-ready-cancel');
+ let settleReady=null;
+ const readyNo={proceed:false,override:false};
+ const readyStatus=$('#ca-production-status');
+ const savedStatus=()=>$('#ca-status-pill')?.dataset.savedStatus||'';
+ const resetReadySelection=()=>{if(readyStatus&&savedStatus()){
+  readyStatus.value=savedStatus();readyStatus.dispatchEvent(new Event('change',{bubbles:true}));
+ }};
+ const scrollToSlots=()=>{panel.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>date.focus({preventScroll:true}),200);};
+ function finishReady(action){
+  if(!settleReady)return;
+  const done=settleReady;settleReady=null;
+  if(readyDialog.open)readyDialog.close();
+  if(action==='add')scrollToSlots();
+  if(action==='cancel')resetReadySelection();
+  done(action==='override'?{proceed:true,override:true}:readyNo);
+ }
+ readyAdd.addEventListener('click',()=>finishReady('add'));
+ readyCancel.addEventListener('click',()=>finishReady('cancel'));
+ readyOverride.addEventListener('click',()=>finishReady('override'));
+ readyDialog.addEventListener('close',()=>{if(!readyDialog.open&&settleReady)finishReady('cancel');});
+ readyStatus?.addEventListener('change',()=>{
+  if(readyStatus.value==='READY_FOR_PICKUP'&&savedStatus()!=='READY_FOR_PICKUP'&&!panel.hidden)scrollToSlots();
+ });
+ window.wtPickupReadyGate=async()=>{
+  const shown=visibleOrder();
+  if(!shown||readyStatus?.value!=='READY_FOR_PICKUP'||savedStatus()==='READY_FOR_PICKUP')return {proceed:true,override:false};
+  if(busy||readyDialog.open)return readyNo;
+  try{
+   const data=await request(shown.id);
+   if(visibleOrder()?.id!==shown.id||readyStatus?.value!=='READY_FOR_PICKUP')return readyNo;
+   const nowParts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Denver',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
+   const now=Object.fromEntries(nowParts.filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));
+   const today=`${now.year}-${now.month}-${now.day}`,clock=`${now.hour}:${now.minute}`;
+   const offered=(data.pickup?.slots||[]).some(x=>x.status==='OFFERED'&&(x.localDate>today||(x.localDate===today&&x.localTime>clock)));
+   if(offered)return {proceed:true,override:false};
+  }catch(e){setStatus('Could not verify pickup times: '+e.message,true);scrollToSlots();return readyNo;}
+  return new Promise(resolve=>{settleReady=resolve;readyDialog.showModal();});
+ };
+
  const observer=new MutationObserver(()=>refresh());
  // Only observe existing admin state indicators. Do not observe this add-on's own
  // panel: writing its content must never retrigger the observer.

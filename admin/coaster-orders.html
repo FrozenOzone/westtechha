@@ -17,7 +17,7 @@
   <link href="../css/admin-production-fields.css?v=20260913-2" rel="stylesheet"/>
   <script src="../js/admin-access.js?v=20260913-prod1"></script>
   <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
-<link rel="stylesheet" href="../css/coaster-pickup-admin.css?v=20261016-timepick1"/>
+<link rel="stylesheet" href="../css/coaster-pickup-admin.css?v=20261016-readyguard1"/>
 </head>
 <body class="coaster-page custom-coasters-page wt-admin-template">
 <div class="page">
@@ -170,6 +170,20 @@
           </section>
 
           <!-- WestTech-styled confirmation (replaces the browser's confirm() dialog). -->
+          <dialog id="wt-pickup-ready-dialog" aria-labelledby="wt-pickup-ready-title" aria-describedby="wt-pickup-ready-description">
+            <div class="wt-pickup-dialog-body">
+              <div class="wt-pickup-dialog-eyebrow">LOCAL PICKUP • READY FOR PICKUP</div>
+              <h2 id="wt-pickup-ready-title">No Pickup Times Selected</h2>
+              <p id="wt-pickup-ready-description">You have not offered a future pickup date and time for this order.</p>
+              <p class="wt-pickup-dialog-note">Add at least one time before notifying your customer, or override scheduling when arrangements were made privately (for example, family or friends).</p>
+              <p class="wt-pickup-dialog-note"><strong>Override:</strong> saves Ready for Pickup without sending the usual Ready for Pickup email. The override is recorded in Order History.</p>
+              <div class="wt-pickup-ready-actions">
+                <button id="wt-pickup-ready-add" type="button">Add Pickup Times</button>
+                <button id="wt-pickup-ready-override" type="button">Override — No Scheduling Email</button>
+                <button id="wt-pickup-ready-cancel" type="button">Cancel — Keep Current Status</button>
+              </div>
+            </div>
+          </dialog>
           <dialog id="wt-pickup-decision-dialog" aria-labelledby="wt-pickup-decision-title" aria-describedby="wt-pickup-decision-description">
             <div class="wt-pickup-dialog-body"><div class="wt-pickup-dialog-eyebrow">LOCAL PICKUP • SCHEDULING</div>
               <h2 id="wt-pickup-decision-title">Review pickup request</h2><p id="wt-pickup-decision-description"></p>
@@ -287,7 +301,7 @@
   </main>
   <div id="site-footer"></div>
 </div>
-<script src="../js/theme.js"></script><script src="../js/admin-production-fields.js?v=20260913-2"></script><script src="../js/coaster-admin.js?v=20260920-carrier1"></script><script src="../js/manufacturing-estimate.js?v=20260913-1"></script><script src="../js/coaster-admin-auto-refresh.js?v=20260916-shippedlock1"></script><script src="../js/coaster-admin-archive.js?v=20260904-archive3"></script><script src="../js/admin-pane-sync.js?v=20260905-1"></script>
-<script src="../js/coaster-pickup-admin.js?v=20261016-timepick1"></script>
+<script src="../js/theme.js"></script><script src="../js/admin-production-fields.js?v=20260913-2"></script><script src="../js/coaster-admin.js?v=20261016-readyguard1"></script><script src="../js/manufacturing-estimate.js?v=20260913-1"></script><script src="../js/coaster-admin-auto-refresh.js?v=20260916-shippedlock1"></script><script src="../js/coaster-admin-archive.js?v=20260904-archive3"></script><script src="../js/admin-pane-sync.js?v=20260905-1"></script>
+<script src="../js/coaster-pickup-admin.js?v=20261016-readyguard1"></script>
 </body>
 </html>
