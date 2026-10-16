@@ -69,8 +69,9 @@
   }
   if(!(state.slots||[]).length){let p=document.createElement('p');p.textContent='There are no offered pickup times right now. Please request another weekday date and time below.';list.appendChild(p);}
   const counter=state.request?.status==='COUNTER_OFFERED';
-  $('#pc-other').disabled=counter;$('#pc-other').closest('label').hidden=counter;
-  if(counter){notify('WestTech has offered alternative pickup times. Please select one of the available appointments.');}
+  // Negotiation stays open: every counter-offer can be accepted or declined.
+  $('#pc-other').disabled=false;$('#pc-other').closest('label').hidden=false;
+  if(counter){notify('WestTech has counter-offered these times. You can accept one or suggest new dates if neither works.');}
   document.querySelectorAll('input[name=pc-choice]').forEach(x=>x.checked=false);
   $('#pc-alternatives').hidden=true;submit.disabled=true;
   submit.textContent='Choose a pickup appointment';setDates();

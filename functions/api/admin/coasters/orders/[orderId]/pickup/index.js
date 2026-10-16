@@ -14,7 +14,7 @@ export async function onRequestPost(context){
       return jsonResponse({ok:true,pickup:await state(context.env,id),link});
     }
     if(b.action==='decide'){
-      await decideAdminPickupRequest(context.env,id,b.requestId,b.decision);
+      await decideAdminPickupRequest(context.env,id,b.requestId,b.decision,b.slotIds);
       return jsonResponse({ok:true,pickup:await state(context.env,id)});
     }
     await addCoasterPickupSlot(context.env,id,b);

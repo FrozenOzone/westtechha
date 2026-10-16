@@ -82,3 +82,16 @@
 #wt-pickup-ready-dialog button:hover{filter:brightness(1.1)}
 #wt-pickup-ready-dialog button:focus-visible{outline:3px solid #79c6ff;outline-offset:3px}
 @media(max-width:480px){#wt-pickup-ready-dialog .wt-pickup-dialog-body{padding:20px}}
+
+/* Each counter-offer explicitly chooses its appointments; preserve earlier rounds. */
+.wt-pickup-counter-choices{display:grid;gap:8px;margin:12px 0;max-height:280px;overflow-y:auto}
+.wt-pickup-counter-choices[hidden]{display:none}
+.wt-pickup-counter-choice{display:flex;align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--border, #35526f);border-radius:8px;cursor:pointer;color:inherit;font-size:.92rem}
+.wt-pickup-counter-choice input{width:17px;height:17px;accent-color:#1677c4;flex:none}
+#wt-pickup-decision-dialog .wt-pickup-counter-feedback{color:#ffd0c8;margin:8px 0;font-size:.92rem}
+.wt-pickup-counter-feedback[hidden]{display:none}
+.wt-pickup-offer-heading{display:block;margin-top:10px}
+.wt-pickup-history{margin-top:12px;padding:10px 12px;border:1px solid #35526f;border-radius:8px}
+.wt-pickup-history summary{cursor:pointer;font-weight:600}
+.wt-pickup-history-round{display:grid;gap:3px;padding:9px 0;border-top:1px solid #35526f;margin-top:9px}
+.wt-pickup-history-round small{display:block}

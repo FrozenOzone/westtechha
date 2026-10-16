@@ -7,8 +7,9 @@
  const date=$('#wt-pickup-date'),time=$('#wt-pickup-time'),list=$('#wt-pickup-list'),status=$('#wt-pickup-status'),add=$('#wt-pickup-add'),reload=$('#wt-pickup-reload');
  const linkButton=$('#wt-pickup-create-link'),linkState=$('#wt-pickup-link-state'),linkBox=$('#wt-pickup-link-box'),linkValue=$('#wt-pickup-link-value'),copyLink=$('#wt-pickup-copy-link'),requestHost=$('#wt-pickup-requests'),appointmentHost=$('#wt-pickup-appointment');
  const decisionDialog=$('#wt-pickup-decision-dialog'),decisionTitle=$('#wt-pickup-decision-title'),decisionDescription=$('#wt-pickup-decision-description'),decisionCancel=$('#wt-pickup-decision-cancel'),decisionConfirm=$('#wt-pickup-decision-confirm');
+ const counterChoices=$('#wt-pickup-counter-choices'),counterFeedback=$('#wt-pickup-counter-feedback');
  const withdrawDialog=$('#wt-pickup-withdraw-dialog'),withdrawDescription=$('#wt-pickup-withdraw-description'),withdrawCancel=$('#wt-pickup-withdraw-cancel'),withdrawConfirm=$('#wt-pickup-withdraw-confirm');
- let activeOrder='',lastKey='',serial=0,busy=false;
+ let activeOrder='',lastKey='',serial=0,busy=false,lastPickupState=null;
  let pendingWithdraw=null,pendingDecision=null,linkedOrder='';
  let lastPickupSnapshot='',autoCheckInFlight=false,lastAutoCheck=0;
  function setStatus(value,error=false){status.textContent=value;status.className='wt-pickup-status'+(error?' error':'');}
@@ -70,6 +71,7 @@
    slots:pickup.slots,requests:pickup.requests,appointment:pickup.appointment});
  }
  function paint(pickup){
+  lastPickupState=pickup;
   lastPickupSnapshot=pickupSnapshot(pickup);
   list.replaceChildren();add.disabled=!pickup.enabled;renderStage2(pickup);
   if(!pickup.enabled)setStatus('Only active Local Pickup production orders can offer times.');
@@ -87,7 +89,7 @@
   const shown=visibleOrder();panel.hidden=!shown;
   if(withdrawDialog.open&&(!shown||shown.id!==pendingWithdraw?.orderId))withdrawDialog.close();
   if(decisionDialog.open&&(!shown||shown.id!==pendingDecision?.orderId))decisionDialog.close();
-  if(!shown){activeOrder='';lastKey='';lastPickupSnapshot='';serial++;linkedOrder='';linkValue.value='';linkBox.hidden=true;return;}
+  if(!shown){activeOrder='';lastKey='';lastPickupSnapshot='';serial++;linkedOrder='';linkValue.value='';linkBox.hidden=true;lastPickupState=null;return;}
   if(linkedOrder&&linkedOrder!==shown.id){linkedOrder='';linkValue.value='';linkBox.hidden=true;}
   activeOrder=shown.id;if(!force&&shown.key===lastKey)return;
   if(shown.key!==lastKey)lastPickupSnapshot='';
@@ -115,14 +117,22 @@
    appointmentHost.hidden=!a;
    appointmentHost.textContent=a?`Confirmed pickup: ${readableDate(a.localDate)} at ${readableTime(a.localTime)} (Mountain Time). Address and invitations are not yet enabled.`:'';
    requestHost.replaceChildren();
-   const recent=(pickup.requests||[]).filter(x=>x.status==='PENDING'||x.status==='COUNTER_OFFERED');
-   if(!recent.length){const p=document.createElement('p');p.textContent='No active alternate-time requests.';requestHost.appendChild(p);return;}
+   const all=pickup.requests||[];
+   const recent=all.filter(x=>x.status==='PENDING'||x.status==='COUNTER_OFFERED');
+   if(!recent.length){const p=document.createElement('p');p.textContent='No active alternate-time requests.';requestHost.appendChild(p);}
    for(const item of recent){
      const box=document.createElement('div'),title=document.createElement('strong'),one=document.createElement('small');box.className='wt-pickup-request';
      title.textContent=item.status==='PENDING'?'Awaiting your approval':'Different times offered — awaiting customer';
+     const origin=document.createElement('small');origin.textContent='Customer originally requested:';
      one.textContent=`First: ${readableDate(item.firstDate)} at ${readableTime(item.firstTime)}`;
-     box.append(title,one);
+     box.append(title,origin,one);
      if(item.secondDate){const two=document.createElement('small');two.textContent=`Second: ${readableDate(item.secondDate)} at ${readableTime(item.secondTime)}`;box.appendChild(two);}
+     if(item.status==='COUNTER_OFFERED'){
+       const selected=Array.isArray(item.counterSlots)?item.counterSlots:(pickup.slots||[]).filter(s=>s.status==='OFFERED');
+       const heading=document.createElement('strong');heading.textContent='WestTech counter-offered:';heading.className='wt-pickup-offer-heading';box.appendChild(heading);
+       for(const slot of selected){const line=document.createElement('small');line.textContent=readableDate(slot.localDate)+' at '+readableTime(slot.localTime);box.appendChild(line);}
+       if(!selected.length){const line=document.createElement('small');line.textContent='No counter-offered times remain. Customer may propose others.';box.appendChild(line);}
+     }
      if(item.status==='PENDING'&&!a){
        const actions=document.createElement('div');actions.className='wt-pickup-request-actions';
        for(const [decision,label,available] of [['first','Approve First Choice',true],['second','Approve Second Choice',!!item.secondDate],['counter','Offer Different Times',true]]){
@@ -132,13 +142,35 @@
        }box.appendChild(actions);
      }requestHost.appendChild(box);
    }
+   const past=all.filter(x=>!['PENDING','COUNTER_OFFERED'].includes(x.status));
+   if(past.length){
+     const history=document.createElement('details');history.className='wt-pickup-history';
+     const summary=document.createElement('summary');summary.textContent=`Earlier scheduling rounds (${past.length})`;history.appendChild(summary);
+     for(const item of past){
+       const line=document.createElement('div');line.className='wt-pickup-history-round';
+       const label=document.createElement('strong');label.textContent=item.status==='CLOSED'?'Customer requested another round':item.status==='APPROVED'?'Approved appointment':'Closed request';line.appendChild(label);
+       const first=document.createElement('small');first.textContent='Customer: '+readableDate(item.firstDate)+' at '+readableTime(item.firstTime);line.appendChild(first);
+       if(item.secondDate){const second=document.createElement('small');second.textContent='Alternate: '+readableDate(item.secondDate)+' at '+readableTime(item.secondTime);line.appendChild(second);}
+       if(item.counterSlots?.length){const h=document.createElement('small');h.textContent='WestTech offered: '+item.counterSlots.map(s=>readableDate(s.localDate)+' at '+readableTime(s.localTime)).join('; ');line.appendChild(h);}
+       history.appendChild(line);
+     }requestHost.appendChild(history);
+   }
  }
  function askDecision(item,decision){
    if(busy||decisionDialog.open||!activeOrder)return;
    pendingDecision={orderId:activeOrder,requestId:item.id,decision};
+   counterChoices.replaceChildren();counterChoices.hidden=decision!=='counter';counterFeedback.hidden=true;
    if(decision==='counter'){
-     decisionTitle.textContent='Offer different pickup times?';
-     decisionDescription.textContent='First, add your proposed weekday slots above. This will mark the alternative request as counter-offered. No email is sent in Stage 2.';
+     decisionTitle.textContent='Choose times for this counter-offer';
+     decisionDescription.textContent='Select exactly which of your available weekday slots to offer back. Older slots are NOT included unless you select them. The customer can suggest new times again if needed.';
+     const offered=(lastPickupState?.slots||[]).filter(s=>s.status==='OFFERED');
+     for(const slot of offered){
+       const label=document.createElement('label'),input=document.createElement('input'),caption=document.createElement('span');
+       label.className='wt-pickup-counter-choice';input.type='checkbox';input.value=String(slot.id);
+       caption.textContent=readableDate(slot.localDate)+' at '+readableTime(slot.localTime);
+       label.append(input,caption);counterChoices.appendChild(label);
+     }
+     if(!offered.length){const note=document.createElement('p');note.textContent='No times are offered. Go Back and add a new weekday appointment first.';counterChoices.appendChild(note);}
    }else{
      const d=decision==='first'?item.firstDate:item.secondDate,t=decision==='first'?item.firstTime:item.secondTime;
      decisionTitle.textContent='Confirm this pickup appointment?';
@@ -148,8 +180,11 @@
  }
  decisionCancel.addEventListener('click',()=>decisionDialog.close());
  decisionConfirm.addEventListener('click',()=>{
-   const p=pendingDecision;decisionDialog.close();
-   if(p&&p.orderId===activeOrder&&!busy)change('POST',{action:'decide',requestId:p.requestId,decision:p.decision});
+   const p=pendingDecision;if(!p||p.orderId!==activeOrder||busy)return;
+   const slotIds=p.decision==='counter'?Array.from(counterChoices.querySelectorAll('input[type="checkbox"]:checked'),el=>Number(el.value)):[];
+   if(p.decision==='counter'&&!slotIds.length){counterFeedback.textContent='Select at least one pickup time, or choose Go Back to add a new time.';counterFeedback.hidden=false;return;}
+   decisionDialog.close();
+   change('POST',{action:'decide',requestId:p.requestId,decision:p.decision,slotIds});
  });
  decisionDialog.addEventListener('close',()=>{pendingDecision=null;});
  linkButton.addEventListener('click',async()=>{

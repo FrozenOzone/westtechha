@@ -51,7 +51,22 @@ async function orderFor(db,id){
 function requireLocal(order){if(order.fulfillmentMethod!=='LOCAL_PICKUP'||!ACTIVE.has(order.status))throw makeError('Pickup scheduling is not available for this order.',409);}
 function requireReady(order){if(order.fulfillmentMethod!=='LOCAL_PICKUP'||order.status!=='READY_FOR_PICKUP')throw makeError('Pickup scheduling opens when your order is Ready for Pickup.',409);}
 async function appointmentFor(db,id){return db.prepare("SELECT id,local_date AS localDate,local_time AS localTime,start_at_utc AS startAtUtc,status FROM coaster_pickup_appointments WHERE order_id=? AND status='CONFIRMED' ORDER BY id DESC LIMIT 1").bind(id).first();}
-async function requestsFor(db,id){return rows(await db.prepare("SELECT id,first_date AS firstDate,first_time AS firstTime,second_date AS secondDate,second_time AS secondTime,status,created_at AS createdAt FROM coaster_pickup_requests WHERE order_id=? ORDER BY id DESC LIMIT 25").bind(id).all());}
+async function requestsFor(db,id){
+  const requests=rows(await db.prepare("SELECT id,first_date AS firstDate,first_time AS firstTime,second_date AS secondDate,second_time AS secondTime,status,created_at AS createdAt FROM coaster_pickup_requests WHERE order_id=? ORDER BY id DESC LIMIT 25").bind(id).all());
+  // Each round's offered appointments are snapshotted in the existing order-history
+  // event table. No new D1 migration and no ambiguity when newer slots are added.
+  const events=rows(await db.prepare("SELECT detail FROM coaster_order_events WHERE order_id=? AND event_type='PICKUP_ALTERNATIVE_COUNTER_OFFERED' ORDER BY id DESC LIMIT 200").bind(id).all());
+  const byRequest=new Map();
+  for(const event of events){
+    try{
+      const detail=JSON.parse(event.detail||'{}');
+      if(Number.isSafeInteger(detail.requestId)&&Array.isArray(detail.slots)&&!byRequest.has(detail.requestId)){
+        byRequest.set(detail.requestId,detail.slots.filter(s=>Number.isSafeInteger(s.id)&&/^\d{4}-\d{2}-\d{2}$/.test(s.localDate)&&/^\d{2}:\d{2}$/.test(s.localTime)).slice(0,100));
+      }
+    }catch(_){/* Older event details may be plain text. */}
+  }
+  return requests.map(r=>({...r,counterSlots:byRequest.get(r.id)||null}));
+}
 async function slotsFor(db,id){
   const now=mountainParts();
   return rows(await db.prepare("SELECT s.id,s.local_date AS localDate,s.local_time AS localTime FROM coaster_pickup_slots s WHERE s.order_id=? AND s.status='OFFERED' AND s.local_date>=? AND NOT EXISTS(SELECT 1 FROM coaster_pickup_appointments a WHERE a.local_date=s.local_date AND a.local_time=s.local_time AND a.status='CONFIRMED') ORDER BY s.local_date,s.local_time LIMIT 100").bind(id,now.date).all()).filter(x=>x.localDate>now.date||x.localTime>now.time);
@@ -100,12 +115,22 @@ export async function viewCustomerPickup(env,token){
   const appointment=await appointmentFor(db,order.orderId);
   const requests=await requestsFor(db,order.orderId);
   const currentRequest=requests.find(x=>['PENDING','COUNTER_OFFERED'].includes(x.status))||null;
-  return {orderId:order.orderId,ready,orderStatus:order.status,timezone:ZONE,appointment,request:currentRequest,slots:ready&&!appointment?await slotsFor(db,order.orderId):[],today:mountainParts().date,needsAddressConfirmation:true};
+  let slots=ready&&!appointment?await slotsFor(db,order.orderId):[];
+  // For a counter-offer, display only the slots WestTech selected for that
+  // round. Old Stage 2 requests have no snapshot, so remain backward-compatible.
+  if(currentRequest?.status==='COUNTER_OFFERED'&&Array.isArray(currentRequest.counterSlots)){
+    const selected=new Set(currentRequest.counterSlots.map(s=>s.id));
+    slots=slots.filter(s=>selected.has(s.id));
+  }
+  return {orderId:order.orderId,ready,orderStatus:order.status,timezone:ZONE,appointment,request:currentRequest,slots,today:mountainParts().date,needsAddressConfirmation:true};
 }
 export async function bookCustomerPickup(env,token,slotId){
   const {db,order}=await resolved(env,token);requireReady(order);
   const id=Number(slotId);if(!Number.isSafeInteger(id)||id<1)throw makeError('Choose an available pickup time.',400);
-  if((await requestsFor(db,order.orderId)).some(x=>x.status==='PENDING'))throw makeError('An alternate-time request is awaiting WestTech review.',409);
+  const requests=await requestsFor(db,order.orderId);
+  if(requests.some(x=>x.status==='PENDING'))throw makeError('An alternate-time request is awaiting WestTech review.',409);
+  const counter=requests.find(x=>x.status==='COUNTER_OFFERED');
+  if(counter&&Array.isArray(counter.counterSlots)&&!counter.counterSlots.some(s=>s.id===id))throw makeError('That time is not part of WestTech’s latest counter-offer. Please refresh your scheduling page.',409);
   const slot=await db.prepare("SELECT id,local_date AS localDate,local_time AS localTime FROM coaster_pickup_slots WHERE id=? AND order_id=? AND status='OFFERED'").bind(id,order.orderId).first();
   if(!slot)throw makeError('That pickup slot is no longer available.',409);
   validatePickupSlot(slot.localDate,slot.localTime);
@@ -117,15 +142,22 @@ export async function requestCustomerAlternative(env,token,first,second){
   const {db,order}=await resolved(env,token);requireReady(order);
   if(await appointmentFor(db,order.orderId))throw makeError('A pickup appointment is already confirmed.',409);
   const existing=await requestsFor(db,order.orderId);
-  if(existing.some(x=>['PENDING','COUNTER_OFFERED'].includes(x.status)))throw makeError('An alternate-time request is already being reviewed.',409);
+  if(existing.some(x=>x.status==='PENDING'))throw makeError('An alternate-time request is already awaiting WestTech review.',409);
   const a=validateAlternative(first?.date,first?.time),b=second?.date||second?.time?validateAlternative(second?.date,second?.time):null;
   if(b&&a.date===b.date&&a.time===b.time)throw makeError('Choose a different second-choice appointment.',400);
-  const saved=await db.prepare("INSERT INTO coaster_pickup_requests(order_id,first_date,first_time,second_date,second_time) SELECT ?,?,?,?,? WHERE NOT EXISTS(SELECT 1 FROM coaster_pickup_requests WHERE order_id=? AND status IN ('PENDING','COUNTER_OFFERED'))").bind(order.orderId,a.date,a.time,b?.date||null,b?.time||null,order.orderId).run();
+  const previous=existing.find(x=>x.status==='COUNTER_OFFERED');
+  // Closing the previous counter-offer and creating the next pending round
+  // are a single D1 batch/transaction. Old rows and event history remain.
+  const commands=[];
+  if(previous)commands.push(db.prepare("UPDATE coaster_pickup_requests SET status='CLOSED',updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND status='COUNTER_OFFERED'").bind(order.orderId));
+  commands.push(db.prepare("INSERT INTO coaster_pickup_requests(order_id,first_date,first_time,second_date,second_time) SELECT ?,?,?,?,? WHERE NOT EXISTS(SELECT 1 FROM coaster_pickup_requests WHERE order_id=? AND status IN ('PENDING','COUNTER_OFFERED'))").bind(order.orderId,a.date,a.time,b?.date||null,b?.time||null,order.orderId));
+  const results=await db.batch(commands);
+  const saved=results[results.length-1];
   if(Number(saved?.meta?.changes||0)!==1)throw makeError('An alternate-time request is already being reviewed.',409);
-  await logEvent(db,order.orderId,'PICKUP_ALTERNATIVE_REQUESTED',{first:a,second:b});
+  await logEvent(db,order.orderId,previous?'PICKUP_ALTERNATIVE_REVISED':'PICKUP_ALTERNATIVE_REQUESTED',{first:a,second:b,previousRequestId:previous?.id||null});
   return viewCustomerPickup(env,token);
 }
-export async function decideAdminPickupRequest(env,orderId,requestId,decision){
+export async function decideAdminPickupRequest(env,orderId,requestId,decision,selectedSlotIds=[]){
   const db=requireOrdersDb(env),order=await orderFor(db,orderId);requireReady(order);
   const id=Number(requestId);if(!Number.isSafeInteger(id)||id<1)throw makeError('Invalid pickup request.',400);
   const r=await db.prepare("SELECT id,first_date AS firstDate,first_time AS firstTime,second_date AS secondDate,second_time AS secondTime,status FROM coaster_pickup_requests WHERE id=? AND order_id=?").bind(id,order.orderId).first();
@@ -139,9 +171,17 @@ export async function decideAdminPickupRequest(env,orderId,requestId,decision){
     await logEvent(db,order.orderId,'PICKUP_ALTERNATIVE_APPROVED',{choice:decision,localDate:d,localTime:t});
   }else if(decision==='counter'){
     const offered=await slotsFor(db,order.orderId);
-    if(!offered.length)throw makeError('Offer at least one available pickup time before sending a counter-offer.',409);
-    await db.prepare("UPDATE coaster_pickup_requests SET status='COUNTER_OFFERED',updated_at=CURRENT_TIMESTAMP WHERE id=? AND order_id=? AND status='PENDING'").bind(id,order.orderId).run();
-    await logEvent(db,order.orderId,'PICKUP_ALTERNATIVE_COUNTER_OFFERED',{offeredCount:offered.length});
+    if(!Array.isArray(selectedSlotIds)||!selectedSlotIds.length||selectedSlotIds.length>100)throw makeError('Select at least one offered time for this counter-offer.',400);
+    const ids=selectedSlotIds.map(Number);
+    if(ids.some(x=>!Number.isSafeInteger(x)||x<1)||new Set(ids).size!==ids.length)throw makeError('Please select valid pickup slots.',400);
+    const selected=offered.filter(x=>ids.includes(x.id));
+    if(selected.length!==ids.length)throw makeError('One of those pickup times is no longer available. Refresh and try again.',409);
+    const slots=selected.map(x=>({id:x.id,localDate:x.localDate,localTime:x.localTime}));
+    const updated=await db.batch([
+      db.prepare("UPDATE coaster_pickup_requests SET status='COUNTER_OFFERED',updated_at=CURRENT_TIMESTAMP WHERE id=? AND order_id=? AND status='PENDING'").bind(id,order.orderId),
+      db.prepare("INSERT INTO coaster_order_events(order_id,event_type,detail) VALUES (?,'PICKUP_ALTERNATIVE_COUNTER_OFFERED',?)").bind(order.orderId,JSON.stringify({requestId:id,slots,offeredCount:slots.length}))
+    ]);
+    if(Number(updated?.[0]?.meta?.changes||0)!==1)throw makeError('This request was already handled. Refresh scheduling.',409);
   }else throw makeError('Choose an approval option or counter-offer.',400);
   return adminPickupExtra(env,order.orderId);
 }

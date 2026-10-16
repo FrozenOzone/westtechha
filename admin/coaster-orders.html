@@ -17,7 +17,7 @@
   <link href="../css/admin-production-fields.css?v=20260913-2" rel="stylesheet"/>
   <script src="../js/admin-access.js?v=20260913-prod1"></script>
   <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
-<link rel="stylesheet" href="../css/coaster-pickup-admin.css?v=20261016-readyguard1"/>
+<link rel="stylesheet" href="../css/coaster-pickup-admin.css?v=20261016-roundtrip1"/>
 </head>
 <body class="coaster-page custom-coasters-page wt-admin-template">
 <div class="page">
@@ -164,7 +164,7 @@
               <div id="wt-pickup-appointment" class="wt-pickup-booking" hidden></div>
               <h3>Alternative pickup requests</h3>
               <div id="wt-pickup-requests" class="wt-pickup-requests"><p>No requests yet.</p></div>
-              <p class="wt-pickup-stage2-note">To counter-offer, add different offered slots above, then select Offer Different Times. Customer emails, directions, address, and calendar invites come in Stage 3.</p>
+              <p class="wt-pickup-stage2-note">For a counter-offer, add times above, then choose Offer Different Times and select exactly which times to offer. Customer emails, directions, address, and calendar invites come in Stage 3.</p>
             </section>
             <div class="wt-pickup-footer"><span>Stage 2 Preview: Private scheduling and approvals are stored in D1. No pickup address or automatic customer notifications yet.</span><button id="wt-pickup-reload" class="ca-secondary" type="button">Refresh Scheduling</button></div>
           </section>
@@ -187,6 +187,8 @@
           <dialog id="wt-pickup-decision-dialog" aria-labelledby="wt-pickup-decision-title" aria-describedby="wt-pickup-decision-description">
             <div class="wt-pickup-dialog-body"><div class="wt-pickup-dialog-eyebrow">LOCAL PICKUP • SCHEDULING</div>
               <h2 id="wt-pickup-decision-title">Review pickup request</h2><p id="wt-pickup-decision-description"></p>
+              <div id="wt-pickup-counter-choices" class="wt-pickup-counter-choices" hidden></div>
+              <p id="wt-pickup-counter-feedback" class="wt-pickup-counter-feedback" role="alert" hidden></p>
               <p class="wt-pickup-dialog-note">The coaster order and payment status do not change. No automatic customer email is sent in Stage 2.</p>
               <div class="wt-pickup-dialog-actions"><button type="button" id="wt-pickup-decision-cancel">Go Back</button><button type="button" id="wt-pickup-decision-confirm">Confirm</button></div>
             </div>
@@ -302,6 +304,6 @@
   <div id="site-footer"></div>
 </div>
 <script src="../js/theme.js"></script><script src="../js/admin-production-fields.js?v=20260913-2"></script><script src="../js/coaster-admin.js?v=20261016-readyguard2"></script><script src="../js/manufacturing-estimate.js?v=20260913-1"></script><script src="../js/coaster-admin-auto-refresh.js?v=20261016-pickup-save-intercept1"></script><script src="../js/coaster-admin-archive.js?v=20260904-archive3"></script><script src="../js/admin-pane-sync.js?v=20260905-1"></script>
-<script src="../js/coaster-pickup-admin.js?v=20261016-pickup-autorefresh1"></script>
+<script src="../js/coaster-pickup-admin.js?v=20261016-roundtrip1"></script>
 </body>
 </html>
