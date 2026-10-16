@@ -5,7 +5,9 @@
  const panel=$('#wt-pickup-panel');
  if(!panel||location.protocol==='file:'||new URLSearchParams(location.search).get('mode')==='local')return;
  const date=$('#wt-pickup-date'),time=$('#wt-pickup-time'),list=$('#wt-pickup-list'),status=$('#wt-pickup-status'),add=$('#wt-pickup-add'),reload=$('#wt-pickup-reload');
+ const withdrawDialog=$('#wt-pickup-withdraw-dialog'),withdrawDescription=$('#wt-pickup-withdraw-description'),withdrawCancel=$('#wt-pickup-withdraw-cancel'),withdrawConfirm=$('#wt-pickup-withdraw-confirm');
  let activeOrder='',lastKey='',serial=0,busy=false;
+ let pendingWithdraw=null;
  function setStatus(value,error=false){status.textContent=value;status.className='wt-pickup-status'+(error?' error':'');}
  function todayMountain(){const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Denver',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const p=Object.fromEntries(parts.filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));return `${p.year}-${p.month}-${p.day}`;}
  date.min=todayMountain();
@@ -22,6 +24,19 @@
  }
  function readableDate(localDate){return new Date(localDate+'T12:00:00Z').toLocaleDateString('en-US',{timeZone:'UTC',weekday:'short',month:'short',day:'numeric',year:'numeric'});}
  function readableTime(localTime){const [h,m]=localTime.split(':').map(Number);return `${h%12||12}:${String(m).padStart(2,'0')} ${h>=12?'PM':'AM'}`;}
+ function askWithdraw(slot){
+  if(busy||withdrawDialog.open||!activeOrder)return;
+  pendingWithdraw={orderId:activeOrder,slotId:slot.id};
+  withdrawDescription.textContent=`${readableDate(slot.localDate)} at ${readableTime(slot.localTime)} (Mountain Time) will no longer be offered for this order.`;
+  withdrawDialog.showModal();
+ }
+ withdrawCancel.addEventListener('click',()=>withdrawDialog.close());
+ withdrawConfirm.addEventListener('click',()=>{
+  const pending=pendingWithdraw;
+  withdrawDialog.close();
+  if(pending&&pending.orderId===activeOrder&&!busy)change('DELETE',{slotId:pending.slotId});
+ });
+ withdrawDialog.addEventListener('close',()=>{pendingWithdraw=null;});
  function paint(pickup){
   list.replaceChildren();add.disabled=!pickup.enabled;
   if(!pickup.enabled)setStatus('Only active Local Pickup production orders can offer times.');
@@ -31,12 +46,13 @@
    const row=document.createElement('div'),description=document.createElement('div'),title=document.createElement('strong'),sub=document.createElement('small');
    row.className='wt-pickup-row';title.textContent=readableDate(slot.localDate)+' · '+readableTime(slot.localTime);sub.textContent='15 minutes · Mountain Time · '+slot.status;
    description.append(title,sub);row.appendChild(description);
-   if(slot.status==='OFFERED'&&pickup.enabled){const button=document.createElement('button');button.type='button';button.className='ca-secondary';button.textContent='Withdraw';button.addEventListener('click',()=>{if(!busy&&confirm('Withdraw this offered pickup time?'))change('DELETE',{slotId:slot.id});});row.appendChild(button);}
+   if(slot.status==='OFFERED'&&pickup.enabled){const button=document.createElement('button');button.type='button';button.className='ca-secondary';button.textContent='Withdraw';button.addEventListener('click',()=>askWithdraw(slot));row.appendChild(button);}
    list.appendChild(row);
   }
  }
  async function refresh(force=false){
   const shown=visibleOrder();panel.hidden=!shown;
+  if(withdrawDialog.open&&(!shown||shown.id!==pendingWithdraw?.orderId))withdrawDialog.close();
   if(!shown){activeOrder='';lastKey='';serial++;return;}
   activeOrder=shown.id;if(!force&&shown.key===lastKey)return;
   lastKey=shown.key;const requestId=++serial;setStatus('Loading pickup times…');

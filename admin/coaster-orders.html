@@ -17,7 +17,7 @@
   <link href="../css/admin-production-fields.css?v=20260913-2" rel="stylesheet"/>
   <script src="../js/admin-access.js?v=20260913-prod1"></script>
   <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
-<link rel="stylesheet" href="../css/coaster-pickup-admin.css?v=20261015-stage1"/>
+<link rel="stylesheet" href="../css/coaster-pickup-admin.css?v=20261015-dialog1"/>
 </head>
 <body class="coaster-page custom-coasters-page wt-admin-template">
 <div class="page">
@@ -159,6 +159,20 @@
             <div class="wt-pickup-footer"><span>Stage 1: Stored in D1 only. Customer scheduling links, emails, and the pickup address are not enabled yet.</span><button id="wt-pickup-reload" class="ca-secondary" type="button">Refresh Times</button></div>
           </section>
 
+          <!-- WestTech-styled confirmation (replaces the browser's confirm() dialog). -->
+          <dialog id="wt-pickup-withdraw-dialog" aria-labelledby="wt-pickup-withdraw-title" aria-describedby="wt-pickup-withdraw-description">
+            <div class="wt-pickup-dialog-body">
+              <div class="wt-pickup-dialog-eyebrow">LOCAL PICKUP • SCHEDULING</div>
+              <h2 id="wt-pickup-withdraw-title">Withdraw offered pickup time?</h2>
+              <p id="wt-pickup-withdraw-description">This appointment will no longer be offered.</p>
+              <p class="wt-pickup-dialog-note">This affects only the offered time. The coaster order remains unchanged.</p>
+              <div class="wt-pickup-dialog-actions">
+                <button id="wt-pickup-withdraw-cancel" type="button">Keep Time</button>
+                <button id="wt-pickup-withdraw-confirm" type="button">Withdraw Time</button>
+              </div>
+            </div>
+          </dialog>
+
           <div class="ca-production-save-row" id="ca-production-save-row" hidden>
             <button class="ca-primary ca-production-save" id="ca-save-top" type="button">Save Production Update</button>
           </div>
@@ -257,6 +271,6 @@
   <div id="site-footer"></div>
 </div>
 <script src="../js/theme.js"></script><script src="../js/admin-production-fields.js?v=20260913-2"></script><script src="../js/coaster-admin.js?v=20260920-carrier1"></script><script src="../js/manufacturing-estimate.js?v=20260913-1"></script><script src="../js/coaster-admin-auto-refresh.js?v=20260916-shippedlock1"></script><script src="../js/coaster-admin-archive.js?v=20260904-archive3"></script><script src="../js/admin-pane-sync.js?v=20260905-1"></script>
-<script src="../js/coaster-pickup-admin.js?v=20261015-stage1"></script>
+<script src="../js/coaster-pickup-admin.js?v=20261015-dialog1"></script>
 </body>
 </html>
