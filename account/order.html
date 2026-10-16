@@ -9,7 +9,7 @@
   <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
   <link href="../css/site.css" rel="stylesheet"/>
   <link href="../css/customer-account.css?v=20261016-order-detail1" rel="stylesheet"/>
-  <link href="../css/customer-order.css?v=20261016-coaster-image1" rel="stylesheet"/>
+  <link href="../css/customer-order.css?v=20261016-proof-step4a" rel="stylesheet"/>
   <link href="../css/coaster-pickup-customer.css?v=20261016-roundtrip1" rel="stylesheet"/>
   <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
 </head>
@@ -45,11 +45,42 @@
             <h3 id="co-delivery-title">Delivery details</h3>
             <p id="co-delivery-details"></p>
           </div>
-          <p class="customer-order-help">For proof approvals and payments, continue using the secure links WestTech provided. Pickup scheduling is available in this dashboard for eligible local pickup orders.</p>
+          <p class="customer-order-help">Review and approve released coaster proofs directly in your customer dashboard. Payment remains on the existing secure WestTech links until portal payment is enabled. Pickup scheduling is available here for eligible local pickup orders.</p>
         </aside>
       </div>
     </section>
     <div class="customer-order-lower-grid">
+      <section id="co-approval" class="customer-order-approval customer-account-card" hidden aria-label="Proof approval">
+        <div class="customer-eyebrow">WESTTECH PROOF · CUSTOMER REVIEW</div>
+        <div class="customer-order-approval-head"><h2>Review your coaster proof</h2><strong id="co-proof-version">—</strong></div>
+        <p id="co-proof-instructions" class="customer-order-approval-copy">Review the exact released design and order terms before deciding.</p>
+        <div id="co-proof-frame" class="customer-order-proof-frame"><p id="co-proof-loading" role="status">Loading WestTech proof…</p><img id="co-proof-image" alt="Final WestTech coaster proof" hidden/><embed id="co-proof-pdf" type="application/pdf" title="Final WestTech coaster proof PDF" hidden/></div>
+        <p><a id="co-proof-open" class="customer-order-proof-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Open full-size proof in a new tab ↗</a></p>
+        <div class="customer-order-proof-terms" aria-label="Final proof terms">
+          <div><span>Coaster set</span><strong id="co-proof-set">—</strong></div>
+          <div><span>Number of sets</span><strong id="co-proof-count">—</strong></div>
+          <div><span>Delivery</span><strong id="co-proof-delivery">—</strong></div>
+          <div><span>Estimated production window</span><strong id="co-proof-window">—</strong></div>
+          <div id="co-proof-base-row"><span>Coaster sets</span><strong id="co-proof-base">—</strong></div>
+          <div id="co-proof-art-row" hidden><span>Artwork and design work</span><strong id="co-proof-art">—</strong></div>
+          <div id="co-proof-other-row" hidden><span>Other charge</span><strong id="co-proof-other">—</strong></div>
+          <div id="co-proof-shipping-row" hidden><span>Shipping</span><strong id="co-proof-shipping">—</strong></div>
+          <div id="co-proof-discount-row" hidden><span>Discount / special pricing</span><strong id="co-proof-discount">—</strong></div>
+          <div class="customer-order-proof-subtotal"><span>Approved subtotal (before applicable sales tax)</span><strong id="co-proof-total">—</strong></div>
+          <div><span>Payment</span><strong id="co-proof-payment">—</strong></div>
+        </div>
+        <div id="co-proof-review-note" class="customer-order-proof-note" hidden><strong>Note from WestTech</strong><p id="co-proof-review-text"></p></div>
+        <div id="co-proof-actions" class="customer-order-proof-actions" hidden>
+          <label class="customer-order-proof-confirm"><input id="co-proof-confirm" type="checkbox"/><span>I have reviewed and approve this proof, coaster quantity, approved subtotal, fulfillment method, and estimated production window. I understand that applicable sales tax will be shown before payment.</span></label>
+          <button id="co-proof-approve" class="customer-order-proof-primary" type="button" disabled>Approve Design &amp; Terms</button>
+          <div class="customer-order-proof-divider">or</div>
+          <label for="co-proof-change">Need something changed?</label>
+          <textarea id="co-proof-change" rows="4" maxlength="1200" placeholder="Tell WestTech exactly what you want changed."></textarea>
+          <button id="co-proof-request" class="customer-order-proof-secondary" type="button">Request Changes</button>
+        </div>
+        <p id="co-proof-result" class="customer-order-proof-result" role="status" hidden></p>
+        <p id="co-proof-feedback" class="customer-order-proof-feedback" role="alert" hidden></p>
+      </section>
       <section id="co-pickup" class="customer-order-pickup" hidden aria-label="Pickup scheduling">
         <div class="customer-eyebrow">LOCAL PICKUP · SCHEDULING</div>
         <h2>Arrange your pickup</h2>
@@ -116,5 +147,5 @@
   </main>
   <div id="site-footer"></div>
 </div>
-<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-pickup-details1"></script><script src="../js/customer-order.js?v=20261016-coaster-image1"></script>
+<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-pickup-details1"></script><script src="../js/customer-order.js?v=20261016-proof-step4a"></script>
 </body></html>

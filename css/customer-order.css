@@ -68,3 +68,40 @@
 .customer-order-design-placeholder{color:var(--customer-muted);font-size:.92rem;text-align:center;padding:32px}
 @media(max-width:950px){.customer-order-lower-grid{grid-template-columns:1fr;margin-top:18px}.customer-order-lower-grid>#co-pickup[hidden]+.customer-order-design{grid-column:auto;max-width:none}}
 @media print{.customer-order-design{display:none!important}}
+
+/* Stage 3 Step 4 — Private customer proof approval, beside submitted coaster design. */
+.customer-order-approval{box-sizing:border-box;min-width:0;margin:0!important}
+.customer-order-approval[hidden],.customer-order-approval [hidden]{display:none!important}
+.customer-order-approval-head{display:flex;gap:15px;justify-content:space-between;align-items:center}
+.customer-order-approval-head h2{margin:10px 0;font-size:clamp(1.35rem,2vw,1.75rem);color:var(--customer-text)}
+.customer-order-approval-head strong{font-size:.8rem;color:var(--customer-muted);white-space:nowrap}
+.customer-order-approval-copy{font-size:.9rem;color:var(--customer-muted);line-height:1.6}
+.customer-order-proof-frame{box-sizing:border-box;background:var(--customer-card-2);border:1px solid var(--customer-border);min-height:210px;border-radius:14px;padding:14px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.customer-order-proof-frame img{display:block;max-width:100%;max-height:430px;object-fit:contain}
+.customer-order-proof-frame embed{display:block;width:100%;height:430px;border:0}
+.customer-order-proof-frame p{color:var(--customer-muted);text-align:center}
+.customer-order-proof-link{color:var(--customer-accent);font-size:.85rem;font-weight:800}
+.customer-order-proof-terms{border-top:1px solid var(--customer-border);margin-top:18px}
+.customer-order-proof-terms>div{display:flex;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid var(--customer-border)}
+.customer-order-proof-terms span{color:var(--customer-muted);font-size:.82rem}
+.customer-order-proof-terms strong{text-align:right;color:var(--customer-text);font-size:.88rem}
+.customer-order-proof-note{padding:15px;margin:18px 0;border:1px solid var(--customer-border);border-radius:12px;background:var(--customer-card-2)}
+.customer-order-proof-note strong{font-size:.84rem;color:var(--customer-text)}
+.customer-order-proof-note p{margin:6px 0 0;color:var(--customer-muted);white-space:pre-wrap}
+.customer-order-proof-actions{display:flex;flex-direction:column;gap:12px;margin-top:20px}
+.customer-order-proof-confirm{display:flex;align-items:flex-start;gap:12px;color:var(--customer-text);font-size:.88rem;line-height:1.6}
+.customer-order-proof-confirm input{margin-top:5px;min-width:18px;min-height:18px;accent-color:var(--customer-accent)}
+.customer-order-proof-primary,.customer-order-proof-secondary{border:1px solid #3b87c4;border-radius:10px;padding:12px 18px;min-height:44px;cursor:pointer;font-family:inherit;font-size:.88rem;font-weight:800;background:#1677c4;color:#fff}
+.customer-order-proof-secondary{background:transparent;border-color:var(--customer-border);color:var(--customer-text)}
+.customer-order-proof-primary:disabled,.customer-order-proof-secondary:disabled{opacity:.45;cursor:not-allowed}
+.customer-order-proof-actions textarea{display:block;width:100%;min-height:90px;resize:vertical;box-sizing:border-box;border-radius:10px;border:1px solid var(--customer-border);background:var(--customer-card-2);color:var(--customer-text);padding:12px;font:inherit}
+.customer-order-proof-actions label[for="co-proof-change"]{font-size:.88rem;font-weight:850;color:var(--customer-text)}
+.customer-order-proof-divider{text-align:center;color:var(--customer-muted);font-size:.85rem}
+.customer-order-proof-result,.customer-order-proof-feedback{padding:15px;border:1px solid var(--customer-border);border-radius:10px;background:var(--customer-card-2);color:var(--customer-text);line-height:1.5;font-size:.86rem}
+.customer-order-proof-feedback[data-error=true]{border-color:#c76c62}
+.customer-order-proof-primary:focus-visible,.customer-order-proof-secondary:focus-visible,.customer-order-proof-link:focus-visible{outline:3px solid #ffcf70;outline-offset:3px}
+.customer-order-lower-grid>#co-approval:not([hidden])~#co-design{grid-column:auto;max-width:none}
+@media(max-width:950px){.customer-order-lower-grid>#co-approval:not([hidden])~#co-design{grid-column:auto;max-width:none}}
+@media print{.customer-order-approval{display:none!important}}
+.customer-order-proof-terms .customer-order-proof-subtotal{margin-top:8px;padding:16px 0}
+.customer-order-proof-terms .customer-order-proof-subtotal strong{font-size:1.07rem}

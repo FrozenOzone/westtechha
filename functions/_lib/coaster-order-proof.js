@@ -32,14 +32,39 @@ export function approvalView(order){if(!order)return null;const work=(order.work
 export async function getCoasterApprovalByToken(env,orderId,token){const db=requireOrdersDb(env),hash=await sha256(clean(token,200));const row=await db.prepare(`SELECT order_id FROM coaster_orders WHERE order_id=? AND approval_token_hash=? AND datetime(approval_expires_at)>CURRENT_TIMESTAMP LIMIT 1`).bind(clean(orderId,80),hash).first();if(!row)return null;return approvalView(await getCoasterOrderDetail(env,row.order_id));}
 export async function getCoasterApprovalProof(env,orderId,token){const approval=await getCoasterApprovalByToken(env,orderId,token);if(!approval)throw makeError('This approval link is invalid or expired.',404);return getStoredCoasterObject(env,orderId,'proof');}
 
+// Both private email links and signed-in customer accounts use the same guarded
+// proof mutation. A stale proof, repeated click, or post-payment action is rejected.
+async function applyCoasterApprovalAction(env,orderId,action,message='',{accountId=null,expectedVersion=null}={}){
+  const db=requireOrdersDb(env),current=await getCoasterOrderDetail(env,orderId);
+  if(!current)throw makeError('Coaster order not found.',404);
+  if(isLocked(current))throw makeError('This order is already paid or in production and is locked.',409);
+  if(String(current.status).toUpperCase()!=='PROOF_SENT'||String(current.proofStatus).toUpperCase()!=='SENT')throw makeError('This proof is no longer awaiting a decision. Refresh your order details.',409);
+  if(!current.approvalExpiresAt||!(Date.parse(String(current.approvalExpiresAt).replace(' ','T').replace(/Z?$/,'Z'))>Date.now()))throw makeError('The 30-day proof review window has expired. Contact WestTech for a fresh approval link.',409);
+  if(expectedVersion!==null&&Number(expectedVersion)!==Number(current.proofVersion))throw makeError('WestTech has released a newer proof. Refresh and review it before approving.',409);
+  if(!current.proofObjectKey||Number(current.proofVersion)<1)throw makeError('A released proof is required before approval.',409);
+  if(!['approve','requestChanges'].includes(action))throw makeError('Unsupported approval action.');
+  const note=action==='requestChanges'?clean(message,3000):'';
+  if(action==='requestChanges'&&note.length<2)throw makeError('Tell WestTech what you would like changed.');
+  const when=nowIso(),toStatus=action==='approve'?'PROOF_APPROVED':'CHANGES_REQUESTED',toProof=action==='approve'?'APPROVED':'CHANGES_REQUESTED';
+  const authorized=accountId===null?'':` AND EXISTS (SELECT 1 FROM customer_account_orders a WHERE a.account_id=? AND a.source_type='COASTER' AND a.source_order_id=coaster_orders.order_id)`;
+  const args=[toProof,toStatus,action==='approve'?when:null,action==='requestChanges'?when:null,note||null,current.orderId,current.proofVersion];
+  if(accountId!==null)args.push(accountId);
+  const result=await db.prepare(`UPDATE coaster_orders SET proof_status=?,status=?,proof_approved_at=?,changes_requested_at=?,customer_change_request=?,updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND proof_version=? AND proof_status='SENT' AND status='PROOF_SENT' AND COALESCE(payment_status,'')<>'PAID' AND datetime(approval_expires_at)>CURRENT_TIMESTAMP${authorized}`).bind(...args).run();
+  if(Number(result?.meta?.changes||0)!==1)throw makeError('This proof was updated or is no longer available. Refresh your order details.',409);
+  await logEvent(db,current.orderId,action==='approve'?'CUSTOMER_PROOF_APPROVED':'CUSTOMER_CHANGES_REQUESTED',action==='approve'?{proofVersion:current.proofVersion}:{proofVersion:current.proofVersion,message:note});
+  return getCoasterOrderDetail(env,current.orderId);
+}
+
 export async function recordCoasterApprovalAction(env,orderId,token,action,message=''){
-  const db=requireOrdersDb(env),approval=await getCoasterApprovalByToken(env,orderId,token);if(!approval)throw makeError('This approval link is invalid or expired.',404);const current=await getCoasterOrderDetail(env,orderId);if(isLocked(current))throw makeError('This order is already in production and is locked.',409);
-  if(action==='requestChanges'){
-    const note=clean(message,3000);if(note.length<2)throw makeError('Tell WestTech what you would like changed.');const when=nowIso();
-    await db.prepare(`UPDATE coaster_orders SET proof_status='CHANGES_REQUESTED',status='CHANGES_REQUESTED',customer_change_request=?,changes_requested_at=?,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(note,when,current.orderId).run();
-    await logEvent(db,current.orderId,'CUSTOMER_CHANGES_REQUESTED',{proofVersion:current.proofVersion,message:note});return getCoasterOrderDetail(env,current.orderId);
-  }
-  if(action!=='approve')throw makeError('Unsupported approval action.');const when=nowIso();
-  await db.prepare(`UPDATE coaster_orders SET proof_status='APPROVED',status='PROOF_APPROVED',proof_approved_at=?,customer_change_request=NULL,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(when,current.orderId).run();
-  await logEvent(db,current.orderId,'CUSTOMER_PROOF_APPROVED',{proofVersion:current.proofVersion});return getCoasterOrderDetail(env,current.orderId);
+  const approval=await getCoasterApprovalByToken(env,orderId,token);
+  if(!approval)throw makeError('This approval link is invalid or expired.',404);
+  return applyCoasterApprovalAction(env,orderId,action,message);
+}
+
+// Only called after requireCustomerSession plus order ownership checks.
+// The SQL guard also re-verifies account/order ownership at mutation time.
+export async function recordCoasterApprovalForCustomer(env,orderId,accountId,action,message='',proofVersion){
+  if(!Number.isSafeInteger(Number(accountId))||Number(accountId)<=0)throw makeError('Sign in to review this proof.',401);
+  if(!Number.isSafeInteger(Number(proofVersion))||Number(proofVersion)<1)throw makeError('Refresh the proof before responding.',400);
+  return applyCoasterApprovalAction(env,orderId,action,message,{accountId:Number(accountId),expectedVersion:Number(proofVersion)});
 }
