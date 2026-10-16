@@ -322,6 +322,11 @@
 
   function shouldInterceptSave(){
     const current=statusCode();const selected=ensureProductionOptions()?.value||'';
+    // Ready for Pickup is handled by coaster-admin.js, which first calls the
+    // pickup scheduling gate. Capturing this click here bypasses its dialog
+    // and prevents the explicit scheduling override from reaching the API.
+    // Keep intercepting other extended production stages as before.
+    if(selected==='READY_FOR_PICKUP'&&fulfillmentIsPickup())return false;
     return EXTENDED_STATUSES.has(current)||EXTENDED_STATUSES.has(selected);
   }
   async function saveExtended(e){
