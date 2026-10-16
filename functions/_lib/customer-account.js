@@ -120,6 +120,35 @@ export async function requestCustomerLogin(env,emailAddress,requestUrl){
   await log(db,account.id,'LOGIN_LINK_REQUESTED',{delivered:delivery.sent===true});return {accepted:true};
 }
 
+// Stage 4A: Include a private portal sign-in URL INSIDE the order receipt.
+// The token is hashed at rest, expires in 20 minutes, and is single-use.
+// Never expose it in a public API response or send a second login email.
+export async function createCustomerOrderReceiptLink(env,{order,requestUrl}){
+  if(!order?.orderId||!EMAIL_RE.test(email(order?.customerEmail)))throw error('Valid order email is required.');
+  const db=requireOrdersDb(env);
+  const account=await ensureAccount(db,{
+    displayName:order.customerName,emailAddress:order.customerEmail,
+    phoneNumber:order.customerPhone,mobileCarrier:order.mobileCarrier,
+    communicationPreference:order.communicationPreference,smsConsent:order.smsConsent
+  });
+  await linkOrdersForEmail(db,account.id,account.email);
+  const linked=await db.prepare(`SELECT 1 AS allowed FROM customer_account_orders WHERE account_id=? AND source_type='COASTER' AND source_order_id=? LIMIT 1`).bind(account.id,order.orderId).first();
+  if(!linked)throw error('The order could not be linked to the customer portal.',500);
+  const raw=await issueToken(db,account.id,account.emailVerifiedAt?'LOGIN':'ACTIVATE');
+  // Use the ACTUAL deployment origin for Preview, not a production-only site URL.
+  const requestedSite=new URL(requestUrl);
+  if(requestedSite.protocol!=='https:')throw error('Customer portal links require HTTPS.',500);
+  const origin=requestedSite.origin;
+  const hostname=requestedSite.hostname.toLowerCase();
+  if(hostname!=='westtechha.com'&&hostname!=='www.westtechha.com'&&hostname!=='westtechha.pages.dev'&&!hostname.endsWith('.westtechha.pages.dev'))throw error('Unexpected customer portal host.',500);
+  const link=new URL('/api/customer/auth/verify',origin);
+  link.searchParams.set('token',raw);
+  link.searchParams.set('type','COASTER');
+  link.searchParams.set('order',order.orderId);
+  await log(db,account.id,'ORDER_RECEIPT_ACCESS_CREATED',{sourceType:'COASTER',orderId:order.orderId});
+  return link.toString();
+}
+
 export async function inviteCustomerForOrder(env,{sourceType,order,requestUrl}){
   if(!order?.customerEmail)return {sent:false,skipped:true,reason:'customer-email-missing'};
   const db=requireOrdersDb(env),account=await ensureAccount(db,{displayName:order.customerName,emailAddress:order.customerEmail,phoneNumber:order.customerPhone,mobileCarrier:order.mobileCarrier,communicationPreference:order.communicationPreference,smsConsent:order.smsConsent});
@@ -145,7 +174,7 @@ export async function verifyCustomerToken(env,rawToken){
   }
   await db.prepare(`UPDATE customer_login_tokens SET used_at=? WHERE id=?`).bind(now(),row.id).run();
   const rawSession=token(),sessionHash=await sha256(rawSession);await db.prepare(`INSERT INTO customer_sessions (account_id,session_hash,expires_at) VALUES (?,?,?)`).bind(row.account_id,sessionHash,addDays(7)).run();
-  return {cookie:`${SESSION_COOKIE}=${encodeURIComponent(rawSession)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`,emailChanged:row.purpose==='EMAIL_CHANGE'};
+  return {cookie:`${SESSION_COOKIE}=${encodeURIComponent(rawSession)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`,emailChanged:row.purpose==='EMAIL_CHANGE',accountId:Number(row.account_id)};
 }
 
 export async function requireCustomerSession(context){

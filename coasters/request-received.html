@@ -21,7 +21,7 @@
   <main class="cr-main">
     <section class="cr-card">
       <div class="cr-kicker">CUSTOM COASTERS • DESIGN REVIEW</div>
-      <h1>Request received.</h1>
+      <h1>Order received.</h1>
       <p class="cr-lead">Your design is now at the review stage. <strong>No payment has been collected and nothing has entered production.</strong> WestTech reviews the artwork, requested set, design work required, final price, and fulfillment terms before the proof/payment stage.</p>
       <div class="cr-local" id="cr-local"><strong>Local test mode:</strong> this request was saved only in this browser so you can test the workflow from a downloaded site. It was not sent to WestTech or stored in the live order database.</div>
       <div class="cr-order"><small>REQUEST / ORDER ID</small><strong id="cr-order-id">Pending</strong></div>
@@ -32,7 +32,8 @@
         <div><b>4.</b> Payment — the approved order receives its payment request.</div>
         <div><b>5.</b> Production — paid orders move into the small-batch production queue.</div>
       </div>
-      <div class="cr-actions"><a class="coaster-btn coaster-btn-primary" href="index.html">Custom Coasters</a><a class="coaster-btn coaster-btn-secondary" href="../account/login.html">My Orders</a><a class="coaster-btn coaster-btn-secondary" href="custom-builder.html">Start Another Design</a><a class="coaster-btn coaster-btn-secondary" id="cr-admin-test" href="../admin/coaster-orders.html" style="display:none">Open WestTech Order Test</a></div>
+      <p class="cr-lead" id="cr-email-note">Check the email address you used at checkout for your order confirmation and a secure <strong>Open My Order</strong> link. It opens this order directly in your private customer portal, where you can follow progress and review your design. The one-time link expires after 20 minutes; you can request a new one at any time.</p>
+      <div class="cr-actions"><a class="coaster-btn coaster-btn-primary" href="../account/login.html">Customer Portal Sign-In</a><a class="coaster-btn coaster-btn-secondary" href="index.html">Custom Coasters</a><a class="coaster-btn coaster-btn-secondary" href="custom-builder.html">Start Another Design</a><a class="coaster-btn coaster-btn-secondary" id="cr-admin-test" href="../admin/coaster-orders.html" style="display:none">Open WestTech Order Test</a></div>
       <p class="cr-note">Keep the request ID above. It will become the reference for the design-review, proof, payment, and production workflow.</p>
     </section>
   </main>
@@ -40,6 +41,6 @@
 </div>
 <script src="../js/theme.js"></script><script src="../js/site-shell.js"></script><script src="../js/coasters.js"></script>
 <script>
-(function(){const p=new URLSearchParams(location.search);const id=p.get('order')||'Pending';document.getElementById('cr-order-id').textContent=id;if(p.get('mode')==='local'){document.getElementById('cr-local').classList.add('show');const a=document.getElementById('cr-admin-test');a.style.display='inline-flex';a.href='../admin/coaster-orders.html?mode=local&order='+encodeURIComponent(id);}})();
+(function(){const p=new URLSearchParams(location.search);const id=p.get('order')||'Pending';document.getElementById('cr-order-id').textContent=id;if(p.get('mode')==='local'){document.getElementById('cr-email-note').textContent='Local test mode does not send confirmation emails or create customer portal access links.';document.getElementById('cr-local').classList.add('show');const a=document.getElementById('cr-admin-test');a.style.display='inline-flex';a.href='../admin/coaster-orders.html?mode=local&order='+encodeURIComponent(id);}})();
 </script>
 </body></html>
