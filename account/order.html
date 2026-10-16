@@ -1,0 +1,55 @@
+<!doctype html>
+<html class="wt-layout-template" lang="en" data-site-root="../" data-site-section="account">
+<head>
+  <meta charset="utf-8"/>
+  <script src="../js/theme-init.js?v=20260916-1"></script>
+  <title>Order Details – WestTech Home Automation</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="robots" content="noindex,nofollow,noarchive"/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="../css/site.css" rel="stylesheet"/>
+  <link href="../css/customer-account.css?v=20261016-order-detail1" rel="stylesheet"/>
+  <link href="../css/customer-order.css?v=20261016-order-detail1" rel="stylesheet"/>
+  <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
+</head>
+<body class="wt-public-template customer-account-page">
+<div class="page"><div id="site-header"></div><script src="../js/site-shell.js"></script>
+  <main class="customer-account-main customer-order-main">
+    <nav class="customer-order-nav" aria-label="Customer account navigation"><a href="index.html">← Back to My Orders</a></nav>
+    <header class="customer-account-head customer-order-page-head">
+      <div><div class="customer-eyebrow">WESTTECH CUSTOMER DASHBOARD</div><h1>Order details.</h1><p id="co-intro">Loading your private order information…</p></div>
+    </header>
+    <div id="co-message" class="customer-message" role="alert" hidden></div>
+    <section id="co-content" hidden aria-label="Order details">
+      <div class="customer-order-detail-grid">
+        <article class="customer-account-card customer-order-primary">
+          <div class="customer-order-detail-heading">
+            <div><div class="customer-eyebrow" id="co-product-type">WESTTECH ORDER</div><h2 id="co-title">Your order</h2><p id="co-order-id" class="customer-order-detail-id"></p></div>
+            <span id="co-status" class="customer-order-detail-status"></span>
+          </div>
+          <div class="customer-order-next-step" aria-live="polite"><div class="customer-eyebrow">LATEST UPDATE</div><strong id="co-next-title"></strong><p id="co-next-body"></p></div>
+          <h3 class="customer-order-section-label">Order progress</h3>
+          <ol id="co-timeline" class="customer-order-timeline" aria-label="Order progress"></ol>
+        </article>
+        <aside class="customer-account-card customer-order-summary">
+          <div class="customer-eyebrow">ORDER SUMMARY</div><h2>At a glance</h2>
+          <dl class="customer-order-detail-facts">
+            <div><dt>Order date</dt><dd id="co-created">—</dd></div>
+            <div><dt>Last updated</dt><dd id="co-updated">—</dd></div>
+            <div><dt>Total</dt><dd id="co-total">—</dd></div>
+            <div><dt>Payment</dt><dd id="co-payment">—</dd></div>
+            <div><dt>Delivery method</dt><dd id="co-fulfillment">—</dd></div>
+          </dl>
+          <div id="co-delivery" class="customer-order-delivery" hidden>
+            <h3 id="co-delivery-title">Delivery details</h3>
+            <p id="co-delivery-details"></p>
+          </div>
+          <p class="customer-order-help">For proof approvals, payment, and pickup requests, keep using the secure links WestTech already sent you while we connect those actions to this dashboard.</p>
+        </aside>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+</div>
+<script src="../js/theme.js"></script><script src="../js/customer-order.js?v=20261016-order-detail1"></script>
+</body></html>

@@ -31,3 +31,8 @@
 .customer-profile-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.customer-profile-grid label small{font-size:.67rem;font-weight:500;line-height:1.45}.customer-sms-consent{grid-column:1/-1!important;display:flex!important;align-items:flex-start!important;gap:10px!important;border:1px solid var(--customer-border);border-radius:12px;padding:14px}.customer-sms-consent input{width:18px!important;min-height:18px!important;margin-top:2px}.customer-profile-actions{grid-column:1/-1;display:flex;justify-content:flex-end}
 @media(max-width:1050px){.customer-order-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.customer-profile-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.customer-login-main,.customer-account-main{width:calc(100% - 22px)}.customer-login-card form,.customer-profile-grid,.customer-order-grid{grid-template-columns:1fr}.customer-account-head{align-items:flex-start;flex-direction:column}.customer-account-head .customer-secondary{width:100%}.customer-login-card form button,.customer-profile-actions button{width:100%}.customer-sms-consent,.customer-profile-actions{grid-column:1}}
+
+/* Stage 3 / Step 1: every existing order has a safe details link. */
+.customer-order-actions{flex-wrap:wrap}
+.customer-order-actions .customer-view-order{background:var(--customer-accent);border-color:var(--customer-accent);color:#fff}
+.customer-order-actions .customer-view-order:focus-visible{outline:3px solid #ffcf70;outline-offset:3px}

@@ -1,0 +1,31 @@
+/* WestTech Customer Portal – Stage 3, Step 1 (read-only order details). */
+.customer-order-nav{margin:0 0 24px}
+.customer-order-nav a{display:inline-flex;align-items:center;color:var(--customer-text);padding:10px 0;font-size:.86rem;font-weight:900;text-decoration:none}
+.customer-order-nav a:hover{text-decoration:underline}
+.customer-order-page-head{margin-bottom:18px}
+.customer-order-page-head h1{font-size:clamp(2.7rem,4vw,4.8rem)}
+.customer-order-detail-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(290px,.85fr);align-items:start;gap:22px}
+.customer-order-detail-grid>.customer-account-card{margin-top:0;min-width:0}
+.customer-order-detail-heading{display:flex;justify-content:space-between;align-items:start;gap:18px}
+.customer-order-detail-heading h2{font-size:clamp(1.45rem,2.1vw,2.25rem);line-height:1.2;overflow-wrap:anywhere;color:var(--customer-text);margin:12px 0 3px}
+.customer-order-detail-id{font-size:.81rem;color:var(--customer-muted);margin:4px 0 0;overflow-wrap:anywhere}
+.customer-order-detail-status{border:1px solid var(--customer-border);border-radius:999px;color:var(--customer-text);font-size:.73rem;font-weight:900;padding:9px 12px;white-space:nowrap}
+.customer-order-next-step{border:1px solid var(--customer-border);border-radius:14px;background:var(--customer-card-2);padding:20px;margin:26px 0}
+.customer-order-next-step strong{display:block;font-size:1.2rem;margin:8px 0 5px;color:var(--customer-text)}
+.customer-order-next-step p{margin:0;color:var(--customer-muted);line-height:1.6;font-size:.91rem}
+.customer-order-section-label{font-size:1.07rem;color:var(--customer-text);margin:28px 0 18px}
+.customer-order-timeline{list-style:none;counter-reset:order-step;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;padding:0;margin:0}
+.customer-order-timeline li{position:relative;padding:20px 4px 0;border-top:5px solid var(--customer-border);color:var(--customer-muted);font-size:.72rem;font-weight:800}
+.customer-order-timeline li[data-stage=complete],.customer-order-timeline li[data-stage=current]{border-top-color:var(--customer-accent);color:var(--customer-text)}
+.customer-order-timeline li[data-stage=current]::before{content:'';position:absolute;top:-8px;left:0;width:11px;height:11px;border:2px solid var(--customer-card);border-radius:50%;background:var(--customer-accent)}
+.customer-order-summary h2{margin:7px 0 22px;font-size:1.4rem;color:var(--customer-text)}
+.customer-order-detail-facts{margin:0;display:grid;grid-template-columns:1fr;gap:0}
+.customer-order-detail-facts div{display:flex;align-items:baseline;justify-content:space-between;gap:15px;padding:14px 0;border-bottom:1px solid var(--customer-border)}
+.customer-order-detail-facts dt{font-size:.79rem;color:var(--customer-muted)}
+.customer-order-detail-facts dd{margin:0;font-size:.85rem;color:var(--customer-text);font-weight:850;text-align:right;overflow-wrap:anywhere}
+.customer-order-delivery h3{font-size:.96rem;color:var(--customer-text)}
+.customer-order-delivery p,.customer-order-help{color:var(--customer-muted);font-size:.83rem;line-height:1.6}
+.customer-order-help{margin:25px 0 0;padding-top:18px;border-top:1px solid var(--customer-border)}
+.customer-order-nav a:focus-visible{outline:3px solid #ffcf70;outline-offset:3px}
+@media(max-width:950px){.customer-order-detail-grid{grid-template-columns:1fr}}
+@media(max-width:580px){.customer-order-detail-heading{flex-direction:column;gap:12px}.customer-order-timeline{gap:3px}.customer-order-timeline li{font-size:.61rem;overflow-wrap:anywhere;hyphens:auto}.customer-order-detail-facts div{align-items:start}}
