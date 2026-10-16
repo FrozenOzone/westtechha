@@ -29,3 +29,13 @@
 .customer-order-nav a:focus-visible{outline:3px solid #ffcf70;outline-offset:3px}
 @media(max-width:950px){.customer-order-detail-grid{grid-template-columns:1fr}}
 @media(max-width:580px){.customer-order-detail-heading{flex-direction:column;gap:12px}.customer-order-timeline{gap:3px}.customer-order-timeline li{font-size:.61rem;overflow-wrap:anywhere;hyphens:auto}.customer-order-detail-facts div{align-items:start}}
+
+/* Stage 3 Step 2 – embed the proven pickup scheduler inside Order Details. */
+.customer-order-pickup{box-sizing:border-box;max-width:1020px;margin:28px 0 0;padding:26px;background:var(--customer-card);border:1px solid var(--customer-border);border-radius:20px;color:var(--customer-text)}
+.customer-order-pickup[hidden]{display:none!important}
+.customer-order-pickup>h2{margin:9px 0 8px;font-size:1.65rem;color:var(--customer-text)}
+.customer-order-pickup-intro{margin:0 0 20px;font-size:.91rem;color:var(--customer-muted);line-height:1.6}
+.customer-order-pickup .pc-card{max-width:100%;margin:0 0 14px}
+.customer-order-pickup .pc-error{margin-bottom:0}
+.customer-order-pickup .pc-card[hidden],.customer-order-pickup [hidden]{display:none!important}
+@media(max-width:610px){.customer-order-pickup{margin-top:18px;padding:16px}.customer-order-pickup .pc-card{padding:17px}.customer-order-pickup .pc-alternatives .pc-field-grid{grid-template-columns:1fr}}

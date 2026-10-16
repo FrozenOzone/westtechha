@@ -2,19 +2,21 @@
 (()=>{
  'use strict';
  const $=s=>document.querySelector(s);
- const tokenFromHash=new URLSearchParams(location.hash.replace(/^#/,'' )).get('key')||'';
+ const portalMode=!!document.querySelector('#co-pickup');
+ const tokenFromHash=portalMode?'':new URLSearchParams(location.hash.replace(/^#/,'' )).get('key')||'';
  if(tokenFromHash&&/^[a-f\d]{64}$/i.test(tokenFromHash))sessionStorage.setItem('westtech-pickup-stage2-token',tokenFromHash);
  const token=tokenFromHash||sessionStorage.getItem('westtech-pickup-stage2-token')||'';
- if(location.hash){try{history.replaceState(null,'',location.pathname+location.search);}catch(e){/* URL cleanup unavailable in local test */}}
+ if(!portalMode&&location.hash){try{history.replaceState(null,'',location.pathname+location.search);}catch(e){/* URL cleanup unavailable in local test */}}
  const busyText=$('#pc-loading'),content=$('#pc-content'),message=$('#pc-message'),submit=$('#pc-submit');
- let state=null,busy=false;
+ let state=null,busy=false,portalOrderId='';
  function showError(text){busyText.hidden=true;content.hidden=true;$('#pc-error').hidden=false;$('#pc-error-text').textContent=text;}
  function notify(text,error=false){message.textContent=text;message.hidden=false;message.className='pc-message'+(error?' error':'');}
  const friendlyDate=date=>new Date(date+'T12:00:00Z').toLocaleDateString('en-US',{timeZone:'UTC',weekday:'long',month:'short',day:'numeric',year:'numeric'});
  function friendlyTime(value){const [h,m]=value.split(':').map(Number);return `${h%12||12}:${String(m).padStart(2,'0')} ${h>=12?'PM':'AM'}`;}
  function pretty(date,time){return `${friendlyDate(date)} at ${friendlyTime(time)} (Mountain Time)`;}
  async function call(action,fields={}){
-  const response=await fetch('/api/coasters/pickup',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:'same-origin',body:JSON.stringify({action,token,...fields})});
+  const portalUrl='/api/customer/orders/COASTER/'+encodeURIComponent(portalOrderId)+'/pickup';
+  const response=await fetch(portalMode?portalUrl:'/api/coasters/pickup',{method:portalMode&&action==='view'?'GET':'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:'same-origin',...(portalMode&&action==='view'?{}:{body:JSON.stringify(portalMode?{action,...fields}:{action,token,...fields})})});
   const data=await response.json().catch(()=>({}));if(!response.ok||!data.ok)throw new Error(data.message||`Scheduling request failed (${response.status}).`);
   return data;
  }
@@ -53,7 +55,7 @@
   busyText.hidden=true;content.hidden=false;message.hidden=true;
   $('#pc-order').textContent='Coaster order '+state.orderId;
   $('#pc-waiting').hidden=true;$('#pc-confirmed').hidden=true;$('#pc-pending').hidden=true;$('#pc-chooser').hidden=true;
-  if(state.appointment){$('#pc-confirmed').hidden=false;$('#pc-confirmed-when').textContent=pretty(state.appointment.localDate,state.appointment.localTime);return;}
+  if(state.appointment){$('#pc-confirmed').hidden=false;$('#pc-confirmed-when').textContent=pretty(state.appointment.localDate,state.appointment.localTime);if(portalMode&&typeof window.wtPortalPickupConfirmed==='function')window.wtPortalPickupConfirmed(state.appointment);return;}
   if(!state.ready){$('#pc-waiting').hidden=false;return;}
   if(state.request?.status==='PENDING'){
    $('#pc-pending').hidden=false;
@@ -107,6 +109,15 @@
   catch(e){notify(e.message||'Could not save. Please try again.',true);}
   finally{busy=false;if(!$('#pc-chooser').hidden){submit.disabled=false;onChange();}}
  });
- if(!/^[a-f\d]{64}$/i.test(token)){showError('The private pickup scheduling link is missing or invalid.');return;}
- call('view').then(data=>{state=data.pickup;paint();}).catch(e=>showError(e.message));
+ if(portalMode){
+  window.wtPickupPortalInit=order=>{
+   if(!order||order.sourceType!=='COASTER'||order.fulfillmentMethod!=='LOCAL_PICKUP')return;
+   if(!['PREPARING_FOR_PICKUP','READY_FOR_PICKUP','COMPLETED'].includes(order.status))return;
+   portalOrderId=order.orderId;$('#co-pickup').hidden=false;
+   call('view').then(data=>{if(data.pickup?.orderId!==portalOrderId)throw new Error('Order changed while loading pickup scheduling.');state=data.pickup;paint();}).catch(e=>showError(e.message));
+  };
+ }else{
+  if(!/^[a-f\d]{64}$/i.test(token)){showError('The private pickup scheduling link is missing or invalid.');return;}
+  call('view').then(data=>{state=data.pickup;paint();}).catch(e=>showError(e.message));
+ }
 })();

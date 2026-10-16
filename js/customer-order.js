@@ -21,7 +21,7 @@
     case 'PRODUCTION_QUEUE':return ['Your order is in the production queue','WestTech has your approved order queued for manufacturing. No action is needed.'];
     case 'IN_PRODUCTION':return ['Your order is in production','WestTech is working on your order. No action is needed.'];
     case 'PREPARING_FOR_PICKUP':return ['WestTech is preparing your pickup order','Final checks and packaging are underway.'];
-    case 'READY_FOR_PICKUP':return ['Your order is ready for pickup','If you have a private pickup scheduling link from WestTech, you can continue arranging pickup there while portal scheduling is being integrated.'];
+    case 'READY_FOR_PICKUP':return ['Your order is ready for pickup','Choose an available pickup appointment or request a different time in the scheduling section below.'];
     case 'PREPARING_TO_SHIP':return ['Your order is preparing for shipment','WestTech is completing final packaging and preparing the shipment.'];
     case 'SHIPPED':return ['Your order has shipped','Your tracking details, when available, are shown in the order summary.'];
     case 'COMPLETED':return ['Your order is complete','Thank you for choosing WestTech. Your order remains in your history.'];
@@ -67,9 +67,10 @@
    dbody.textContent=[order.trackingCarrier||'Carrier',order.trackingNumber].join(' · ');
   }else if(fulfillment==='LOCAL_PICKUP'&&['PREPARING_FOR_PICKUP','READY_FOR_PICKUP'].includes(status)){
    detail.hidden=false;dtitle.textContent='Local pickup';
-   dbody.textContent='Private pickup appointments and directions will appear here after the scheduling integration is complete. Continue using your existing scheduling link for now.';
+   dbody.textContent='Review your pickup scheduling options below. Private pickup address and directions will appear after confirmation when that Stage 3 feature is enabled.';
   }else{detail.hidden=true;dbody.textContent='';}
   content.hidden=false;
+  if(typeof window.wtPickupPortalInit==='function')window.wtPickupPortalInit(order);
  }
  async function load(){
   if(!validSource.has(source)||!id||id.length>100){
@@ -85,5 +86,13 @@
    render(order);
   }catch(e){message.textContent=e.message||'Could not load your order details.';message.classList.add('error');message.hidden=false;}
  }
+ window.wtPortalPickupConfirmed=appointment=>{
+  const info=$('#co-delivery'),title=$('#co-delivery-title'),body=$('#co-delivery-details');
+  if(!info||!appointment)return;
+  const when=new Date(appointment.localDate+'T12:00:00Z').toLocaleDateString('en-US',{timeZone:'UTC',weekday:'long',month:'short',day:'numeric',year:'numeric'});
+  const [hour,min]=appointment.localTime.split(':').map(Number);
+  info.hidden=false;title.textContent='Confirmed pickup appointment';
+  body.textContent=`${when} at ${hour%12||12}:${String(min).padStart(2,'0')} ${hour>=12?'PM':'AM'} Mountain Time. Pickup address and calendar links are coming in a later Stage 3 step.`;
+ };
  load();
 })();

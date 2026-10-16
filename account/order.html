@@ -9,7 +9,8 @@
   <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
   <link href="../css/site.css" rel="stylesheet"/>
   <link href="../css/customer-account.css?v=20261016-order-detail1" rel="stylesheet"/>
-  <link href="../css/customer-order.css?v=20261016-order-detail1" rel="stylesheet"/>
+  <link href="../css/customer-order.css?v=20261016-order-detail2" rel="stylesheet"/>
+  <link href="../css/coaster-pickup-customer.css?v=20261016-roundtrip1" rel="stylesheet"/>
   <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
 </head>
 <body class="wt-public-template customer-account-page">
@@ -44,12 +45,48 @@
             <h3 id="co-delivery-title">Delivery details</h3>
             <p id="co-delivery-details"></p>
           </div>
-          <p class="customer-order-help">For proof approvals, payment, and pickup requests, keep using the secure links WestTech already sent you while we connect those actions to this dashboard.</p>
+          <p class="customer-order-help">For proof approvals and payments, continue using the secure links WestTech provided. Pickup scheduling is available in this dashboard for eligible local pickup orders.</p>
         </aside>
       </div>
     </section>
+      <section id="co-pickup" class="customer-order-pickup" hidden aria-label="Pickup scheduling">
+        <div class="customer-eyebrow">LOCAL PICKUP · SCHEDULING</div>
+        <h2>Arrange your pickup</h2>
+        <p class="customer-order-pickup-intro">Choose an available appointment, suggest different times, or review your confirmed booking. All times are Mountain Time.</p>
+ <section class="pc-card" id="pc-loading" role="status">Loading your pickup appointments…</section>
+ <section class="pc-card" id="pc-content" hidden>
+   <div class="pc-orderline"><strong id="pc-order">Your order</strong><span>Mountain Time · 15-minute pickup</span></div>
+   <div class="pc-message" id="pc-message" role="status" aria-live="polite" hidden></div>
+   <div id="pc-waiting" hidden><h2>Scheduling will open when your order is ready.</h2><p>WestTech will mark your coasters Ready for Pickup when manufacturing and inspection are complete. Please return to this private link then.</p></div>
+   <div id="pc-confirmed" hidden><h2><span aria-hidden="true">✓</span> Your pickup appointment is reserved</h2><p id="pc-confirmed-when"></p><p class="pc-note">Your confirmed appointment is recorded in WestTech. Private address, directions, and calendar options will be added in a later Stage 3 step.</p></div>
+   <div id="pc-pending" hidden><h2>We received your alternate pickup request.</h2><p id="pc-pending-text"></p><p class="pc-note">This is a request, not a confirmed appointment. WestTech will review your preferred times. Return to your WestTech customer dashboard to see whether an appointment is confirmed or other times are offered.</p></div>
+   <div id="pc-chooser" hidden>
+    <h2>Available appointments</h2>
+    <p class="pc-muted">You may choose one of the times WestTech has offered for your order.</p>
+    <div id="pc-slot-list" class="pc-slot-list" role="radiogroup" aria-label="Offered pickup times"></div>
+    <label class="pc-other"><input type="radio" name="pc-choice" value="other" id="pc-other"/><span><strong>None of these times work for me</strong></span></label>
+    <div id="pc-alternatives" class="pc-alternatives" hidden>
+      <h3>Request a different pickup time</h3>
+      <p>What day and time would work better for you?</p>
+      <div class="pc-field-grid">
+        <label>Preferred date <input id="pc-first-date" type="date"/></label>
+        <label>Preferred time <select id="pc-first-time" aria-label="Preferred pickup time"><option value="">Choose a time</option></select></label>
+      </div>
+      <p>Have another time that would work? <span class="pc-muted">(Optional)</span></p>
+      <div class="pc-field-grid">
+        <label>Second-choice date <input id="pc-second-date" type="date"/></label>
+        <label>Second-choice time <select id="pc-second-time" aria-label="Second-choice pickup time"><option value="">Choose a time</option></select></label>
+      </div>
+      <p class="pc-note">Monday–Friday only; no weekend pickups. Alternative times are subject to WestTech approval.</p>
+    </div>
+    <button id="pc-submit" type="button" class="pc-primary" disabled>Choose a pickup appointment</button>
+    <p class="pc-note">Pickup location and calendar details will be provided only after confirmation when the next Stage 3 features are enabled.</p>
+   </div>
+ </section>
+ <section class="pc-card pc-error" id="pc-error" role="alert" hidden><h2>Pickup scheduling unavailable</h2><p id="pc-error-text"></p><p>Please contact WestTech if you need assistance.</p></section>
+      </section>
   </main>
   <div id="site-footer"></div>
 </div>
-<script src="../js/theme.js"></script><script src="../js/customer-order.js?v=20261016-order-detail1"></script>
+<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-portal-pickup1"></script><script src="../js/customer-order.js?v=20261016-order-detail2"></script>
 </body></html>

@@ -110,8 +110,8 @@ export async function adminPickupExtra(env,orderId){
   const link=await db.prepare('SELECT expires_at AS expiresAt FROM coaster_pickup_links WHERE order_id=? AND revoked_at IS NULL AND datetime(expires_at)>CURRENT_TIMESTAMP ORDER BY id DESC LIMIT 1').bind(order.orderId).first();
   return {appointment:await appointmentFor(db,order.orderId),requests:await requestsFor(db,order.orderId),linkActive:!!link,linkExpiresAt:link?.expiresAt||'',canCreateLink:order.fulfillmentMethod==='LOCAL_PICKUP'&&ACTIVE.has(order.status)};
 }
-export async function viewCustomerPickup(env,token){
-  const {db,order}=await resolved(env,token),ready=order.status==='READY_FOR_PICKUP';
+async function viewPickupForOrder(db,order){
+  const ready=order.status==='READY_FOR_PICKUP';
   const appointment=await appointmentFor(db,order.orderId);
   const requests=await requestsFor(db,order.orderId);
   const currentRequest=requests.find(x=>['PENDING','COUNTER_OFFERED'].includes(x.status))||null;
@@ -124,8 +124,8 @@ export async function viewCustomerPickup(env,token){
   }
   return {orderId:order.orderId,ready,orderStatus:order.status,timezone:ZONE,appointment,request:currentRequest,slots,today:mountainParts().date,needsAddressConfirmation:true};
 }
-export async function bookCustomerPickup(env,token,slotId){
-  const {db,order}=await resolved(env,token);requireReady(order);
+async function bookPickupForOrder(db,order,slotId){
+  requireReady(order);
   const id=Number(slotId);if(!Number.isSafeInteger(id)||id<1)throw makeError('Choose an available pickup time.',400);
   const requests=await requestsFor(db,order.orderId);
   if(requests.some(x=>x.status==='PENDING'))throw makeError('An alternate-time request is awaiting WestTech review.',409);
@@ -136,10 +136,10 @@ export async function bookCustomerPickup(env,token,slotId){
   validatePickupSlot(slot.localDate,slot.localTime);
   const appointment=await bookDate(db,order,slot.localDate,slot.localTime,id);
   await db.prepare("UPDATE coaster_pickup_requests SET status='CLOSED',updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND status='COUNTER_OFFERED'").bind(order.orderId).run();
-  return {appointment,view:await viewCustomerPickup(env,token)};
+  return {appointment,view:await viewPickupForOrder(db,order)};
 }
-export async function requestCustomerAlternative(env,token,first,second){
-  const {db,order}=await resolved(env,token);requireReady(order);
+async function requestAlternativeForOrder(db,order,first,second){
+  requireReady(order);
   if(await appointmentFor(db,order.orderId))throw makeError('A pickup appointment is already confirmed.',409);
   const existing=await requestsFor(db,order.orderId);
   if(existing.some(x=>x.status==='PENDING'))throw makeError('An alternate-time request is already awaiting WestTech review.',409);
@@ -155,7 +155,28 @@ export async function requestCustomerAlternative(env,token,first,second){
   const saved=results[results.length-1];
   if(Number(saved?.meta?.changes||0)!==1)throw makeError('An alternate-time request is already being reviewed.',409);
   await logEvent(db,order.orderId,previous?'PICKUP_ALTERNATIVE_REVISED':'PICKUP_ALTERNATIVE_REQUESTED',{first:a,second:b,previousRequestId:previous?.id||null});
-  return viewCustomerPickup(env,token);
+  return viewPickupForOrder(db,order);
+}
+
+// Token-based Stage 2 scheduling and session-verified Stage 3 portal both use
+// the same ordering, counter-offer, validation and booking rules.
+export async function viewCustomerPickup(env,token){
+  const {db,order}=await resolved(env,token);return viewPickupForOrder(db,order);
+}
+export async function bookCustomerPickup(env,token,slotId){
+  const {db,order}=await resolved(env,token);return bookPickupForOrder(db,order,slotId);
+}
+export async function requestCustomerAlternative(env,token,first,second){
+  const {db,order}=await resolved(env,token);return requestAlternativeForOrder(db,order,first,second);
+}
+export async function viewPortalPickup(env,orderId){
+  const db=requireOrdersDb(env),order=await orderFor(db,orderId);return viewPickupForOrder(db,order);
+}
+export async function bookPortalPickup(env,orderId,slotId){
+  const db=requireOrdersDb(env),order=await orderFor(db,orderId);return bookPickupForOrder(db,order,slotId);
+}
+export async function requestPortalPickupAlternative(env,orderId,first,second){
+  const db=requireOrdersDb(env),order=await orderFor(db,orderId);return requestAlternativeForOrder(db,order,first,second);
 }
 export async function decideAdminPickupRequest(env,orderId,requestId,decision,selectedSlotIds=[]){
   const db=requireOrdersDb(env),order=await orderFor(db,orderId);requireReady(order);
