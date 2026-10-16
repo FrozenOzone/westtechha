@@ -12,7 +12,29 @@
  let pendingWithdraw=null,pendingDecision=null,linkedOrder='';
  function setStatus(value,error=false){status.textContent=value;status.className='wt-pickup-status'+(error?' error':'');}
  function todayMountain(){const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Denver',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const p=Object.fromEntries(parts.filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));return `${p.year}-${p.month}-${p.day}`;}
- date.min=todayMountain();
+ function syncDateMin(){
+  const today=todayMountain();date.min=today;
+  if(date.value&&date.value<today)date.value='';
+ }
+ function addTimeChoices(){
+  // 9:00 AM through 4:45 PM (last 15-minute appointment ends at 5:00 PM).
+  time.replaceChildren(new Option('Choose a time',''));
+  for(let mins=9*60;mins<=16*60+45;mins+=15){
+   const hour=Math.floor(mins/60),minute=mins%60;
+   const value=`${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`;
+   const label=`${hour%12||12}:${String(minute).padStart(2,'0')} ${hour>=12?'PM':'AM'}`;
+   time.add(new Option(label,value));
+  }
+  time.value='10:00';
+ }
+ syncDateMin();addTimeChoices();
+ date.addEventListener('click',()=>{syncDateMin();try{date.showPicker?.();}catch(_){/* native input remains usable */}});
+ date.addEventListener('focus',syncDateMin);
+ date.addEventListener('change',()=>{
+  if(!date.value)return;
+  const d=new Date(date.value+'T12:00:00Z');
+  if(!Number.isFinite(d.getTime())||[0,6].includes(d.getUTCDay())){date.value='';setStatus('Please select a weekday. No weekend pickups.',true);}
+ });
  function visibleOrder(){
   if($('#ca-detail')?.hidden||$('#ca-production-card')?.hidden)return null;
   if($('#ca-prod-fulfillment')?.textContent.trim()!=='Local Pickup')return null;
@@ -66,7 +88,7 @@
   if(busy||!activeOrder)return;busy=true;add.disabled=reload.disabled=true;setStatus('Saving pickup times…');const order=activeOrder;
   try{const result=await request(order,method,body);if(activeOrder===order)paint(result.pickup);}catch(e){if(activeOrder===order)setStatus(e.message,true);}finally{busy=false;reload.disabled=false;add.disabled=false;}
  }
- add.addEventListener('click',()=>{if(!date.value||!time.value){setStatus('Choose a date and time.',true);return;}change('POST',{date:date.value,time:time.value});});
+ add.addEventListener('click',()=>{syncDateMin();if(!date.value||!time.value){setStatus('Choose a date and time.',true);return;}change('POST',{date:date.value,time:time.value});});
  reload.addEventListener('click',()=>refresh(true));
  function renderStage2(pickup){
    linkButton.disabled=!pickup.canCreateLink;

@@ -17,7 +17,7 @@
   <link href="../css/admin-production-fields.css?v=20260913-2" rel="stylesheet"/>
   <script src="../js/admin-access.js?v=20260913-prod1"></script>
   <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
-<link rel="stylesheet" href="../css/coaster-pickup-admin.css?v=20261016-stage2"/>
+<link rel="stylesheet" href="../css/coaster-pickup-admin.css?v=20261016-timepick1"/>
 </head>
 <body class="coaster-page custom-coasters-page wt-admin-template">
 <div class="page">
@@ -151,7 +151,7 @@
             <p class="wt-pickup-note">Pick the specific appointment times you want to offer. Monday–Friday, 9 AM–5 PM, Mountain Time. Each pickup lasts 15 minutes. No weekend pickups.</p>
             <div class="wt-pickup-fields">
               <div class="ca-field"><label for="wt-pickup-date">Pickup date</label><input id="wt-pickup-date" type="date"/></div>
-              <div class="ca-field"><label for="wt-pickup-time">Pickup time</label><input id="wt-pickup-time" type="time" value="10:00" min="09:00" max="16:45" step="900"/></div>
+              <div class="ca-field"><label for="wt-pickup-time">Pickup time</label><select id="wt-pickup-time" aria-label="Pickup time"><option value="">Choose a time</option></select></div>
               <button id="wt-pickup-add" class="ca-secondary" type="button">+ Add Offered Time</button>
             </div>
             <div id="wt-pickup-status" class="wt-pickup-status" role="status" aria-live="polite"></div>
@@ -288,6 +288,6 @@
   <div id="site-footer"></div>
 </div>
 <script src="../js/theme.js"></script><script src="../js/admin-production-fields.js?v=20260913-2"></script><script src="../js/coaster-admin.js?v=20260920-carrier1"></script><script src="../js/manufacturing-estimate.js?v=20260913-1"></script><script src="../js/coaster-admin-auto-refresh.js?v=20260916-shippedlock1"></script><script src="../js/coaster-admin-archive.js?v=20260904-archive3"></script><script src="../js/admin-pane-sync.js?v=20260905-1"></script>
-<script src="../js/coaster-pickup-admin.js?v=20261016-stage2"></script>
+<script src="../js/coaster-pickup-admin.js?v=20261016-timepick1"></script>
 </body>
 </html>

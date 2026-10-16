@@ -3,7 +3,8 @@
 #wt-pickup-panel .wt-pickup-note{line-height:1.65;opacity:.85;margin:0 0 18px}
 #wt-pickup-panel .wt-pickup-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:12px;align-items:end}
 #wt-pickup-panel .wt-pickup-fields .ca-field{min-width:0}
-#wt-pickup-panel .wt-pickup-fields input{box-sizing:border-box;width:100%;min-width:0}
+#wt-pickup-panel .wt-pickup-fields input,#wt-pickup-panel .wt-pickup-fields select{box-sizing:border-box;width:100%;min-width:0;cursor:pointer}
+#wt-pickup-panel .wt-pickup-fields select{min-height:48px;max-width:100%;padding-right:38px}
 #wt-pickup-panel .wt-pickup-fields button{white-space:nowrap;min-height:48px}
 #wt-pickup-panel .wt-pickup-status{min-height:24px;margin:12px 0;font-size:.88rem}
 #wt-pickup-panel .wt-pickup-status.error{color:#f39f9f}

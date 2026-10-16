@@ -18,11 +18,37 @@
   const data=await response.json().catch(()=>({}));if(!response.ok||!data.ok)throw new Error(data.message||`Scheduling request failed (${response.status}).`);
   return data;
  }
- function setDates(){
-  const now=state.today;const max=new Date(Date.parse(now+'T12:00:00Z')+120*86400000).toISOString().slice(0,10);
-  ['pc-first-date','pc-second-date'].forEach(id=>{$('#'+id).min=now;$('#'+id).max=max;});
+ function todayMountain(){
+  const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Denver',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+  const p=Object.fromEntries(parts.filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));
+  return `${p.year}-${p.month}-${p.day}`;
  }
- function validWeekday(date){const d=new Date(date+'T12:00:00Z');return Number.isFinite(d.getTime())&&!([0,6].includes(d.getUTCDay()));}
+ function setDates(){
+  // Refresh even when a page remains open overnight. Never accept an older server date.
+  const now=todayMountain()>state.today?todayMountain():state.today;
+  const max=new Date(Date.parse(now+'T12:00:00Z')+120*86400000).toISOString().slice(0,10);
+  ['pc-first-date','pc-second-date'].forEach(id=>{const el=$('#'+id);el.min=now;el.max=max;if(el.value&&el.value<now)el.value='';});
+ }
+ function addTimeChoices(){
+  // Visible 12-hour labels, exact HH:mm values for API and D1.
+  for(const id of ['pc-first-time','pc-second-time']){
+   const select=$('#'+id);select.replaceChildren(new Option('Choose a time',''));
+   for(let mins=8*60;mins<=18*60;mins+=15){
+    const hour=Math.floor(mins/60),minute=mins%60;
+    const value=`${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`;
+    const label=`${hour%12||12}:${String(minute).padStart(2,'0')} ${hour>=12?'PM':'AM'}`;
+    select.add(new Option(label,value));
+   }
+  }
+ }
+ // Clicking anywhere inside a date field opens the native calendar in supported browsers.
+ for(const id of ['pc-first-date','pc-second-date']){
+  const el=$('#'+id);
+  el.addEventListener('click',()=>{setDates();try{el.showPicker?.();}catch(_){/* native input remains usable */}});
+  el.addEventListener('focus',setDates);
+ }
+ addTimeChoices();
+ function validWeekday(date){const d=new Date(date+'T12:00:00Z');return Number.isFinite(d.getTime())&&d.toISOString().slice(0,10)===date&&!([0,6].includes(d.getUTCDay()));}
  function paint(){
   busyText.hidden=true;content.hidden=false;message.hidden=true;
   $('#pc-order').textContent='Coaster order '+state.orderId;
@@ -66,10 +92,13 @@
   const checked=$('input[name=pc-choice]:checked');if(!checked)return;
   const other=checked.value==='other';let fields;
   if(other){
+   setDates();
    const first=parseChoice('first'),second=parseChoice('second');
    if(!first.date||!first.time){notify('Please enter your first-choice date and time.',true);return;}
    if(!validWeekday(first.date)||second.date&&!validWeekday(second.date)){notify('Weekend pickup dates are not available. Please choose weekdays.',true);return;}
    if(!!second.date!==!!second.time){notify('Please enter both date and time for your optional second choice.',true);return;}
+   const offeredChoices=[...$('#pc-first-time').options].map(x=>x.value).filter(Boolean);
+   if(!offeredChoices.includes(first.time)||(second.time&&!offeredChoices.includes(second.time))){notify('Please select a time from the 15-minute options between 8 AM and 6 PM.',true);return;}
    fields={first,second};
   }else fields={slotId:Number(checked.value)};
   busy=true;submit.disabled=true;submit.textContent='Saving…';

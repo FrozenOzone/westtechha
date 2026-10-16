@@ -8,7 +8,7 @@
 <script src="../js/theme-init.js?v=20260916-1"></script>
 <link rel="stylesheet" href="../css/site.css"/>
 <link rel="stylesheet" href="../css/layout-template.css?v=20260916-site1"/>
-<link rel="stylesheet" href="../css/coaster-pickup-customer.css?v=20261016-stage2"/>
+<link rel="stylesheet" href="../css/coaster-pickup-customer.css?v=20261016-timepick1"/>
 </head>
 <body class="wt-public-template pickup-scheduling-page">
 <div class="page"><div id="site-header"></div>
@@ -33,12 +33,12 @@
       <p>What day and time would work better for you?</p>
       <div class="pc-field-grid">
         <label>Preferred date <input id="pc-first-date" type="date"/></label>
-        <label>Preferred time <input id="pc-first-time" type="time" step="900"/></label>
+        <label>Preferred time <select id="pc-first-time" aria-label="Preferred pickup time"><option value="">Choose a time</option></select></label>
       </div>
       <p>Have another time that would work? <span class="pc-muted">(Optional)</span></p>
       <div class="pc-field-grid">
         <label>Second-choice date <input id="pc-second-date" type="date"/></label>
-        <label>Second-choice time <input id="pc-second-time" type="time" step="900"/></label>
+        <label>Second-choice time <select id="pc-second-time" aria-label="Second-choice pickup time"><option value="">Choose a time</option></select></label>
       </div>
       <p class="pc-note">Monday–Friday only; no weekend pickups. Alternative times are subject to WestTech approval.</p>
     </div>
@@ -49,5 +49,5 @@
  <section class="pc-card pc-error" id="pc-error" role="alert" hidden><h2>Scheduling link unavailable</h2><p id="pc-error-text"></p><p>Please reply to your WestTech order email for assistance.</p></section>
 </main><div id="site-footer"></div></div>
 <script src="../js/theme.js"></script><script src="../js/site-shell.js"></script>
-<script src="../js/coaster-pickup-customer.js?v=20261016-stage2"></script>
+<script src="../js/coaster-pickup-customer.js?v=20261016-timepick1"></script>
 </body></html>

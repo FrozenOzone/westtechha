@@ -36,7 +36,7 @@ function validateAlternative(dateValue,timeValue,now=new Date()){
   if(day.getUTCDay()===0||day.getUTCDay()===6)throw makeError('Weekend pickups are not available.',400);
   if(!/^\d{2}:\d{2}$/.test(time))throw makeError('Choose a valid time.',400);
   const [h,m]=time.split(':').map(Number);
-  if(h>23||m>59||m%15!==0)throw makeError('Choose a time in 15-minute increments.',400);
+  if(h<8||h>18||m>59||m%15!==0||(h===18&&m!==0))throw makeError('Choose a time from 8:00 AM to 6:00 PM in 15-minute increments.',400);
   const current=mountainParts(now);
   if(date<current.date||(date===current.date&&time<=current.time))throw makeError('Choose a future pickup time.',400);
   if(date>mountainParts(new Date(now.getTime()+120*86400000)).date)throw makeError('Pickup requests are limited to 120 days ahead.',400);
