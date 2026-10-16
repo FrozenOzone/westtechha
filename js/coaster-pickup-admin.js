@@ -175,9 +175,20 @@
  readyStatus?.addEventListener('change',()=>{
   if(readyStatus.value==='READY_FOR_PICKUP'&&savedStatus()!=='READY_FOR_PICKUP'&&!panel.hidden)scrollToSlots();
  });
- window.wtPickupReadyGate=async()=>{
-  const shown=visibleOrder();
-  if(!shown||readyStatus?.value!=='READY_FOR_PICKUP'||savedStatus()==='READY_FOR_PICKUP')return {proceed:true,override:false};
+ window.wtPickupReadyGate=async(expectedOrderId='')=>{
+  // The main Save button supplies its order ID. Never silently bypass the
+  // scheduling popup if the UI is still rendering or showing another order.
+  let shown=visibleOrder();
+  if(!shown&&expectedOrderId&&$('#ca-prod-fulfillment')?.textContent.trim()==='Local Pickup'&&$('#ca-order-id')?.textContent.trim()===expectedOrderId){
+    shown={id:expectedOrderId};
+  }
+  if(expectedOrderId&&(!shown||shown.id!==expectedOrderId)){
+    setStatus('Pickup order details are still loading. Please refresh this order before saving.',true);
+    return readyNo;
+  }
+  if(!shown||readyStatus?.value!=='READY_FOR_PICKUP'||savedStatus()==='READY_FOR_PICKUP'){
+    return expectedOrderId?readyNo:{proceed:true,override:false};
+  }
   if(busy||readyDialog.open)return readyNo;
   try{
    const data=await request(shown.id);
