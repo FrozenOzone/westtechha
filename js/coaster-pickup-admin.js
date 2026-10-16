@@ -10,6 +10,7 @@
  const withdrawDialog=$('#wt-pickup-withdraw-dialog'),withdrawDescription=$('#wt-pickup-withdraw-description'),withdrawCancel=$('#wt-pickup-withdraw-cancel'),withdrawConfirm=$('#wt-pickup-withdraw-confirm');
  let activeOrder='',lastKey='',serial=0,busy=false;
  let pendingWithdraw=null,pendingDecision=null,linkedOrder='';
+ let lastPickupSnapshot='',autoCheckInFlight=false,lastAutoCheck=0;
  function setStatus(value,error=false){status.textContent=value;status.className='wt-pickup-status'+(error?' error':'');}
  function todayMountain(){const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Denver',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const p=Object.fromEntries(parts.filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));return `${p.year}-${p.month}-${p.day}`;}
  function syncDateMin(){
@@ -61,7 +62,15 @@
   if(pending&&pending.orderId===activeOrder&&!busy)change('DELETE',{slotId:pending.slotId});
  });
  withdrawDialog.addEventListener('close',()=>{pendingWithdraw=null;});
+ // Compare only the actual scheduling state; unchanged background replies do not
+ // re-render buttons or interrupt an admin who is reviewing a request.
+ function pickupSnapshot(pickup){
+  return JSON.stringify({enabled:pickup.enabled,canCreateLink:pickup.canCreateLink,
+   linkActive:pickup.linkActive,linkExpiresAt:pickup.linkExpiresAt,
+   slots:pickup.slots,requests:pickup.requests,appointment:pickup.appointment});
+ }
  function paint(pickup){
+  lastPickupSnapshot=pickupSnapshot(pickup);
   list.replaceChildren();add.disabled=!pickup.enabled;renderStage2(pickup);
   if(!pickup.enabled)setStatus('Only active Local Pickup production orders can offer times.');
   else if(!(pickup.slots||[]).length)setStatus('No pickup times offered yet.');
@@ -74,18 +83,26 @@
    list.appendChild(row);
   }
  }
- async function refresh(force=false){
+ async function refresh(force=false,quiet=false){
   const shown=visibleOrder();panel.hidden=!shown;
   if(withdrawDialog.open&&(!shown||shown.id!==pendingWithdraw?.orderId))withdrawDialog.close();
   if(decisionDialog.open&&(!shown||shown.id!==pendingDecision?.orderId))decisionDialog.close();
-  if(!shown){activeOrder='';lastKey='';serial++;linkedOrder='';linkValue.value='';linkBox.hidden=true;return;}
+  if(!shown){activeOrder='';lastKey='';lastPickupSnapshot='';serial++;linkedOrder='';linkValue.value='';linkBox.hidden=true;return;}
   if(linkedOrder&&linkedOrder!==shown.id){linkedOrder='';linkValue.value='';linkBox.hidden=true;}
   activeOrder=shown.id;if(!force&&shown.key===lastKey)return;
-  lastKey=shown.key;const requestId=++serial;setStatus('Loading pickup times…');
-  try{const result=await request(shown.id);if(requestId===serial&&activeOrder===shown.id)paint(result.pickup);}catch(e){if(requestId===serial&&activeOrder===shown.id)setStatus(e.message,true);}
+  if(shown.key!==lastKey)lastPickupSnapshot='';
+  lastKey=shown.key;const requestId=++serial;
+  if(!quiet)setStatus('Loading pickup times…');
+  try{
+   const result=await request(shown.id);
+   if(requestId!==serial||activeOrder!==shown.id||visibleOrder()?.id!==shown.id)return;
+   // Do not replace decisions while a modal or a write is in progress.
+   if(quiet&&(busy||withdrawDialog.open||decisionDialog.open||readyDialog.open))return;
+   if(!quiet||pickupSnapshot(result.pickup)!==lastPickupSnapshot)paint(result.pickup);
+  }catch(e){if(!quiet&&requestId===serial&&activeOrder===shown.id)setStatus(e.message,true);}
  }
  async function change(method,body){
-  if(busy||!activeOrder)return;busy=true;add.disabled=reload.disabled=true;setStatus('Saving pickup times…');const order=activeOrder;
+  if(busy||!activeOrder)return;serial++;busy=true;add.disabled=reload.disabled=true;setStatus('Saving pickup times…');const order=activeOrder;
   try{const result=await request(order,method,body);if(activeOrder===order)paint(result.pickup);}catch(e){if(activeOrder===order)setStatus(e.message,true);}finally{busy=false;reload.disabled=false;add.disabled=false;}
  }
  add.addEventListener('click',()=>{syncDateMin();if(!date.value||!time.value){setStatus('Choose a date and time.',true);return;}change('POST',{date:date.value,time:time.value});});
@@ -136,7 +153,7 @@
  });
  decisionDialog.addEventListener('close',()=>{pendingDecision=null;});
  linkButton.addEventListener('click',async()=>{
-   if(busy||!activeOrder)return;busy=true;linkButton.disabled=true;setStatus('Preparing private link…');const id=activeOrder;
+   if(busy||!activeOrder)return;serial++;busy=true;linkButton.disabled=true;setStatus('Preparing private link…');const id=activeOrder;
    try{const result=await request(id,'POST',{action:'createLink'});
      if(activeOrder===id){paint(result.pickup);linkedOrder=id;linkValue.value=result.link||'';linkBox.hidden=!linkValue.value;setStatus('Private link created. Copy and share only with this customer. No email has been sent.');}
    }catch(e){if(activeOrder===id)setStatus(e.message,true);}
@@ -201,6 +218,21 @@
   }catch(e){setStatus('Could not verify pickup times: '+e.message,true);scrollToSlots();return readyNo;}
   return new Promise(resolve=>{settleReady=resolve;readyDialog.showModal();});
  };
+
+ // Check the currently displayed pickup order every 20 seconds while visible.
+ // The normal order auto-refresh intentionally does not monitor pickup requests.
+ function maybeAutoRefresh(){
+  if(document.hidden||autoCheckInFlight||busy||!visibleOrder())return;
+  if(withdrawDialog.open||decisionDialog.open||readyDialog.open)return;
+  // Avoid changing scheduling controls while the admin is editing their values.
+  if(panel.contains(document.activeElement)&&/^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement?.tagName||''))return;
+  const now=Date.now();if(now-lastAutoCheck<1500)return;lastAutoCheck=now;
+  autoCheckInFlight=true;
+  refresh(true,true).finally(()=>{autoCheckInFlight=false;});
+ }
+ setInterval(maybeAutoRefresh,20000);
+ window.addEventListener('focus',maybeAutoRefresh);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)maybeAutoRefresh();});
 
  const observer=new MutationObserver(()=>refresh());
  // Only observe existing admin state indicators. Do not observe this add-on's own
