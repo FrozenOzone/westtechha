@@ -36,7 +36,7 @@
 <div class="form-grid">
 <div><label for="name">Your name</label><input id="name" name="name" type="text" autocomplete="name" required /></div>
 <div><label for="email">Your email</label><input id="email" name="email" type="email" autocomplete="email" required /></div>
-<div><label for="topic">Topic</label><select id="topic" name="topic" required><option value="Product Fit">Product Question / Support</option><option value="Order">Order / Quote</option><option value="Shipping">Shipping / Delivery</option><option value="Returns">Returns / Warranty</option><option value="General">General Question</option></select></div>
+<div><label for="topic">Topic</label><select id="topic" name="topic" required><option value="Product Fit">Product Question / Support</option><option value="Order">Order / Quote</option><option value="Account Access">Account Access Help</option><option value="Shipping">Shipping / Delivery</option><option value="Returns">Returns / Warranty</option><option value="General">General Question</option></select></div>
 <div><label for="product">Product / Order (optional)</label><input id="product" name="product" type="text" placeholder="Scout, Ranger, Command, Coasters, order number, or other" /></div>
 <div class="wt-full"><label for="message">Message</label><textarea id="message" name="message" rows="6" required placeholder="Tell us which product or order you are asking about and where you need help."></textarea></div>
 </div>
@@ -147,12 +147,22 @@
     }
   }
 
+  function applyAccountAccessPrefill() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('help') !== 'account-access') return;
+    topic.value = 'Account Access';
+    if (product && !product.value) product.value = 'Customer Account Access';
+    if (message && !message.value) message.value = 'I need help locating my WestTech customer account. I do not remember which email address I used for my order.\n\nOrder number (if known):\nApproximate order date:\nProduct ordered:\nAdditional details:\n\nPlease contact me at the email address I entered above to arrange private account verification.';
+  }
   function applyRouting() {
     const value = String(topic.value || '').toLowerCase();
     let targetEmail = 'contact@westtechha.com';
     let subjectLine = 'WestTech Home Automation Contact Form';
 
-    if (value === 'order') {
+    if (value === 'account access') {
+      targetEmail = 'orders@westtechha.com';
+      subjectLine = 'WestTech Customer Account Access Request';
+    } else if (value === 'order') {
       targetEmail = 'orders@westtechha.com';
       subjectLine = 'WestTech Home Automation Order Form';
     } else if (value === 'product fit' || value === 'shipping' || value === 'returns') {
@@ -166,6 +176,7 @@
 
   next.value = new URL('thank-you.html', window.location.href).href;
   applyCoasterPrefill();
+  applyAccountAccessPrefill();
   applyRouting();
   topic.addEventListener('change', applyRouting);
   form.addEventListener('submit', applyRouting);
