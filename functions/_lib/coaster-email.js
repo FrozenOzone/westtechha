@@ -59,9 +59,12 @@ function template(type,order,links={}){
     headline=`Your proof is ready, ${name}.`;
     intro='I’ve reviewed your request and prepared the design that WestTech will use for your order.';
     process='Please check the artwork, wording, quantity, fulfillment method, and final total. Once you approve the proof, those customer-facing terms become the production reference. If something needs changing, use the change-request option instead of approving it.';
-    action='Your next step is to review the proof and either approve it or request changes.';
+    const directPortalLink=!!approvalUrl&&new URL(approvalUrl).pathname==='/api/customer/auth/verify';
+    action=directPortalLink
+      ? 'Select Open My Order below. Your private customer portal shows the released proof and lets you approve it or request changes. The single-use access link expires in 20 minutes; request a new sign-in link if it expires.'
+      : 'Sign in to your private customer portal, open this order, and approve the proof or request changes.';
     details=[`Order: ${orderId}`,summary,`Approved subtotal: ${finalTotal}`];if(productionWindow)details.push(`Estimated production / ship window: ${productionWindow}`);
-    buttonLabel='Review Proof & Terms';buttonUrl=approvalUrl;
+    buttonLabel=directPortalLink?'Open My Order':'Customer Portal Sign-In';buttonUrl=approvalUrl;
   }else if(type==='CHANGES_REQUESTED'){
     subject=`I received your coaster changes — ${orderId}`;
     headline=`Got it, ${name} — your changes are saved.`;

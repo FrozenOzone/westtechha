@@ -123,7 +123,7 @@ export async function requestCustomerLogin(env,emailAddress,requestUrl){
 // Stage 4A: Include a private portal sign-in URL INSIDE the order receipt.
 // The token is hashed at rest, expires in 20 minutes, and is single-use.
 // Never expose it in a public API response or send a second login email.
-export async function createCustomerOrderReceiptLink(env,{order,requestUrl}){
+async function createCustomerCoasterAccessLink(env,{order,requestUrl,eventType}){
   if(!order?.orderId||!EMAIL_RE.test(email(order?.customerEmail)))throw error('Valid order email is required.');
   const db=requireOrdersDb(env);
   const account=await ensureAccount(db,{
@@ -145,8 +145,18 @@ export async function createCustomerOrderReceiptLink(env,{order,requestUrl}){
   link.searchParams.set('token',raw);
   link.searchParams.set('type','COASTER');
   link.searchParams.set('order',order.orderId);
-  await log(db,account.id,'ORDER_RECEIPT_ACCESS_CREATED',{sourceType:'COASTER',orderId:order.orderId});
+  await log(db,account.id,eventType,{sourceType:'COASTER',orderId:order.orderId});
   return link.toString();
+}
+
+export async function createCustomerOrderReceiptLink(env,{order,requestUrl}){
+  return createCustomerCoasterAccessLink(env,{order,requestUrl,eventType:'ORDER_RECEIPT_ACCESS_CREATED'});
+}
+
+// Stage 4C: the proof-ready notification opens the SAME authenticated order page.
+// The customer never needs a standalone proof approval token to review it.
+export async function createCustomerProofReadyLink(env,{order,requestUrl}){
+  return createCustomerCoasterAccessLink(env,{order,requestUrl,eventType:'PROOF_READY_ACCESS_CREATED'});
 }
 
 export async function inviteCustomerForOrder(env,{sourceType,order,requestUrl}){
