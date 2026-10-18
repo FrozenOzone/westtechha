@@ -111,3 +111,16 @@
 .customer-order-overview .customer-order-detail-heading > div {flex:1 1 auto;min-width:0}
 .customer-order-overview .customer-order-next-step {display:block;width:auto}
 .customer-order-overview .customer-order-timeline {width:100%}
+/* WT CUSTOMER ORDER FULL-WIDTH PROGRESS v1 */
+/* Order identity, latest update and the six-stage progress line stay together. */
+.customer-order-main .customer-order-detail-grid {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+}
+.customer-order-main .customer-order-detail-grid > .customer-order-overview,
+.customer-order-main .customer-order-detail-grid > .customer-order-summary {
+  grid-column: 1;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.customer-order-main .customer-order-overview .customer-order-timeline { width: 100%; }
