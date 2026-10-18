@@ -105,3 +105,9 @@
 @media print{.customer-order-approval{display:none!important}}
 .customer-order-proof-terms .customer-order-proof-subtotal{margin-top:8px;padding:16px 0}
 .customer-order-proof-terms .customer-order-proof-subtotal strong{font-size:1.07rem}
+
+/* WT CUSTOMER ORDER OVERVIEW HEADER FIX v1 */
+.customer-order-detail-grid > .customer-order-overview {display:block;min-width:0}
+.customer-order-overview .customer-order-detail-heading > div {flex:1 1 auto;min-width:0}
+.customer-order-overview .customer-order-next-step {display:block;width:auto}
+.customer-order-overview .customer-order-timeline {width:100%}
