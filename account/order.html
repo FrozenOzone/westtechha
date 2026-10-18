@@ -9,7 +9,7 @@
   <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
   <link href="../css/site.css" rel="stylesheet"/>
   <link href="../css/customer-account.css?v=20261016-stage4c-layout1" rel="stylesheet"/>
-  <link href="../css/customer-order.css?v=20261018-fullwidth1" rel="stylesheet"/>
+  <link href="../css/customer-order.css?v=20261018-overview2" rel="stylesheet"/>
   <link href="../css/coaster-pickup-customer.css?v=20261016-roundtrip1" rel="stylesheet"/>
   <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
 </head>
@@ -22,32 +22,37 @@
     </header>
     <div id="co-message" class="customer-message" role="alert" hidden></div>
     <section id="co-content" hidden aria-label="Order details">
-      <div class="customer-order-detail-grid">
-        <article class="customer-account-card customer-order-overview">
-          <div class="customer-order-detail-heading">
-            <div><div class="customer-eyebrow" id="co-product-type">WESTTECH ORDER</div><h2 id="co-title">Your order</h2><p id="co-order-id" class="customer-order-detail-id"></p></div>
-            <span id="co-status" class="customer-order-detail-status"></span>
-          </div>
-          <div class="customer-order-next-step" aria-live="polite"><div class="customer-eyebrow">LATEST UPDATE</div><strong id="co-next-title"></strong><p id="co-next-body"></p></div>
+      <article class="customer-account-card customer-order-overview">
+        <div class="customer-order-detail-heading">
+          <div><div class="customer-eyebrow" id="co-product-type">WESTTECH ORDER</div><h2 id="co-title">Your order</h2><p id="co-order-id" class="customer-order-detail-id"></p></div>
+          <span id="co-status" class="customer-order-detail-status"></span>
+        </div>
+        <div class="customer-order-detail-grid">
+          <section class="customer-order-next-step" aria-label="Latest order update" aria-live="polite">
+            <div class="customer-eyebrow">LATEST UPDATE</div>
+            <strong id="co-next-title"></strong>
+            <p id="co-next-body"></p>
+          </section>
+          <aside class="customer-order-summary" aria-label="Order summary">
+            <div class="customer-eyebrow">ORDER SUMMARY</div><h2>At a glance</h2>
+            <dl class="customer-order-detail-facts">
+              <div><dt>Order date</dt><dd id="co-created">—</dd></div>
+              <div><dt>Last updated</dt><dd id="co-updated">—</dd></div>
+              <div><dt>Total</dt><dd id="co-total">—</dd></div>
+              <div><dt>Payment</dt><dd id="co-payment">—</dd></div>
+              <div><dt>Delivery method</dt><dd id="co-fulfillment">—</dd></div>
+            </dl>
+            <div id="co-delivery" class="customer-order-delivery" hidden>
+              <h3 id="co-delivery-title">Delivery details</h3>
+              <p id="co-delivery-details"></p>
+            </div>
+          </aside>
+        </div>
+        <div class="customer-order-progress">
           <h3 class="customer-order-section-label">Order progress</h3>
           <ol id="co-timeline" class="customer-order-timeline" aria-label="Order progress"></ol>
-        </article>
-        <aside class="customer-account-card customer-order-summary">
-          <div class="customer-eyebrow">ORDER SUMMARY</div><h2>At a glance</h2>
-          <dl class="customer-order-detail-facts">
-            <div><dt>Order date</dt><dd id="co-created">—</dd></div>
-            <div><dt>Last updated</dt><dd id="co-updated">—</dd></div>
-            <div><dt>Total</dt><dd id="co-total">—</dd></div>
-            <div><dt>Payment</dt><dd id="co-payment">—</dd></div>
-            <div><dt>Delivery method</dt><dd id="co-fulfillment">—</dd></div>
-          </dl>
-          <div id="co-delivery" class="customer-order-delivery" hidden>
-            <h3 id="co-delivery-title">Delivery details</h3>
-            <p id="co-delivery-details"></p>
-          </div>
-          <p class="customer-order-help">Review and approve released coaster proofs directly in your customer dashboard. Payment remains on the existing secure WestTech links until portal payment is enabled. Pickup scheduling is available here for eligible local pickup orders.</p>
-        </aside>
-      </div>
+        </div>
+      </article>
     </section>
     <div class="customer-order-lower-grid">
       <section id="co-approval" class="customer-order-approval customer-account-card" hidden aria-label="Proof approval">
