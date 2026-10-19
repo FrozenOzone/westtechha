@@ -48,3 +48,10 @@
 .customer-art-fallback{font-size:.7rem;text-align:center;color:var(--customer-muted);padding:8px}
 .customer-order-date{font-size:.75rem;color:var(--customer-muted);margin-top:6px}
 @media(max-width:700px){.customer-order-tools{align-items:stretch;flex-direction:column}.customer-order-tools>span{padding:0}.customer-order-art{width:88px;height:88px;flex-basis:88px}}
+
+/* Exact-repeat coaster reorder: quantity and delivery choice before creating a new order. */
+.wt-reorder-dialog{width:min(520px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;box-sizing:border-box;border:1px solid var(--customer-border);background:var(--customer-card);color:var(--customer-text);border-radius:18px;padding:25px;box-shadow:0 30px 90px #0009}
+.wt-reorder-dialog::backdrop{background:rgba(0,0,0,.68)}
+.wt-reorder-form{display:grid;gap:17px}.wt-reorder-form header small{color:#70b9ed;font-weight:900;letter-spacing:.12em}.wt-reorder-form h2{margin:8px 0;font-size:1.55rem}.wt-reorder-form p{color:var(--customer-muted);margin:0;line-height:1.5}
+.wt-reorder-price{display:grid;grid-template-columns:1fr auto;gap:9px;background:var(--customer-card-2);padding:15px;border:1px solid var(--customer-border);border-radius:12px}.wt-reorder-price span{color:var(--customer-muted)}
+.wt-reorder-form .wt-reorder-estimate{color:var(--customer-text);font-size:.9rem}.wt-reorder-form footer{display:flex;gap:10px;justify-content:flex-end}.wt-reorder-form footer button{min-height:43px}.wt-reorder-form label{display:grid;gap:7px}

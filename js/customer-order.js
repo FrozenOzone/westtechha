@@ -14,6 +14,7 @@
  function money(value){const number=Number(value);return Number.isFinite(number)?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(number):'—';}
  function explain(status,fulfillment){
    switch(status){
+    case 'REORDER_VERIFICATION':return ['WestTech is verifying your reorder','We are confirming current pricing and production timing for your previously approved design. No additional artwork approval is necessary.'];
     case 'DESIGN_REVIEW':return ['WestTech is reviewing your request','No action is needed while WestTech reviews your order.'];
     case 'PROOF_SENT':return ['Your design is ready for review','Review your latest WestTech proof and approve it or request changes in the section below.'];
     case 'CHANGES_REQUESTED':return ['Your changes were sent to WestTech','WestTech will prepare and release a revised proof for your review.'];
@@ -35,7 +36,7 @@
  const stages=['Submitted','Review','Approval / Payment','Production','Fulfillment','Completed'];
  function step(status){
    if(['SUBMITTED','REQUESTED','PENDING','DRAFT'].includes(status))return 1;
-   if(status==='DESIGN_REVIEW')return 2;
+   if(['DESIGN_REVIEW','REORDER_VERIFICATION'].includes(status))return 2;
    if(['PROOF_SENT','CHANGES_REQUESTED','PROOF_APPROVED','AWAITING_PAYMENT','PAYMENT_PENDING','APPROVED'].includes(status))return 3;
    if(['PRODUCTION_QUEUE','IN_PRODUCTION'].includes(status))return 4;
    if(['PREPARING_FOR_PICKUP','READY_FOR_PICKUP','PREPARING_TO_SHIP','SHIPPED'].includes(status))return 5;
@@ -64,6 +65,7 @@
     guidance='No action is needed right now. Watch this page for the next update.';
     break;
    case 2:
+    if(status==='REORDER_VERIFICATION'){title='Your reorder is being verified';explanation='Your previously approved artwork will be reused. WestTech is confirming the current total and manufacturing schedule.';guidance='No new proof approval is needed. Payment is next once WestTech verifies the order.';break;}
     title='WestTech is reviewing your design';
     explanation='We are checking your coaster design and order details before releasing a customer proof.';
     guidance='You will be able to approve the proof or request changes once it is released.';
@@ -158,7 +160,7 @@
   const timeline=$('#co-timeline');timeline.replaceChildren();
   const current=step(status);
   for(let i=0;i<stages.length;i++){
-   const item=document.createElement('li');item.textContent=stages[i];
+   const item=document.createElement('li');item.textContent=status==='REORDER_VERIFICATION'&&i===1?'Verify Reorder':stages[i];
    item.dataset.stage=current===null?'upcoming':current>i+1?'complete':current===i+1?'current':'upcoming';
    timeline.appendChild(item);
   }
