@@ -1,6 +1,7 @@
 (function(){
   'use strict';
-  if(location.hostname!=='coasters-v30-preview.westtechha.pages.dev')return;
+  const previewHosts=new Set(['pickup-stage1-preview.westtechha.pages.dev','coasters-v30-preview.westtechha.pages.dev']);
+  if(!previewHosts.has(location.hostname.toLowerCase()))return;
   const $=s=>document.querySelector(s);
   let busy=false;
   function token(){return sessionStorage.getItem('westtechha-admin-token')||'';}
