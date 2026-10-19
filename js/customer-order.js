@@ -18,7 +18,7 @@
     case 'PROOF_SENT':return ['Your design is ready for review','Review your latest WestTech proof and approve it or request changes in the section below.'];
     case 'CHANGES_REQUESTED':return ['Your changes were sent to WestTech','WestTech will prepare and release a revised proof for your review.'];
     case 'PROOF_APPROVED':return ['Your proof was approved','Your proof and agreed terms are recorded. Payment will follow if required.'];
-    case 'AWAITING_PAYMENT':return ['Payment is awaiting completion','Use the secure PayPal payment link already provided by WestTech. Payment inside the dashboard will be added in a later step.'];
+    case 'AWAITING_PAYMENT':return ['Payment is awaiting completion','Your proof has been approved. Check the current payment instructions below; Preview test orders never require a PayPal charge.'];
     case 'PRODUCTION_QUEUE':return ['Your order is in the production queue','WestTech has your approved order queued for manufacturing. No action is needed.'];
     case 'IN_PRODUCTION':return ['Your order is in production','WestTech is working on your order. No action is needed.'];
     case 'PREPARING_FOR_PICKUP':return ['WestTech is preparing your pickup order','Final checks and packaging are underway.'];
@@ -51,6 +51,7 @@
   if(!host||!panel)return;
   const status=String(order.status||'').toUpperCase();
   const payment=String(order.paymentStatus||'NOT_REQUESTED').toUpperCase();
+  const required=order.paymentRequired===true;
   const fulfillment=String(order.fulfillmentMethod||'').toUpperCase();
   host.classList.toggle('customer-order-stage-only',String(order.sourceType||'').toUpperCase()!=='COASTER');
   const paid=['PAID','CAPTURED','COMPLETED'].includes(payment);
@@ -78,17 +79,17 @@
      explanation='WestTech has your feedback. The visible proof is the previous version until a revised proof is released.';
      guidance='No further action is needed until the revised proof is ready.';
     }else if(paid){
-     title='Payment has been recorded';
-     explanation='Your artwork is approved and payment is recorded. WestTech will move your order forward.';
+     title=order.paymentSimulated?'Preview payment test recorded':'Payment has been recorded';
+     explanation=order.paymentSimulated?'This test payment was simulated in Preview. No PayPal charge was made.':'Your artwork is approved and payment is recorded. WestTech will move your order forward.';
      guidance='No additional payment action is needed here.';
-    }else if(payment==='NOT_REQUIRED'||payment==='NOT_REQUESTED'&&status==='PROOF_APPROVED'){
+    }else if(payment==='NOT_REQUIRED'||(!required&&payment==='NOT_REQUESTED'&&status==='PROOF_APPROVED')){
      title='Your design is approved';
      explanation='Your approved artwork and order terms are saved.';
      guidance='WestTech will advance your order to production when it is ready.';
     }else{
      title='Your artwork is approved';
      explanation='Your approved design and terms are locked. Payment is the next step before production.';
-     guidance='Please use the secure payment instructions provided by WestTech. Payment is not collected directly on this page.';
+     guidance=payment==='PREVIEW_AWAITING_TEST_PAYMENT'?'PREVIEW TEST: WestTech can simulate payment from Admin. No PayPal charge will be made.':payment==='NOT_REQUESTED'?'Payment is required but checkout has not been prepared yet. WestTech will provide the next step.':'Please use the secure payment instructions provided by WestTech. Payment is not collected directly on this page.';
     }
     break;
    case 4:
@@ -126,7 +127,7 @@
   $text('#co-stage-explanation',explanation);
   $text('#co-stage-guidance',guidance);
   $('#co-stage-payment').hidden=!showPayment;
-  if(showPayment){$text('#co-stage-amount',money(order.total));$text('#co-stage-payment-status',readable(payment));}
+  if(showPayment){$text('#co-stage-amount',money(order.total));$text('#co-stage-payment-status',order.paymentSimulated?'Preview Test Paid · No Charge':required&&payment==='NOT_REQUESTED'?'Required · Not yet initiated':payment==='PREVIEW_AWAITING_TEST_PAYMENT'?'Preview · Awaiting test payment':readable(payment));}
   panel.hidden=false;host.hidden=false;
  }
  function render(order){
@@ -147,7 +148,7 @@
    timeline.appendChild(item);
   }
   $text('#co-created',date(order.createdAt));$text('#co-updated',date(order.updatedAt));
-  $text('#co-total',money(order.total));$text('#co-payment',readable(order.paymentStatus));
+  $text('#co-total',money(order.total));$text('#co-payment',order.paymentSimulated?'Preview Test Paid · No Charge':type==='COASTER'&&order.paymentRequired===true&&String(order.paymentStatus||'').toUpperCase()==='NOT_REQUESTED'&&['PROOF_APPROVED','AWAITING_PAYMENT'].includes(status)?'Required · Not yet initiated':String(order.paymentStatus||'').toUpperCase()==='PREVIEW_AWAITING_TEST_PAYMENT'?'Preview · Awaiting test payment':readable(order.paymentStatus));
   $text('#co-fulfillment',({'LOCAL_PICKUP':'Local Pickup','SHIP':'Ship Order','UNSET':'To Be Confirmed'})[fulfillment]||readable(fulfillment));
   const detail=$('#co-delivery'),dtitle=$('#co-delivery-title'),dbody=$('#co-delivery-details');
   if(fulfillment==='SHIP'&&order.trackingNumber){

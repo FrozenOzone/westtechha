@@ -18,7 +18,7 @@
       message('Preview test payment recorded. No PayPal call was made. Order moved to Production Queue.','success');
       setTimeout(()=>$('#ca-refresh')?.click(),350);
     }catch(err){message(err.message||'Could not simulate preview payment.','error');}
-    finally{busy=false;if(button){button.disabled=false;button.textContent='Preview: Mark Paid';}}
+    finally{busy=false;if(button){button.disabled=false;button.textContent='Preview: Mark Test Paid';}}
   }
   async function render(){
     const code=status();
@@ -27,7 +27,7 @@
     if(!order||!order.paymentRequired||String(order.paymentStatus||'').toUpperCase()==='PAID'){removeButton();return;}
     const actions=document.querySelector('.ca-paypal-actions');if(!actions)return;
     let button=$('#ca-preview-mark-paid');
-    if(!button){button=document.createElement('button');button.id='ca-preview-mark-paid';button.type='button';button.className='ca-secondary';button.textContent='Preview: Mark Paid';button.addEventListener('click',markPaid);actions.appendChild(button);}
+    if(!button){button=document.createElement('button');button.id='ca-preview-mark-paid';button.type='button';button.className='ca-secondary';button.textContent='Preview: Mark Test Paid';button.addEventListener('click',markPaid);actions.appendChild(button);}
     let note=$('#ca-preview-pay-note');
     if(!note){note=document.createElement('small');note.id='ca-preview-pay-note';note.style.display='block';note.style.marginTop='8px';note.style.color='#8a5a00';const host=document.querySelector('.ca-proof-payment');host?.appendChild(note);}
     if(note)note.textContent=order.fulfillmentMethod==='SHIP'?'PREVIEW ONLY — no PayPal call. Marks this order paid and inserts a clearly labeled test shipping address so you can test the full shipping workflow.':'PREVIEW ONLY — no PayPal call. Marks this order paid so you can test the remaining workflow.';

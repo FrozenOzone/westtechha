@@ -8,8 +8,9 @@ import { ensureManufacturingWorkOrder } from '../../../../../_lib/manufacturing-
 function previewHostAllowed(context){
   try{
     const host=new URL(context.request.url).hostname.toLowerCase();
-    const configured=String(context.env?.PUBLIC_SITE_URL||'').toLowerCase().replace(/\/+$/,'');
-    return host==='coasters-v30-preview.westtechha.pages.dev'&&configured==='https://coasters-v30-preview.westtechha.pages.dev';
+    const allowed=new Set(['pickup-stage1-preview.westtechha.pages.dev','coasters-v30-preview.westtechha.pages.dev']);
+    // The exact Pages Preview hostname is the security boundary: NEVER allow production domains.
+    return allowed.has(host);
   }catch(e){return false;}
 }
 async function markPreviewPaid(context,order){
