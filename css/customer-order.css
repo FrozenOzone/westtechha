@@ -156,3 +156,65 @@
   .customer-order-main .customer-order-summary {padding:16px;}
   .customer-order-main .customer-order-timeline li {font-size:.61rem;}
 }
+
+
+/* Customer portal — Stage-aware lower workspace, Oct 19 2026.
+   Exactly one artwork surface (proof OR design), one stage-specific action panel. */
+.customer-order-main .customer-order-lower-grid {
+  display:grid;
+  grid-template-columns:minmax(0,1.3fr) minmax(290px,.85fr);
+  align-items:start;
+  gap:20px;
+  margin-top:18px;
+}
+.customer-order-main #co-stage-workspace[hidden] {display:none!important;}
+.customer-order-main .customer-order-lower-grid>#co-approval,
+.customer-order-main .customer-order-lower-grid>#co-design {
+  grid-column:1;
+  grid-row:1;
+  width:100%;
+  max-width:none;
+  margin:0;
+  min-width:0;
+  box-sizing:border-box;
+}
+.customer-order-main .customer-order-lower-grid>#co-stage-panel {
+  grid-column:2;
+  grid-row:1;
+  width:100%;
+  margin:0;
+  min-width:0;
+  box-sizing:border-box;
+}
+.customer-order-main .customer-order-lower-grid>#co-pickup {
+  grid-column:1/-1;
+  grid-row:2;
+  max-width:none;
+  margin:0;
+  min-width:0;
+}
+.customer-order-main .customer-order-lower-grid>[hidden] {display:none!important;}
+.customer-order-stage-panel h2 {color:var(--customer-text);font-size:clamp(1.25rem,1.8vw,1.7rem);line-height:1.25;margin:10px 0 12px}
+.customer-order-stage-explanation {font-size:.94rem;line-height:1.6;color:var(--customer-text);margin:0 0 16px}
+.customer-order-stage-guidance {font-size:.88rem;line-height:1.6;color:var(--customer-muted);margin:17px 0 0}
+.customer-order-stage-payment {border:1px solid var(--customer-border);background:var(--customer-card-2);border-radius:12px;padding:8px 15px;margin-top:18px}
+.customer-order-stage-payment[hidden] {display:none!important}
+.customer-order-stage-payment>div {display:flex;align-items:start;justify-content:space-between;gap:12px;padding:11px 0}
+.customer-order-stage-payment>div+div {border-top:1px solid var(--customer-border)}
+.customer-order-stage-payment span {font-size:.81rem;color:var(--customer-muted)}
+.customer-order-stage-payment strong {font-size:.94rem;color:var(--customer-text);text-align:right}
+.customer-order-proof-disclosure {margin-top:17px}
+.customer-order-proof-disclosure summary {cursor:pointer;font-size:.88rem;font-weight:800;color:var(--customer-text);padding:12px 0}
+.customer-order-proof-disclosure summary:focus-visible {outline:3px solid #ffcf70;outline-offset:3px}
+.customer-order-proof-disclosure .customer-order-proof-terms {margin-top:0}
+.customer-order-main .customer-order-lower-grid #co-approval .customer-order-proof-frame img {max-height:350px}
+@media(max-width:950px) {
+  .customer-order-main .customer-order-lower-grid {grid-template-columns:minmax(0,1fr)}
+  .customer-order-main .customer-order-lower-grid>#co-approval,
+  .customer-order-main .customer-order-lower-grid>#co-design {grid-column:1;grid-row:1}
+  .customer-order-main .customer-order-lower-grid>#co-stage-panel {grid-column:1;grid-row:2}
+  .customer-order-main .customer-order-lower-grid>#co-pickup {grid-column:1;grid-row:3}
+}
+
+.customer-order-main .customer-order-stage-only>#co-stage-panel {grid-column:1/-1;grid-row:1}
+@media(max-width:950px){.customer-order-main .customer-order-stage-only>#co-stage-panel {grid-column:1;grid-row:1}}
