@@ -9,7 +9,7 @@
   <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
   <link href="../css/site.css" rel="stylesheet"/>
   <link href="../css/customer-account.css?v=20261016-stage4c-layout1" rel="stylesheet"/>
-  <link href="../css/customer-order.css?v=20261019-stage1" rel="stylesheet"/>
+  <link href="../css/customer-order.css?v=20261019-dashboard-art-v1" rel="stylesheet"/>
   <link href="../css/coaster-pickup-customer.css?v=20261016-roundtrip1" rel="stylesheet"/>
   <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
 </head>
@@ -30,8 +30,19 @@
         <div class="customer-order-detail-grid">
           <section class="customer-order-next-step" aria-label="Latest order update" aria-live="polite">
             <div class="customer-eyebrow">LATEST UPDATE</div>
-            <strong id="co-next-title"></strong>
-            <p id="co-next-body"></p>
+            <div class="customer-order-update-content">
+              <div class="customer-order-update-copy">
+                <strong id="co-next-title"></strong>
+                <p id="co-next-body"></p>
+              </div>
+              <div id="co-design" class="customer-order-design customer-order-top-artwork" hidden aria-label="Your coaster artwork">
+                <div id="co-design-frame" class="customer-order-design-frame">
+                  <img id="co-design-image" alt="Coaster artwork for this order" loading="lazy" decoding="async" hidden/>
+                  <div id="co-design-placeholder" class="customer-order-design-placeholder" role="status">Loading your coaster design…</div>
+                </div>
+                <p id="co-design-caption" class="customer-order-design-caption">Your current coaster design</p>
+              </div>
+            </div>
           </section>
           <aside class="customer-order-summary" aria-label="Order summary">
             <div class="customer-eyebrow">ORDER SUMMARY</div><h2>At a glance</h2>
@@ -141,16 +152,6 @@
  </section>
  <section class="pc-card pc-error" id="pc-error" role="alert" hidden><h2>Pickup scheduling unavailable</h2><p id="pc-error-text"></p><p>Please contact WestTech if you need assistance.</p></section>
       </section>
-      <section id="co-design" class="customer-order-design customer-account-card" hidden aria-label="Coaster design preview">
-        <div class="customer-eyebrow">YOUR COASTER DESIGN</div>
-        <h2>Your coaster artwork</h2>
-        <p class="customer-order-design-copy">See your actual design, not just an order number.</p>
-        <div id="co-design-frame" class="customer-order-design-frame">
-          <img id="co-design-image" alt="Coaster artwork for this order" loading="lazy" decoding="async" hidden/>
-          <div id="co-design-placeholder" class="customer-order-design-placeholder" role="status">Loading your coaster design…</div>
-        </div>
-        <p id="co-design-caption" class="customer-order-design-caption">Your submitted design or the latest WestTech proof will appear here.</p>
-      </section>
       <aside id="co-stage-panel" class="customer-order-stage-panel customer-account-card" hidden aria-label="Current stage and next steps" aria-live="polite">
         <div class="customer-eyebrow" id="co-stage-label">CURRENT STAGE</div>
         <h2 id="co-stage-title">Your order</h2>
@@ -165,5 +166,5 @@
   </main>
   <div id="site-footer"></div>
 </div>
-<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-pickup-details1"></script><script src="../js/customer-order.js?v=20261019-payment-v1"></script>
+<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-pickup-details1"></script><script src="../js/customer-order.js?v=20261019-dashboard-art-v1"></script>
 </body></html>

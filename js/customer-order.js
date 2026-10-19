@@ -122,13 +122,28 @@
     explanation=['CANCELED','CANCELLED','EXPIRED'].includes(status)?'This order is no longer active.':'The order details above show the last available status.';
     guidance='Contact WestTech if you need help with this order.';
   }
-  $text('#co-stage-label',current?`STAGE ${current} OF ${stages.length} · ${stages[current-1].toUpperCase()}`:'ORDER STATUS');
+  $text('#co-stage-label',current===3&&showPayment?'PAYMENT & NEXT STEP':current?`STAGE ${current} OF ${stages.length} · ${stages[current-1].toUpperCase()}`:'ORDER STATUS');
+  if(current===3&&showPayment){title='Payment details';explanation=required?'Your approved order is waiting for its payment step.':'Your approved order does not require payment.';}
   $text('#co-stage-title',title);
   $text('#co-stage-explanation',explanation);
   $text('#co-stage-guidance',guidance);
   $('#co-stage-payment').hidden=!showPayment;
   if(showPayment){$text('#co-stage-amount',money(order.total));$text('#co-stage-payment-status',order.paymentSimulated?'Preview Test Paid · No Charge':required&&payment==='NOT_REQUESTED'?'Required · Not yet initiated':payment==='PREVIEW_AWAITING_TEST_PAYMENT'?'Preview · Awaiting test payment':readable(payment));}
-  panel.hidden=false;host.hidden=false;
+  // Latest Update already carries the stage message. Below progress, only keep
+  // the customer payment details when they add information or a next step.
+  const coaster=String(order.sourceType||'').toUpperCase()==='COASTER';
+  const paymentStage=current===3&&showPayment;
+  panel.hidden=coaster&&!paymentStage;
+  host.classList.toggle('customer-order-workspace-no-panel',panel.hidden);
+  syncWorkspaceVisibility();
+ }
+ function syncWorkspaceVisibility(){
+  const host=$('#co-stage-workspace');
+  if(!host)return;
+  const visible=['#co-approval','#co-stage-panel','#co-pickup'].some(selector=>{
+   const node=$(selector);return node&&!node.hidden;
+  });
+  host.hidden=!visible;
  }
  function render(order){
   const status=String(order.status||'').toUpperCase();
@@ -162,7 +177,8 @@
   renderStageWorkspace(order,current);
   const proofStage=type==='COASTER'&&['PROOF_SENT','CHANGES_REQUESTED','PROOF_APPROVED','AWAITING_PAYMENT','PAYMENT_PENDING'].includes(status);
   if(proofStage){
-   // Load ONE image endpoint: the released proof when present, submitted art otherwise.
+   // A full-size, reviewable proof takes priority while the customer decides.
+   // After approval, show the saved image up in Latest Update instead.
    $('#co-design').hidden=true;
    renderCoasterApproval(order);
   }else{
@@ -170,6 +186,7 @@
    renderCoasterDesign(order);
   }
   if(typeof window.wtPickupPortalInit==='function')window.wtPickupPortalInit(order);
+  syncWorkspaceVisibility();
  }
  function renderCoasterDesign(order){
   const host=$('#co-design'),image=$('#co-design-image'),placeholder=$('#co-design-placeholder'),caption=$('#co-design-caption');
@@ -178,7 +195,7 @@
   if(host.hidden)return;
   image.hidden=false;image.style.visibility='hidden';image.removeAttribute('src');
   placeholder.hidden=false;placeholder.textContent='Loading your coaster design…';
-  caption.textContent='WestTech displays the current proof when available, or the design you submitted.';
+  caption.textContent='Your current coaster artwork';
   const url='/api/customer/orders/COASTER/'+encodeURIComponent(order.orderId)+'/artwork';
   image.alt='Coaster design for order '+order.orderId;
   image.onload=()=>{image.style.visibility='visible';placeholder.hidden=true;};
@@ -206,14 +223,17 @@
        return;
      }
      activeProof=p;proofHost.hidden=false;
-     // The released proof is the ONE artwork view for this stage.
-     // Never show the submitted-design image alongside it.
-     const design=$('#co-design');if(design)design.hidden=true;
-     proofFeedback('');$('#co-proof-confirm').checked=false;$('#co-proof-change').value='';
-     proofText('#co-proof-version','Proof V'+p.proofVersion);
      const approved=p.proofStatus==='APPROVED'||['PROOF_APPROVED','AWAITING_PAYMENT'].includes(String(p.status||'').toUpperCase());
      const changing=p.proofStatus==='CHANGES_REQUESTED';
-     proofText('#co-proof-title',p.canRespond?'Review your coaster proof':approved?'Your approved proof':changing?'Previous proof · changes requested':'Your saved proof');
+     // The exact full-size proof remains in the review workflow. For approved
+     // image proofs, show the saved artwork above and keep terms below.
+     const topArtwork=approved&&!p.proofIsPdf;
+     if(topArtwork)renderCoasterDesign(order);
+     else $('#co-design').hidden=true;
+     $('#co-proof-frame').hidden=topArtwork;
+     proofFeedback('');$('#co-proof-confirm').checked=false;$('#co-proof-change').value='';
+     proofText('#co-proof-version','Proof V'+p.proofVersion);
+     proofText('#co-proof-title',p.canRespond?'Review your coaster proof':approved?'Approved proof & saved terms':changing?'Previous proof · changes requested':'Your saved proof');
      $('#co-proof-terms-details').open=!!p.canRespond;
      proofText('#co-proof-terms-label',p.canRespond?'Proof and order terms':'View saved proof and order terms');
      proofText('#co-proof-set',p.setSize+'-Coaster Set');
@@ -244,7 +264,9 @@
      image.onload=null;image.onerror=null;image.removeAttribute('src');pdf.removeAttribute('src');image.hidden=true;pdf.hidden=true;
      loader.hidden=false;loader.textContent='Loading WestTech proof…';
      const url=proofUrl()+'/proof';open.href=url;open.hidden=false;
-     if(p.proofIsPdf){
+     if(topArtwork){
+       loader.hidden=true;proofLoaded=true;
+     }else if(p.proofIsPdf){
        pdf.hidden=false;pdf.src=url;loader.hidden=true;proofLoaded=true;
      }else{
        image.onload=()=>{image.hidden=false;loader.hidden=true;proofLoaded=true;proofButtons();};
@@ -252,12 +274,19 @@
        image.src=url;
      }
      proofButtons();
+     syncWorkspaceVisibility();
    }catch(error){
-     // Keep a single artwork image as fallback; report proof failure explicitly.
+     // Show the original design if a saved proof is unavailable, without
+     // claiming the original design is a substitute for approval.
      proofHost.hidden=true;
      renderCoasterDesign(order);
      const panel=$('#co-stage-panel');
-     if(panel){const note=$('#co-stage-guidance');note.textContent='The released proof could not be loaded. Refresh this page or contact WestTech before approving. '+(error.message||'');}
+     if(panel){
+       panel.hidden=false;
+       proofText('#co-stage-title','Proof details unavailable');
+       proofText('#co-stage-guidance','The released proof could not be loaded. Refresh this page or contact WestTech before approving. '+(error.message||''));
+     }
+     syncWorkspaceVisibility();
    }
  }
  async function submitProofAction(action){
@@ -295,6 +324,12 @@
    window.wtPortalPickupEmail=typeof data.profile?.email==='string'?data.profile.email:'';
    render(order);
   }catch(e){message.textContent=e.message||'Could not load your order details.';message.classList.add('error');message.hidden=false;}
+ }
+ // Pickup scheduler reveals itself asynchronously; don't hide its actions
+ // just because they were not visible during the initial page render.
+ const pickupSection=$('#co-pickup');
+ if(pickupSection&&typeof MutationObserver!=='undefined'){
+  new MutationObserver(syncWorkspaceVisibility).observe(pickupSection,{attributes:true,attributeFilter:['hidden']});
  }
  window.wtPortalPickupConfirmed=(appointment,pickupDetails)=>{
   const info=$('#co-delivery'),title=$('#co-delivery-title'),body=$('#co-delivery-details');
