@@ -227,7 +227,7 @@
 }
 .customer-order-main .customer-order-update-copy {min-width:0;flex:1 1 auto}
 .customer-order-main .customer-order-top-artwork {
-  flex:0 0 clamp(132px, 12vw, 184px);width:clamp(132px, 12vw, 184px);
+  flex:0 0 clamp(170px, 16vw, 240px);width:clamp(170px, 16vw, 240px);
   min-width:0;margin:0;box-sizing:border-box;
 }
 .customer-order-main .customer-order-top-artwork[hidden] {display:none!important}
@@ -235,7 +235,7 @@
   width:100%;min-height:0;aspect-ratio:1;padding:7px;border-radius:12px;
 }
 .customer-order-main .customer-order-top-artwork .customer-order-design-frame img {
-  display:block;width:100%;max-width:100%;height:100%;max-height:176px;object-fit:contain;
+  display:block;width:100%;max-width:100%;height:100%;max-height:230px;object-fit:contain;
 }
 .customer-order-main .customer-order-top-artwork .customer-order-design-placeholder {
   padding:8px;font-size:.75rem;
@@ -248,10 +248,34 @@
 }
 @media(max-width:610px){
   .customer-order-main .customer-order-update-content {flex-direction:column;align-items:flex-start;gap:12px;min-height:0}
-  .customer-order-main .customer-order-top-artwork {flex:0 0 auto;align-self:center;width:160px;max-width:100%}
+  .customer-order-main .customer-order-top-artwork {flex:0 0 auto;align-self:center;width:205px;max-width:100%}
   .customer-order-main .customer-order-lower-grid.customer-order-workspace-no-panel>#co-approval:not([hidden]) {grid-column:1}
 }
 /* With no other lower panel, pickup scheduling starts at the top of the workspace. */
 .customer-order-main .customer-order-lower-grid.customer-order-workspace-no-panel>#co-pickup:not([hidden]) {
   grid-row:1;
+}
+
+/* Housekeeping 5: give live proof decisions the same full-width workspace as progress.
+   Saved proof/payment layout deliberately remains two columns. */
+.customer-order-main .customer-order-lower-grid>#co-approval.customer-order-review-full:not([hidden]) {
+  grid-column:1/-1;
+  grid-row:1;
+  width:100%;
+  max-width:none;
+}
+.customer-order-main #co-approval.customer-order-review-full .customer-order-proof-layout {
+  display:grid;
+  grid-template-columns:minmax(0,.95fr) minmax(0,1fr);
+  align-items:start;
+  gap:clamp(18px,2vw,32px);
+}
+.customer-order-main #co-approval.customer-order-review-full .customer-order-proof-visual,
+.customer-order-main #co-approval.customer-order-review-full .customer-order-proof-detail-column {min-width:0;}
+.customer-order-main #co-approval.customer-order-review-full .customer-order-proof-disclosure {margin-top:0;}
+.customer-order-main #co-approval.customer-order-review-full .customer-order-proof-frame {min-height:370px;}
+.customer-order-main #co-approval.customer-order-review-full .customer-order-proof-frame img {max-height:450px;}
+@media(max-width:840px){
+  .customer-order-main #co-approval.customer-order-review-full .customer-order-proof-layout {grid-template-columns:minmax(0,1fr);}
+  .customer-order-main #co-approval.customer-order-review-full .customer-order-proof-frame {min-height:260px;}
 }

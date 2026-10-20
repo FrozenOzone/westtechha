@@ -9,7 +9,7 @@
   <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
   <link href="../css/site.css" rel="stylesheet"/>
   <link href="../css/customer-account.css?v=20261016-stage4c-layout1" rel="stylesheet"/>
-  <link href="../css/customer-order.css?v=20261019-dashboard-art-v1" rel="stylesheet"/>
+  <link href="../css/customer-order.css?v=20261020-housekeeping15-v1" rel="stylesheet"/>
   <link href="../css/coaster-pickup-customer.css?v=20261016-roundtrip1" rel="stylesheet"/>
   <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
 </head>
@@ -70,8 +70,12 @@
         <div class="customer-eyebrow">WESTTECH PROOF · CUSTOMER REVIEW</div>
         <div class="customer-order-approval-head"><h2 id="co-proof-title">Review your coaster proof</h2><strong id="co-proof-version">—</strong></div>
         <p id="co-proof-instructions" class="customer-order-approval-copy">Review the exact released design and order terms before deciding.</p>
+        <div class="customer-order-proof-layout">
+          <div class="customer-order-proof-visual">
         <div id="co-proof-frame" class="customer-order-proof-frame"><p id="co-proof-loading" role="status">Loading WestTech proof…</p><img id="co-proof-image" alt="Final WestTech coaster proof" hidden/><embed id="co-proof-pdf" type="application/pdf" title="Final WestTech coaster proof PDF" hidden/></div>
         <p><a id="co-proof-open" class="customer-order-proof-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Open full-size proof in a new tab ↗</a></p>
+          </div>
+          <div class="customer-order-proof-detail-column">
         <details id="co-proof-terms-details" class="customer-order-proof-disclosure" open>
           <summary id="co-proof-terms-label">Proof and order terms</summary>
           <div class="customer-order-proof-terms" aria-label="Final proof terms">
@@ -99,10 +103,12 @@
         </div>
         <p id="co-proof-result" class="customer-order-proof-result" role="status" hidden></p>
         <p id="co-proof-feedback" class="customer-order-proof-feedback" role="alert" hidden></p>
+          </div>
+        </div>
       </section>
       <section id="co-pickup" class="customer-order-pickup" hidden aria-label="Pickup scheduling">
         <div class="customer-eyebrow">LOCAL PICKUP · SCHEDULING</div>
-        <h2>Arrange your pickup</h2>
+        <h2 id="co-pickup-heading">Arrange your pickup</h2>
         <p class="customer-order-pickup-intro">Choose an available appointment, suggest different times, or review your confirmed booking. All times are Mountain Time.</p>
  <section class="pc-card" id="pc-loading" role="status">Loading your pickup appointments…</section>
  <section class="pc-card" id="pc-content" hidden>
@@ -147,7 +153,7 @@
       <p class="pc-note">Monday–Friday only; no weekend pickups. Alternative times are subject to WestTech approval.</p>
     </div>
     <button id="pc-submit" type="button" class="pc-primary" disabled>Choose a pickup appointment</button>
-    <p class="pc-note">Pickup location and calendar details will be provided only after confirmation when the next Stage 3 features are enabled.</p>
+    <p class="pc-note">Your private pickup location and calendar details will be available after your appointment is confirmed.</p>
    </div>
  </section>
  <section class="pc-card pc-error" id="pc-error" role="alert" hidden><h2>Pickup scheduling unavailable</h2><p id="pc-error-text"></p><p>Please contact WestTech if you need assistance.</p></section>
@@ -166,5 +172,5 @@
   </main>
   <div id="site-footer"></div>
 </div>
-<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-pickup-details1"></script><script src="../js/customer-order.js?v=20261019-dashboard-art-v1"></script>
+<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-pickup-details1"></script><script src="../js/customer-order.js?v=20261020-housekeeping15-v1"></script>
 </body></html>

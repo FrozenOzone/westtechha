@@ -167,13 +167,15 @@
   $text('#co-created',date(order.createdAt));$text('#co-updated',date(order.updatedAt));
   $text('#co-total',money(order.total));$text('#co-payment',order.paymentSimulated?'Preview Test Paid · No Charge':type==='COASTER'&&order.paymentRequired===true&&String(order.paymentStatus||'').toUpperCase()==='NOT_REQUESTED'&&['PROOF_APPROVED','AWAITING_PAYMENT'].includes(status)?'Required · Not yet initiated':String(order.paymentStatus||'').toUpperCase()==='PREVIEW_AWAITING_TEST_PAYMENT'?'Preview · Awaiting test payment':readable(order.paymentStatus));
   $text('#co-fulfillment',({'LOCAL_PICKUP':'Local Pickup','SHIP':'Ship Order','UNSET':'To Be Confirmed'})[fulfillment]||readable(fulfillment));
+  $text('#co-pickup-heading',status==='COMPLETED'?'Your Pickup Details':'Arrange your pickup');
+  $text('.customer-order-pickup-intro',status==='COMPLETED'?'Review your pickup appointment, directions, and calendar details. All times are Mountain Time.':'Choose an available appointment, suggest different times, or review your confirmed booking. All times are Mountain Time.');
   const detail=$('#co-delivery'),dtitle=$('#co-delivery-title'),dbody=$('#co-delivery-details');
   if(fulfillment==='SHIP'&&order.trackingNumber){
    detail.hidden=false;dtitle.textContent='Shipping tracking';
    dbody.textContent=[order.trackingCarrier||'Carrier',order.trackingNumber].join(' · ');
   }else if(fulfillment==='LOCAL_PICKUP'&&['PREPARING_FOR_PICKUP','READY_FOR_PICKUP'].includes(status)){
    detail.hidden=false;dtitle.textContent='Local pickup';
-   dbody.textContent='Review your pickup scheduling options below. Private pickup address and directions will appear after confirmation when that Stage 3 feature is enabled.';
+   dbody.textContent='Review your pickup options below. After confirmation, your private pickup location, directions, and calendar links appear in your order details.';
   }else{detail.hidden=true;dbody.textContent='';}
   content.hidden=false;
   renderStageWorkspace(order,current);
@@ -212,7 +214,7 @@
  function proofButtons(){const allowed=!!activeProof?.canRespond&&!proofBusy&&proofLoaded;$('#co-proof-approve').disabled=!allowed||!$('#co-proof-confirm').checked;$('#co-proof-request').disabled=!allowed;}
  async function renderCoasterApproval(order){
    if(!proofHost)return;
-   proofHost.hidden=true;activeProof=null;proofLoaded=false;
+   proofHost.hidden=true;proofHost.classList.remove('customer-order-review-full');activeProof=null;proofLoaded=false;
    if(String(order.sourceType||'').toUpperCase()!=='COASTER')return;
    try{
      const response=await fetch(proofUrl(),{credentials:'same-origin',headers:{Accept:'application/json'}});
@@ -224,7 +226,7 @@
        renderCoasterDesign(order);
        return;
      }
-     activeProof=p;proofHost.hidden=false;
+     activeProof=p;proofHost.hidden=false;proofHost.classList.toggle('customer-order-review-full',p.canRespond===true);
      const approved=p.proofStatus==='APPROVED'||['PROOF_APPROVED','AWAITING_PAYMENT'].includes(String(p.status||'').toUpperCase());
      const changing=p.proofStatus==='CHANGES_REQUESTED';
      // The exact full-size proof remains in the review workflow. For approved

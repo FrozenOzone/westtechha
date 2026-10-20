@@ -129,9 +129,18 @@
                   <option value="COMPLETED">Completed</option>
                 </select>
               </div>
+              <label id="ca-completion-confirm-row" class="ca-completion-confirm" hidden>
+                <input type="checkbox" id="ca-completion-confirm"/>
+                <span id="ca-completion-confirm-label">I confirm the customer received this order.</span>
+              </label>
               <div class="ca-production-reference"><small>APPROVED PROOF</small><strong id="ca-prod-proof">—</strong><span>The approved design shown above is the production reference.</span></div>
               <div class="ca-production-reference"><small>PAYPAL / PAYMENT</small><strong id="ca-prod-paypal">—</strong><span id="ca-prod-paypal-detail">—</span></div>
             </div>
+            <style>
+              .ca-completion-confirm{box-sizing:border-box;display:flex;align-items:flex-start;gap:12px;padding:14px;border:1px solid #5898c8;border-radius:11px;background:rgba(22,119,196,.12);color:var(--ca-text,#f5f9ff);font-size:.88rem;font-weight:750;line-height:1.5}
+              .ca-completion-confirm[hidden]{display:none!important}
+              .ca-completion-confirm input{width:19px;height:19px;margin:2px 0 0;flex:none;accent-color:#1677c4}
+            </style>
             <div class="ca-production-delivery" id="ca-production-delivery">
               <div><small id="ca-prod-delivery-label">DELIVERY DETAILS</small><strong id="ca-prod-delivery-primary">—</strong><span id="ca-prod-delivery-secondary">—</span></div>
             </div>
@@ -164,9 +173,9 @@
               <div id="wt-pickup-appointment" class="wt-pickup-booking" hidden></div>
               <h3>Alternative pickup requests</h3>
               <div id="wt-pickup-requests" class="wt-pickup-requests"><p>No requests yet.</p></div>
-              <p class="wt-pickup-stage2-note">For a counter-offer, add times above, then choose Offer Different Times and select exactly which times to offer. Customer emails, directions, address, and calendar invites come in Stage 3.</p>
+              <p class="wt-pickup-stage2-note">For a counter-offer, add times above, then choose Offer Different Times and select exactly which times to offer. Confirmed appointments provide private location, directions, and calendar links in the customer portal. Use the available communication controls for notifications.</p>
             </section>
-            <div class="wt-pickup-footer"><span>Stage 2 Preview: Private scheduling and approvals are stored in D1. No pickup address or automatic customer notifications yet.</span><button id="wt-pickup-reload" class="ca-secondary" type="button">Refresh Scheduling</button></div>
+            <div class="wt-pickup-footer"><span>Private pickup offers, alternate requests, and confirmations are stored with the order. Customers can view confirmed pickup location and calendar options in their portal.</span><button id="wt-pickup-reload" class="ca-secondary" type="button">Refresh Scheduling</button></div>
           </section>
 
           <!-- WestTech-styled confirmation (replaces the browser's confirm() dialog). -->
@@ -303,7 +312,7 @@
   </main>
   <div id="site-footer"></div>
 </div>
-<script src="../js/theme.js"></script><script src="../js/admin-production-fields.js?v=20260913-2"></script><script src="../js/coaster-admin.js?v=20261016-stage4c-portal1"></script>
+<script src="../js/theme.js"></script><script src="../js/admin-production-fields.js?v=20260913-2"></script><script src="../js/coaster-admin.js?v=20261020-housekeeping15-v1"></script>
 <script src="../js/coaster-admin-preview-payment.js?v=20261019-preview-payment1"></script><script src="../js/coaster-admin-reorder.js?v=20261019-reorder1"></script><script src="../js/manufacturing-estimate.js?v=20260913-1"></script><script src="../js/coaster-admin-auto-refresh.js?v=20261016-pickup-save-intercept1"></script><script src="../js/coaster-admin-archive.js?v=20260904-archive3"></script><script src="../js/admin-pane-sync.js?v=20260905-1"></script>
 <script src="../js/coaster-pickup-admin.js?v=20261016-roundtrip1"></script>
 </body>

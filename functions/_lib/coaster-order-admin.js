@@ -56,6 +56,10 @@ export async function updateCoasterOrderAdmin(env,orderId,payload={}){
     if(status==='PREPARING_TO_SHIP'&&order.fulfillmentMethod!=='SHIP')throw makeError('Preparing to Ship is only valid for shipped orders.');
     if(status==='SHIPPED'&&order.fulfillmentMethod!=='SHIP')throw makeError('Shipped is only valid for shipped orders.');
     const currentStatus=String(order.status||'').toUpperCase();
+    const completing=status==='COMPLETED'&&currentStatus!=='COMPLETED';
+    // Never treat a shipped or scheduled order as delivered by status alone.
+    // An authorized Admin must explicitly confirm physical handoff / delivery.
+    if(completing&&!bool(payload.fulfillmentConfirmed))throw makeError(order.fulfillmentMethod==='LOCAL_PICKUP'?'Confirm that the coasters were handed to the customer before completing this pickup order.':'Confirm that the customer received the shipment before completing this order.',409);
     let pickupOverrideUsed=false;
     if(status==='READY_FOR_PICKUP'&&currentStatus!=='READY_FOR_PICKUP'){
       const parts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/Denver',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));
@@ -72,6 +76,7 @@ export async function updateCoasterOrderAdmin(env,orderId,payload={}){
     const now=nowIso();
     await db.prepare(`UPDATE coaster_orders SET status=?,admin_notes=?,tracking_carrier=?,tracking_number=?,pickup_ready_at=CASE WHEN ?='READY_FOR_PICKUP' THEN COALESCE(pickup_ready_at,?) ELSE pickup_ready_at END,shipped_at=CASE WHEN ?='SHIPPED' THEN COALESCE(shipped_at,?) ELSE shipped_at END,completed_at=CASE WHEN ?='COMPLETED' THEN COALESCE(completed_at,?) ELSE completed_at END,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(status,clean(payload.adminNotes,4000),trackingCarrier,trackingNumber,status,now,status,now,status,now,order.orderId).run();
     await logEvent(db,order.orderId,'PRODUCTION_UPDATED',{status,trackingCarrier,trackingNumber,previousStatus:order.status});
+    if(completing)await logEvent(db,order.orderId,'FULFILLMENT_RECEIPT_CONFIRMED',{fulfillmentMethod:order.fulfillmentMethod,confirmedBy:'ADMIN',previousStatus:currentStatus});
     if(pickupOverrideUsed)await logEvent(db,order.orderId,'PICKUP_SCHEDULING_OVERRIDDEN',{reason:'MANUAL_PICKUP_ARRANGEMENT',noOfferedTimes:true,readyEmailSuppressed:true});
     const updated=await getCoasterOrderDetail(env,order.orderId);await syncManufacturingWorkOrder(env,'COASTER',updated);updated._statusChanged=order.status!==status;updated._pickupSchedulingOverrideUsed=pickupOverrideUsed;return updated;
   }
