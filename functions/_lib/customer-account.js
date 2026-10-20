@@ -212,15 +212,16 @@ export async function customerDashboard(env,account){
   const coasterDetails=await db.prepare(`
     SELECT o.order_id,o.production_window,o.shipping_amount,
       o.shipping_name,o.shipping_address1,o.shipping_address2,o.shipping_city,
-      o.shipping_region,o.shipping_postal_code,o.shipping_country
-    FROM customer_account_orders l JOIN coaster_orders o
+      o.shipping_region,o.shipping_postal_code,o.shipping_country,
+       EXISTS(SELECT 1 FROM coaster_order_events e WHERE e.order_id=o.order_id AND e.event_type='CUSTOMER_REORDER_REQUESTED') AS is_reorder
+     FROM customer_account_orders l JOIN coaster_orders o
       ON l.source_type='COASTER' AND l.source_order_id=o.order_id
     WHERE l.account_id=?`).bind(account.id).all();
   const coasterById=new Map((coasterDetails?.results||[]).map(row=>[row.order_id,row]));
   return {profile:account,orders:(result?.results||[]).map(row=>{
     const coaster=row.source_type==='COASTER'?coasterById.get(row.order_id):null;
     return {sourceType:row.source_type,orderId:row.order_id,status:row.status,title:row.title,createdAt:row.created_at,updatedAt:row.updated_at,fulfillmentMethod:row.fulfillment_method||'UNSET',paymentStatus:row.payment_status||'NOT_REQUESTED',paymentRequired:!!Number(row.payment_required),paymentSimulated:!!Number(row.preview_test_payment),total:Number(row.total||0),trackingCarrier:row.tracking_carrier||'',trackingNumber:row.tracking_number||'',canReorder:!!Number(row.can_reorder),
-      ...(coaster?{productionWindow:coaster.production_window||'',shippingAmount:Number(coaster.shipping_amount||0),shippingDestination:{name:coaster.shipping_name||'',address1:coaster.shipping_address1||'',address2:coaster.shipping_address2||'',city:coaster.shipping_city||'',region:coaster.shipping_region||'',postalCode:coaster.shipping_postal_code||'',country:coaster.shipping_country||''}}:{})};
+      ...(coaster?{isReorder:!!Number(coaster.is_reorder),productionWindow:coaster.production_window||'',shippingAmount:Number(coaster.shipping_amount||0),shippingDestination:{name:coaster.shipping_name||'',address1:coaster.shipping_address1||'',address2:coaster.shipping_address2||'',city:coaster.shipping_city||'',region:coaster.shipping_region||'',postalCode:coaster.shipping_postal_code||'',country:coaster.shipping_country||''}}:{})};
   })};
 }
 

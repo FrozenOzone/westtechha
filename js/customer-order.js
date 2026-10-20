@@ -125,7 +125,7 @@
     guidance='Contact WestTech if you need help with this order.';
   }
   $text('#co-stage-label',current===3&&showPayment?'PAYMENT & NEXT STEP':current?`STAGE ${current} OF ${stages.length} · ${stages[current-1].toUpperCase()}`:'ORDER STATUS');
-  if(current===3&&showPayment){title='Payment details';explanation=paid?'Your payment is recorded. No further payment is needed.':required?'Your approved order is waiting for its payment step.':'Your approved order does not require payment.';}
+  if(current===3&&showPayment){title='Payment details';explanation=paid?'Your payment is recorded. No further payment is needed.':order.isReorder?(required?'Your verified reorder is awaiting payment. No new proof approval is required.':'Your verified reorder does not require payment.'):required?'Your approved order is waiting for its payment step.':'Your approved order does not require payment.';}
   $text('#co-stage-title',title);
   $text('#co-stage-explanation',explanation);
   $text('#co-stage-guidance',guidance);
@@ -213,7 +213,7 @@
   $text('#co-title',order.title||'WestTech Order');
   $text('#co-order-id',order.orderId);
   $text('#co-status',readable(status));
-  const [headline,body]=explain(status,fulfillment);$text('#co-next-title',headline);$text('#co-next-body',body);
+  const [headline,body]=explain(status,fulfillment);$text('#co-next-title',headline);$text('#co-next-body',order.isReorder&&['PROOF_APPROVED','AWAITING_PAYMENT','PAYMENT_PENDING'].includes(status)?'Your reorder has been verified. Your previously approved artwork is being reused; no additional proof approval is needed. Check payment details below.':body);
   const productionStage=type==='COASTER'&&['PRODUCTION_QUEUE','IN_PRODUCTION'].includes(status);
   $('#co-production-window').hidden=!productionStage;
   if(productionStage)$text('#co-production-window-value',String(order.productionWindow||'').trim()||'WestTech will confirm your production dates.');
@@ -300,7 +300,7 @@
      $('#co-proof-frame').hidden=topArtwork;
      proofFeedback('');$('#co-proof-confirm').checked=false;$('#co-proof-change').value='';
      proofText('#co-proof-version','Proof V'+p.proofVersion);
-     proofText('#co-proof-title',p.canRespond?'Review your coaster proof':approved?'Approved proof & saved terms':changing?'Previous proof · changes requested':'Your saved proof');
+     proofText('#co-proof-title',p.canRespond?'Review your coaster proof':approved?(order.isReorder?'Verified reorder & saved terms':'Approved proof & saved terms'):changing?'Previous proof · changes requested':'Your saved proof');
      // Approved terms stay immediately visible while the customer awaits payment.
      $('#co-proof-terms-details').open=!!p.canRespond||approved;
      proofText('#co-proof-terms-label',p.canRespond?'Proof and order terms':'View saved proof and order terms');
@@ -315,12 +315,12 @@
      $('#co-proof-shipping-row').hidden=p.shippingAmount===0;proofText('#co-proof-shipping',money(p.shippingAmount));
      $('#co-proof-discount-row').hidden=p.discountAmount===0;proofText('#co-proof-discount','−'+money(p.discountAmount));
      proofText('#co-proof-total',money(p.finalAmount));
-     proofText('#co-proof-payment',p.paymentRequired?'Required after approval':'Not required');
+     proofText('#co-proof-payment',p.paymentRequired?(order.isReorder?'Required after verification':'Required after approval'):'Not required');
      $('#co-proof-review-note').hidden=!p.customerReviewNote;
      proofText('#co-proof-review-text',p.customerReviewNote||'');
      const note=$('#co-proof-result');note.hidden=p.canRespond;
      if(!p.canRespond){
-       note.textContent=p.reviewExpired&&p.proofStatus==='SENT'?'The 30-day proof review period has expired. Please contact WestTech to request a new approval link.':p.proofStatus==='CHANGES_REQUESTED'?'Your changes are recorded. The proof shown here is the previous version; wait for WestTech to release the revised proof.':p.proofStatus==='APPROVED'?'Proof approved. The design and terms are locked. '+(p.paymentRequired?'Payment is the next step.':'No payment is required.'):'This proof is not currently open for approval.';
+       note.textContent=p.reviewExpired&&p.proofStatus==='SENT'?'The 30-day proof review period has expired. Please contact WestTech to request a new approval link.':p.proofStatus==='CHANGES_REQUESTED'?'Your changes are recorded. The proof shown here is the previous version; wait for WestTech to release the revised proof.':p.proofStatus==='APPROVED'?(order.isReorder?'Your reorder was verified using your previously approved artwork. No repeat proof approval is required. ':'Proof approved. The design and terms are locked. ')+(p.paymentRequired?'Payment is the next step.':'No payment is required.'):'This proof is not currently open for approval.';
      }
      $('#co-proof-actions').hidden=!p.canRespond;
      if(p.reviewExpired&&!p.canRespond&&p.proofStatus==='SENT'){
