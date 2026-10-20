@@ -221,13 +221,16 @@
 
 /* Dashboard artwork v1 — one compact approved-artwork preview in Latest Update.
    Proof review continues to use the full-size, actionable proof beneath progress. */
+/* One larger artwork preview centered BELOW the latest status.
+   Keep the status text readable and use the available vertical card space. */
 .customer-order-main .customer-order-update-content {
-  display:flex;align-items:center;justify-content:space-between;gap:20px;
-  min-height:154px;
+  display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;
+  gap:20px;min-height:0;
 }
-.customer-order-main .customer-order-update-copy {min-width:0;flex:1 1 auto}
+.customer-order-main .customer-order-update-copy {min-width:0;flex:0 0 auto}
 .customer-order-main .customer-order-top-artwork {
-  flex:0 0 clamp(170px, 16vw, 240px);width:clamp(170px, 16vw, 240px);
+  flex:0 0 auto;align-self:center;
+  width:min(100%, clamp(275px, 28vw, 340px));
   min-width:0;margin:0;box-sizing:border-box;
 }
 .customer-order-main .customer-order-top-artwork[hidden] {display:none!important}
@@ -235,7 +238,7 @@
   width:100%;min-height:0;aspect-ratio:1;padding:7px;border-radius:12px;
 }
 .customer-order-main .customer-order-top-artwork .customer-order-design-frame img {
-  display:block;width:100%;max-width:100%;height:100%;max-height:230px;object-fit:contain;
+  display:block;width:100%;max-width:100%;height:100%;max-height:none;object-fit:contain;
 }
 .customer-order-main .customer-order-top-artwork .customer-order-design-placeholder {
   padding:8px;font-size:.75rem;
@@ -247,8 +250,8 @@
   grid-column:1/-1;grid-row:1;max-width:1020px;
 }
 @media(max-width:610px){
-  .customer-order-main .customer-order-update-content {flex-direction:column;align-items:flex-start;gap:12px;min-height:0}
-  .customer-order-main .customer-order-top-artwork {flex:0 0 auto;align-self:center;width:205px;max-width:100%}
+  .customer-order-main .customer-order-update-content {gap:12px;min-height:0}
+  .customer-order-main .customer-order-top-artwork {flex:0 0 auto;align-self:center;width:min(100%,280px)}
   .customer-order-main .customer-order-lower-grid.customer-order-workspace-no-panel>#co-approval:not([hidden]) {grid-column:1}
 }
 /* With no other lower panel, pickup scheduling starts at the top of the workspace. */

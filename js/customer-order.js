@@ -24,7 +24,7 @@
     case 'IN_PRODUCTION':return ['Your order is in production','WestTech is working on your order. No action is needed.'];
     case 'PREPARING_FOR_PICKUP':return ['WestTech is preparing your pickup order','Final checks and packaging are underway.'];
     case 'READY_FOR_PICKUP':return ['Your order is ready for pickup','Choose an available pickup appointment or request a different time in the scheduling section below.'];
-    case 'PREPARING_TO_SHIP':return ['Your order is preparing for shipment','WestTech is completing final packaging and preparing the shipment.'];
+    case 'PREPARING_TO_SHIP':return ['Your order is being prepared for shipment','WestTech is completing final packaging and preparing the shipment.'];
     case 'SHIPPED':return ['Your order has shipped','Your tracking details, when available, are shown in the order summary.'];
     case 'COMPLETED':return ['Your order is complete','Thank you for choosing WestTech. Your order remains in your history.'];
     case 'ARCHIVED':return ['Your order is in your history','You can return to this page to review your previous order.'];
@@ -157,6 +157,15 @@
   if(/^FEDEX(?:\b|\s)/.test(c)&&/^(?:\d{12}|\d{15}|\d{20}|\d{22})$/.test(n))return 'https://www.fedex.com/fedextrack/?trknbr='+encodeURIComponent(n);
   return '';
  }
+ // Open the carrier's official tracking page even for Preview test references,
+ // but never submit a simulated / malformed tracking ID to the carrier.
+ function carrierTrackingPage(carrier){
+  const c=String(carrier||'').trim().toUpperCase();
+  if(/^USPS(?:\b|\s)/.test(c))return {name:'USPS',url:'https://tools.usps.com/go/TrackConfirmAction_input'};
+  if(/^UPS(?:\b|\s)/.test(c))return {name:'UPS',url:'https://www.ups.com/track?loc=en_US'};
+  if(/^FEDEX(?:\b|\s)/.test(c))return {name:'FedEx',url:'https://www.fedex.com/en-us/tracking.html'};
+  return null;
+ }
  function renderShipping(order){
   const box=$('#co-shipping');if(!box)return;
   const isCoaster=String(order.sourceType||'').toUpperCase()==='COASTER';
@@ -177,11 +186,23 @@
    status==='SHIPPED'||status==='COMPLETED'?'No delivery address is recorded for this order. Please contact WestTech.':'Address will appear when shipping details are confirmed.');
   $('#co-shipping-test-note').hidden=!isPreview;
   const tracking=String(order.trackingNumber||'').trim();
-  $('#co-shipping-tracking').hidden=!tracking;
-  $text('#co-shipping-tracking-detail',[order.trackingCarrier||'Carrier',tracking].filter(Boolean).join(' · '));
-  const url=carrierTrackingUrl(order.trackingCarrier,tracking,isPreview);
-  const link=$('#co-shipping-tracking-link');link.hidden=!url;
-  if(url)link.href=url;else link.removeAttribute('href');
+  const carrier=carrierTrackingPage(order.trackingCarrier);
+  const shipped=['SHIPPED','COMPLETED'].includes(status);
+  const details=tracking?(isPreview
+   ?[order.trackingCarrier||'Carrier',tracking,'Preview test reference — not a real tracking number'].join(' · ')
+   :[order.trackingCarrier||'Carrier',tracking].join(' · '))
+   :carrier?carrier.name+' · Tracking number pending':'';
+  const trackingPanel=$('#co-shipping-tracking');
+  trackingPanel.hidden=!(tracking||(shipped&&carrier));
+  $text('#co-shipping-tracking-detail',details);
+  const directUrl=shipped?carrierTrackingUrl(order.trackingCarrier,tracking,isPreview):'';
+  const url=shipped?(directUrl||carrier?.url||''):'';
+  const link=$('#co-shipping-tracking-link');
+  link.hidden=!url;
+  if(url){
+   link.href=url;
+   link.textContent=directUrl?'Track shipment with '+carrier.name+' ↗':'Visit '+carrier.name+' tracking ↗';
+  }else link.removeAttribute('href');
  }
  function render(order){
   const status=String(order.status||'').toUpperCase();
