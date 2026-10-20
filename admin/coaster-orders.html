@@ -131,7 +131,10 @@
               </div>
               <label id="ca-completion-confirm-row" class="ca-completion-confirm" hidden>
                 <input type="checkbox" id="ca-completion-confirm"/>
-                <span id="ca-completion-confirm-label">I confirm the customer received this order.</span>
+                <span class="ca-completion-confirm-copy">
+                  <span id="ca-completion-confirm-label">I confirm the customer received this order.</span>
+                  <small id="ca-completion-error" class="ca-completion-error" role="alert" hidden></small>
+                </span>
               </label>
               <div class="ca-production-reference"><small>APPROVED PROOF</small><strong id="ca-prod-proof">—</strong><span>The approved design shown above is the production reference.</span></div>
               <div class="ca-production-reference"><small>PAYPAL / PAYMENT</small><strong id="ca-prod-paypal">—</strong><span id="ca-prod-paypal-detail">—</span></div>
@@ -140,6 +143,11 @@
               .ca-completion-confirm{box-sizing:border-box;display:flex;align-items:flex-start;gap:12px;padding:14px;border:1px solid #5898c8;border-radius:11px;background:rgba(22,119,196,.12);color:var(--ca-text,#f5f9ff);font-size:.88rem;font-weight:750;line-height:1.5}
               .ca-completion-confirm[hidden]{display:none!important}
               .ca-completion-confirm input{width:19px;height:19px;margin:2px 0 0;flex:none;accent-color:#1677c4}
+              .ca-completion-confirm-copy{display:flex;flex-direction:column;gap:7px;min-width:0}
+              .ca-completion-error{display:block;color:#ffd4c8;font-size:.82rem;font-weight:800;line-height:1.45}
+              .ca-completion-error[hidden]{display:none!important}
+              .ca-completion-confirm.ca-completion-confirm-error{border-color:#f5a18f;background:rgba(198,70,60,.16);box-shadow:0 0 0 2px rgba(245,161,143,.18)}
+              .ca-completion-confirm.ca-completion-confirm-error input{outline:2px solid #f5a18f;outline-offset:2px}
             </style>
             <div class="ca-production-delivery" id="ca-production-delivery">
               <div><small id="ca-prod-delivery-label">DELIVERY DETAILS</small><strong id="ca-prod-delivery-primary">—</strong><span id="ca-prod-delivery-secondary">—</span></div>
