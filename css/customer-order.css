@@ -279,3 +279,23 @@
   .customer-order-main #co-approval.customer-order-review-full .customer-order-proof-layout {grid-template-columns:minmax(0,1fr);}
   .customer-order-main #co-approval.customer-order-review-full .customer-order-proof-frame {min-height:260px;}
 }
+
+/* Housekeeping 6-7: production estimate in Latest Update, shipping in At a Glance. */
+.customer-order-main .customer-order-production-window{margin-top:16px;padding:11px 13px;border:1px solid var(--customer-border);border-radius:10px;background:var(--customer-card);max-width:360px;line-height:1.4}
+.customer-order-main .customer-order-production-window[hidden],.customer-order-main .customer-order-shipping[hidden]{display:none!important}
+.customer-order-main .customer-order-production-window span{display:block;font-size:.76rem;font-weight:750;color:var(--customer-muted)}
+.customer-order-main .customer-order-production-window strong{display:block;margin-top:5px;font-size:1rem;color:var(--customer-text)}
+.customer-order-main .customer-order-production-window small{display:block;margin-top:5px;font-size:.7rem;color:var(--customer-muted)}
+.customer-order-main .customer-order-shipping{border-top:1px solid var(--customer-border);margin-top:15px;padding-top:13px;min-width:0}
+.customer-order-main .customer-order-shipping h3{font-size:1rem;margin:2px 0 9px;color:var(--customer-text)}
+.customer-order-main .customer-order-shipping-facts{margin:0}
+.customer-order-main .customer-order-shipping-facts>div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--customer-border);padding:8px 0}
+.customer-order-main .customer-order-shipping-facts dt{font-size:.77rem;color:var(--customer-muted)}
+.customer-order-main .customer-order-shipping-facts dd{margin:0;text-align:right;font-size:.82rem;font-weight:800;color:var(--customer-text);overflow-wrap:anywhere}
+.customer-order-main .customer-order-shipping-address,.customer-order-main .customer-order-shipping-tracking{margin-top:13px}
+.customer-order-main .customer-order-shipping-address strong,.customer-order-main .customer-order-shipping-tracking strong{font-size:.82rem;color:var(--customer-text)}
+.customer-order-main .customer-order-shipping-address p,.customer-order-main .customer-order-shipping-tracking p{white-space:pre-line;margin:6px 0 0;overflow-wrap:anywhere;font-size:.8rem;color:var(--customer-muted);line-height:1.5}
+.customer-order-main .customer-order-test-note{padding:9px;border:1px solid var(--customer-border);border-radius:8px;margin-top:10px;font-size:.79rem;line-height:1.45;color:var(--customer-text);font-weight:750}
+.customer-order-main .customer-order-shipping-tracking a{display:inline-block;color:var(--customer-accent);font-weight:750;font-size:.8rem;margin-top:8px}
+.customer-order-main .customer-order-shipping-tracking a:focus-visible{outline:3px solid #ffcf70;outline-offset:3px}
+.customer-order-main .customer-order-shipping-tracking a[hidden]{display:none!important}

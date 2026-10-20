@@ -9,7 +9,7 @@
   <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
   <link href="../css/site.css" rel="stylesheet"/>
   <link href="../css/customer-account.css?v=20261016-stage4c-layout1" rel="stylesheet"/>
-  <link href="../css/customer-order.css?v=20261020-housekeeping15-v1" rel="stylesheet"/>
+  <link href="../css/customer-order.css?v=20261020-housekeeping67-v1" rel="stylesheet"/>
   <link href="../css/coaster-pickup-customer.css?v=20261016-roundtrip1" rel="stylesheet"/>
   <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
 </head>
@@ -34,6 +34,11 @@
               <div class="customer-order-update-copy">
                 <strong id="co-next-title"></strong>
                 <p id="co-next-body"></p>
+                <div id="co-production-window" class="customer-order-production-window" hidden>
+                  <span>Estimated production window</span>
+                  <strong id="co-production-window-value"></strong>
+                  <small>Estimated timing, not a guaranteed delivery date.</small>
+                </div>
               </div>
               <div id="co-design" class="customer-order-design customer-order-top-artwork" hidden aria-label="Your coaster artwork">
                 <div id="co-design-frame" class="customer-order-design-frame">
@@ -53,6 +58,23 @@
               <div><dt>Payment</dt><dd id="co-payment">—</dd></div>
               <div><dt>Delivery method</dt><dd id="co-fulfillment">—</dd></div>
             </dl>
+            <section id="co-shipping" class="customer-order-shipping" aria-label="Shipping and delivery" hidden>
+              <h3>Shipping &amp; delivery</h3>
+              <dl class="customer-order-shipping-facts">
+                <div><dt>Shipping charge</dt><dd id="co-shipping-charge"></dd></div>
+                <div><dt>Shipment status</dt><dd id="co-shipping-status"></dd></div>
+              </dl>
+              <div id="co-shipping-address-block" class="customer-order-shipping-address">
+                <strong id="co-shipping-address-title">Ship-to address</strong>
+                <p id="co-shipping-address"></p>
+              </div>
+              <p id="co-shipping-test-note" class="customer-order-test-note" hidden>PREVIEW TEST ADDRESS — DO NOT SHIP. No actual customer delivery is scheduled.</p>
+              <div id="co-shipping-tracking" class="customer-order-shipping-tracking" hidden>
+                <strong>Tracking</strong>
+                <p id="co-shipping-tracking-detail"></p>
+                <a id="co-shipping-tracking-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Track shipment ↗</a>
+              </div>
+            </section>
             <div id="co-delivery" class="customer-order-delivery" hidden>
               <h3 id="co-delivery-title">Delivery details</h3>
               <p id="co-delivery-details"></p>
@@ -172,5 +194,5 @@
   </main>
   <div id="site-footer"></div>
 </div>
-<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-pickup-details1"></script><script src="../js/customer-order.js?v=20261020-housekeeping15-v1"></script>
+<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-pickup-details1"></script><script src="../js/customer-order.js?v=20261020-housekeeping67-v1"></script>
 </body></html>

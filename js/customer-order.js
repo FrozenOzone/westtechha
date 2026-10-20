@@ -147,6 +147,42 @@
   });
   host.hidden=!visible;
  }
+ // Only link to well-formed, non-test carrier tracking IDs. A Preview test
+ // shipment never opens a real carrier tracking page.
+ function carrierTrackingUrl(carrier,tracking,simulated){
+  if(simulated)return '';
+  const c=String(carrier||'').trim().toUpperCase(),n=String(tracking||'').trim().toUpperCase();
+  if(/^USPS(?:\b|\s)/.test(c)&&/^\d{20,26}$/.test(n))return 'https://tools.usps.com/go/TrackConfirmAction?tLabels='+encodeURIComponent(n);
+  if(/^UPS(?:\b|\s)/.test(c)&&/^1Z[A-Z0-9]{16}$/.test(n))return 'https://www.ups.com/track?tracknum='+encodeURIComponent(n);
+  if(/^FEDEX(?:\b|\s)/.test(c)&&/^(?:\d{12}|\d{15}|\d{20}|\d{22})$/.test(n))return 'https://www.fedex.com/fedextrack/?trknbr='+encodeURIComponent(n);
+  return '';
+ }
+ function renderShipping(order){
+  const box=$('#co-shipping');if(!box)return;
+  const isCoaster=String(order.sourceType||'').toUpperCase()==='COASTER';
+  const shipping=String(order.fulfillmentMethod||'').toUpperCase()==='SHIP';
+  box.hidden=!(isCoaster&&shipping);if(box.hidden)return;
+  const status=String(order.status||'').toUpperCase();
+  $text('#co-shipping-charge',money(order.shippingAmount));
+  const shipmentStatus=({PREPARING_TO_SHIP:'Preparing for shipment',SHIPPED:'Shipped',COMPLETED:'Completed'})[status]||'Not shipped yet';
+  $text('#co-shipping-status',shipmentStatus);
+  const destination=order.shippingDestination||{};
+  const isPreview=order.paymentSimulated===true;
+  const lines=[destination.name,destination.address1,destination.address2,
+   [destination.city,destination.region,destination.postalCode].filter(Boolean).join(', '),
+   destination.country].map(s=>String(s||'').trim()).filter(Boolean);
+  const hasStreet=!!String(destination.address1||'').trim();
+  $text('#co-shipping-address-title',isPreview?'Preview test destination — not a customer address':'Ship-to address');
+  $text('#co-shipping-address',hasStreet?lines.join('\n'):
+   status==='SHIPPED'||status==='COMPLETED'?'No delivery address is recorded for this order. Please contact WestTech.':'Address will appear when shipping details are confirmed.');
+  $('#co-shipping-test-note').hidden=!isPreview;
+  const tracking=String(order.trackingNumber||'').trim();
+  $('#co-shipping-tracking').hidden=!tracking;
+  $text('#co-shipping-tracking-detail',[order.trackingCarrier||'Carrier',tracking].filter(Boolean).join(' · '));
+  const url=carrierTrackingUrl(order.trackingCarrier,tracking,isPreview);
+  const link=$('#co-shipping-tracking-link');link.hidden=!url;
+  if(url)link.href=url;else link.removeAttribute('href');
+ }
  function render(order){
   const status=String(order.status||'').toUpperCase();
   const type=String(order.sourceType||'').toUpperCase();
@@ -157,6 +193,9 @@
   $text('#co-order-id',order.orderId);
   $text('#co-status',readable(status));
   const [headline,body]=explain(status,fulfillment);$text('#co-next-title',headline);$text('#co-next-body',body);
+  const productionStage=type==='COASTER'&&['PRODUCTION_QUEUE','IN_PRODUCTION'].includes(status);
+  $('#co-production-window').hidden=!productionStage;
+  if(productionStage)$text('#co-production-window-value',String(order.productionWindow||'').trim()||'WestTech will confirm your production dates.');
   const timeline=$('#co-timeline');timeline.replaceChildren();
   const current=step(status);
   for(let i=0;i<stages.length;i++){
@@ -169,11 +208,9 @@
   $text('#co-fulfillment',({'LOCAL_PICKUP':'Local Pickup','SHIP':'Ship Order','UNSET':'To Be Confirmed'})[fulfillment]||readable(fulfillment));
   $text('#co-pickup-heading',status==='COMPLETED'?'Your Pickup Details':'Arrange your pickup');
   $text('.customer-order-pickup-intro',status==='COMPLETED'?'Review your pickup appointment, directions, and calendar details. All times are Mountain Time.':'Choose an available appointment, suggest different times, or review your confirmed booking. All times are Mountain Time.');
+  renderShipping(order);
   const detail=$('#co-delivery'),dtitle=$('#co-delivery-title'),dbody=$('#co-delivery-details');
-  if(fulfillment==='SHIP'&&order.trackingNumber){
-   detail.hidden=false;dtitle.textContent='Shipping tracking';
-   dbody.textContent=[order.trackingCarrier||'Carrier',order.trackingNumber].join(' · ');
-  }else if(fulfillment==='LOCAL_PICKUP'&&['PREPARING_FOR_PICKUP','READY_FOR_PICKUP'].includes(status)){
+  if(fulfillment==='LOCAL_PICKUP'&&['PREPARING_FOR_PICKUP','READY_FOR_PICKUP'].includes(status)){
    detail.hidden=false;dtitle.textContent='Local pickup';
    dbody.textContent='Review your pickup options below. After confirmation, your private pickup location, directions, and calendar links appear in your order details.';
   }else{detail.hidden=true;dbody.textContent='';}
