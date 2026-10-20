@@ -125,7 +125,7 @@
     guidance='Contact WestTech if you need help with this order.';
   }
   $text('#co-stage-label',current===3&&showPayment?'PAYMENT & NEXT STEP':current?`STAGE ${current} OF ${stages.length} · ${stages[current-1].toUpperCase()}`:'ORDER STATUS');
-  if(current===3&&showPayment){title='Payment details';explanation=required?'Your approved order is waiting for its payment step.':'Your approved order does not require payment.';}
+  if(current===3&&showPayment){title='Payment details';explanation=paid?'Your payment is recorded. No further payment is needed.':required?'Your approved order is waiting for its payment step.':'Your approved order does not require payment.';}
   $text('#co-stage-title',title);
   $text('#co-stage-explanation',explanation);
   $text('#co-stage-guidance',guidance);
@@ -237,7 +237,11 @@
   }else{detail.hidden=true;dbody.textContent='';}
   content.hidden=false;
   renderStageWorkspace(order,current);
-  const proofStage=type==='COASTER'&&['PROOF_SENT','CHANGES_REQUESTED','PROOF_APPROVED','AWAITING_PAYMENT','PAYMENT_PENDING'].includes(status);
+  // Once payment has been recorded, retire the large proof/terms panel.
+  // Approved proof data remains stored; the active dashboard focuses on production.
+  const paymentRecorded=order.paymentSimulated===true||['PAID','CAPTURED','COMPLETED','NOT_REQUIRED'].includes(String(order.paymentStatus||'').toUpperCase());
+  const proofStage=type==='COASTER'&&(['PROOF_SENT','CHANGES_REQUESTED'].includes(status)||
+   (!paymentRecorded&&['PROOF_APPROVED','AWAITING_PAYMENT','PAYMENT_PENDING'].includes(status)));
   if(proofStage){
    // A full-size, reviewable proof takes priority while the customer decides.
    // After approval, show the saved image up in Latest Update instead.
@@ -272,7 +276,7 @@
  function proofButtons(){const allowed=!!activeProof?.canRespond&&!proofBusy&&proofLoaded;$('#co-proof-approve').disabled=!allowed||!$('#co-proof-confirm').checked;$('#co-proof-request').disabled=!allowed;}
  async function renderCoasterApproval(order){
    if(!proofHost)return;
-   proofHost.hidden=true;proofHost.classList.remove('customer-order-review-full');activeProof=null;proofLoaded=false;
+   proofHost.hidden=true;proofHost.classList.remove('customer-order-review-full','customer-order-approved-terms');activeProof=null;proofLoaded=false;
    if(String(order.sourceType||'').toUpperCase()!=='COASTER')return;
    try{
      const response=await fetch(proofUrl(),{credentials:'same-origin',headers:{Accept:'application/json'}});
@@ -286,6 +290,7 @@
      }
      activeProof=p;proofHost.hidden=false;proofHost.classList.toggle('customer-order-review-full',p.canRespond===true);
      const approved=p.proofStatus==='APPROVED'||['PROOF_APPROVED','AWAITING_PAYMENT'].includes(String(p.status||'').toUpperCase());
+     proofHost.classList.toggle('customer-order-approved-terms',approved&&!p.canRespond);
      const changing=p.proofStatus==='CHANGES_REQUESTED';
      // The exact full-size proof remains in the review workflow. For approved
      // image proofs, show the saved artwork above and keep terms below.
@@ -296,7 +301,8 @@
      proofFeedback('');$('#co-proof-confirm').checked=false;$('#co-proof-change').value='';
      proofText('#co-proof-version','Proof V'+p.proofVersion);
      proofText('#co-proof-title',p.canRespond?'Review your coaster proof':approved?'Approved proof & saved terms':changing?'Previous proof · changes requested':'Your saved proof');
-     $('#co-proof-terms-details').open=!!p.canRespond;
+     // Approved terms stay immediately visible while the customer awaits payment.
+     $('#co-proof-terms-details').open=!!p.canRespond||approved;
      proofText('#co-proof-terms-label',p.canRespond?'Proof and order terms':'View saved proof and order terms');
      proofText('#co-proof-set',p.setSize+'-Coaster Set');
      proofText('#co-proof-count',p.setCount+' ('+p.totalCoasters+' coasters)');

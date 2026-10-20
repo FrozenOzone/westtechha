@@ -306,3 +306,34 @@
 .customer-order-main .customer-order-shipping-tracking a{display:inline-block;color:var(--customer-accent);font-weight:750;font-size:.8rem;margin-top:8px}
 .customer-order-main .customer-order-shipping-tracking a:focus-visible{outline:3px solid #ffcf70;outline-offset:3px}
 .customer-order-main .customer-order-shipping-tracking a[hidden]{display:none!important}
+
+/* Customer dashboard: approved terms visible during payment, without a second
+   artwork panel. The original active proof-review layout is unchanged. */
+.customer-order-main #co-approval.customer-order-approved-terms .customer-order-proof-layout {
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:0;
+}
+.customer-order-main #co-approval.customer-order-approved-terms .customer-order-proof-visual {
+  min-width:0;
+}
+.customer-order-main #co-approval.customer-order-approved-terms .customer-order-proof-visual>p {
+  margin:0 0 8px;
+}
+.customer-order-main #co-approval.customer-order-approved-terms .customer-order-proof-disclosure {
+  margin-top:0;
+}
+/* Move the production estimate into At a Glance, beside the order's other facts. */
+.customer-order-main .customer-order-detail-facts .customer-order-production-summary-row[hidden] {
+  display:none!important;
+}
+.customer-order-main .customer-order-production-summary-row dt small {
+  display:block;
+  margin-top:4px;
+  font-size:.69rem;
+  font-weight:500;
+  line-height:1.35;
+}
+.customer-order-main .customer-order-production-summary-row dd {
+  overflow-wrap:anywhere;
+}
