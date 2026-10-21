@@ -12,6 +12,7 @@
   <link href="../css/coasters.css" rel="stylesheet"/>
   <link href="../css/coaster-admin.css?v=20260913-theme1" rel="stylesheet"/>
   <link href="../css/coaster-order-theme.css" rel="stylesheet"/>
+  <link href="../css/production-awareness.css?v=20261021-stageA1" rel="stylesheet"/>
   <link href="../css/work-orders.css" rel="stylesheet"/>
   <link href="../css/admin-pane.css" rel="stylesheet"/>
   <link href="../css/admin-production-fields.css?v=20260913-2" rel="stylesheet"/>
@@ -245,6 +246,13 @@
               <div class="ca-total ca-total-inline"><div><span>FINAL CUSTOMER PRICE</span></div><div><strong id="ca-final-total">$0.00</strong><small id="ca-total-detail">1 set • 4 coasters</small></div></div>
             </div>
             <div class="mw-estimate-panel" data-manufacturing-estimate data-minutes-target="#ca-printer-minutes" data-window-target="#ca-production-window"><p id="ca-window-estimate" data-estimate-result>Enter the expected printer minutes, then calculate a suggested customer window from the combined coaster + enclosure queue.</p><button class="ca-secondary" type="button" data-estimate-button>Calculate Shared Queue Window</button></div>
+            <section id="ca-production-awareness" class="pa-panel" aria-label="Production date awareness">
+              <div class="pa-header"><div><div class="pa-eyebrow">PRODUCTION DATE AWARENESS • STAGE A</div><h3>Suggested dates and schedule warnings</h3></div><button class="pa-button secondary" type="button" id="ca-pa-reload">Recalculate</button></div>
+              <p class="pa-text pa-metrics" id="ca-pa-summary" role="status">Checking saved production commitments…</p>
+              <p class="pa-note" id="ca-pa-note">Dates are suggestions only. You choose the dates and save them.</p>
+              <p class="pa-warning" id="ca-pa-risk"></p>
+              <div class="pa-actions"><button class="pa-button" type="button" id="ca-pa-apply">Use Suggested Dates</button><span class="pa-warning" id="ca-pa-warning" role="status"></span></div>
+            </section>
             <div class="ca-action-buttons" style="margin-top:12px;flex-wrap:wrap;align-items:center">
               <div class="ca-inline-message" id="ca-review-save-near-message" role="status" aria-live="polite" hidden></div>
               <button class="ca-primary" id="ca-save-review-near-dates" type="button">Save Order Review</button>
@@ -325,7 +333,7 @@
   <div id="site-footer"></div>
 </div>
 <script src="../js/theme.js"></script><script src="../js/admin-production-fields.js?v=20260913-2"></script><script src="../js/coaster-admin.js?v=20261021-review-quick-save1"></script>
-<script src="../js/coaster-admin-preview-payment.js?v=20261019-preview-payment1"></script><script src="../js/coaster-admin-reorder.js?v=20261020-reorder-schedule-guard1"></script><script src="../js/manufacturing-estimate.js?v=20260913-1"></script><script src="../js/coaster-admin-auto-refresh.js?v=20261016-pickup-save-intercept1"></script><script src="../js/coaster-admin-archive.js?v=20260904-archive3"></script><script src="../js/admin-pane-sync.js?v=20260905-1"></script>
+<script src="../js/coaster-admin-preview-payment.js?v=20261019-preview-payment1"></script><script src="../js/coaster-admin-reorder.js?v=20261020-reorder-schedule-guard1"></script><script src="../js/manufacturing-estimate.js?v=20260913-1"></script><script src="../js/production-awareness.js?v=20261021-stageA1"></script><script src="../js/coaster-admin-auto-refresh.js?v=20261016-pickup-save-intercept1"></script><script src="../js/coaster-admin-archive.js?v=20260904-archive3"></script><script src="../js/admin-pane-sync.js?v=20260905-1"></script>
 <script src="../js/coaster-pickup-admin.js?v=20261016-roundtrip1"></script>
 </body>
 </html>

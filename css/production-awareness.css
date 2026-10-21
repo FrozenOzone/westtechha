@@ -1,0 +1,22 @@
+/* WestTech Production Date Awareness - Stage A (advisory only) */
+.pa-panel{border:1px solid rgba(22,119,196,.45);background:rgba(22,119,196,.055);border-radius:12px;padding:16px;margin:12px 0 18px;color:inherit}
+.pa-header{display:flex;align-items:start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.pa-header h2,.pa-header h3{margin:2px 0 0;font-size:1.05rem}
+.pa-eyebrow{font-size:.69rem;color:#4ca9ed;letter-spacing:.1em;font-weight:900}
+.pa-text{font-size:.85rem;line-height:1.55;margin:8px 0;color:inherit}
+.pa-metrics{font-weight:800}
+.pa-actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-top:12px}
+.pa-button{border-radius:8px;padding:9px 13px;border:1px solid #1677c4;background:#1677c4;color:#fff;font-weight:800;cursor:pointer;font:inherit}
+.pa-button.secondary{color:#64b6f5;background:transparent}
+.pa-button:disabled{opacity:.48;cursor:not-allowed}
+.pa-note{font-size:.81rem;opacity:.82;line-height:1.5}
+.pa-warning{font-size:.82rem;font-weight:700;color:#dfa35d;line-height:1.5}
+.pa-items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.pa-item{display:grid;grid-template-columns:1fr auto;gap:4px 10px;border:1px solid rgba(120,151,180,.24);border-radius:9px;padding:12px;min-width:0}
+.pa-item a{font-weight:800;color:#60b3f0;text-decoration:none;overflow-wrap:anywhere}
+.pa-item span:last-child{grid-column:1/-1;font-size:.8rem;opacity:.86;line-height:1.45}
+.pa-state{font-size:.7rem;letter-spacing:.015em;text-transform:uppercase}
+.pa-state-at_risk,.pa-state-overdue,.pa-state-no_window{color:#e4a05c}
+.pa-state-on_track{color:#4bbb97}
+.pa-state-paused,.pa-state-due_today{color:#a7bad0}
+@media(max-width:750px){.pa-items{grid-template-columns:1fr}.pa-header{align-items:stretch}}

@@ -13,6 +13,7 @@
   <link href="../css/coaster-theme-auto-admin.css" rel="stylesheet"/>
   <link href="../css/coaster-theme-light-admin.css" rel="stylesheet"/>
   <link href="../css/work-orders.css?v=20260912-fifo1" rel="stylesheet"/>
+  <link href="../css/production-awareness.css?v=20261021-stageA1" rel="stylesheet"/>
   <script src="../js/admin-access.js?v=20260913-prod1"></script>
   <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
 </head>
@@ -33,6 +34,12 @@
     <article><span>DAILY CAPACITY</span><strong id="wo-capacity">—</strong><small>Productive printer hours</small></article>
   </section>
 
+  <section class="pa-panel" id="wo-awareness" aria-label="Production date awareness">
+    <div class="pa-header"><div><div class="pa-eyebrow">STAGE A • PRODUCTION AWARENESS</div><h2>Are we on schedule?</h2></div><button class="pa-button secondary" type="button" id="wo-pa-reload">Refresh forecast</button></div>
+    <p class="pa-text pa-metrics" id="wo-pa-summary" role="status">Connect Admin to review saved production windows.</p>
+    <p class="pa-note" id="wo-pa-suggestion">Advisory only. Existing customer dates are never changed automatically.</p>
+    <div id="wo-pa-list" class="pa-items"></div>
+  </section>
   <section class="wo-controls ca-card">
     <div><div class="ca-eyebrow">QUEUE VIEW</div><h2>What gets manufactured next</h2></div>
     <div class="wo-control-row"><label>Show<select id="wo-filter"><option value="ACTIVE">Active manufacturing</option><option value="ALL">All work orders</option><option value="COASTER">Coasters</option><option value="ENCLOSURE">Enclosures</option><option value="CUSTOM">Custom Orders</option><option value="PAUSED">Paused</option><option value="COMPLETED">Completed</option></select></label><label>Search<input id="wo-search" type="search" placeholder="Order or customer"/></label><button class="ca-secondary" id="wo-refresh" type="button">Reload</button></div>
@@ -47,5 +54,5 @@
     <p>Default capacity assumes two K2 printers with 20 productive hours each per day. The calculation adds handling time, skips weekends, and never changes a customer-approved promised window.</p>
   </details>
 </main><div id="site-footer"></div></div>
-<script src="../js/theme.js"></script><script src="../js/work-orders.js?v=20260912-fifo1"></script>
+<script src="../js/theme.js"></script><script src="../js/work-orders.js?v=20260912-fifo1"></script><script src="../js/production-awareness.js?v=20261021-stageA1"></script>
 </body></html>
