@@ -6,6 +6,7 @@ import { sendCoasterCustomerEmail } from '../../../../../../_lib/coaster-email.j
 import { sendCoasterAdminProductionEmail } from '../../../../../../_lib/coaster-admin-production-email.js';
 import { jsonResponse } from '../../../../../../_lib/shared.js';
 import { requireOrdersDb } from '../../../../../../_lib/orders.js';
+import { isCoasterSandbox, previewSandboxRequested } from '../../../../../../_lib/coaster-preview-payment-mode.js';
 
 const previewHosts=new Set(['pickup-stage1-preview.westtechha.pages.dev','coasters-v30-preview.westtechha.pages.dev']);
 function isPaymentTestPreview(context){try{return previewHosts.has(new URL(context.request.url).hostname.toLowerCase());}catch{return false;}}
@@ -25,6 +26,7 @@ export async function onRequestPost(context){
     const body=await context.request.json();
     const action=String(body?.action||'');
     const version=Number(body?.proofVersion);
+    if(previewSandboxRequested(context)&&!isCoasterSandbox(context))return respond({ok:false,message:'Preview Sandbox checkout is misconfigured; PayPal must be set to sandbox before approving.'},503);
     if(!publicCustomerProof(order).canRespond)return respond({ok:false,message:'This proof is no longer awaiting a decision. Refresh your order.'},409);
     const updated=await recordCoasterApprovalForCustomer(context.env,order.orderId,account.id,action,body?.message||'',version);
     let notice='';
@@ -38,7 +40,7 @@ export async function onRequestPost(context){
         if(String(queued?.status).toUpperCase()==='PRODUCTION_QUEUE')await sendCoasterAdminProductionEmail(context.env,{order:queued,requestUrl:context.request.url});
       }catch(error){notice='Approval was saved. WestTech needs to review production queue setup.';}
     }else if(action==='approve'&&updated.paymentRequired){
-      if(isPaymentTestPreview(context)){
+      if(isPaymentTestPreview(context)&&!isCoasterSandbox(context)){
         // Preview-only handoff: no PayPal call and no real payment captured.
         const db=requireOrdersDb(context.env);
         const result=await db.prepare("UPDATE coaster_orders SET status='AWAITING_PAYMENT',payment_status='PREVIEW_AWAITING_TEST_PAYMENT',paypal_last_error=NULL,updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND status='PROOF_APPROVED' AND proof_status='APPROVED' AND payment_required=1").bind(updated.orderId).run();
@@ -46,8 +48,9 @@ export async function onRequestPost(context){
         await db.prepare("INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PREVIEW_PAYMENT_BYPASS_READY',?)").bind(updated.orderId,JSON.stringify({status:'AWAITING_PAYMENT',paymentStatus:'PREVIEW_AWAITING_TEST_PAYMENT',paypalCalled:false,via:'CUSTOMER_PORTAL'})).run();
         notice='Proof approved. This is a Preview test: WestTech can simulate payment in Admin. No PayPal charge is made.';
       }else{
-        // Live checkout in signed-in portal remains a separate Step 5 integration.
-        notice='Your proof is approved. WestTech will provide the payment step next.';
+        // In Preview Sandbox, checkout starts from the authenticated order portal.
+        // In production this path still does not create a checkout.
+        notice=isCoasterSandbox(context)?'Your approval is saved. Continue to PayPal Sandbox from this order page; no real money will be charged.':'Your proof is approved. WestTech will provide the payment step next.';
       }
     }
     const {order:refreshed}=await requireCustomerCoasterProof(context);

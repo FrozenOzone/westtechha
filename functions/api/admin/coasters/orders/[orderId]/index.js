@@ -5,6 +5,7 @@ import { sendCoasterCustomerEmail } from '../../../../../_lib/coaster-email.js';
 import { sendCoasterAdminProductionEmail } from '../../../../../_lib/coaster-admin-production-email.js';
 import { requireOrdersDb } from '../../../../../_lib/orders.js';
 import { ensureManufacturingWorkOrder } from '../../../../../_lib/manufacturing-work-orders.js';
+import { previewSandboxRequested } from '../../../../../_lib/coaster-preview-payment-mode.js';
 function previewHostAllowed(context){
   try{
     const host=new URL(context.request.url).hostname.toLowerCase();
@@ -14,7 +15,8 @@ function previewHostAllowed(context){
   }catch(e){return false;}
 }
 async function markPreviewPaid(context,order){
-  if(!previewHostAllowed(context))throw Object.assign(new Error('Preview payment simulation is not available on this site.'),{status:403});
+  if(!previewHostAllowed(context)||previewSandboxRequested(context))throw Object.assign(new Error('Simulated payments are disabled when PayPal Sandbox testing is active.'),{status:403});
+  if(order.paypalOrderId||String(order.paymentStatus||'').toUpperCase()!=='PREVIEW_AWAITING_TEST_PAYMENT')throw Object.assign(new Error('This order is not a simulated-payment test order.'),{status:409});
   if(!order.paymentRequired)throw Object.assign(new Error('This order does not require payment.'),{status:409});
   if(String(order.proofStatus||'').toUpperCase()!=='APPROVED')throw Object.assign(new Error('Customer proof approval is required before preview payment can be simulated.'),{status:409});
   if(String(order.paymentStatus||'').toUpperCase()==='PAID')return order;

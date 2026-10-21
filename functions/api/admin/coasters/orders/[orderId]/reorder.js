@@ -10,6 +10,7 @@ import { getCoasterOrderDetail } from '../../../../../_lib/coaster-orders.js';
 import { requireOrdersDb } from '../../../../../_lib/orders.js';
 import { requireArtworkBucket } from '../../../../../_lib/coaster-order-util.js';
 import { ensureManufacturingWorkOrder } from '../../../../../_lib/manufacturing-work-orders.js';
+import { isCoasterSandbox, previewSandboxRequested } from '../../../../../_lib/coaster-preview-payment-mode.js';
 
 const respond=(value,status=200)=>{const r=jsonResponse(value,status);r.headers.set('Cache-Control','private, no-store');return r;};
 function fail(message,status=400){const e=new Error(message);e.status=status;return e;}
@@ -33,6 +34,7 @@ export async function onRequestPost(context){
  try{
   requireCoasterAdmin(context);
   if(!previewHost(context))throw fail('Reorder payment handoff is only enabled for Preview testing.',403);
+  if(previewSandboxRequested(context)&&!isCoasterSandbox(context))throw fail('PayPal Sandbox must be configured before releasing this Preview reorder.',403);
   const origin=context.request.headers.get('Origin');if(origin&&origin!==new URL(context.request.url).origin)throw fail('Invalid request origin.',403);
   if(!/^application\/json(?:;|$)/i.test(context.request.headers.get('Content-Type')||''))throw fail('JSON request required.',415);
   const body=await context.request.json();if(body?.action!=='verifyForPayment'||body?.confirmed!==true)throw fail('Confirm the approved artwork, pricing, and production schedule first.');
@@ -46,12 +48,12 @@ export async function onRequestPost(context){
   const object=await requireArtworkBucket(context.env).head(source.proofObjectKey);
   if(!object)throw fail('The approved production proof is not available in artwork storage.',409);
   const status=order.paymentRequired?'AWAITING_PAYMENT':'PRODUCTION_QUEUE';
-  const paymentStatus=order.paymentRequired?'PREVIEW_AWAITING_TEST_PAYMENT':'NOT_REQUIRED';
+  const paymentStatus=order.paymentRequired?(isCoasterSandbox(context)?'AWAITING_PAYMENT':'PREVIEW_AWAITING_TEST_PAYMENT'):'NOT_REQUIRED';
   const result=await db.prepare(`UPDATE coaster_orders SET status=?,payment_status=?,proof_version=?,proof_status='APPROVED',proof_source=?,proof_object_key=?,proof_filename=?,proof_content_type=?,proof_size_bytes=?,paypal_order_id=NULL,paypal_approval_url=NULL,paypal_order_status=NULL,paypal_capture_id=NULL,paypal_paid_at=NULL,paypal_payment_id=NULL,payment_total=0,updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND status IN ('REORDER_VERIFICATION','DESIGN_REVIEW')`).bind(status,paymentStatus,source.proofVersion,source.proofSource,source.proofObjectKey,source.proofFilename,source.proofContentType,source.proofSizeBytes,order.orderId).run();
   if(Number(result?.meta?.changes||0)!==1)throw fail('The reorder changed while being verified. Reload and check its status.',409);
-  await db.prepare("INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'REORDER_VERIFIED',?)").bind(order.orderId,JSON.stringify({sourceOrderId,originalApprovedProofVersion:source.proofVersion,finalAmount:order.finalAmount,fulfillmentMethod:order.fulfillmentMethod,paymentRequired:order.paymentRequired,previewOnly:true,noNewApproval:true})).run();
+  await db.prepare("INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'REORDER_VERIFIED',?)").bind(order.orderId,JSON.stringify({sourceOrderId,originalApprovedProofVersion:source.proofVersion,finalAmount:order.finalAmount,fulfillmentMethod:order.fulfillmentMethod,paymentRequired:order.paymentRequired,previewOnly:true,paymentMode:isCoasterSandbox(context)?'sandbox':'simulated',noNewApproval:true})).run();
   const updated=await getCoasterOrderDetail(context.env,order.orderId);
   if(status==='PRODUCTION_QUEUE')await ensureManufacturingWorkOrder(context.env,'COASTER',updated);
-  return respond({ok:true,order:updated,previewOnly:true,action:order.paymentRequired?'READY_FOR_PREVIEW_TEST_PAYMENT':'QUEUED_NO_PAYMENT'});
+  return respond({ok:true,order:updated,previewOnly:true,action:order.paymentRequired?(isCoasterSandbox(context)?'READY_FOR_SANDBOX_CHECKOUT':'READY_FOR_PREVIEW_TEST_PAYMENT'):'QUEUED_NO_PAYMENT'});
  }catch(e){return respond({ok:false,message:e.message||'Could not verify reorder.'},e.status||500);}
 }

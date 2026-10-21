@@ -25,7 +25,7 @@
     const code=status();
     if(!['PROOF_APPROVED','AWAITING_PAYMENT'].includes(code)){removeButton();return;}
     const order=await fetchOrder();
-    if(!order||!order.paymentRequired||String(order.paymentStatus||'').toUpperCase()==='PAID'){removeButton();return;}
+    if(!order||!order.paymentRequired||String(order.paymentStatus||'').toUpperCase()!=='PREVIEW_AWAITING_TEST_PAYMENT'||order.paypalOrderId){removeButton();return;}
     const actions=document.querySelector('.ca-paypal-actions');if(!actions)return;
     let button=$('#ca-preview-mark-paid');
     if(!button){button=document.createElement('button');button.id='ca-preview-mark-paid';button.type='button';button.className='ca-secondary';button.textContent='Preview: Mark Test Paid';button.addEventListener('click',markPaid);actions.appendChild(button);}

@@ -19,7 +19,7 @@
     case 'PROOF_SENT':return ['Your design is ready for review','Review your latest WestTech proof and approve it or request changes in the section below.'];
     case 'CHANGES_REQUESTED':return ['Your changes were sent to WestTech','WestTech will prepare and release a revised proof for your review.'];
     case 'PROOF_APPROVED':return ['Your proof was approved','Your proof and agreed terms are recorded. Payment will follow if required.'];
-    case 'AWAITING_PAYMENT':return ['Payment is awaiting completion','Your proof has been approved. Check the current payment instructions below; Preview test orders never require a PayPal charge.'];
+    case 'AWAITING_PAYMENT':return ['Payment is awaiting completion','Your approved order is ready for its payment step. Review the payment information below.'];
     case 'PRODUCTION_QUEUE':return ['Your order is in the production queue','WestTech has your approved order queued for manufacturing. No action is needed.'];
     case 'IN_PRODUCTION':return ['Your order is in production','WestTech is working on your order. No action is needed.'];
     case 'PREPARING_FOR_PICKUP':return ['WestTech is preparing your pickup order','Final checks and packaging are underway.'];
@@ -237,6 +237,7 @@
   }else{detail.hidden=true;dbody.textContent='';}
   content.hidden=false;
   renderStageWorkspace(order,current);
+  renderSandboxPayment(order);
   // Once payment has been recorded, retire the large proof/terms panel.
   // Approved proof data remains stored; the active dashboard focuses on production.
   const paymentRecorded=order.paymentSimulated===true||['PAID','CAPTURED','COMPLETED','NOT_REQUIRED'].includes(String(order.paymentStatus||'').toUpperCase());
@@ -378,6 +379,63 @@
  $('#co-proof-confirm').addEventListener('change',proofButtons);
  $('#co-proof-approve').addEventListener('click',()=>submitProofAction('approve'));
  $('#co-proof-request').addEventListener('click',()=>submitProofAction('requestChanges'));
+ const sandbox=$('#co-paypal-sandbox'),sandboxBtn=$('#co-paypal-start'),sandboxMsg=$('#co-paypal-feedback');
+ const taxPanel=$('#co-paypal-tax-review'),taxCheckbox=$('#co-paypal-confirm-tax'),taxBtn=$('#co-paypal-capture');
+ const payRoute=()=>'/api/customer/orders/COASTER/'+encodeURIComponent(id)+'/payment';
+ let sandboxBusy=false,sandboxMode='',sandboxOrder=null,payReturnAttempted=false;
+ function sandboxFeedback(value,error=false){if(!sandboxMsg)return;sandboxMsg.hidden=!value;sandboxMsg.textContent=value||'';sandboxMsg.style.color=error?'#ffb3b3':'#a5cde8';}
+ async function paymentPost(action,rest={}){
+  const response=await fetch(payRoute(),{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({action,...rest})});
+  if(response.status===401){location.replace('login.html');throw new Error('Sign in again to continue payment.');}
+  const data=await response.json().catch(()=>({}));if(!response.ok||!data.ok)throw new Error(data.message||'Could not complete the Sandbox step.');return data;
+ }
+ function clearPaypalReturn(){
+  const u=new URL(location.href);u.searchParams.delete('payment');u.searchParams.delete('token');u.searchParams.delete('PayerID');
+  history.replaceState(null,'',u.pathname+u.search+u.hash);
+ }
+ async function captureSandbox(confirmTax=false){
+  if(sandboxBusy)return;sandboxBusy=true;taxBtn.disabled=true;sandboxBtn.disabled=true;sandboxFeedback('Confirming Sandbox payment…');
+  try{
+   const token=String(params.get('token')||'');if(!token)throw new Error('PayPal return token is missing. Return to checkout or contact WestTech.');
+   const data=await paymentPost('capture',{paypalOrderId:token,confirmTax});
+   if(data.taxConfirmationRequired){
+    const quote=data.taxReview||{};
+    taxPanel.hidden=false;taxCheckbox.checked=false;taxBtn.disabled=true;
+    $text('#co-paypal-tax-breakdown',`Taxable items: ${money(quote.taxableAmount)} · Shipping: ${money(quote.shippingAmount)} · Colorado tax: ${money(quote.taxAmount)} · Final total: ${money(quote.totalAmount)}.`);
+    sandboxFeedback('Review and confirm the final Sandbox amount before completing payment.');
+   }else if(data.paid){taxPanel.hidden=true;clearPaypalReturn();sandboxFeedback('Sandbox payment captured. Your order is entering the production queue.');await load();}
+   else sandboxFeedback('Sandbox payment was not yet completed. Please contact WestTech.',true);
+  }catch(e){sandboxFeedback(e.message||'Could not capture payment.',true);}
+  finally{sandboxBusy=false;sandboxBtn.disabled=false;taxBtn.disabled=!taxCheckbox.checked;}
+ }
+ function renderSandboxPayment(order){
+  sandboxOrder=order;
+  const pending=order.sourceType==='COASTER'&&order.paymentRequired===true&&['PROOF_APPROVED','AWAITING_PAYMENT'].includes(String(order.status||'').toUpperCase())&&order.paymentStatus!=='PAID';
+  sandbox.hidden=true;taxPanel.hidden=true;
+  if(!pending)return;
+  fetch(payRoute(),{credentials:'same-origin',headers:{Accept:'application/json'}}).then(async response=>{
+   const data=await response.json().catch(()=>({}));if(!response.ok||!data.ok)return;
+   if(sandboxOrder!==order)return;
+   sandboxMode=data.mode||'';
+   if(sandboxMode==='configuration_error'){sandbox.hidden=false;sandboxBtn.hidden=true;sandboxFeedback('Sandbox checkout is not configured correctly. Contact WestTech.',true);return;}
+   if(data.mode!=='sandbox'||!data.canCheckout)return;
+   sandbox.hidden=false;sandboxBtn.hidden=false;
+   $text('#co-stage-guidance','Use PayPal Sandbox below to test checkout securely. No real funds will be charged. Your final tax and shipping total will be shown before capture.');
+   sandboxFeedback('');
+   if(params.get('payment')==='return'&&params.has('token')&&!payReturnAttempted){
+    payReturnAttempted=true;captureSandbox(false);
+   }else if(params.get('payment')==='cancel'){
+    sandboxFeedback('Your Sandbox checkout was canceled; you can try again. No payment was captured.');clearPaypalReturn();
+   }
+  }).catch(()=>{});
+ }
+ sandboxBtn.addEventListener('click',async()=>{
+  if(sandboxBusy||sandboxMode!=='sandbox')return;sandboxBusy=true;sandboxBtn.disabled=true;sandboxFeedback('Opening PayPal Sandbox checkout…');
+  try{const data=await paymentPost('startCheckout');const u=new URL(data.approvalUrl);if(u.protocol!=='https:'||!['sandbox.paypal.com','www.sandbox.paypal.com'].includes(u.hostname.toLowerCase()))throw new Error('Invalid Sandbox checkout destination.');location.assign(u.href);}
+  catch(e){sandboxBusy=false;sandboxBtn.disabled=false;sandboxFeedback(e.message||'Could not open PayPal Sandbox.',true);}
+ });
+ taxCheckbox.addEventListener('change',()=>{taxBtn.disabled=!taxCheckbox.checked||sandboxBusy;});
+ taxBtn.addEventListener('click',()=>{if(taxCheckbox.checked)captureSandbox(true);});
  async function load(){
   if(!validSource.has(source)||!id||id.length>100){
    message.textContent='This order link is incomplete. Return to My Orders and select an order.';message.classList.add('error');message.hidden=false;return;
