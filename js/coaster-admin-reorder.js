@@ -28,16 +28,58 @@
   #ca-reorder-confirm button{border-radius:9px;padding:11px 16px;font-weight:750;cursor:pointer;border:1px solid #417ba9;color:#fff;background:#102942}
   #ca-reorder-confirm button.wt-verify-release{background:#1677c4;border-color:#1677c4}
   #ca-reorder-confirm button:disabled{opacity:.6;cursor:wait}
-  #ca-reorder-confirm button:focus-visible{outline:3px solid #ffc85e;outline-offset:3px}`;
+  #ca-reorder-confirm button:focus-visible{outline:3px solid #ffc85e;outline-offset:3px}
+  .wt-date-window.wt-reorder-date-required{outline:2px solid #ed897b;outline-offset:5px;border-radius:8px}
+  #ca-reorder-date-warning{color:#ffd2c9;background:rgba(168,57,45,.17);border:1px solid #df8276;border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.45;margin:10px 0 0}
+  #ca-printer-minutes.wt-reorder-minutes-required{outline:2px solid #ed897b;outline-offset:3px}`;
   document.head.appendChild(style);
  };
  function remove(){
+  clearScheduleWarning();
   $('#ca-reorder-panel')?.remove();$('#ca-reorder-tag')?.remove();
   const proof=$('.ca-proof-card');proof?.classList.remove('wt-exact-reorder');
   const dialog=$('#ca-reorder-confirm');if(dialog?.open)dialog.close();dialog?.remove();
  }
  function number(n){return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(n||0));}
  function savedWindow(x){return String(x?.order?.productionWindow||'').trim()||'Not saved';}
+ // Keep draft saving available, but do not open payment release confirmation
+ // until the date window has been saved and matches the Admin fields.
+ function clearScheduleWarning(){
+  $('.wt-date-window')?.classList.remove('wt-reorder-date-required');
+  $('#ca-printer-minutes')?.classList.remove('wt-reorder-minutes-required');
+  $('#ca-reorder-date-warning')?.remove();
+ }
+ function guideSchedule(message,fieldSelector='#ca-production-window-start'){
+  clearScheduleWarning();
+  const field=$(fieldSelector)||$('#ca-production-window-start');
+  if(!field){text(message);return;}
+  const wrapper=field.closest('.wt-date-window')||field.closest('.ca-field')||field.parentElement;
+  if(fieldSelector==='#ca-printer-minutes')field.classList.add('wt-reorder-minutes-required');
+  else wrapper?.classList.add('wt-reorder-date-required');
+  const warning=document.createElement('p');warning.id='ca-reorder-date-warning';warning.setAttribute('role','alert');warning.textContent=message;
+  if(wrapper){wrapper.appendChild(warning);wrapper.scrollIntoView({behavior:'smooth',block:'center'});}
+  field.focus({preventScroll:true});
+ }
+ function scheduleReady(info){
+  const saved=String(info?.order?.productionWindow||'').trim();
+  const fields=window.WestTechProductionFields;
+  const parsed=fields?.parseWindow(saved);
+  if(!saved||!parsed?.start){
+   guideSchedule('Enter an estimated production start date (end date is optional), click Save Order Review, then Verify Reorder & Release to Payment.');
+   return false;
+  }
+  const visible=fields?.getWindow('#ca-production-window')||String($('#ca-production-window')?.value||'').trim();
+  if(visible!==saved){
+   guideSchedule('These production dates have not been saved. Click Save Order Review, then return to Verify Reorder & Release to Payment.');
+   return false;
+  }
+  const minutes=Number(info?.order?.estimatedPrinterMinutes||0);
+  if(!Number.isFinite(minutes)||minutes<=0){
+   guideSchedule('Enter the estimated printer minutes and click Save Order Review before releasing the reorder.','#ca-printer-minutes');
+   return false;
+  }
+  clearScheduleWarning();return true;
+ }
  function addRow(list,label,value){const row=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;row.append(dt,dd);list.appendChild(row);}
  function openConfirm(info,btn){
   const previous=$('#ca-reorder-confirm');if(previous)previous.remove();
@@ -95,6 +137,7 @@
     // Refresh before confirmation: use the latest SAVED terms, not a stale page snapshot.
     const latest=await api(`/api/admin/coasters/orders/${encodeURIComponent(id)}/reorder`);
     if(String($('#ca-order-id')?.textContent||'').trim()!==id||!latest.canVerify||latest.sourceOrderId!==info.sourceOrderId)throw new Error('This reorder changed. Reload it before verifying.');
+    if(!scheduleReady(latest))return;
     openConfirm(latest,btn);
    }catch(e){text(e.message||'Could not load current reorder terms.');}
    finally{btn.disabled=false;}
