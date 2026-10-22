@@ -38,6 +38,17 @@ export function parseWindow(value){
   return null;
 }
 export function daysForCoaster(setSize=4,setCount=1){const size=int(setSize,1,100),count=int(setCount,1,100);return (size===4?2:size===8?3:Math.max(2,Math.ceil(size/4)*2))*count;}
+// Capacity check for production awareness only. The older manufacturing estimate
+// already includes separate handling and window-span buffers, which must NOT be
+// stacked on top of the 2-/3-business-day coaster allowance.
+export function capacityReadyBusinessDay(today,queuedMinutes,candidateMinutes,capacityMinutesPerDay){
+  const daily=Math.max(1,Number(capacityMinutesPerDay)||0);
+  const queued=Math.max(0,Number(queuedMinutes)||0);
+  const candidate=Math.max(1,Number(candidateMinutes)||0);
+  const requiredDays=Math.max(1,Math.ceil((queued+candidate)/daily));
+  return addBusinessDays(today,requiredDays);
+}
+
 export function awarenessForQueue(orders=[],today=todayMountain()){
   return orders.filter(row=>PRINTING.has(String(row.status||'').toUpperCase())).map(row=>{
     const promised=parseWindow(row.promisedWindow),projected=isoParts(row.projectedShipEnd)?row.projectedShipEnd:null;
@@ -79,6 +90,7 @@ export async function getProductionAwareness(env,{setSize=4,setCount=1,minutes=6
   ]);
   const commitments=(committed.results||[]).map(x=>({sourceType:x.source_type,orderId:x.order_id,status:x.status,productionWindow:x.production_window}));
   const today=todayMountain(),alerts=awarenessForQueue(dashboard.orders||[],today);
-  const suggested=suggestWindow({today,commitments,capacityEnd:estimate.suggestedShipEnd,setSize:size,setCount:count,orderId:id,sourceType:type});
+  const capacityEnd=capacityReadyBusinessDay(today,estimate.remainingPrinterMinutes,candidateMinutes,estimate.capacityMinutesPerDay);
+  const suggested=suggestWindow({today,commitments,capacityEnd,setSize:size,setCount:count,orderId:id,sourceType:type});
   return {today,suggested,alerts,summary:{atRisk:alerts.filter(x=>x.status==='AT_RISK').length,overdue:alerts.filter(x=>x.status==='OVERDUE').length,missing:alerts.filter(x=>x.status==='NO_WINDOW').length,dueToday:alerts.filter(x=>x.status==='DUE_TODAY').length,paused:alerts.filter(x=>x.status==='PAUSED').length,active:alerts.length},capacity:{activePrinters:dashboard.settings.activePrinters,remainingPrinterMinutes:dashboard.summary.remainingPrinterMinutes,queuePosition:estimate.queuePosition},config:{setSize:size,setCount:count,minutes:candidateMinutes}};
 }
