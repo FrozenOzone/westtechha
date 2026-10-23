@@ -313,3 +313,58 @@ export async function syncCoasterPayPalOrder(env,orderId){
   await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PAYPAL_STATUS_SYNCED',?)`).bind(orderId,JSON.stringify({paypalOrderId:order.paypalOrderId,paypalStatus:status})).run();
   return getCoasterOrderDetail(env,orderId);
 }
+
+// Stage 5K2: explicit Admin-only recovery of a COMPLETED PayPal capture.
+// NEVER calls /capture, never clears a lock or treats provider APPROVED as paid.
+// The authenticated Preview endpoint verifies an exact provider reference and capture ID.
+export async function recoverCompletedCoasterPayPalCapture(env,orderId,providerOrderId,expectedCaptureId){
+ const stop=(msg,status=409)=>{throw Object.assign(new Error(msg),{status});};
+ if(sanitizeEnvValue(env.PAYPAL_ENV).toLowerCase()!=='sandbox')stop('Payment recovery is Sandbox-only.',403);
+ if(!/^WTCC-\d{8}-\d{1,6}$/.test(String(orderId||'')))stop('Invalid coaster order.',400);
+ const ref=String(providerOrderId||'').trim(),capture=String(expectedCaptureId||'').trim();
+ if(!/^[A-Z0-9]{8,32}$/i.test(ref)||!/^[A-Za-z0-9-]{8,120}$/.test(capture))stop('A valid provider order and confirmed capture ID are required.',400);
+ const current=await getCoasterOrderDetail(env,orderId);
+ if(!current)stop('Coaster order not found.',404);
+ if(current.paypalOrderId!==ref)stop('Provider order reference is different. No recovery performed.');
+ if(String(current.paymentStatus||'').toUpperCase()==='PAID'){
+  if(String(current.paypalCaptureId||'')===capture)return {order:current,recovered:false,alreadyPaid:true};
+  stop('Order is already paid with a different capture. Review manually.');
+ }
+ if(String(current.paymentStatus||'').toUpperCase()!=='CAPTURING_PAYPAL')stop('Only an existing locked PayPal capture can be recovered.');
+ if(current.paymentRequired!==true||current.proofStatus!=='APPROVED')stop('Order proof or payment terms do not permit recovery.');
+ const got=await paypalCall(env,'/v2/checkout/orders/'+encodeURIComponent(ref)); // GET only
+ const verified=verifyCoasterProviderCapture(current,ref,got.data,got.data);
+ if(verified.captureId!==capture)stop('Confirmed capture ID differs from PayPal. No recovery performed.');
+ // Re-read after provider network call. markCaptured uses a conditional lock write too.
+ const latest=await getCoasterOrderDetail(env,orderId);
+ if(!latest||latest.paypalOrderId!==ref||String(latest.paymentStatus||'').toUpperCase()!=='CAPTURING_PAYPAL'||
+    latest.paymentRequired!==true||latest.proofStatus!=='APPROVED'||
+    String(latest.paypalCaptureId||'')!==String(current.paypalCaptureId||'')||
+    latest.fulfillmentMethod!==current.fulfillmentMethod||
+    money(latest.finalAmount)!==money(current.finalAmount)||money(latest.taxAmount)!==money(current.taxAmount)||
+    money(latest.paymentTotal)!==money(current.paymentTotal)||String(latest.taxAddressJson||'')!==String(current.taxAddressJson||''))
+  stop('Order changed while verifying PayPal. Nothing was recovered.');
+ const paid=await markCaptured(env,orderId,ref,got.data,got.data,{method:'PAYPAL'});
+ if(!paid||String(paid.paymentStatus||'').toUpperCase()!=='PAID')stop('Provider captured but WestTech order requires manual review.',502);
+ return {order:paid,recovered:true,alreadyPaid:false};
+}
+
+// Recover a missing manufacturing record on an already-paid order, not a charge.
+// Confirmation at the provider comes before the idempotent UPSERT of the work order.
+export async function repairCoasterPaidWorkOrder(env,orderId,providerOrderId,expectedCaptureId){
+ const stop=(msg,status=409)=>{throw Object.assign(new Error(msg),{status});};
+ if(sanitizeEnvValue(env.PAYPAL_ENV).toLowerCase()!=='sandbox')stop('Repair is Sandbox-only.',403);
+ const order=await getCoasterOrderDetail(env,orderId);
+ if(!order)stop('Coaster order not found.',404);
+ if(String(order.paymentStatus||'').toUpperCase()!=='PAID'||order.paypalOrderStatus!=='COMPLETED')stop('Only a recorded, completed payment can repair a production work order.');
+ const ref=String(providerOrderId||''),capture=String(expectedCaptureId||'');
+ if(!/^[A-Z0-9]{8,32}$/i.test(ref)||!/^[A-Za-z0-9-]{8,120}$/.test(capture)||
+    order.paypalOrderId!==ref||order.paypalCaptureId!==capture)stop('Provider order or capture reference does not match the paid record.');
+ const got=await paypalCall(env,'/v2/checkout/orders/'+encodeURIComponent(ref)); // GET only
+ const verified=verifyCoasterProviderCapture(order,ref,got.data,got.data);
+ if(verified.captureId!==capture)stop('PayPal capture differs from paid record.');
+ const fresh=await getCoasterOrderDetail(env,orderId);
+ if(!fresh||fresh.paymentStatus!=='PAID'||fresh.paypalOrderId!==ref||fresh.paypalCaptureId!==capture)stop('Paid record changed while inspecting provider.');
+ const workOrder=await ensureManufacturingWorkOrder(env,'COASTER',fresh);
+ return {order:fresh,workOrder,repaired:true};
+}
