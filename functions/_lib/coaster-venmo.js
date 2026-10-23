@@ -78,6 +78,20 @@ export async function startVenmoPickup(env, orderId, expectedTotal) {
     .bind(attemptId,orderId,'VENMO',created.id,String(quote.totalAmount),JSON.stringify(quote)).run();
   return {orderId:created.id};
 }
+// Record a buyer-abandoned Sandbox attempt without changing the coaster order.
+// A CAPTURING or CAPTURED attempt can never be downgraded to CANCELED.
+export async function cancelVenmoPickup(env, orderId, paypalOrderId) {
+  if (sanitizeEnvValue(env.PAYPAL_ENV).toLowerCase() !== 'sandbox') throw fail('Sandbox cancellation unavailable.',403);
+  const db=requireOrdersDb(env);
+  const changed=await db.prepare("UPDATE coaster_payment_attempts SET status='CANCELED',updated_at=CURRENT_TIMESTAMP WHERE coaster_order_id=? AND method='VENMO' AND provider_order_id=? AND status='CREATED'")
+    .bind(orderId,paypalOrderId).run();
+  if(Number(changed?.meta?.changes||0)===1)return {canceled:true};
+  const row=await db.prepare("SELECT status FROM coaster_payment_attempts WHERE coaster_order_id=? AND method='VENMO' AND provider_order_id=? LIMIT 1")
+    .bind(orderId,paypalOrderId).first();
+  if(!row)throw fail('Payment attempt not found.',404);
+  if(row.status==='CANCELED')return {canceled:true};
+  throw fail('Payment is processing or completed; cancellation is not allowed. Check your order before retrying.',409);
+}
 export async function captureVenmoPickup(env, orderId, paypalOrderId) {
   if (sanitizeEnvValue(env.PAYPAL_ENV).toLowerCase() !== 'sandbox') throw fail('Venmo Sandbox checkout is not enabled.', 403);
   const db = requireOrdersDb(env);

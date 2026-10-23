@@ -3,7 +3,7 @@ import { requireOrdersDb } from '../../../../../../_lib/orders.js';
 import { getCoasterOrderDetail } from '../../../../../../_lib/coaster-orders.js';
 import { jsonResponse, sanitizeEnvValue } from '../../../../../../_lib/shared.js';
 import { isCoasterSandbox } from '../../../../../../_lib/coaster-preview-payment-mode.js';
-import { getVenmoPickupQuote, startVenmoPickup, captureVenmoPickup } from '../../../../../../_lib/coaster-venmo.js';
+import { getVenmoPickupQuote, startVenmoPickup, captureVenmoPickup, cancelVenmoPickup } from '../../../../../../_lib/coaster-venmo.js';
 import { sendCoasterAdminProductionEmail } from '../../../../../../_lib/coaster-admin-production-email.js';
 import { inviteCustomerForOrder } from '../../../../../../_lib/customer-account.js';
 
@@ -52,6 +52,11 @@ export async function onRequestPost(context){
   if(action==='startVenmo'){
    if(body?.confirmedTotal!==true)throw fail('Confirm the displayed tax and final total.',400);
    const result=await startVenmoPickup(context.env,order.orderId,String(body.expectedTotal||''));
+   return reply({ok:true,...result});
+  }
+  if(action==='cancelVenmo'){
+   const id=String(body.paypalOrderId||'');if(!/^[A-Z0-9]{8,32}$/i.test(id))throw fail('Invalid payment reference.',400);
+   const result=await cancelVenmoPickup(context.env,order.orderId,id);
    return reply({ok:true,...result});
   }
   if(action==='captureVenmo'){

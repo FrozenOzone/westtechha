@@ -10,7 +10,7 @@
  const confirm=document.querySelector('#co-venmo-tax-confirm'),quoteEl=document.querySelector('#co-venmo-total');
  const feedback=document.querySelector('#co-venmo-feedback');
  const route='/api/customer/orders/COASTER/'+encodeURIComponent(orderId)+'/payment-methods';
- let quote=null,session=null,busy=false,initialized=false;
+ let quote=null,session=null,busy=false,initialized=false,activeCreate=null,activeOrderId=null;
  function status(message,error=false){feedback.hidden=!message;feedback.textContent=message;feedback.style.color=error?'#ffb3b3':'#c6dcec';}
  async function json(url,options={}){
   const res=await fetch(url,{credentials:'same-origin',headers:{Accept:'application/json',...(options.body?{'Content-Type':'application/json'}:{})},...options});
@@ -44,12 +44,20 @@
    if(!eligible.isEligible('venmo')){setEnabled(false);explain.textContent='Venmo is not available for this device or Sandbox buyer. PayPal remains available above.';return;}
    session=sdk.createVenmoOneTimePaymentSession({
     onApprove:async ({orderId:paypalOrderId})=>{
+     activeCreate=null;activeOrderId=null; // Authorization began; never cancel this attempt automatically.
      status('Checking Venmo authorization and recording your payment…');
      const r=await post('captureVenmo',{paypalOrderId});
      if(r.paid){status('Venmo Sandbox payment recorded. Reloading your order…');location.reload();}
      else throw new Error('Payment requires verification. Contact WestTech before retrying.');
     },
-    onCancel:()=>{busy=false;status('Venmo was canceled. No payment was captured.');},
+    onCancel:async()=>{
+     busy=false;
+     const creating=activeCreate;let id=activeOrderId;activeCreate=null;activeOrderId=null;
+     if(!id&&creating){try{id=(await creating).orderId;}catch{}}
+     if(!id){status('Venmo was canceled before a payment attempt was created.');return;}
+     try{await post('cancelVenmo',{paypalOrderId:id});status('Venmo was canceled. No payment captured; the test attempt is recorded as canceled.');}
+     catch(e){status('Checkout closed, but the cancellation could not be verified. Please check your order before retrying.',true);}
+    },
     onError:()=>{busy=false;status('Venmo could not complete the payment. Please review your order before trying again.',true);}
    });
    setEnabled(true);status('Venmo is available for this Sandbox buyer. Confirm the tax and total before paying.');
@@ -62,7 +70,8 @@
   try{
    // Create a separate PayPal Orders API attempt without disturbing existing PayPal approval links.
    const promise=post('startVenmo',{confirmedTotal:true,expectedTotal:String(quote.totalAmount)})
-     .then(data=>({orderId:data.orderId}));
+     .then(data=>{activeOrderId=data.orderId;return {orderId:data.orderId};});
+   activeCreate=promise;
    await session.start({presentationMode:'auto'},promise);
   }catch(e){status(e.message||'Venmo checkout could not start.',true);}
   finally{busy=false;}
