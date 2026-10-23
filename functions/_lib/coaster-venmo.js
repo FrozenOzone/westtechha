@@ -104,7 +104,7 @@ export async function captureVenmoPickup(env, orderId, paypalOrderId) {
   // Legacy PayPal capture explicitly rejects CAPTURING_VENMO to avoid double charges.
   const reserved=await db.prepare("UPDATE coaster_payment_attempts SET status='CAPTURING',updated_at=CURRENT_TIMESTAMP WHERE attempt_id=? AND status='CREATED'").bind(attempt.attempt_id).run();
   if (Number(reserved?.meta?.changes||0)!==1) throw fail('Payment already processing.',409);
-  const orderLock=await db.prepare("UPDATE coaster_orders SET payment_status='CAPTURING_VENMO',updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND payment_status IN ('AWAITING_PAYMENT','AWAITING_TAX_CONFIRMATION','PREVIEW_AWAITING_TEST_PAYMENT','PAYPAL_ERROR')").bind(orderId).run();
+  const orderLock=await db.prepare("UPDATE coaster_orders SET payment_status='CAPTURING_VENMO',updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND payment_required=1 AND proof_status='APPROVED' AND fulfillment_method='LOCAL_PICKUP' AND status IN ('PROOF_APPROVED','AWAITING_PAYMENT') AND payment_status IN ('NOT_REQUESTED','AWAITING_PAYMENT','AWAITING_TAX_CONFIRMATION','PREVIEW_AWAITING_TEST_PAYMENT','PAYPAL_ERROR')").bind(orderId).run();
   if (Number(orderLock?.meta?.changes||0)!==1) {
     await db.prepare("UPDATE coaster_payment_attempts SET status='CANCELED',updated_at=CURRENT_TIMESTAMP WHERE attempt_id=? AND status='CAPTURING'").bind(attempt.attempt_id).run();
     throw fail('Another payment is already processing. Contact WestTech.',409);
