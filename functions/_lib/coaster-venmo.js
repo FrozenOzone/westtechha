@@ -48,36 +48,122 @@ async function api(env, url, opts = {}) {
   if (!r.ok) throw fail(data?.details?.[0]?.description || data?.message || `PayPal failed (${r.status}).`, r.status >= 500 ? 502 : 409);
   return data;
 }
+// D1 serializes each INSERT statement. This reservation is the authoritative
+// cross-tab/cross-worker checkout-creation lock (not a browser-only guard).
+// No schema change: payment attempts already allow interim status values.
+const ACTIVE_VENMO_STATES = "('CREATING','CREATED','CAPTURING')";
+async function activeVenmoCheckout(db, orderId) {
+  return db.prepare("SELECT * FROM coaster_payment_attempts WHERE coaster_order_id=? AND method='VENMO' AND status IN " + ACTIVE_VENMO_STATES + " ORDER BY created_at DESC LIMIT 1")
+    .bind(orderId).first();
+}
+function sameVenmoQuote(attempt, fresh) {
+  if (String(attempt?.amount) !== String(fresh.totalAmount)) return false;
+  let prior;
+  try { prior=JSON.parse(attempt.quote_json); } catch { return false; }
+  return ['itemAmount','taxAmount','totalAmount','taxRate','jurisdictionCode','source']
+    .every(key=>String(prior?.[key]??'')===String(fresh[key]??'')) &&
+    JSON.stringify(prior?.address??null)===JSON.stringify(fresh.address??null);
+}
+async function reuseVenmoCheckout(env,db,orderId,quote,attempt) {
+  if(attempt.status==='CREATING')throw fail('Venmo checkout is being prepared. Please wait a moment before trying again.',409);
+  if(attempt.status==='CAPTURING')throw fail('A Venmo payment is being captured. Do not submit another payment.',409);
+  if(attempt.status!=='CREATED')return null;
+  if(!sameVenmoQuote(attempt,quote))throw fail('The pending Venmo checkout has different tax or order terms. Contact WestTech before retrying.',409);
+  // Never silently reuse an already-authorized or completed provider order.
+  const details=await api(env,`/v2/checkout/orders/${encodeURIComponent(attempt.provider_order_id)}`);
+  const unit=details?.purchase_units?.[0];
+  if(unit?.custom_id!==orderId || unit?.amount?.currency_code!=='USD' ||
+     String(unit?.amount?.value)!==String(quote.totalAmount))
+    throw fail('The pending Venmo transaction does not match this order. Contact WestTech.',409);
+  const state=String(details?.status||'').toUpperCase();
+  if(state==='VOIDED') {
+    await db.prepare("UPDATE coaster_payment_attempts SET status='VOIDED',updated_at=CURRENT_TIMESTAMP WHERE attempt_id=? AND status='CREATED'")
+      .bind(attempt.attempt_id).run();
+    return null;
+  }
+  if(!['CREATED','PAYER_ACTION_REQUIRED'].includes(state))
+    throw fail('A previous Venmo authorization may exist. Contact WestTech to verify it before retrying.',409);
+  // After the standard provider window, retire only a still-unapproved checkout.
+  // PayPal's default redirect limit is 6 hours; allow a buffer for clock skew.
+  const createdUtc=Date.parse(String(attempt.created_at||'').replace(' ','T')+'Z');
+  if(Number.isFinite(createdUtc) && Date.now()-createdUtc>7*60*60*1000) {
+    await db.prepare("UPDATE coaster_payment_attempts SET status='EXPIRED',updated_at=CURRENT_TIMESTAMP WHERE attempt_id=? AND status='CREATED'")
+      .bind(attempt.attempt_id).run();
+    return null;
+  }
+  // Recheck after the network call; a different tab may have canceled it.
+  const still=await db.prepare("SELECT status FROM coaster_payment_attempts WHERE attempt_id=? LIMIT 1")
+    .bind(attempt.attempt_id).first();
+  return still?.status==='CREATED'?{orderId:attempt.provider_order_id,reused:true}:null;
+}
 export async function startVenmoPickup(env, orderId, expectedTotal) {
   if (!validMoney(expectedTotal)) throw fail('Confirm a valid final total.', 400);
   if (sanitizeEnvValue(env.PAYPAL_ENV).toLowerCase() !== 'sandbox') throw fail('Venmo Sandbox checkout is not enabled.', 403);
-  const order = await getCoasterOrderDetail(env, orderId);
-  const quote = await quoteFor(env, order);
-  if (String(quote.totalAmount) !== expectedTotal) throw fail('Your tax quote changed. Review the total again.');
-  const db = requireOrdersDb(env);
-  const count = await db.prepare("SELECT COUNT(*) AS n FROM coaster_payment_attempts WHERE coaster_order_id=? AND created_at > datetime('now','-1 hour')").bind(orderId).first();
-  if (Number(count?.n || 0) >= 5) throw fail('Too many payment attempts. Please contact WestTech.', 429);
-  const attemptId = crypto.randomUUID();
-  const currency = sanitizeEnvValue(env.PAYPAL_CURRENCY) || 'USD';
-  if (currency !== 'USD') throw fail('Venmo requires USD.', 403);
-  // No payment_source: the JS SDK v6 Venmo session selects the instrument.
-  const payload = {intent:'CAPTURE',purchase_units:[{
-    reference_id:'CUSTOM_COASTER',custom_id:orderId,
-    invoice_id:`${orderId}-V-${attemptId.slice(0,8)}`,
-    description:`WestTech custom coasters - ${orderId} - local pickup`,
-    amount:{currency_code:'USD',value:String(quote.totalAmount),breakdown:{
-      item_total:{currency_code:'USD',value:String(quote.itemAmount)},
-      shipping:{currency_code:'USD',value:'0.00'},
-      tax_total:{currency_code:'USD',value:String(quote.taxAmount)}
-    }},
-    items:[{name:'WestTech custom coaster set',quantity:'1',category:'PHYSICAL_GOODS',unit_amount:{currency_code:'USD',value:String(quote.itemAmount)}}]
-  }]};
-  const created = await api(env, '/v2/checkout/orders', {method:'POST',body:payload,requestId:`WT-VM-${attemptId}`});
-  if (!created?.id || !/^[A-Z0-9]{8,32}$/i.test(created.id)) throw fail('PayPal did not return a valid order ID.', 502);
-  await db.prepare('INSERT INTO coaster_payment_attempts (attempt_id,coaster_order_id,method,provider_order_id,amount,quote_json) VALUES (?,?,?,?,?,?)')
-    .bind(attemptId,orderId,'VENMO',created.id,String(quote.totalAmount),JSON.stringify(quote)).run();
-  return {orderId:created.id};
+  const order=await getCoasterOrderDetail(env,orderId);
+  const quote=await quoteFor(env,order);
+  if(String(quote.totalAmount)!==expectedTotal)throw fail('Your tax quote changed. Review the total again.');
+  const currency=sanitizeEnvValue(env.PAYPAL_CURRENCY)||'USD';
+  if(currency!=='USD')throw fail('Venmo requires USD.',403);
+  const db=requireOrdersDb(env);
+  // Clear abandoned reservations after a worker interrupted checkout creation.
+  // A late creator cannot finalize after its reservation has been abandoned.
+  await db.prepare("UPDATE coaster_payment_attempts SET status='ABANDONED',updated_at=CURRENT_TIMESTAMP WHERE coaster_order_id=? AND method='VENMO' AND status='CREATING' AND updated_at < datetime('now','-3 minutes')")
+    .bind(orderId).run();
+  for(let step=0;step<3;step++) {
+    const active=await activeVenmoCheckout(db,orderId);
+    if(active){
+      const reused=await reuseVenmoCheckout(env,db,orderId,quote,active);
+      if(reused)return reused;
+      continue;
+    }
+    // Only actual new reservations count toward the abuse limit. Reusing a
+    // checkout (including page refreshes) does not use another attempt.
+    const count=await db.prepare("SELECT COUNT(*) AS n FROM coaster_payment_attempts WHERE coaster_order_id=? AND created_at > datetime('now','-1 hour') AND status NOT IN ('ABANDONED','FAILED')")
+      .bind(orderId).first();
+    if(Number(count?.n||0)>=12)throw fail('Too many new Venmo checkouts this hour. Please contact WestTech.',429);
+    const attemptId=crypto.randomUUID();
+    const pendingRef='PENDING'+attemptId.replaceAll('-','').toUpperCase();
+    // One conditional SQL write wins across concurrent Cloudflare Workers.
+    // Revalidate payment eligibility *inside* the statement to close the
+    // race with a concurrent PayPal/Venmo payment capture.
+    const claim=await db.prepare("INSERT INTO coaster_payment_attempts (attempt_id,coaster_order_id,method,provider_order_id,amount,quote_json,status) SELECT ?,?,'VENMO',?,?,?,'CREATING' WHERE EXISTS (SELECT 1 FROM coaster_orders WHERE order_id=? AND payment_required=1 AND proof_status='APPROVED' AND fulfillment_method='LOCAL_PICKUP' AND status IN ('PROOF_APPROVED','AWAITING_PAYMENT') AND payment_status IN ('NOT_REQUESTED','AWAITING_PAYMENT','AWAITING_TAX_CONFIRMATION','PREVIEW_AWAITING_TEST_PAYMENT','PAYPAL_ERROR')) AND NOT EXISTS (SELECT 1 FROM coaster_payment_attempts WHERE coaster_order_id=? AND method='VENMO' AND status IN ('CREATING','CREATED','CAPTURING'))")
+      .bind(attemptId,orderId,pendingRef,String(quote.totalAmount),JSON.stringify(quote),orderId,orderId).run();
+    if(Number(claim?.meta?.changes||0)!==1){
+      // Either another request won, or the order was paid/locked meanwhile.
+      const other=await activeVenmoCheckout(db,orderId);
+      if(other){const reused=await reuseVenmoCheckout(env,db,orderId,quote,other);if(reused)return reused;}
+      throw fail('Checkout changed while processing. Refresh the order before trying again.',409);
+    }
+    // No payment_source: SDK v6 selects Venmo at authorization.
+    const payload={intent:'CAPTURE',purchase_units:[{
+      reference_id:'CUSTOM_COASTER',custom_id:orderId,
+      invoice_id:`${orderId}-V-${attemptId.slice(0,8)}`,
+      description:`WestTech custom coasters - ${orderId} - local pickup`,
+      amount:{currency_code:'USD',value:String(quote.totalAmount),breakdown:{
+        item_total:{currency_code:'USD',value:String(quote.itemAmount)},
+        shipping:{currency_code:'USD',value:'0.00'},
+        tax_total:{currency_code:'USD',value:String(quote.taxAmount)}
+      }},
+      items:[{name:'WestTech custom coaster set',quantity:'1',category:'PHYSICAL_GOODS',unit_amount:{currency_code:'USD',value:String(quote.itemAmount)}}]
+    }]};
+    try {
+      const created=await api(env,'/v2/checkout/orders',{method:'POST',body:payload,requestId:`WT-VM-${attemptId}`});
+      if(!created?.id||!/^[A-Z0-9]{8,32}$/i.test(created.id))throw fail('PayPal did not return a valid order ID.',502);
+      const completed=await db.prepare("UPDATE coaster_payment_attempts SET provider_order_id=?,status='CREATED',updated_at=CURRENT_TIMESTAMP WHERE attempt_id=? AND provider_order_id=? AND status='CREATING' AND EXISTS (SELECT 1 FROM coaster_orders WHERE order_id=? AND payment_required=1 AND payment_status IN ('NOT_REQUESTED','AWAITING_PAYMENT','AWAITING_TAX_CONFIRMATION','PREVIEW_AWAITING_TEST_PAYMENT','PAYPAL_ERROR'))")
+        .bind(created.id,attemptId,pendingRef,orderId).run();
+      if(Number(completed?.meta?.changes||0)!==1)throw fail('Venmo checkout reservation changed; review the order before retrying.',502);
+      return {orderId:created.id,reused:false};
+    } catch(e) {
+      // If PayPal returned a network error, the unexposed pending provider
+      // order cannot be approved by this buyer. Release only our reservation.
+      await db.prepare("UPDATE coaster_payment_attempts SET status='FAILED',updated_at=CURRENT_TIMESTAMP WHERE attempt_id=? AND status='CREATING' AND provider_order_id=?")
+        .bind(attemptId,pendingRef).run();
+      throw e;
+    }
+  }
+  throw fail('Venmo checkout state changed repeatedly. Check your order before retrying.',409);
 }
+
 // Record a buyer-abandoned Sandbox attempt without changing the coaster order.
 // A CAPTURING or CAPTURED attempt can never be downgraded to CANCELED.
 export async function cancelVenmoPickup(env, orderId, paypalOrderId) {
