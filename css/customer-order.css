@@ -337,3 +337,30 @@
 .customer-order-main .customer-order-production-summary-row dd {
   overflow-wrap:anywhere;
 }
+
+/* Stage 5I: an approved unpaid coaster order is a focused checkout, not a
+   status dashboard. All other stages keep their existing dashboard/layout. */
+.customer-order-main.co-checkout-mode #co-content {display:none!important;}
+.customer-order-main.co-checkout-mode #co-stage-workspace {
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:20px;
+  align-items:start;
+  margin-top:14px;
+}
+.customer-order-main.co-checkout-mode #co-stage-workspace>#co-approval {
+  grid-column:1;grid-row:1;
+}
+.customer-order-main.co-checkout-mode #co-stage-workspace>#co-stage-panel {
+  grid-column:2;grid-row:1;
+}
+.customer-order-main.co-checkout-mode #co-stage-workspace>#co-approval .customer-order-proof-frame {
+  min-height:240px;
+}
+.customer-order-main.co-checkout-mode #co-stage-workspace>#co-approval .customer-order-proof-frame img {
+  max-height:350px;
+}
+@media (max-width:950px) {
+  .customer-order-main.co-checkout-mode #co-stage-workspace {grid-template-columns:minmax(0,1fr);gap:16px;}
+  .customer-order-main.co-checkout-mode #co-stage-workspace>#co-approval {grid-column:1;grid-row:1;}
+  .customer-order-main.co-checkout-mode #co-stage-workspace>#co-stage-panel {grid-column:1;grid-row:2;}
+}

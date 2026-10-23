@@ -44,6 +44,17 @@
    return null;
  }
 
+ // Stage 5I: a paid/released order sees the dashboard; only an approved,
+ // payment-required, unpaid coaster order sees the focused checkout.
+ // Never infer a paid state from a browser action or provider callback.
+ function isFocusedCheckout(order){
+  if(String(order?.sourceType||'').toUpperCase()!=='COASTER'||order.paymentRequired!==true||order.paymentSimulated===true)return false;
+  const status=String(order.status||'').toUpperCase();
+  const payment=String(order.paymentStatus||'NOT_REQUESTED').toUpperCase();
+  return ['PROOF_APPROVED','AWAITING_PAYMENT','PAYMENT_PENDING','APPROVED'].includes(status) &&
+    !['PAID','CAPTURED','COMPLETED','NOT_REQUIRED'].includes(payment);
+ }
+
  // Stage-specific workspace uses the same step() mapping as the progress timeline.
  // These are presentation-only rules; proof approvals, payment and pickup continue
  // to use their existing, authenticated endpoints.
@@ -126,6 +137,11 @@
   }
   $text('#co-stage-label',current===3&&showPayment?'PAYMENT & NEXT STEP':current?`STAGE ${current} OF ${stages.length} · ${stages[current-1].toUpperCase()}`:'ORDER STATUS');
   if(current===3&&showPayment){title='Payment details';explanation=paid?'Your payment is recorded. No further payment is needed.':order.isReorder?(required?'Your verified reorder is awaiting payment. No new proof approval is required.':'Your verified reorder does not require payment.'):required?'Your approved order is waiting for its payment step.':'Your approved order does not require payment.';}
+  if(isFocusedCheckout(order)){
+   title='Complete payment';
+   explanation='Your approved design and saved terms are shown alongside your secure payment choices.';
+   guidance='Review your delivery information and the final tax and total before authorizing payment.';
+  }
   $text('#co-stage-title',title);
   $text('#co-stage-explanation',explanation);
   $text('#co-stage-guidance',guidance);
@@ -208,7 +224,13 @@
   const status=String(order.status||'').toUpperCase();
   const type=String(order.sourceType||'').toUpperCase();
   const fulfillment=String(order.fulfillmentMethod||'').toUpperCase();
-  $text('#co-intro','Track the progress of your WestTech order and see what happens next.');
+  const checkoutMode=isFocusedCheckout(order);
+  $('.customer-order-main')?.classList.toggle('co-checkout-mode',checkoutMode);
+  $text('#co-page-eyebrow',checkoutMode?'WESTTECH CHECKOUT':'WESTTECH CUSTOMER DASHBOARD');
+  $text('#co-page-title',checkoutMode?'Complete your payment.':'Order details.');
+  $text('#co-intro',checkoutMode?
+   'Your approved '+String(order.title||'coaster order')+' ('+String(order.orderId||'')+') is ready for payment. Your artwork and saved terms appear beside the payment options.':
+   'Track the progress of your WestTech order and see what happens next.');
   $text('#co-product-type',({'COASTER':'CUSTOM COASTERS','CUSTOM':'CUSTOM ORDER','ENCLOSURE':'ESP32 ENCLOSURES','STORE':'WESTTECH STORE'})[type]||'WESTTECH ORDER');
   $text('#co-title',order.title||'WestTech Order');
   $text('#co-order-id',order.orderId);
@@ -295,7 +317,7 @@
      const changing=p.proofStatus==='CHANGES_REQUESTED';
      // The exact full-size proof remains in the review workflow. For approved
      // image proofs, show the saved artwork above and keep terms below.
-     const topArtwork=approved&&!p.proofIsPdf;
+     const topArtwork=approved&&!p.proofIsPdf&&!isFocusedCheckout(order);
      if(topArtwork)renderCoasterDesign(order);
      else $('#co-design').hidden=true;
      $('#co-proof-frame').hidden=topArtwork;
