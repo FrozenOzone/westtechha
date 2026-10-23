@@ -284,3 +284,86 @@ export async function captureVenmoPickup(env, orderId, paypalOrderId) {
   await db.prepare("UPDATE coaster_payment_attempts SET status='CAPTURED',updated_at=CURRENT_TIMESTAMP WHERE attempt_id=?").bind(attempt.attempt_id).run();
   return {order:paid,capturedNow:!!paid._paymentCapturedNow};
 }
+
+
+// Stage 5K3: explicit, Sandbox-only Admin recovery for a provider-COMPLETED Venmo
+// capture. GET provider details only: NEVER requests a capture, refund, or unlock.
+// Requires the original CAPTURING attempt and frozen total/address to agree.
+export async function recoverCompletedCoasterVenmoCapture(env,orderId,providerOrderId,expectedCaptureId){
+ const stop=(message,status=409)=>{throw fail(message,status);};
+ if(sanitizeEnvValue(env.PAYPAL_ENV).toLowerCase()!=='sandbox')stop('Venmo recovery is Sandbox-only.',403);
+ if(!/^WTCC-\d{8}-\d{1,6}$/.test(String(orderId||'')))stop('Invalid coaster order.',400);
+ const ref=String(providerOrderId||'').trim(),capture=String(expectedCaptureId||'').trim();
+ if(!/^[A-Z0-9]{8,32}$/i.test(ref)||!/^[A-Za-z0-9-]{8,120}$/.test(capture))stop('Valid provider and capture references are required.',400);
+ const db=requireOrdersDb(env),current=await getCoasterOrderDetail(env,orderId);
+ if(!current)stop('Order not found.',404);
+ const attempt=await db.prepare("SELECT * FROM coaster_payment_attempts WHERE coaster_order_id=? AND method='VENMO' AND provider_order_id=? LIMIT 1")
+   .bind(orderId,ref).first();
+ if(!attempt)stop('Venmo payment attempt not found.');
+ if(String(current.paymentStatus||'').toUpperCase()==='PAID'){
+  if(current.paypalOrderId===ref&&current.paypalCaptureId===capture&&attempt.status==='CAPTURED')
+   return {order:current,recovered:false,alreadyPaid:true};
+  stop('Already paid or incomplete finalization. Inspect manually; do not pay again.');
+ }
+ if(current.paymentStatus!=='CAPTURING_VENMO'||attempt.status!=='CAPTURING')stop('Only an existing locked Venmo capture is recoverable.');
+ if(current.paymentRequired!==true||current.proofStatus!=='APPROVED'||
+    !['PROOF_APPROVED','AWAITING_PAYMENT'].includes(String(current.status||''))||
+    !['SHIP','LOCAL_PICKUP'].includes(current.fulfillmentMethod))stop('Approved payment terms are not recoverable.');
+ if(current.paypalOrderId&&current.paypalOrderId!==ref)stop('Different provider order was previously recorded.');
+ if(current.paypalCaptureId)stop('Capture already recorded; manual review required.');
+ let locked;
+ try{locked=JSON.parse(String(attempt.quote_json||''));}catch{stop('Frozen Venmo quote is invalid.');}
+ const exact=v=>typeof v==='string'&&/^\d{1,7}\.\d{2}$/.test(v);
+ if(!exact(String(attempt.amount||''))||!exact(locked?.totalAmount)||!exact(locked?.itemAmount)||
+    !exact(locked?.shippingAmount)||!exact(locked?.taxAmount)||
+    String(locked.totalAmount)!==String(attempt.amount)||
+    Math.abs(Number(locked.itemAmount)+Number(locked.shippingAmount)+Number(locked.taxAmount)-Number(locked.totalAmount))>.001||
+    Math.abs(Number(locked.itemAmount)+Number(locked.shippingAmount)-Number(current.finalAmount))>.001||
+    (current.fulfillmentMethod==='LOCAL_PICKUP'&&Number(locked.shippingAmount)!==0)||
+    (current.fulfillmentMethod==='SHIP'&&Math.abs(Number(locked.shippingAmount)-Number(current.shippingAmount))>.001))
+    stop('Frozen quote and approved order do not match.');
+ if(current.fulfillmentMethod==='SHIP'&&(!locked.address||!locked.address.fullName))stop('Frozen shipping address is missing.');
+ // Do not let an earlier PayPal tax record silently override this locked quote.
+ if(Number(current.paymentTotal||0)>0&&Math.abs(Number(current.paymentTotal)-Number(locked.totalAmount))>.001)
+  stop('Existing payment total conflicts with frozen Venmo quote.');
+ if(current.taxAddressJson){
+  let prior;try{prior=JSON.parse(current.taxAddressJson);}catch{stop('Recorded tax address is invalid.');}
+  const norm=x=>String(x||'').trim().toUpperCase().replace(/\s+/g,' ');
+  const fields=['address1','address2','city','state','postalCode','countryCode'];
+  if(fields.some(k=>norm(prior[k])!==norm(locked.address?.[k])))stop('Recorded tax address conflicts with frozen Venmo quote.');
+ }
+ const provider=await api(env,'/v2/checkout/orders/'+encodeURIComponent(ref)); // GET only
+ const units=provider?.purchase_units||[],unit=units[0],caps=unit?.payments?.captures||[],cap=caps[0];
+ if(provider?.id!==ref||provider?.status!=='COMPLETED'||units.length!==1||
+    unit?.custom_id!==orderId||!provider?.payment_source?.venmo||caps.length!==1||
+    cap?.status!=='COMPLETED'||cap?.id!==capture||
+    cap?.amount?.currency_code!=='USD'||unit?.amount?.currency_code!=='USD'||
+    String(cap?.amount?.value)!==String(attempt.amount)||
+    String(unit?.amount?.value)!==String(attempt.amount))
+    stop('PayPal did not verify the exact completed Venmo charge. Do not pay again.');
+ if(current.fulfillmentMethod==='SHIP'&&!providerShippingMatches(locked,unit))
+    stop('Provider shipping destination or recipient differs from frozen quote.');
+ const fresh=await getCoasterOrderDetail(env,orderId);
+ const again=await db.prepare("SELECT * FROM coaster_payment_attempts WHERE coaster_order_id=? AND method='VENMO' AND provider_order_id=? LIMIT 1")
+   .bind(orderId,ref).first();
+ if(!fresh||!again||fresh.paymentStatus!=='CAPTURING_VENMO'||again.status!=='CAPTURING'||
+    String(again.attempt_id)!==String(attempt.attempt_id)||again.quote_json!==attempt.quote_json||
+    again.amount!==attempt.amount||fresh.proofStatus!=='APPROVED'||fresh.paymentRequired!==true||
+    fresh.fulfillmentMethod!==current.fulfillmentMethod||fresh.status!==current.status||
+    Math.abs(Number(fresh.finalAmount)-Number(current.finalAmount))>.001||
+    Math.abs(Number(fresh.shippingAmount||0)-Number(current.shippingAmount||0))>.001||
+    String(fresh.paypalOrderId||'')!==String(current.paypalOrderId||''))
+    stop('Locked order or payment attempt changed during verification.');
+ // Mirrors the ordinary Venmo finalization and leaves the capture lock in place.
+ // An interrupted finalization remains locked; never resets status to retryable.
+ const write=await db.prepare("UPDATE coaster_orders SET paypal_order_id=?,paypal_order_status='COMPLETED',taxable_amount=?,tax_amount=?,tax_rate=?,tax_jurisdiction_code=?,tax_source=?,tax_address_source=?,tax_address_json=?,tax_quote_json=?,payment_total=?,tax_confirmed_at=CURRENT_TIMESTAMP,updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND payment_status='CAPTURING_VENMO' AND payment_required=1 AND proof_status='APPROVED' AND (paypal_order_id IS NULL OR paypal_order_id=?) AND paypal_capture_id IS NULL AND final_amount=? AND shipping_amount=?")
+   .bind(ref,Number(locked.itemAmount),Number(locked.taxAmount),Number(locked.taxRate||0),String(locked.jurisdictionCode||''),String(locked.source||''),
+     fresh.fulfillmentMethod==='SHIP'?'VENMO_SHIPPING':'WESTTECH_PICKUP',JSON.stringify(locked.address),JSON.stringify(locked),Number(locked.totalAmount),orderId,ref,Number(fresh.finalAmount),Number(fresh.shippingAmount||0)).run();
+ if(Number(write?.meta?.changes||0)!==1)stop('Verified capture is still locked; Admin must inspect the changed order.');
+ const paid=await markCaptured(env,orderId,ref,provider,provider,{method:'VENMO'});
+ if(!paid||String(paid.paymentStatus||'').toUpperCase()!=='PAID')stop('Provider capture verified, but local finalization needs manual review.',502);
+ const finished=await db.prepare("UPDATE coaster_payment_attempts SET status='CAPTURED',updated_at=CURRENT_TIMESTAMP WHERE attempt_id=? AND status='CAPTURING'")
+   .bind(attempt.attempt_id).run();
+ if(Number(finished?.meta?.changes||0)!==1)stop('Payment is paid, but attempt ledger needs manual reconciliation.',502);
+ return {order:paid,recovered:true,alreadyPaid:false};
+}

@@ -277,6 +277,9 @@ export async function inspectCoasterPaymentRecovery(env,orderId){
   providerStatus:null,providerCaptureStatus:null,providerCaptureReference:null,
   providerCaptureAmount:null,expectedAmount:usd(money(order.paymentTotal)>0?order.paymentTotal:money(order.finalAmount)+money(order.taxAmount)),
   captureVerified:false,needsManualReview:!['PAID','NOT_REQUIRED'].includes(localStatus)};
+ if(localStatus==='CREATING_PAYPAL_ORDER'&&!order.paypalOrderId){
+  summary.creationLockReview='Checkout creation is incomplete and the provider order ID was not saved. Do not clear this lock or create another checkout until the original PayPal request is reconciled manually.';
+ }
  if(!ref||ref.startsWith('PENDING'))return summary;
  const result=await paypalCall(env,
   '/v2/checkout/orders/'+encodeURIComponent(ref));
