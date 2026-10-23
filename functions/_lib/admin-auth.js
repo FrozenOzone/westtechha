@@ -11,6 +11,13 @@ export function requireWestTechAdmin(context){
   const accessHosts=new Set(['westtechha.com','www.westtechha.com']);
   const accessEmails=new Set(['west.ed@gmail.com','ewest@westtechha.com']);
   const isProductionAccessHost=accessHosts.has(host);
+  // Preview Admin never falls back to a reusable bearer token. The value
+  // below is set ONLY by middleware after cryptographic Access JWT validation.
+  if(host==='dev.westtechha.com'){
+    const verifiedEmail=sanitizeEnvValue(context.data?.westtechVerifiedAdmin).toLowerCase();
+    if(!accessEmails.has(verifiedEmail))throw Object.assign(new Error('Cloudflare Access authentication required.'),{status:401});
+    return {authentication:'cloudflare-access',email:verifiedEmail};
+  }
 
   if(isProductionAccessHost&&accessEmails.has(accessEmail)&&accessAssertion){
     return {authentication:'cloudflare-access',email:accessEmail};

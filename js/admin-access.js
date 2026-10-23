@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const productionHosts=new Set(['westtechha.com','www.westtechha.com']);
+  const productionHosts=new Set(['westtechha.com','www.westtechha.com','dev.westtechha.com']);
   const isProduction=productionHosts.has(location.hostname.toLowerCase());
   window.WestTechAdminAccess={isProduction,token:'cloudflare-access',loginPath:'/admin/login'};
   if(!isProduction)return;
