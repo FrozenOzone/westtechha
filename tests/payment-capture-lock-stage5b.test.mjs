@@ -18,7 +18,10 @@ test('capture uses an order-scoped, conditional PayPal lock for both customer an
 });
 
 test('Venmo capture preserves provider locks and records payment method',()=>{
-  assert.match(venmo,/payment_required=1 AND proof_status='APPROVED' AND fulfillment_method='LOCAL_PICKUP'/);
+  const lockedCapture=venmo.match(/const orderLock=await db\.prepare\("([^"]+)"\)\.bind\(orderId\)\.run\(\);/);
+  assert.ok(lockedCapture,'Venmo capture must retain an order-scoped, conditional D1 lock');
+  assert.match(lockedCapture[1],/payment_required=1 AND proof_status='APPROVED' AND \(fulfillment_method='LOCAL_PICKUP' OR fulfillment_method='SHIP'\)/);
+  assert.match(venmo,/providerShippingMatches\(fresh,details\.purchase_units\?\.\[0\]\)/);
   assert.match(venmo,/status IN \('PROOF_APPROVED','AWAITING_PAYMENT'\) AND payment_status IN \('NOT_REQUESTED','AWAITING_PAYMENT','AWAITING_TAX_CONFIRMATION','PREVIEW_AWAITING_TEST_PAYMENT','PAYPAL_ERROR'\)/);
   assert.match(venmo,/WHERE order_id=\? AND payment_status='CAPTURING_VENMO'/);
   assert.match(venmo,/markCaptured\(env,orderId,paypalOrderId,details,captured,\{method:'VENMO'\}\)/);

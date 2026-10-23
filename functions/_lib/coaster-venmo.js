@@ -1,7 +1,7 @@
-/* Sandbox-only, local-pickup Venmo payment adapter. No change to existing PayPal checkout. */
+/* Sandbox-only Venmo adapter: local pickup + gated shipping. Existing PayPal checkout unchanged. */
 import { generateAccessToken, paypalBaseUrl } from './paypal.js';
 import { getCoasterOrderDetail } from './coaster-orders.js';
-import { buildTaxQuote } from './tax.js';
+import { buildTaxQuote, validateShippingAddress } from './tax.js';
 import { requireOrdersDb } from './orders.js';
 import { readJsonSafe, sanitizeEnvValue } from './shared.js';
 import { markCaptured } from './coaster-paypal.js';
@@ -18,18 +18,49 @@ function requireOrder(order) {
   if (order.paymentRequired !== true || order.proofStatus !== 'APPROVED' ||
     !['PROOF_APPROVED', 'AWAITING_PAYMENT'].includes(String(order.status || '').toUpperCase()) ||
     ['PAID','CAPTURING_VENMO','CAPTURING_PAYPAL','CREATING_PAYPAL_ORDER'].includes(String(order.paymentStatus || '').toUpperCase())) throw fail('Payment is not available for this order.');
-  if (order.fulfillmentMethod !== 'LOCAL_PICKUP') throw fail('Venmo testing currently supports local pickup only. Please use PayPal for shipped orders.');
+  if (order.fulfillmentMethod !== 'LOCAL_PICKUP' && order.fulfillmentMethod !== 'SHIP') throw fail('Unsupported Venmo fulfillment method.');
   if (!String(order.productionWindow || '').trim()) throw fail('Production window is not set.');
   if (!(Number(order.finalAmount) > 0)) throw fail('Approved amount is invalid.');
 }
-async function quoteFor(env, order) {
+async function quoteFor(env, order, shippingAddress=null) {
   requireOrder(order);
-  const amount = money(Number(order.finalAmount));
-  const quote = await buildTaxQuote(env, PICKUP_ADDRESS, {
-    taxableAmount: amount, itemAmount: amount, shippingAmount: 0
-  });
-  if (!quote.isColorado || !validMoney(String(quote.totalAmount))) throw fail('Could not verify pickup tax quote.', 503);
+  const ship=order.fulfillmentMethod==='SHIP';
+  if(ship && (!shippingAddress || typeof shippingAddress!=='object' || Array.isArray(shippingAddress)))
+    throw fail('Enter and confirm a shipping address before starting Venmo.',400);
+  const address=ship?validateShippingAddress(shippingAddress):PICKUP_ADDRESS;
+  if(ship && (!String(address.fullName||'').trim() || String(address.fullName).length>200))
+    throw fail('Enter a shipping recipient name.',400);
+  if(ship){
+    for(const [key,max] of [['address1',200],['address2',200],['city',120],['postalCode',15]])
+      if(String(address[key]||'').length>max)throw fail('Shipping address field is too long.',400);
+    if(!/^\d{5}(?:-\d{4})?$/.test(String(address.postalCode)))
+      throw fail('Enter a valid U.S. ZIP code.',400);
+  }
+  const subtotal=money(Number(order.finalAmount));
+  const shippingAmount=ship?money(Number(order.shippingAmount||0)):0;
+  if(ship && (!Number.isFinite(Number(order.shippingAmount)) || shippingAmount<0 || shippingAmount>=subtotal))
+    throw fail('Approved shipping charge is invalid. Contact WestTech.',409);
+  const itemAmount=money(subtotal-shippingAmount);
+  const quote=await buildTaxQuote(env,address,{taxableAmount:itemAmount,itemAmount,shippingAmount});
+  if(!validMoney(String(quote.totalAmount)))throw fail('Could not verify the final Venmo tax quote.',503);
+  if(!ship && !quote.isColorado)throw fail('Could not verify pickup tax quote.',503);
   return quote;
+}
+export async function getVenmoShippingQuote(env,orderId,shippingAddress) {
+  const order=await getCoasterOrderDetail(env,orderId);
+  if(order?.fulfillmentMethod!=='SHIP')throw fail('Shipping quote only for shipped orders.',400);
+  return quoteFor(env,order,shippingAddress);
+}
+// No trust in browser addresses at capture: match PayPal's chosen shipping to our locked quote.
+function providerShippingMatches(quote, unit) {
+  const a=quote?.address,b=unit?.shipping?.address;
+  if(!a||!b)return false;
+  const norm=s=>String(s??'').trim().toUpperCase().replace(/\s+/g,' ');
+  const equal=(left,right)=>norm(left)===norm(right);
+  return equal(a.address1,b.address_line_1)&&equal(a.address2,b.address_line_2)&&
+    equal(a.city,b.admin_area_2)&&equal(a.state,b.admin_area_1)&&
+    equal(a.postalCode,b.postal_code)&&equal(a.countryCode,b.country_code)&&
+    equal(a.fullName,unit?.shipping?.name?.full_name);
 }
 export async function getVenmoPickupQuote(env, orderId) {
   const order = await getCoasterOrderDetail(env, orderId);
@@ -96,11 +127,11 @@ async function reuseVenmoCheckout(env,db,orderId,quote,attempt) {
     .bind(attempt.attempt_id).first();
   return still?.status==='CREATED'?{orderId:attempt.provider_order_id,reused:true}:null;
 }
-export async function startVenmoPickup(env, orderId, expectedTotal) {
+export async function startVenmoPickup(env, orderId, expectedTotal, shippingAddress=null) {
   if (!validMoney(expectedTotal)) throw fail('Confirm a valid final total.', 400);
   if (sanitizeEnvValue(env.PAYPAL_ENV).toLowerCase() !== 'sandbox') throw fail('Venmo Sandbox checkout is not enabled.', 403);
   const order=await getCoasterOrderDetail(env,orderId);
-  const quote=await quoteFor(env,order);
+  const quote=await quoteFor(env,order,shippingAddress);
   if(String(quote.totalAmount)!==expectedTotal)throw fail('Your tax quote changed. Review the total again.');
   const currency=sanitizeEnvValue(env.PAYPAL_CURRENCY)||'USD';
   if(currency!=='USD')throw fail('Venmo requires USD.',403);
@@ -126,7 +157,7 @@ export async function startVenmoPickup(env, orderId, expectedTotal) {
     // One conditional SQL write wins across concurrent Cloudflare Workers.
     // Revalidate payment eligibility *inside* the statement to close the
     // race with a concurrent PayPal/Venmo payment capture.
-    const claim=await db.prepare("INSERT INTO coaster_payment_attempts (attempt_id,coaster_order_id,method,provider_order_id,amount,quote_json,status) SELECT ?,?,'VENMO',?,?,?,'CREATING' WHERE EXISTS (SELECT 1 FROM coaster_orders WHERE order_id=? AND payment_required=1 AND proof_status='APPROVED' AND fulfillment_method='LOCAL_PICKUP' AND status IN ('PROOF_APPROVED','AWAITING_PAYMENT') AND payment_status IN ('NOT_REQUESTED','AWAITING_PAYMENT','AWAITING_TAX_CONFIRMATION','PREVIEW_AWAITING_TEST_PAYMENT','PAYPAL_ERROR')) AND NOT EXISTS (SELECT 1 FROM coaster_payment_attempts WHERE coaster_order_id=? AND method='VENMO' AND status IN ('CREATING','CREATED','CAPTURING'))")
+    const claim=await db.prepare("INSERT INTO coaster_payment_attempts (attempt_id,coaster_order_id,method,provider_order_id,amount,quote_json,status) SELECT ?,?,'VENMO',?,?,?,'CREATING' WHERE EXISTS (SELECT 1 FROM coaster_orders WHERE order_id=? AND payment_required=1 AND proof_status='APPROVED' AND (fulfillment_method='LOCAL_PICKUP' OR fulfillment_method='SHIP') AND status IN ('PROOF_APPROVED','AWAITING_PAYMENT') AND payment_status IN ('NOT_REQUESTED','AWAITING_PAYMENT','AWAITING_TAX_CONFIRMATION','PREVIEW_AWAITING_TEST_PAYMENT','PAYPAL_ERROR')) AND NOT EXISTS (SELECT 1 FROM coaster_payment_attempts WHERE coaster_order_id=? AND method='VENMO' AND status IN ('CREATING','CREATED','CAPTURING'))")
       .bind(attemptId,orderId,pendingRef,String(quote.totalAmount),JSON.stringify(quote),orderId,orderId).run();
     if(Number(claim?.meta?.changes||0)!==1){
       // Either another request won, or the order was paid/locked meanwhile.
@@ -138,14 +169,24 @@ export async function startVenmoPickup(env, orderId, expectedTotal) {
     const payload={intent:'CAPTURE',purchase_units:[{
       reference_id:'CUSTOM_COASTER',custom_id:orderId,
       invoice_id:`${orderId}-V-${attemptId.slice(0,8)}`,
-      description:`WestTech custom coasters - ${orderId} - local pickup`,
+      description:`WestTech custom coasters - ${orderId} - ${order.fulfillmentMethod==='SHIP'?'shipping':'local pickup'}`,
       amount:{currency_code:'USD',value:String(quote.totalAmount),breakdown:{
         item_total:{currency_code:'USD',value:String(quote.itemAmount)},
-        shipping:{currency_code:'USD',value:'0.00'},
+        shipping:{currency_code:'USD',value:String(quote.shippingAmount)},
         tax_total:{currency_code:'USD',value:String(quote.taxAmount)}
       }},
-      items:[{name:'WestTech custom coaster set',quantity:'1',category:'PHYSICAL_GOODS',unit_amount:{currency_code:'USD',value:String(quote.itemAmount)}}]
-    }]};
+      items:[{name:'WestTech custom coaster set',quantity:'1',category:'PHYSICAL_GOODS',unit_amount:{currency_code:'USD',value:String(quote.itemAmount)}}],
+      ...(order.fulfillmentMethod==='SHIP'?{shipping:{
+        name:{full_name:quote.address.fullName},
+        address:{address_line_1:quote.address.address1,
+          ...(quote.address.address2?{address_line_2:quote.address.address2}:{}),
+          admin_area_2:quote.address.city,admin_area_1:quote.address.state,
+          postal_code:quote.address.postalCode,country_code:'US'}
+      }}:{})
+    }],
+    ...(order.fulfillmentMethod==='SHIP'?{payment_source:{venmo:{experience_context:{
+      shipping_preference:'SET_PROVIDED_ADDRESS',user_action:'PAY_NOW'
+    }}}}:{})};
     try {
       const created=await api(env,'/v2/checkout/orders',{method:'POST',body:payload,requestId:`WT-VM-${attemptId}`});
       if(!created?.id||!/^[A-Z0-9]{8,32}$/i.test(created.id))throw fail('PayPal did not return a valid order ID.',502);
@@ -192,7 +233,10 @@ export async function captureVenmoPickup(env, orderId, paypalOrderId) {
   }
   requireOrder(current);
   if (attempt.status!=='CREATED') throw fail('Payment is already being processed. Contact WestTech before retrying.',409);
-  const fresh = await quoteFor(env,current);
+  let locked;
+  try{locked=JSON.parse(attempt.quote_json);}catch{throw fail('Venmo quote record is invalid. Contact WestTech.',409);}
+  const fresh=await quoteFor(env,current,current.fulfillmentMethod==='SHIP'?locked.address:null);
+  if(!sameVenmoQuote(attempt,fresh))throw fail('Shipping address or tax quote changed. No payment captured. Contact WestTech.',409);
   if (String(fresh.totalAmount)!==attempt.amount) throw fail('The tax amount changed. No payment has been captured. Please contact WestTech.',409);
   const details = await api(env,`/v2/checkout/orders/${encodeURIComponent(paypalOrderId)}`);
   if (details?.status!=='APPROVED' || details.purchase_units?.[0]?.custom_id!==orderId ||
@@ -200,11 +244,13 @@ export async function captureVenmoPickup(env, orderId, paypalOrderId) {
       details.purchase_units?.[0]?.amount?.currency_code!=='USD') throw fail('PayPal authorization or transaction amount did not match.',409);
   // Venmo instrument must be asserted by PayPal; never trust a browser-provided method.
   if (!details?.payment_source?.venmo) throw fail('PayPal did not confirm Venmo as the funding method. No payment captured.',409);
+  if (current.fulfillmentMethod==='SHIP' && !providerShippingMatches(fresh,details.purchase_units?.[0]))
+    throw fail('Venmo shipping address does not match the confirmed address. No payment captured. Contact WestTech.',409);
   // Reserve both this attempt and the WestTech order BEFORE calling PayPal capture.
   // Legacy PayPal capture explicitly rejects CAPTURING_VENMO to avoid double charges.
   const reserved=await db.prepare("UPDATE coaster_payment_attempts SET status='CAPTURING',updated_at=CURRENT_TIMESTAMP WHERE attempt_id=? AND status='CREATED'").bind(attempt.attempt_id).run();
   if (Number(reserved?.meta?.changes||0)!==1) throw fail('Payment already processing.',409);
-  const orderLock=await db.prepare("UPDATE coaster_orders SET payment_status='CAPTURING_VENMO',updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND payment_required=1 AND proof_status='APPROVED' AND fulfillment_method='LOCAL_PICKUP' AND status IN ('PROOF_APPROVED','AWAITING_PAYMENT') AND payment_status IN ('NOT_REQUESTED','AWAITING_PAYMENT','AWAITING_TAX_CONFIRMATION','PREVIEW_AWAITING_TEST_PAYMENT','PAYPAL_ERROR')").bind(orderId).run();
+  const orderLock=await db.prepare("UPDATE coaster_orders SET payment_status='CAPTURING_VENMO',updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND payment_required=1 AND proof_status='APPROVED' AND (fulfillment_method='LOCAL_PICKUP' OR fulfillment_method='SHIP') AND status IN ('PROOF_APPROVED','AWAITING_PAYMENT') AND payment_status IN ('NOT_REQUESTED','AWAITING_PAYMENT','AWAITING_TAX_CONFIRMATION','PREVIEW_AWAITING_TEST_PAYMENT','PAYPAL_ERROR')").bind(orderId).run();
   if (Number(orderLock?.meta?.changes||0)!==1) {
     await db.prepare("UPDATE coaster_payment_attempts SET status='CANCELED',updated_at=CURRENT_TIMESTAMP WHERE attempt_id=? AND status='CAPTURING'").bind(attempt.attempt_id).run();
     throw fail('Another payment is already processing. Contact WestTech.',409);
@@ -220,15 +266,18 @@ export async function captureVenmoPickup(env, orderId, paypalOrderId) {
   if (captured?.status!=='COMPLETED' || !cap?.id || cap?.status!=='COMPLETED' ||
       String(cap?.amount?.value)!==attempt.amount || cap?.amount?.currency_code!=='USD')
     throw fail('Capture response needs reconciliation. Do not pay again.',502);
+  if(current.fulfillmentMethod==='SHIP' && captured?.purchase_units?.[0]?.shipping &&
+     !providerShippingMatches(fresh,captured.purchase_units[0]))
+    throw fail('Capture succeeded but the provider shipping address changed. Manual reconciliation required. Do not pay again.',502);
   // Preserve existing order lifecycle; use shared markCaptured(), which records
   // events, creates manufacturing work order, and queues production only once.
   const venmoFinalize=await db.prepare(`UPDATE coaster_orders SET paypal_order_id=?,paypal_order_status='COMPLETED',
       tax_amount=?,tax_rate=?,taxable_amount=?,tax_jurisdiction_code=?,tax_source=?,
-      tax_address_source='WESTTECH_PICKUP',tax_address_json=?,tax_quote_json=?,
+      tax_address_source=?,tax_address_json=?,tax_quote_json=?,
       payment_total=?,tax_confirmed_at=CURRENT_TIMESTAMP
       WHERE order_id=? AND payment_status='CAPTURING_VENMO'`)
     .bind(paypalOrderId,Number(fresh.taxAmount),Number(fresh.taxRate),Number(fresh.taxableAmount),String(fresh.jurisdictionCode||''),String(fresh.source||''),
-      JSON.stringify(fresh.address),JSON.stringify(fresh),Number(fresh.totalAmount),orderId).run();
+      current.fulfillmentMethod==='SHIP'?'VENMO_SHIPPING':'WESTTECH_PICKUP',JSON.stringify(fresh.address),JSON.stringify(fresh),Number(fresh.totalAmount),orderId).run();
   if(Number(venmoFinalize?.meta?.changes||0)!==1)throw fail('Venmo captured, but the order lock changed. Admin reconciliation required; do not pay again.',502);
   const paid=await markCaptured(env,orderId,paypalOrderId,details,captured,{method:'VENMO'});
   if (!paid || String(paid.paymentStatus||'').toUpperCase()!=='PAID') throw fail('Payment captured, but order needs admin reconciliation. Do not pay again.',502);

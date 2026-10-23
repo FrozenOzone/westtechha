@@ -195,9 +195,23 @@
           <p id="co-paypal-feedback" role="status" aria-live="polite" hidden></p>
           <section id="co-payment-methods" hidden aria-label="Venmo Sandbox checkout" style="border-top:1px solid #356187;margin-top:16px;padding-top:14px;">
             <h3 style="margin:0 0 8px;">Or pay with Venmo</h3>
-            <p style="margin:0 0 10px;color:#b5d1e6;">Sandbox test · Local pickup only · No real funds will be charged. Eligible US buyers can use Venmo without opening a PayPal account.</p>
+            <p style="margin:0 0 10px;color:#b5d1e6;">Sandbox only · No real funds will be charged. Shipped orders require a confirmed delivery address and final tax quote before checkout.</p>
+            <div id="co-venmo-shipping" hidden style="padding:12px;margin:12px 0;border:1px solid #356187;border-radius:9px;">
+              <strong style="display:block;margin-bottom:8px;">Shipping address for Venmo Sandbox</strong>
+              <p style="margin:0 0 9px;color:#b5d1e6;">Enter the delivery address. Shipping is already included in your approved subtotal. We'll calculate destination sales tax before payment. Your Venmo shipping address must match.</p>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:9px;">
+                <label>Recipient name<input id="co-venmo-ship-name" autocomplete="shipping name" maxlength="200"/></label>
+                <label>Street address<input id="co-venmo-ship-line1" autocomplete="shipping address-line1" maxlength="200"/></label>
+                <label>Apt / Suite (optional)<input id="co-venmo-ship-line2" autocomplete="shipping address-line2" maxlength="200"/></label>
+                <label>City<input id="co-venmo-ship-city" autocomplete="shipping address-level2" maxlength="120"/></label>
+                <label>State (2-letter code)<input id="co-venmo-ship-state" autocomplete="shipping address-level1" maxlength="2" placeholder="CO"/></label>
+                <label>ZIP code<input id="co-venmo-ship-zip" autocomplete="shipping postal-code" maxlength="15"/></label>
+              </div>
+              <button id="co-venmo-ship-quote" type="button" class="customer-primary-btn" style="margin-top:12px;background:#1677c4;color:#fff;border:0;border-radius:6px;padding:10px 14px;cursor:pointer;">Calculate Shipping & Tax Total</button>
+              <p id="co-venmo-ship-summary" style="color:#b5d1e6;" role="status" aria-live="polite"></p>
+            </div>
             <strong id="co-venmo-total" style="display:block;margin-bottom:9px;"></strong>
-            <label style="display:flex;gap:8px;align-items:flex-start;margin-bottom:10px;"><input id="co-venmo-tax-confirm" type="checkbox"/><span>I confirm the displayed Colorado tax and full payment amount before starting Venmo checkout.</span></label>
+            <label style="display:flex;gap:8px;align-items:flex-start;margin-bottom:10px;"><input id="co-venmo-tax-confirm" type="checkbox"/><span>I confirm the delivery details, applicable sales tax, and final payment amount before starting Venmo checkout.</span></label>
             <venmo-button id="co-venmo-button" type="pay" hidden></venmo-button>
             <p id="co-venmo-explain" hidden>Venmo isn't available for this buyer; PayPal is still available above.</p>
             <p id="co-venmo-feedback" role="status" aria-live="polite" hidden></p>
@@ -214,5 +228,5 @@
   </main>
   <div id="site-footer"></div>
 </div>
-<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-pickup-details1"></script><script src="../js/customer-order.js?v=20261021-sandbox1"></script><script src="../js/customer-payment-methods.js?v=20261023-stage5e1"></script>
+<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-pickup-details1"></script><script src="../js/customer-order.js?v=20261021-sandbox1"></script><script src="../js/customer-payment-methods.js?v=20261023-stage5g1"></script>
 </body></html>

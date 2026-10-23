@@ -9,6 +9,11 @@
  const button=document.querySelector('#co-venmo-button'),explain=document.querySelector('#co-venmo-explain');
  const confirm=document.querySelector('#co-venmo-tax-confirm'),quoteEl=document.querySelector('#co-venmo-total');
  const feedback=document.querySelector('#co-venmo-feedback');
+ const shippingPanel=document.querySelector('#co-venmo-shipping');
+ const shippingButton=document.querySelector('#co-venmo-ship-quote');
+ const shippingSummary=document.querySelector('#co-venmo-ship-summary');
+ const shippingFields=['name','line1','line2','city','state','zip'].map(x=>document.querySelector('#co-venmo-ship-'+x));
+ let shippingMode=false,confirmedAddress=null;
  const route='/api/customer/orders/COASTER/'+encodeURIComponent(orderId)+'/payment-methods';
  let quote=null,session=null,busy=false,initialized=false,activeCreate=null,activeOrderId=null;
  function status(message,error=false){feedback.hidden=!message;feedback.textContent=message;feedback.style.color=error?'#ffb3b3':'#c6dcec';}
@@ -29,19 +34,19 @@
   if(!window.paypal?.createInstance)throw new Error('PayPal/Venmo checkout did not initialize.');
  }
  function setEnabled(yes){button.hidden=!yes;explain.hidden=yes;}
- async function init(){
-  if(initialized)return;initialized=true;
-  try{
-   const data=await json(route);
-   const venmo=data.methods?.find(m=>m.id==='venmo');
-   if(data.mode!=='sandbox'||!venmo?.enabled||!data.clientId||!data.quote){root.hidden=true;return;}
-   quote=data.quote;
-   root.hidden=false;
-   quoteEl.textContent=`Approved subtotal: $${quote.taxableAmount} + Colorado tax: $${quote.taxAmount} = Total: $${quote.totalAmount}`;
+ function addressFromFields(){const [name,line1,line2,city,state,zip]=shippingFields.map(x=>x.value.trim());
+  return {fullName:name,address1:line1,address2:line2,city,state,postalCode:zip,countryCode:'US'};
+ }
+ function showQuote(q){
+  quote=q;
+  quoteEl.textContent='Items: $'+q.itemAmount+' + shipping: $'+q.shippingAmount+' + sales tax: $'+q.taxAmount+' = Total: $'+q.totalAmount;
+  if(shippingMode)shippingSummary.textContent='Deliver to: '+[q.address.fullName,q.address.address1,q.address.address2,q.address.city+', '+q.address.state+' '+q.address.postalCode].filter(Boolean).join(' · ');
+ }
+ async function checkoutReady(clientId){
    await loadSdk();
-   const sdk=await window.paypal.createInstance({clientId:data.clientId,components:['venmo-payments'],pageType:'checkout'});
+   const sdk=await window.paypal.createInstance({clientId,components:['venmo-payments'],pageType:'checkout'});
    const eligible=await sdk.findEligibleMethods({currencyCode:'USD',countryCode:'US',amount:String(quote.totalAmount)});
-   if(!eligible.isEligible('venmo')){setEnabled(false);explain.textContent='Venmo is not available for this device or Sandbox buyer. PayPal remains available above.';return;}
+   if(!eligible.isEligible('venmo')){setEnabled(false);explain.textContent='Venmo is unavailable for this Sandbox buyer. PayPal remains available.';return;}
    session=sdk.createVenmoOneTimePaymentSession({
     onApprove:async ({orderId:paypalOrderId})=>{
      activeCreate=null;activeOrderId=null; // Authorization began; never cancel this attempt automatically.
@@ -60,8 +65,33 @@
     },
     onError:()=>{busy=false;status('Venmo could not complete the payment. Please review your order before trying again.',true);}
    });
-   setEnabled(true);status('Venmo is available for this Sandbox buyer. Confirm the tax and total before paying.');
-  }catch(e){root.hidden=false;setEnabled(false);explain.textContent=e.message||'Could not check Venmo eligibility.';}
+
+   setEnabled(true);status('Confirm the address, tax, and final total before paying with Venmo.');
+ }
+ async function init(){
+   if(initialized)return;initialized=true;
+   try{
+     const data=await json(route);
+     const venmo=data.methods?.find(m=>m.id==='venmo');
+     if(data.mode!=='sandbox'||!venmo?.enabled||!data.clientId||(data.fulfillmentMethod!=='SHIP'&&!data.quote)){root.hidden=true;return;}
+     shippingMode=data.fulfillmentMethod==='SHIP';root.hidden=false;shippingPanel.hidden=!shippingMode;
+     if(shippingMode){
+       setEnabled(false);explain.textContent='Calculate and confirm the delivery address and tax total first.';
+       shippingFields.forEach(field=>field.addEventListener('input',()=>{
+         quote=null;confirmedAddress=null;session=null;confirm.checked=false;setEnabled(false);
+         quoteEl.textContent='';shippingSummary.textContent='Address changed. Calculate a new quote.';
+       }));
+       shippingButton.addEventListener('click',async()=>{
+         shippingButton.disabled=true;shippingSummary.textContent='Checking delivery address and calculating tax…';
+         try{
+           const result=await post('quoteVenmoShipping',{shippingAddress:addressFromFields()});
+           confirmedAddress=result.quote.address;showQuote(result.quote);confirm.checked=false;
+           await checkoutReady(data.clientId);
+         }catch(err){quote=null;confirmedAddress=null;session=null;setEnabled(false);shippingSummary.textContent=err.message||'Could not verify the shipping quote.';}
+         finally{shippingButton.disabled=false;}
+       });
+     }else{showQuote(data.quote);await checkoutReady(data.clientId);}
+   }catch(e){root.hidden=false;setEnabled(false);explain.textContent=e.message||'Could not check Venmo eligibility.';}
  }
  button.addEventListener('click',async()=>{
   if(!session||busy)return;
@@ -69,7 +99,7 @@
   busy=true;status('Opening secure Venmo Sandbox checkout…');
   try{
    // Create a separate PayPal Orders API attempt without disturbing existing PayPal approval links.
-   const promise=post('startVenmo',{confirmedTotal:true,expectedTotal:String(quote.totalAmount)})
+   const promise=post('startVenmo',{confirmedTotal:true,expectedTotal:String(quote.totalAmount),...(shippingMode?{shippingAddress:confirmedAddress}:{})})
      .then(data=>{activeOrderId=data.orderId;return {orderId:data.orderId};});
    activeCreate=promise;
    await session.start({presentationMode:'auto'},promise);

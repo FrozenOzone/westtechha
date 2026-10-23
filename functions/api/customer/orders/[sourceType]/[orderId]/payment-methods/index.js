@@ -3,7 +3,7 @@ import { requireOrdersDb } from '../../../../../../_lib/orders.js';
 import { getCoasterOrderDetail } from '../../../../../../_lib/coaster-orders.js';
 import { jsonResponse, sanitizeEnvValue } from '../../../../../../_lib/shared.js';
 import { isCoasterSandbox } from '../../../../../../_lib/coaster-preview-payment-mode.js';
-import { getVenmoPickupQuote, startVenmoPickup, captureVenmoPickup, cancelVenmoPickup } from '../../../../../../_lib/coaster-venmo.js';
+import { getVenmoPickupQuote, getVenmoShippingQuote, startVenmoPickup, captureVenmoPickup, cancelVenmoPickup } from '../../../../../../_lib/coaster-venmo.js';
 import { sendCoasterAdminProductionEmail } from '../../../../../../_lib/coaster-admin-production-email.js';
 import { inviteCustomerForOrder } from '../../../../../../_lib/customer-account.js';
 
@@ -25,7 +25,7 @@ function flags(context,order){
    ['PROOF_APPROVED','AWAITING_PAYMENT'].includes(String(order.status||'').toUpperCase()) &&
    String(order.paymentStatus||'').toUpperCase()!=='PAID';
  return {sandbox,pending,
-   venmo:sandbox && pending && order.fulfillmentMethod==='LOCAL_PICKUP' &&
+   venmo:sandbox && pending && (order.fulfillmentMethod==='LOCAL_PICKUP'||(order.fulfillmentMethod==='SHIP'&&sanitizeEnvValue(context.env.COASTER_VENMO_SHIPPING_SANDBOX_ENABLED)==='1')) &&
      sanitizeEnvValue(context.env.COASTER_VENMO_SANDBOX_ENABLED)==='1' &&
      sanitizeEnvValue(context.env.PAYPAL_CURRENCY)==='USD' &&
      !!sanitizeEnvValue(context.env.PAYPAL_CLIENT_ID)};
@@ -35,11 +35,11 @@ export async function onRequestGet(context){
   const order=await owned(context);const f=flags(context,order);
   if(!f.sandbox)return reply({ok:true,mode:'unavailable',methods:[]});
   const methods=[{id:'paypal',label:'PayPal',enabled:f.pending},
-    {id:'venmo',label:'Venmo',enabled:f.venmo,reason:order.fulfillmentMethod!=='LOCAL_PICKUP'?'Venmo shipping checkout needs further verification.':null}];
+    {id:'venmo',label:'Venmo',enabled:f.venmo,reason:order.fulfillmentMethod==='SHIP'&&!f.venmo?'Venmo shipping Sandbox is not yet enabled.':null}];
   let quote=null;
-  if(f.venmo){const q=await getVenmoPickupQuote(context.env,order.orderId);
+  if(f.venmo&&order.fulfillmentMethod==='LOCAL_PICKUP'){const q=await getVenmoPickupQuote(context.env,order.orderId);
    quote={taxableAmount:q.taxableAmount,taxAmount:q.taxAmount,totalAmount:q.totalAmount,taxRate:q.taxRate,shippingAmount:q.shippingAmount};}
-  return reply({ok:true,mode:'sandbox',methods,clientId:f.venmo?sanitizeEnvValue(context.env.PAYPAL_CLIENT_ID):null,quote});
+  return reply({ok:true,mode:'sandbox',methods,fulfillmentMethod:order.fulfillmentMethod,clientId:f.venmo?sanitizeEnvValue(context.env.PAYPAL_CLIENT_ID):null,quote});
  }catch(e){return reply({ok:false,message:e.message||'Could not load payment methods.'},e.status||500);}
 }
 export async function onRequestPost(context){
@@ -49,9 +49,14 @@ export async function onRequestPost(context){
   if(!/^application\/json(?:;|$)/i.test(context.request.headers.get('Content-Type')||''))throw fail('JSON required.',415);
   const order=await owned(context);const f=flags(context,order);if(!f.venmo)throw fail('Venmo is not enabled for this order.',403);
   const body=await context.request.json();const action=String(body?.action||'');
+  if(action==='quoteVenmoShipping'){
+   if(order.fulfillmentMethod!=='SHIP')throw fail('Shipping quote requires a shipped order.',400);
+   const q=await getVenmoShippingQuote(context.env,order.orderId,body.shippingAddress);
+   return reply({ok:true,quote:{address:q.address,itemAmount:q.itemAmount,shippingAmount:q.shippingAmount,taxAmount:q.taxAmount,taxRate:q.taxRate,totalAmount:q.totalAmount,taxableAmount:q.taxableAmount,isColorado:q.isColorado}});
+  }
   if(action==='startVenmo'){
    if(body?.confirmedTotal!==true)throw fail('Confirm the displayed tax and final total.',400);
-   const result=await startVenmoPickup(context.env,order.orderId,String(body.expectedTotal||''));
+   const result=await startVenmoPickup(context.env,order.orderId,String(body.expectedTotal||''),order.fulfillmentMethod==='SHIP'?body.shippingAddress:null);
    return reply({ok:true,...result});
   }
   if(action==='cancelVenmo'){
