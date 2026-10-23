@@ -12,6 +12,95 @@
   <link href="../css/customer-order.css?v=20261020-proof-terms-v1" rel="stylesheet"/>
   <link href="../css/coaster-pickup-customer.css?v=20261016-roundtrip1" rel="stylesheet"/>
   <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
+  <style>
+    /* Stage 5H: checkout review only; no styles outside the Venmo panel. */
+    #co-payment-methods .co-venmo-review {
+      margin: 18px 0 0;
+      padding: clamp(14px, 3vw, 20px);
+      color: #eaf5ff;
+      background: linear-gradient(155deg, #102d4e 0%, #091d33 100%);
+      border: 2px solid #3699dc;
+      border-radius: 12px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, .19);
+    }
+    #co-payment-methods .co-venmo-review[hidden] { display: none !important; }
+    #co-payment-methods .co-venmo-review-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 13px;
+      flex-wrap: wrap;
+    }
+    #co-payment-methods .co-venmo-review-head strong { font-size: 1.07rem; letter-spacing: .01em; }
+    #co-payment-methods .co-venmo-review-head span {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      color: #b9ddf8;
+      text-transform: uppercase;
+    }
+    #co-payment-methods .co-venmo-price-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 8px 2px;
+      border-bottom: 1px solid rgba(160, 204, 236, .19);
+      font-size: .95rem;
+    }
+    #co-payment-methods .co-venmo-price-row span { color: #c9e1f2; }
+    #co-payment-methods .co-venmo-price-row strong { white-space: nowrap; font-variant-numeric: tabular-nums; }
+    #co-payment-methods .co-venmo-price-row.co-venmo-due {
+      border: 0;
+      border-top: 2px solid rgba(102, 183, 240, .65);
+      margin: 10px 0 14px;
+      padding: 14px 2px 4px;
+      align-items: center;
+    }
+    #co-payment-methods .co-venmo-due span { color: #fff; font-size: 1.05rem; font-weight: 750; }
+    #co-payment-methods #co-venmo-total { font-size: clamp(1.4rem, 2.7vw, 1.75rem); color: #fff; }
+    #co-payment-methods .co-venmo-confirm-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+      margin: 0 0 14px;
+      padding: 13px;
+      background: rgba(49, 116, 170, .18);
+      border: 1px solid rgba(160, 204, 236, .43);
+      border-radius: 9px;
+      color: #eef7ff;
+      cursor: pointer;
+      font-size: .95rem;
+      line-height: 1.4;
+    }
+    #co-payment-methods .co-venmo-confirm-row:focus-within { outline: 2px solid #80c8f8; outline-offset: 2px; }
+    #co-payment-methods #co-venmo-tax-confirm {
+      appearance: auto !important;
+      -webkit-appearance: checkbox !important;
+      display: inline-block !important;
+      box-sizing: border-box !important;
+      width: 18px !important;
+      height: 18px !important;
+      min-width: 18px !important;
+      min-height: 18px !important;
+      max-width: 18px !important;
+      max-height: 18px !important;
+      flex: 0 0 18px !important;
+      margin: 2px 0 0 !important;
+      padding: 0 !important;
+      border-radius: 3px;
+      accent-color: #1677c4;
+    }
+    #co-payment-methods .co-venmo-action { display: flex; align-items: flex-start; flex-direction: column; gap: 8px; }
+    #co-payment-methods #co-venmo-feedback { margin: 6px 0 0; font-size: .91rem; line-height: 1.45; }
+    #co-payment-methods #co-venmo-explain { margin: 6px 0 0; font-size: .91rem; }
+    @media (max-width: 520px) {
+      #co-payment-methods .co-venmo-review { padding: 14px; }
+      #co-payment-methods .co-venmo-price-row { gap: 8px; }
+      #co-payment-methods .co-venmo-review-head { gap: 6px; }
+    }
+  </style>
 </head>
 <body class="wt-public-template customer-account-page">
 <div class="page"><div id="site-header"></div><script src="../js/site-shell.js"></script>
@@ -210,11 +299,19 @@
               <button id="co-venmo-ship-quote" type="button" class="customer-primary-btn" style="margin-top:12px;background:#1677c4;color:#fff;border:0;border-radius:6px;padding:10px 14px;cursor:pointer;">Calculate Shipping & Tax Total</button>
               <p id="co-venmo-ship-summary" style="color:#b5d1e6;" role="status" aria-live="polite"></p>
             </div>
-            <strong id="co-venmo-total" style="display:block;margin-bottom:9px;"></strong>
-            <label style="display:flex;gap:8px;align-items:flex-start;margin-bottom:10px;"><input id="co-venmo-tax-confirm" type="checkbox"/><span>I confirm the delivery details, applicable sales tax, and final payment amount before starting Venmo checkout.</span></label>
-            <venmo-button id="co-venmo-button" type="pay" hidden></venmo-button>
-            <p id="co-venmo-explain" hidden>Venmo isn't available for this buyer; PayPal is still available above.</p>
-            <p id="co-venmo-feedback" role="status" aria-live="polite" hidden></p>
+            <section id="co-venmo-review" class="co-venmo-review" aria-label="Final Venmo payment summary" hidden>
+              <div class="co-venmo-review-head"><strong>Final payment summary</strong><span>Sandbox test · No real charge</span></div>
+              <div class="co-venmo-price-row"><span>Coaster items</span><strong id="co-venmo-items-amount">—</strong></div>
+              <div class="co-venmo-price-row"><span>Shipping</span><strong id="co-venmo-shipping-amount">—</strong></div>
+              <div class="co-venmo-price-row"><span>Sales tax</span><strong id="co-venmo-tax-amount">—</strong></div>
+              <div class="co-venmo-price-row co-venmo-due"><span>Total due now</span><strong id="co-venmo-total">—</strong></div>
+              <label class="co-venmo-confirm-row" for="co-venmo-tax-confirm"><input id="co-venmo-tax-confirm" type="checkbox"/><span>I confirm the delivery address, sales tax, and final total.</span></label>
+              <div class="co-venmo-action">
+                <venmo-button id="co-venmo-button" type="pay" hidden></venmo-button>
+                <p id="co-venmo-explain" hidden>Venmo isn't available for this buyer; PayPal is still available above.</p>
+                <p id="co-venmo-feedback" role="status" aria-live="polite" hidden></p>
+              </div>
+            </section>
           </section>
           <div id="co-paypal-tax-review" hidden style="border-top:1px solid #356187;margin-top:14px;padding-top:14px;">
             <h3 style="margin:0 0 8px;">Confirm Colorado sales tax before payment</h3>
@@ -228,5 +325,5 @@
   </main>
   <div id="site-footer"></div>
 </div>
-<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-pickup-details1"></script><script src="../js/customer-order.js?v=20261021-sandbox1"></script><script src="../js/customer-payment-methods.js?v=20261023-stage5g1"></script>
+<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-pickup-details1"></script><script src="../js/customer-order.js?v=20261021-sandbox1"></script><script src="../js/customer-payment-methods.js?v=20261023-stage5h1"></script>
 </body></html>

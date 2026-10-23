@@ -74,5 +74,5 @@ test('Admin renders actual method while retaining PayPal processing reference',(
  assert.match(admin,/Processed by PayPal/);
  assert.match(html,/PROCESSOR REFERENCE/);
  assert.match(html,/coaster-admin\.js\?v=20261023-stage5e1/);
- assert.match(customerHtml,/customer-payment-methods\.js\?v=20261023-stage5g1/);
+ assert.match(customerHtml,/customer-payment-methods\.js\?v=20261023-stage5h1/);
 });

@@ -8,6 +8,8 @@
  const root=document.querySelector('#co-payment-methods');if(!root)return;
  const button=document.querySelector('#co-venmo-button'),explain=document.querySelector('#co-venmo-explain');
  const confirm=document.querySelector('#co-venmo-tax-confirm'),quoteEl=document.querySelector('#co-venmo-total');
+ const review=document.querySelector('#co-venmo-review');
+ const itemsEl=document.querySelector('#co-venmo-items-amount'),shippingAmountEl=document.querySelector('#co-venmo-shipping-amount'),taxAmountEl=document.querySelector('#co-venmo-tax-amount');
  const feedback=document.querySelector('#co-venmo-feedback');
  const shippingPanel=document.querySelector('#co-venmo-shipping');
  const shippingButton=document.querySelector('#co-venmo-ship-quote');
@@ -39,7 +41,11 @@
  }
  function showQuote(q){
   quote=q;
-  quoteEl.textContent='Items: $'+q.itemAmount+' + shipping: $'+q.shippingAmount+' + sales tax: $'+q.taxAmount+' = Total: $'+q.totalAmount;
+  itemsEl.textContent='$'+q.itemAmount;
+  shippingAmountEl.textContent='$'+q.shippingAmount;
+  taxAmountEl.textContent='$'+q.taxAmount;
+  quoteEl.textContent='$'+q.totalAmount;
+  review.hidden=false;
   if(shippingMode)shippingSummary.textContent='Deliver to: '+[q.address.fullName,q.address.address1,q.address.address2,q.address.city+', '+q.address.state+' '+q.address.postalCode].filter(Boolean).join(' · ');
  }
  async function checkoutReady(clientId){
@@ -79,7 +85,7 @@
        setEnabled(false);explain.textContent='Calculate and confirm the delivery address and tax total first.';
        shippingFields.forEach(field=>field.addEventListener('input',()=>{
          quote=null;confirmedAddress=null;session=null;confirm.checked=false;setEnabled(false);
-         quoteEl.textContent='';shippingSummary.textContent='Address changed. Calculate a new quote.';
+         review.hidden=true;quoteEl.textContent='';shippingSummary.textContent='Address changed. Calculate a new quote.';
        }));
        shippingButton.addEventListener('click',async()=>{
          shippingButton.disabled=true;shippingSummary.textContent='Checking delivery address and calculating tax…';
@@ -87,7 +93,7 @@
            const result=await post('quoteVenmoShipping',{shippingAddress:addressFromFields()});
            confirmedAddress=result.quote.address;showQuote(result.quote);confirm.checked=false;
            await checkoutReady(data.clientId);
-         }catch(err){quote=null;confirmedAddress=null;session=null;setEnabled(false);shippingSummary.textContent=err.message||'Could not verify the shipping quote.';}
+         }catch(err){quote=null;confirmedAddress=null;session=null;review.hidden=true;setEnabled(false);shippingSummary.textContent=err.message||'Could not verify the shipping quote.';}
          finally{shippingButton.disabled=false;}
        });
      }else{showQuote(data.quote);await checkoutReady(data.clientId);}

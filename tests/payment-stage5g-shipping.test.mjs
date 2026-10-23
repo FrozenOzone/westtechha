@@ -97,7 +97,7 @@ test('buyer requires quote, preserves tax confirmation and invalidates edits',()
  assert.match(buyer,/if\(!confirm.checked\)/);
  assert.match(html,/id="co-venmo-shipping"/);
  assert.match(html,/id="co-venmo-ship-quote"/);
- assert.match(html,/customer-payment-methods\.js\?v=20261023-stage5g1/);
+ assert.match(html,/customer-payment-methods\.js\?v=20261023-stage5h1/);
 });
 test('payment labels and existing local-pickup route are unchanged',()=>{
  assert.match(lib,/export async function getVenmoPickupQuote/);
