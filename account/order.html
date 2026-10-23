@@ -193,6 +193,15 @@
           <p style="margin:0 0 12px;color:#aec7dd;">Sandbox test only. No real PayPal charge will be made. Review the final tax and shipping total before capture.</p>
           <button id="co-paypal-start" type="button" class="customer-primary-btn" style="background:#1677c4;color:white;border:0;border-radius:6px;padding:10px 16px;cursor:pointer;">Continue to PayPal Sandbox</button>
           <p id="co-paypal-feedback" role="status" aria-live="polite" hidden></p>
+          <section id="co-payment-methods" hidden aria-label="Venmo Sandbox checkout" style="border-top:1px solid #356187;margin-top:16px;padding-top:14px;">
+            <h3 style="margin:0 0 8px;">Or pay with Venmo</h3>
+            <p style="margin:0 0 10px;color:#b5d1e6;">Sandbox test · Local pickup only · No real funds will be charged. Eligible US buyers can use Venmo without opening a PayPal account.</p>
+            <strong id="co-venmo-total" style="display:block;margin-bottom:9px;"></strong>
+            <label style="display:flex;gap:8px;align-items:flex-start;margin-bottom:10px;"><input id="co-venmo-tax-confirm" type="checkbox"/><span>I confirm the displayed Colorado tax and full payment amount before starting Venmo checkout.</span></label>
+            <venmo-button id="co-venmo-button" type="pay" hidden></venmo-button>
+            <p id="co-venmo-explain" hidden>Venmo isn't available for this buyer; PayPal is still available above.</p>
+            <p id="co-venmo-feedback" role="status" aria-live="polite" hidden></p>
+          </section>
           <div id="co-paypal-tax-review" hidden style="border-top:1px solid #356187;margin-top:14px;padding-top:14px;">
             <h3 style="margin:0 0 8px;">Confirm Colorado sales tax before payment</h3>
             <p id="co-paypal-tax-breakdown"></p>
@@ -205,5 +214,5 @@
   </main>
   <div id="site-footer"></div>
 </div>
-<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-pickup-details1"></script><script src="../js/customer-order.js?v=20261021-sandbox1"></script>
+<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-pickup-details1"></script><script src="../js/customer-order.js?v=20261021-sandbox1"></script><script src="../js/customer-payment-methods.js?v=20261023-stage5a1"></script>
 </body></html>

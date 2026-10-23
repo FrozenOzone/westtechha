@@ -162,7 +162,7 @@ async function assignSlotOrFlagReview(env,orderId){
   }
 }
 
-async function markCaptured(env,orderId,paypalOrderId,details,captured){
+export async function markCaptured(env,orderId,paypalOrderId,details,captured){
   const db=requireOrdersDb(env);const order=await getCoasterOrderDetail(env,orderId);if(!order)return null;
   if(String(order.paymentStatus||'').toUpperCase()==='PAID'){await ensureManufacturingWorkOrder(env,'COASTER',order);order._paymentCapturedNow=false;return order;}
   const ship=order.fulfillmentMethod==='SHIP'?(function(){const latest=extractShipping(captured);return latest.address1&&latest.postalCode?latest:extractShipping(details);})():null;if(order.fulfillmentMethod==='SHIP')requireUsShipping(ship);
@@ -192,6 +192,7 @@ export async function captureCoasterPayPalOrderForCustomer(env,orderId,paypalOrd
 }
 async function captureCoasterPayPalOrderCore(env,orderId,paypalOrderId,{confirmTax=false}={}){
   const order=await getCoasterOrderDetail(env,orderId);if(!order)throw Object.assign(new Error('Coaster order not found.'),{status:404});
+  if(String(order.paymentStatus||'').toUpperCase()==='CAPTURING_VENMO')throw Object.assign(new Error('A Venmo payment is being verified. Please contact WestTech before retrying.'),{status:409});
   if(!order.paypalOrderId||order.paypalOrderId!==paypalOrderId)throw Object.assign(new Error('This PayPal checkout does not match the approved coaster order.'),{status:409});
   if(String(order.paymentStatus||'').toUpperCase()==='PAID'){await ensureManufacturingWorkOrder(env,'COASTER',order);return {order,capturedNow:false,taxConfirmationRequired:false};}
   let accessToken=await generateAccessToken(env);const detailResult=await paypalCall(env,`/v2/checkout/orders/${encodeURIComponent(paypalOrderId)}`,{accessToken});accessToken=detailResult.accessToken;
