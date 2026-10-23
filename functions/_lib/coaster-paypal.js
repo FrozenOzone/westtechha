@@ -5,6 +5,7 @@ import { readJsonSafe, sanitizeEnvValue } from './shared.js';
 import { sendCoasterCustomerEmail } from './coaster-email.js';
 import { buildTaxQuote } from './tax.js';
 import { ensureManufacturingWorkOrder } from './manufacturing-work-orders.js';
+import { assignPaidCoasterSlot } from './production-awareness.js';
 
 const PICKUP_ADDRESS={
   fullName:'WestTech Home Automation, LLC',
@@ -118,10 +119,12 @@ export async function ensureCoasterPayPalOrder(env,orderId,{returnUrl,cancelUrl}
     await db.prepare(`UPDATE coaster_orders SET payment_status='NOT_REQUIRED',status='PRODUCTION_QUEUE',paypal_last_error=NULL,payment_total=0,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(orderId).run();
     await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PAYMENT_NOT_REQUIRED',?)`).bind(orderId,JSON.stringify({finalAmount:money(order.finalAmount)})).run();
     await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PRODUCTION_QUEUED',?)`).bind(orderId,JSON.stringify({reason:'NO_PAYMENT_REQUIRED'})).run();
+    const released=await getCoasterOrderDetail(env,orderId);
+    if(released)await ensureManufacturingWorkOrder(env,'COASTER',released);
+    if(released)await assignSlotOrFlagReview(env,orderId);
     const queued=await getCoasterOrderDetail(env,orderId);
-    if(queued)await ensureManufacturingWorkOrder(env,'COASTER',queued);
     if(queued)await sendCoasterCustomerEmail(env,{type:'PRODUCTION_QUEUED',order:queued});
-    return await getCoasterOrderDetail(env,orderId)||queued;
+    return queued;
   }
   if(String(order.proofStatus)!=='APPROVED')throw Object.assign(new Error('Customer proof approval is required before PayPal checkout can be created.'),{status:409});
   if(money(order.finalAmount)<=0)throw Object.assign(new Error('The approved customer subtotal must be greater than $0 before PayPal checkout can be created.'),{status:400});
@@ -143,6 +146,22 @@ export async function ensureCoasterPayPalOrder(env,orderId,{returnUrl,cancelUrl}
   return getCoasterOrderDetail(env,orderId);
 }
 
+// A completed PayPal capture must never be reported as failed merely because
+// production scheduling needs attention. Leave the paid order visible in the
+// manufacturing queue with no promised slot and flag it for Admin review.
+async function assignSlotOrFlagReview(env,orderId){
+  try{return await assignPaidCoasterSlot(env,orderId);}
+  catch(error){
+    console.error('Paid production slot needs manual review:',orderId,error);
+    const db=requireOrdersDb(env),detail=clean(error?.message||'Could not assign a production slot.',500);
+    try{
+      await db.prepare(`UPDATE coaster_orders SET production_window=NULL,updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND payment_status IN ('PAID','NOT_REQUIRED')`).bind(orderId).run();
+      await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PRODUCTION_SLOT_REVIEW_REQUIRED',?)`).bind(orderId,JSON.stringify({reason:detail})).run();
+    }catch(loggingError){console.error('Could not record production scheduling review:',orderId,loggingError);}
+    return {assigned:false,reviewRequired:true,reason:detail};
+  }
+}
+
 async function markCaptured(env,orderId,paypalOrderId,details,captured){
   const db=requireOrdersDb(env);const order=await getCoasterOrderDetail(env,orderId);if(!order)return null;
   if(String(order.paymentStatus||'').toUpperCase()==='PAID'){await ensureManufacturingWorkOrder(env,'COASTER',order);order._paymentCapturedNow=false;return order;}
@@ -153,8 +172,10 @@ async function markCaptured(env,orderId,paypalOrderId,details,captured){
   const paid=await getCoasterOrderDetail(env,orderId);
   await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PAYPAL_ORDER_CAPTURED',?)`).bind(orderId,JSON.stringify({paypalOrderId,captureId:cap||null,paymentStatus:'PAID',approvedSubtotal:money(paid?.finalAmount),taxAmount:money(paid?.taxAmount),paymentTotal:money(paid?.paymentTotal),addressSource:ship?'PAYPAL':'WESTTECH_PICKUP'})).run();
   await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PRODUCTION_QUEUED',?)`).bind(orderId,JSON.stringify({reason:'PAYMENT_RECEIVED',paypalOrderId,captureId:cap||null})).run();
+  const paidOrder=await getCoasterOrderDetail(env,orderId);
+  if(paidOrder)await ensureManufacturingWorkOrder(env,'COASTER',paidOrder);
+  if(paidOrder)await assignSlotOrFlagReview(env,orderId);
   const queued=await getCoasterOrderDetail(env,orderId);
-  if(queued)await ensureManufacturingWorkOrder(env,'COASTER',queued);
   if(queued)await sendCoasterCustomerEmail(env,{type:'PRODUCTION_QUEUED',order:queued});
   if(queued)queued._paymentCapturedNow=true;
   return queued;

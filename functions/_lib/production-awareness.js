@@ -6,7 +6,7 @@ import { requireOrdersDb } from './orders.js';
 import { manufacturingDashboard, estimateManufacturingWindow } from './manufacturing-work-orders.js';
 
 const ZONE='America/Denver';
-const ACTIVE=new Set(['PROOF_SENT','PROOF_APPROVED','AWAITING_PAYMENT','REORDER_VERIFICATION','PRODUCTION_QUEUE','IN_PRODUCTION']);
+const ACTIVE=new Set(['PRODUCTION_QUEUE','IN_PRODUCTION']); // Only released paid/no-charge production occupies a slot.
 const PRINTING=new Set(['PRODUCTION_QUEUE','IN_PRODUCTION']);
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const clean=(s,max=100)=>String(s??'').trim().slice(0,max);
@@ -79,6 +79,48 @@ export function suggestWindow({today,commitments=[],capacityEnd='',setSize=4,set
   if(capacityExtended)end=validCapacity;
   return {start,end,label:formatWindow(start,end),allowanceBusinessDays:allowanceDays,lastCommittedEnd:lastEnd||null,capacityEnd:validCapacity||null,capacityExtended,commitmentsChecked:checked,unreadableWindows:unreadable,businessDaysOnly:true,advisory:true};
 }
+/* Assign a slot ONCE, after PayPal capture or deliberate no-charge release.
+ * Prepayment windows are estimates only. Already assigned paid slots are not changed.
+ * Other active COASTER, ENCLOSURE, and CUSTOM production windows share the same FIFO.
+ */
+export async function assignPaidCoasterSlot(env,orderId,{at=new Date()}={}){
+  const db=requireOrdersDb(env),id=clean(orderId,80);
+  if(!id)throw new Error('Missing coaster order ID for production scheduling.');
+  const order=await db.prepare(`SELECT order_id,status,payment_status,set_size,set_count,estimated_printer_minutes,production_window
+    FROM coaster_orders WHERE order_id=?`).bind(id).first();
+  if(!order)throw new Error('Coaster order is missing during production scheduling.');
+  if(!PRINTING.has(String(order.status||'').toUpperCase())||!['PAID','NOT_REQUIRED'].includes(String(order.payment_status||'').toUpperCase())){
+    throw new Error('A production slot can only be assigned after payment or deliberate no-charge release.');
+  }
+  const prior=await db.prepare(`SELECT 1 AS assigned FROM coaster_order_events WHERE order_id=? AND event_type='PRODUCTION_SLOT_ASSIGNED' LIMIT 1`).bind(id).first();
+  if(prior)return {assigned:false,alreadyAssigned:true,label:clean(order.production_window,160)};
+  const rows=await db.prepare(`
+    SELECT 'COASTER' AS source_type,order_id,status,payment_status,production_window FROM coaster_orders
+      WHERE order_id<>? AND status IN ('PRODUCTION_QUEUE','IN_PRODUCTION') AND payment_status IN ('PAID','NOT_REQUIRED')
+    UNION ALL SELECT 'ENCLOSURE',order_id,status,payment_status,production_window FROM enclosure_orders
+      WHERE status IN ('PRODUCTION_QUEUE','IN_PRODUCTION') AND payment_status IN ('PAID','NOT_REQUIRED')
+    UNION ALL SELECT 'CUSTOM',order_id,status,payment_status,production_window FROM custom_orders
+      WHERE status IN ('PRODUCTION_QUEUE','IN_PRODUCTION') AND payment_status IN ('PAID','NOT_REQUIRED')
+  `).bind(id).all();
+  const commitments=(rows.results||[]).map(x=>({sourceType:x.source_type,orderId:x.order_id,status:x.status,paymentStatus:x.payment_status,productionWindow:x.production_window||''}));
+  // Do not issue a potentially overlapping slot if existing paid work lacks a readable date.
+  const missing=commitments.filter(x=>!parseWindow(x.productionWindow));
+  if(missing.length)throw new Error(`Cannot allocate a paid production slot: ${missing.length} active paid order(s) have no readable production window. Review the queue.`);
+  const today=todayMountain(at);
+  const dashboard=await manufacturingDashboard(env);
+  const ahead=(dashboard.orders||[]).filter(x=>x.sourceOrderId!==id&&PRINTING.has(String(x.status||'').toUpperCase())&&['PAID','NOT_REQUIRED'].includes(String(x.paymentStatus||'').toUpperCase())&&!x.isPaused);
+  const aheadMinutes=ahead.reduce((n,x)=>n+Math.max(0,Number(x.remainingPrinterMinutes)||0),0);
+  const availableMinutes=dashboard.summary?.capacityMinutesPerDay||dashboard.settings?.activePrinters*dashboard.settings?.productiveMinutesPerPrinterDay;
+  const capacityEnd=capacityReadyBusinessDay(today,aheadMinutes,Number(order.estimated_printer_minutes)||650,availableMinutes);
+  const slot=suggestWindow({today,commitments,capacityEnd,setSize:order.set_size||4,setCount:order.set_count||1,orderId:id,sourceType:'COASTER'});
+  const result=await db.prepare(`UPDATE coaster_orders SET production_window=?,updated_at=CURRENT_TIMESTAMP
+    WHERE order_id=? AND status IN ('PRODUCTION_QUEUE','IN_PRODUCTION') AND payment_status IN ('PAID','NOT_REQUIRED')`).bind(slot.label,id).run();
+  if(!Number(result?.meta?.changes||0))throw new Error('Paid order changed before its production slot could be assigned.');
+  await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PRODUCTION_SLOT_ASSIGNED',?)`)
+    .bind(id,JSON.stringify({productionWindow:slot.label,start:slot.start,end:slot.end,previousEstimate:order.production_window||'',followingCommittedEnd:slot.lastCommittedEnd,allowanceBusinessDays:slot.allowanceBusinessDays,capacityExtended:slot.capacityExtended,allocatedAt:at.toISOString()})).run();
+  return {assigned:true,label:slot.label,start:slot.start,end:slot.end};
+}
+
 export async function getProductionAwareness(env,{setSize=4,setCount=1,minutes=650,orderId='',sourceType='COASTER'}={}){
   const size=int(setSize,1,100),count=int(setCount,1,100),candidateMinutes=int(minutes,1,1000000),id=clean(orderId,80),type=clean(sourceType,20).toUpperCase();
   const db=requireOrdersDb(env);
