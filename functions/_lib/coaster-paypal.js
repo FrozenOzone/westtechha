@@ -169,6 +169,43 @@ async function assignSlotOrFlagReview(env,orderId){
   }
 }
 
+// Stage 5K1: reject incomplete or mismatched provider captures before any paid write.
+// This is deliberately fail-closed. An ambiguous charge needs Admin reconciliation,
+// never a new customer payment or an automatic unlock.
+function verifyCoasterProviderCapture(order,providerOrderId,details,captured){
+ const stop=(why)=>{throw Object.assign(new Error('Provider capture needs reconciliation ('+why+'). Do not pay again.'),{status:502});};
+ const unit=captured?.purchase_units?.[0], prior=details?.purchase_units?.[0];
+ const caps=unit?.payments?.captures||[];
+ if(String(captured?.status||'').toUpperCase()!=='COMPLETED')stop('order is not completed');
+ if(String(captured?.id||'')!==String(providerOrderId||''))stop('provider order mismatch');
+ if(!Array.isArray(captured?.purchase_units)||captured.purchase_units.length!==1)stop('purchase-unit mismatch');
+ if(!Array.isArray(caps)||caps.length!==1)stop('ambiguous capture count');
+ const cap=caps[0];
+ if(!/^[A-Za-z0-9-]{8,120}$/.test(String(cap?.id||'')))stop('missing capture reference');
+ if(String(cap?.status||'').toUpperCase()!=='COMPLETED')stop('capture is not completed');
+ if(String(unit?.custom_id||prior?.custom_id||'')!==String(order?.orderId||''))stop('WestTech order reference mismatch');
+ const expected=money(order?.paymentTotal)>0?money(order.paymentTotal):money(order?.finalAmount)+money(order?.taxAmount);
+ const received=Number(cap?.amount?.value);
+ const orderAmount=Number(unit?.amount?.value??prior?.amount?.value);
+ if(!(expected>0)||!Number.isFinite(received)||!Number.isFinite(orderAmount)||
+    Math.abs(received-expected)>.001||Math.abs(orderAmount-expected)>.001)stop('captured amount does not match the confirmed total');
+ if(cap?.amount?.currency_code!=='USD'||(unit?.amount?.currency_code??prior?.amount?.currency_code)!=='USD')stop('non-USD capture');
+ if(String(order?.fulfillmentMethod||'').toUpperCase()==='SHIP'){
+  let recorded;
+  try{recorded=JSON.parse(String(order?.taxAddressJson||''));}catch{stop('missing confirmed shipping address');}
+  const ship=unit?.shipping||prior?.shipping, address=ship?.address;
+  const norm=v=>String(v||'').trim().toUpperCase().replace(/\s+/g,' ');
+  if(!recorded||!address||
+     norm(recorded.address1)!==norm(address.address_line_1)||
+     norm(recorded.address2)!==norm(address.address_line_2)||
+     norm(recorded.city)!==norm(address.admin_area_2)||
+     norm(recorded.state)!==norm(address.admin_area_1)||
+     norm(recorded.postalCode)!==norm(address.postal_code)||
+     norm(recorded.countryCode)!==norm(address.country_code))stop('shipping address changed after tax calculation');
+ }
+ return {captureId:String(cap.id),amount:expected};
+}
+
 async function reservePayPalCapture(env,orderId,paypalOrderId){
   const db=requireOrdersDb(env);
   const result=await db.prepare("UPDATE coaster_orders SET payment_status='CAPTURING_PAYPAL',updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND paypal_order_id=? AND payment_required=1 AND payment_status IN ('AWAITING_PAYMENT','AWAITING_TAX_CONFIRMATION','PREVIEW_AWAITING_TEST_PAYMENT','PAYPAL_ERROR')")
@@ -182,7 +219,8 @@ export async function markCaptured(env,orderId,paypalOrderId,details,captured,{m
   if(String(order.paymentStatus||'').toUpperCase()==='PAID'){await ensureManufacturingWorkOrder(env,'COASTER',order);order._paymentCapturedNow=false;return order;}
   if(String(order.paymentStatus||'').toUpperCase()!==requiredLock)throw Object.assign(new Error('Payment capture lock is missing. Reconciliation required; do not retry.'),{status:409});
   const ship=order.fulfillmentMethod==='SHIP'?(function(){const latest=extractShipping(captured);return latest.address1&&latest.postalCode?latest:extractShipping(details);})():null;if(order.fulfillmentMethod==='SHIP')requireUsShipping(ship);
-  const cap=captureId(captured)||captureId(details);const paidAt=new Date().toISOString();
+  const verified=verifyCoasterProviderCapture(order,paypalOrderId,details,captured);
+  const cap=verified.captureId;const paidAt=new Date().toISOString();
   const write=await db.prepare(`UPDATE coaster_orders SET paypal_order_status='COMPLETED',paypal_capture_id=?,paypal_payment_id=?,payment_status='PAID',paypal_paid_at=COALESCE(paypal_paid_at,?),paypal_last_error=NULL,status='PRODUCTION_QUEUE',shipping_name=?,shipping_address1=?,shipping_address2=?,shipping_city=?,shipping_region=?,shipping_postal_code=?,shipping_country=?,payment_total=CASE WHEN payment_total>0 THEN payment_total ELSE final_amount END,updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND payment_status=? AND paypal_order_id=?`).bind(cap||null,cap||null,paidAt,ship?.name||null,ship?.address1||null,ship?.address2||null,ship?.city||null,ship?.region||null,ship?.postalCode||null,ship?.country||null,orderId,requiredLock,paypalOrderId).run();
   if(Number(write?.meta?.changes||0)!==1)throw Object.assign(new Error('Capture completed at PayPal, but order state changed. Manual reconciliation required; do not pay again.'),{status:502});
   const paid=await getCoasterOrderDetail(env,orderId);
@@ -221,6 +259,39 @@ async function captureCoasterPayPalOrderCore(env,orderId,paypalOrderId,{confirmT
   const captured=await paypalCall(env,`/v2/checkout/orders/${encodeURIComponent(paypalOrderId)}/capture`,{method:'POST',body:{},accessToken,requestId:requestId(order.orderId,order.proofVersion,'capture')});
   const paid=await markCaptured(env,orderId,paypalOrderId,detailResult.data,captured.data);
   return {order:paid,capturedNow:!!paid?._paymentCapturedNow,taxConfirmationRequired:false};
+}
+
+// Stage 5K1: read-only Admin inspection, never capture, refund, or unlock.
+// Supports Venmo locks whose PayPal order ID was not yet finalized on coaster_orders.
+export async function inspectCoasterPaymentRecovery(env,orderId){
+ const order=await getCoasterOrderDetail(env,orderId);
+ if(!order)throw Object.assign(new Error('Coaster order not found.'),{status:404});
+ const db=requireOrdersDb(env);
+ const attempt=await db.prepare("SELECT status,provider_order_id,amount FROM coaster_payment_attempts WHERE coaster_order_id=? AND method='VENMO' AND status IN ('CAPTURING','CAPTURED','CREATED') ORDER BY CASE status WHEN 'CAPTURING' THEN 0 WHEN 'CAPTURED' THEN 1 ELSE 2 END,created_at DESC LIMIT 1").bind(orderId).first();
+ const localStatus=String(order.paymentStatus||'');
+ const venmoLocked=localStatus==='CAPTURING_VENMO';
+ const ref=venmoLocked?String(attempt?.provider_order_id||''):String(order.paypalOrderId||'');
+ const summary={orderId:order.orderId,orderStatus:order.status,paymentStatus:localStatus,
+  localCaptureRecorded:!!order.paypalCaptureId,paymentMethod:venmoLocked?'VENMO':attempt?.status==='CAPTURED'?'VENMO':'PAYPAL',
+  providerOrderReference:ref||null,attemptStatus:attempt?.status||null,
+  providerStatus:null,providerCaptureStatus:null,providerCaptureReference:null,
+  providerCaptureAmount:null,expectedAmount:usd(money(order.paymentTotal)>0?order.paymentTotal:money(order.finalAmount)+money(order.taxAmount)),
+  captureVerified:false,needsManualReview:!['PAID','NOT_REQUIRED'].includes(localStatus)};
+ if(!ref||ref.startsWith('PENDING'))return summary;
+ const result=await paypalCall(env,
+  '/v2/checkout/orders/'+encodeURIComponent(ref));
+ const provider=result.data||{},cap=provider.purchase_units?.[0]?.payments?.captures?.[0];
+ summary.providerStatus=String(provider.status||'UNKNOWN');
+ summary.providerCaptureStatus=cap?.status||null;
+ summary.providerCaptureReference=cap?.id||null;
+ summary.providerCaptureAmount=cap?.amount?.value||null;
+ if(summary.providerStatus==='COMPLETED'){
+  try{verifyCoasterProviderCapture(order,ref,provider,provider);summary.captureVerified=true;}
+  catch(e){summary.validationWarning=e.message;}
+ }
+ // Inspection never declares a payment safe to retry. An authorized human must
+ // investigate incomplete provider responses or ambiguous locked states.
+ return summary;
 }
 
 export async function syncCoasterPayPalOrder(env,orderId){
