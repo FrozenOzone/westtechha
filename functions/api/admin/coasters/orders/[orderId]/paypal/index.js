@@ -3,7 +3,17 @@ import { requireCoasterAdmin } from '../../../../../../_lib/coaster-admin.js';
 import { syncCoasterPayPalOrder, inspectCoasterPaymentRecovery, recoverCompletedCoasterPayPalCapture, repairCoasterPaidWorkOrder } from '../../../../../../_lib/coaster-paypal.js';
 import { isCoasterSandbox } from '../../../../../../_lib/coaster-preview-payment-mode.js';
 import { recoverCompletedCoasterVenmoCapture } from '../../../../../../_lib/coaster-venmo.js';
-export async function onRequestPost(context){try{requireCoasterAdmin(context);const body=await context.request.json();if(body?.action==='inspect-recovery'){if(!isCoasterSandbox(context))return jsonResponse({ok:false,message:'Recovery inspection is Preview Sandbox only.'},403);const report=await inspectCoasterPaymentRecovery(context.env,context.params.orderId);return jsonResponse({ok:true,report});}if(body?.action==='recover-completed-venmo'){
+import { inspectCoasterPaidHandoff, repairCoasterPaidHandoff } from '../../../../../../_lib/coaster-paid-handoff.js';
+export async function onRequestPost(context){try{requireCoasterAdmin(context);const body=await context.request.json();if(body?.action==='inspect-paid-handoff'||body?.action==='repair-paid-handoff'){
+ if(!isCoasterSandbox(context))return jsonResponse({ok:false,message:'Paid handoff inspection and repair are Preview Sandbox only.'},403);
+ const origin=context.request.headers.get('Origin');
+ if(origin&&origin!==new URL(context.request.url).origin)return jsonResponse({ok:false,message:'Invalid recovery request origin.'},403);
+ if(!/^application\/json(?:;|$)/i.test(context.request.headers.get('Content-Type')||''))return jsonResponse({ok:false,message:'JSON request required.'},415);
+ if(body.action==='inspect-paid-handoff')return jsonResponse({ok:true,report:await inspectCoasterPaidHandoff(context.env,context.params.orderId)});
+ if(body.acknowledgeRisk!==true)return jsonResponse({ok:false,message:'Explicit paid-handoff repair confirmation is required.'},400);
+ const result=await repairCoasterPaidHandoff(context.env,context.params.orderId,String(body.providerOrderId||''),String(body.captureId||''),context.request.url);
+ return jsonResponse({ok:true,...result});
+}if(body?.action==='inspect-recovery'){if(!isCoasterSandbox(context))return jsonResponse({ok:false,message:'Recovery inspection is Preview Sandbox only.'},403);const report=await inspectCoasterPaymentRecovery(context.env,context.params.orderId);return jsonResponse({ok:true,report});}if(body?.action==='recover-completed-venmo'){
  if(!isCoasterSandbox(context))return jsonResponse({ok:false,message:'Venmo recovery is Preview Sandbox only.'},403);
  const origin=context.request.headers.get('Origin');if(origin&&origin!==new URL(context.request.url).origin)return jsonResponse({ok:false,message:'Invalid recovery request origin.'},403);
  if(!/^application\/json(?:;|$)/i.test(context.request.headers.get('Content-Type')||''))return jsonResponse({ok:false,message:'JSON request required.'},415);
