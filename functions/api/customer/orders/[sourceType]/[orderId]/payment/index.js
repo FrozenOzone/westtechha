@@ -30,7 +30,7 @@ export async function onRequestGet(context){
   const {order}=await owned(context);
   return respond({ok:true,mode:isCoasterSandbox(context)?'sandbox':previewSandboxRequested(context)?'configuration_error':'simulated',
    paymentRequired:!!order.paymentRequired,paymentStatus:order.paymentStatus,status:order.status,
-   canCheckout:isCoasterSandbox(context)&&!!order.paymentRequired&&order.proofStatus==='APPROVED'&&['PROOF_APPROVED','AWAITING_PAYMENT'].includes(order.status)&&!['PAID'].includes(String(order.paymentStatus||'').toUpperCase())});
+   canCheckout:isCoasterSandbox(context)&&!!order.paymentRequired&&order.proofStatus==='APPROVED'&&['PROOF_APPROVED','AWAITING_PAYMENT'].includes(order.status)&&!['PAID','CAPTURING_VENMO','CAPTURING_PAYPAL','CREATING_PAYPAL_ORDER'].includes(String(order.paymentStatus||'').toUpperCase())});
  }catch(e){return respond({ok:false,message:e.message||'Could not load payment status.'},e.status||500);}
 }
 export async function onRequestPost(context){
@@ -40,7 +40,7 @@ export async function onRequestPost(context){
   if(!/^application\/json(?:;|$)/i.test(context.request.headers.get('Content-Type')||''))throw fail('JSON request required.',415);
   const {order}=await owned(context);const body=await context.request.json();const action=String(body?.action||'');
   if(action==='startCheckout'){
-   if(!order.paymentRequired||order.proofStatus!=='APPROVED'||!['PROOF_APPROVED','AWAITING_PAYMENT'].includes(order.status)||['PAID'].includes(String(order.paymentStatus||'').toUpperCase()))throw fail('This order is not eligible for Sandbox checkout. Create a new test order after enabling Sandbox mode.',409);
+   if(!order.paymentRequired||order.proofStatus!=='APPROVED'||!['PROOF_APPROVED','AWAITING_PAYMENT'].includes(order.status)||['PAID','CAPTURING_VENMO','CAPTURING_PAYPAL','CREATING_PAYPAL_ORDER'].includes(String(order.paymentStatus||'').toUpperCase()))throw fail('This order is not eligible for Sandbox checkout. Create a new test order after enabling Sandbox mode.',409);
    if(!['LOCAL_PICKUP','SHIP'].includes(order.fulfillmentMethod))throw fail('Fulfillment is not confirmed.',409);
    if(!String(order.productionWindow||'').trim())throw fail('Production window has not been saved.',409);
    const root=new URL(context.request.url).origin;

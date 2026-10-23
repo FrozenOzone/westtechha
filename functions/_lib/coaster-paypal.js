@@ -80,7 +80,8 @@ async function persistTaxQuote(env,order,quote,addressSource,confirmTax){
   const db=requireOrdersDb(env),now=new Date().toISOString(),address=addressJson(quote.address),quoteJson=JSON.stringify(quote);
   const wasConfirmed=taxConfirmationMatches(order,quote);
   const unchanged=order.taxAddressJson===address&&Math.abs(money(order.taxAmount)-money(quote.taxAmount))<0.001&&Math.abs(money(order.paymentTotal)-money(quote.totalAmount))<0.001;
-  await db.prepare(`UPDATE coaster_orders SET taxable_amount=?,tax_amount=?,tax_rate=?,tax_jurisdiction_code=?,tax_source=?,tax_address_source=?,tax_address_json=?,tax_quote_json=?,payment_total=?,tax_prepared_at=?,tax_confirmed_at=CASE WHEN ?=1 THEN ? WHEN tax_address_json=? AND ABS(COALESCE(tax_amount,0)-?)<0.001 AND ABS(COALESCE(payment_total,0)-?)<0.001 THEN tax_confirmed_at ELSE NULL END,payment_status=CASE WHEN ?=1 AND ?=0 THEN 'AWAITING_TAX_CONFIRMATION' ELSE payment_status END,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(Number(quote.taxableAmount),Number(quote.taxAmount),Number(quote.taxRate),clean(quote.jurisdictionCode,200)||null,clean(quote.source,80)||null,addressSource,address,quoteJson,Number(quote.totalAmount),now,confirmTax?1:0,now,address,Number(quote.taxAmount),Number(quote.totalAmount),quote.isColorado?1:0,confirmTax||wasConfirmed?1:0,order.orderId).run();
+  const taxWrite=await db.prepare(`UPDATE coaster_orders SET taxable_amount=?,tax_amount=?,tax_rate=?,tax_jurisdiction_code=?,tax_source=?,tax_address_source=?,tax_address_json=?,tax_quote_json=?,payment_total=?,tax_prepared_at=?,tax_confirmed_at=CASE WHEN ?=1 THEN ? WHEN tax_address_json=? AND ABS(COALESCE(tax_amount,0)-?)<0.001 AND ABS(COALESCE(payment_total,0)-?)<0.001 THEN tax_confirmed_at ELSE NULL END,payment_status=CASE WHEN ?=1 AND ?=0 THEN 'AWAITING_TAX_CONFIRMATION' ELSE payment_status END,updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND payment_status NOT IN ('PAID','CAPTURING_PAYPAL','CAPTURING_VENMO','CREATING_PAYPAL_ORDER')`).bind(Number(quote.taxableAmount),Number(quote.taxAmount),Number(quote.taxRate),clean(quote.jurisdictionCode,200)||null,clean(quote.source,80)||null,addressSource,address,quoteJson,Number(quote.totalAmount),now,confirmTax?1:0,now,address,Number(quote.taxAmount),Number(quote.totalAmount),quote.isColorado?1:0,confirmTax||wasConfirmed?1:0,order.orderId).run();
+  if(Number(taxWrite?.meta?.changes||0)!==1)throw Object.assign(new Error('Another payment progressed during tax calculation. Do not retry without checking order status.'),{status:409});
   if(!unchanged)await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'TAX_PREPARED',?)`).bind(order.orderId,JSON.stringify({source:quote.source,addressSource,isColorado:quote.isColorado,taxRate:quote.taxRate,taxAmount:Number(quote.taxAmount),paymentTotal:Number(quote.totalAmount),jurisdictionCode:quote.jurisdictionCode||null})).run();
   if(quote.isColorado&&confirmTax&&!wasConfirmed)await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'COLORADO_TAX_CONFIRMED',?)`).bind(order.orderId,JSON.stringify({addressSource,taxAmount:Number(quote.taxAmount),paymentTotal:Number(quote.totalAmount),jurisdictionCode:quote.jurisdictionCode||null})).run();
   return getCoasterOrderDetail(env,order.orderId);
@@ -106,7 +107,8 @@ function taxReview(prepared){
 
 export async function recordCoasterPayPalFailure(env,orderId,error){
   const db=requireOrdersDb(env);const msg=clean(error?.message||'PayPal checkout setup failed.',1000);
-  await db.prepare(`UPDATE coaster_orders SET payment_status='PAYPAL_ERROR', paypal_last_error=?, updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(msg,orderId).run();
+  const failureWrite=await db.prepare(`UPDATE coaster_orders SET payment_status='PAYPAL_ERROR', paypal_last_error=?, updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND payment_status NOT IN ('PAID','CAPTURING_PAYPAL','CAPTURING_VENMO','CREATING_PAYPAL_ORDER')`).bind(msg,orderId).run();
+  if(Number(failureWrite?.meta?.changes||0)!==1)return getCoasterOrderDetail(env,orderId);
   await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PAYPAL_ERROR',?)`).bind(orderId,JSON.stringify({message:msg})).run();
   return getCoasterOrderDetail(env,orderId);
 }
@@ -114,6 +116,7 @@ export async function recordCoasterPayPalFailure(env,orderId,error){
 export async function ensureCoasterPayPalOrder(env,orderId,{returnUrl,cancelUrl}={}){
   const db=requireOrdersDb(env);let order=await getCoasterOrderDetail(env,orderId);if(!order)return null;
   if(String(order.paymentStatus||'').toUpperCase()==='PAID'){await ensureManufacturingWorkOrder(env,'COASTER',order);return order;}
+  if(['CAPTURING_VENMO','CAPTURING_PAYPAL','CREATING_PAYPAL_ORDER'].includes(String(order.paymentStatus||'').toUpperCase()))throw Object.assign(new Error('Payment processing in progress. Do not create another checkout.'),{status:409});
   if(order.paymentRequired===false){
     if(String(order.paymentStatus||'').toUpperCase()==='NOT_REQUIRED'){await ensureManufacturingWorkOrder(env,'COASTER',order);return order;}
     await db.prepare(`UPDATE coaster_orders SET payment_status='NOT_REQUIRED',status='PRODUCTION_QUEUE',paypal_last_error=NULL,payment_total=0,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(orderId).run();
@@ -132,16 +135,20 @@ export async function ensureCoasterPayPalOrder(env,orderId,{returnUrl,cancelUrl}
 
   if(order.paypalOrderId){
     const got=await paypalCall(env,`/v2/checkout/orders/${encodeURIComponent(order.paypalOrderId)}`);const url=approvalUrl(got.data);
-    await db.prepare(`UPDATE coaster_orders SET paypal_order_status=?, paypal_approval_url=CASE WHEN ?<>'' THEN ? ELSE paypal_approval_url END, payment_status=CASE WHEN payment_status='PAID' THEN payment_status ELSE 'AWAITING_PAYMENT' END, status=CASE WHEN payment_status='PAID' THEN status ELSE 'AWAITING_PAYMENT' END, updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(String(got.data?.status||''),url,url,orderId).run();
-    return getCoasterOrderDetail(env,orderId);
+    await db.prepare(`UPDATE coaster_orders SET paypal_order_status=?, paypal_approval_url=CASE WHEN ?<>'' THEN ? ELSE paypal_approval_url END, payment_status=CASE WHEN payment_status='PAID' THEN payment_status ELSE 'AWAITING_PAYMENT' END, status=CASE WHEN payment_status='PAID' THEN status ELSE 'AWAITING_PAYMENT' END, updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND payment_status NOT IN ('PAID','CAPTURING_VENMO','CAPTURING_PAYPAL','CREATING_PAYPAL_ORDER')`).bind(String(got.data?.status||''),url,url,orderId).run();
+    const refreshed=await getCoasterOrderDetail(env,orderId);
+    if(['PAID','CAPTURING_VENMO','CAPTURING_PAYPAL'].includes(String(refreshed?.paymentStatus||'').toUpperCase()))throw Object.assign(new Error('Another checkout has progressed. Reload order.'),{status:409});
+    return refreshed;
   }
 
   const currency=sanitizeEnvValue(env.PAYPAL_CURRENCY)||'USD';const token=await generateAccessToken(env);const payload=buildPayload(order,currency,{returnUrl,cancelUrl});
-  await db.prepare(`UPDATE coaster_orders SET payment_status='CREATING_PAYPAL_ORDER',paypal_last_error=NULL,taxable_amount=0,tax_amount=0,tax_rate=0,tax_jurisdiction_code=NULL,tax_source=NULL,tax_address_source=NULL,tax_address_json=NULL,tax_quote_json=NULL,payment_total=0,tax_prepared_at=NULL,tax_confirmed_at=NULL,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(orderId).run();
+  const creationLock=await db.prepare(`UPDATE coaster_orders SET payment_status='CREATING_PAYPAL_ORDER',paypal_last_error=NULL,taxable_amount=0,tax_amount=0,tax_rate=0,tax_jurisdiction_code=NULL,tax_source=NULL,tax_address_json=NULL,tax_quote_json=NULL,payment_total=0,tax_prepared_at=NULL,tax_confirmed_at=NULL,updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND paypal_order_id IS NULL AND payment_status IN ('NOT_REQUESTED','AWAITING_PAYMENT','PAYPAL_ERROR','PREVIEW_AWAITING_TEST_PAYMENT')`).bind(orderId).run();
+  if(Number(creationLock?.meta?.changes||0)!==1)throw Object.assign(new Error('Another checkout started. Reload this order before retrying.'),{status:409});
   const created=await paypalCall(env,'/v2/checkout/orders',{method:'POST',body:payload,accessToken:token,requestId:requestId(order.orderId,order.proofVersion,'create-order')});
   if(!created.data?.id)throw new Error('PayPal created the checkout but did not return an order ID.');
   const url=approvalUrl(created.data);
-  await db.prepare(`UPDATE coaster_orders SET paypal_order_id=?,paypal_order_status=?,paypal_approval_url=?,payment_status='AWAITING_PAYMENT',status='AWAITING_PAYMENT',updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(created.data.id,String(created.data.status||'CREATED'),url||null,orderId).run();
+  const createdWrite=await db.prepare(`UPDATE coaster_orders SET paypal_order_id=?,paypal_order_status=?,paypal_approval_url=?,payment_status='AWAITING_PAYMENT',status='AWAITING_PAYMENT',updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND payment_status='CREATING_PAYPAL_ORDER' AND paypal_order_id IS NULL`).bind(created.data.id,String(created.data.status||'CREATED'),url||null,orderId).run();
+  if(Number(createdWrite?.meta?.changes||0)!==1)throw Object.assign(new Error('PayPal created an order, but its WestTech checkout lock changed. Admin review required.'),{status:502});
   await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PAYPAL_ORDER_CREATED',?)`).bind(orderId,JSON.stringify({paypalOrderId:created.data.id,approvedSubtotal:money(order.finalAmount),shippingPreference:order.fulfillmentMethod==='SHIP'?'GET_FROM_FILE':'NO_SHIPPING',taxTiming:'AFTER_PAYPAL_ADDRESS'})).run();
   return getCoasterOrderDetail(env,orderId);
 }
@@ -162,15 +169,24 @@ async function assignSlotOrFlagReview(env,orderId){
   }
 }
 
-export async function markCaptured(env,orderId,paypalOrderId,details,captured){
+async function reservePayPalCapture(env,orderId,paypalOrderId){
+  const db=requireOrdersDb(env);
+  const result=await db.prepare("UPDATE coaster_orders SET payment_status='CAPTURING_PAYPAL',updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND paypal_order_id=? AND payment_required=1 AND payment_status IN ('AWAITING_PAYMENT','AWAITING_TAX_CONFIRMATION','PREVIEW_AWAITING_TEST_PAYMENT','PAYPAL_ERROR')")
+    .bind(orderId,paypalOrderId).run();
+  if(Number(result?.meta?.changes||0)!==1)throw Object.assign(new Error('Another payment is processing, this checkout is no longer eligible, or manual reconciliation is needed. Do not retry payment.'),{status:409});
+}
+export async function markCaptured(env,orderId,paypalOrderId,details,captured,{method='PAYPAL'}={}){
   const db=requireOrdersDb(env);const order=await getCoasterOrderDetail(env,orderId);if(!order)return null;
+  const requiredLock=method==='VENMO'?'CAPTURING_VENMO':'CAPTURING_PAYPAL';
+  if(order.paypalOrderId!==paypalOrderId)throw Object.assign(new Error('Payment provider order does not match this order. Reconciliation required.'),{status:409});
   if(String(order.paymentStatus||'').toUpperCase()==='PAID'){await ensureManufacturingWorkOrder(env,'COASTER',order);order._paymentCapturedNow=false;return order;}
+  if(String(order.paymentStatus||'').toUpperCase()!==requiredLock)throw Object.assign(new Error('Payment capture lock is missing. Reconciliation required; do not retry.'),{status:409});
   const ship=order.fulfillmentMethod==='SHIP'?(function(){const latest=extractShipping(captured);return latest.address1&&latest.postalCode?latest:extractShipping(details);})():null;if(order.fulfillmentMethod==='SHIP')requireUsShipping(ship);
   const cap=captureId(captured)||captureId(details);const paidAt=new Date().toISOString();
-  const write=await db.prepare(`UPDATE coaster_orders SET paypal_order_status='COMPLETED',paypal_capture_id=?,paypal_payment_id=?,payment_status='PAID',paypal_paid_at=COALESCE(paypal_paid_at,?),paypal_last_error=NULL,status='PRODUCTION_QUEUE',shipping_name=?,shipping_address1=?,shipping_address2=?,shipping_city=?,shipping_region=?,shipping_postal_code=?,shipping_country=?,payment_total=CASE WHEN payment_total>0 THEN payment_total ELSE final_amount END,updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND COALESCE(payment_status,'')<>'PAID'`).bind(cap||null,cap||null,paidAt,ship?.name||null,ship?.address1||null,ship?.address2||null,ship?.city||null,ship?.region||null,ship?.postalCode||null,ship?.country||null,orderId).run();
-  if(!Number(write?.meta?.changes||0)){const current=await getCoasterOrderDetail(env,orderId);if(current)current._paymentCapturedNow=false;return current;}
+  const write=await db.prepare(`UPDATE coaster_orders SET paypal_order_status='COMPLETED',paypal_capture_id=?,paypal_payment_id=?,payment_status='PAID',paypal_paid_at=COALESCE(paypal_paid_at,?),paypal_last_error=NULL,status='PRODUCTION_QUEUE',shipping_name=?,shipping_address1=?,shipping_address2=?,shipping_city=?,shipping_region=?,shipping_postal_code=?,shipping_country=?,payment_total=CASE WHEN payment_total>0 THEN payment_total ELSE final_amount END,updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND payment_status=? AND paypal_order_id=?`).bind(cap||null,cap||null,paidAt,ship?.name||null,ship?.address1||null,ship?.address2||null,ship?.city||null,ship?.region||null,ship?.postalCode||null,ship?.country||null,orderId,requiredLock,paypalOrderId).run();
+  if(Number(write?.meta?.changes||0)!==1)throw Object.assign(new Error('Capture completed at PayPal, but order state changed. Manual reconciliation required; do not pay again.'),{status:502});
   const paid=await getCoasterOrderDetail(env,orderId);
-  await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PAYPAL_ORDER_CAPTURED',?)`).bind(orderId,JSON.stringify({paypalOrderId,captureId:cap||null,paymentStatus:'PAID',approvedSubtotal:money(paid?.finalAmount),taxAmount:money(paid?.taxAmount),paymentTotal:money(paid?.paymentTotal),addressSource:ship?'PAYPAL':'WESTTECH_PICKUP'})).run();
+  await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,?,?)`).bind(orderId,method==='VENMO'?'VENMO_ORDER_CAPTURED':'PAYPAL_ORDER_CAPTURED',JSON.stringify({method,paypalOrderId,captureId:cap||null,paymentStatus:'PAID',approvedSubtotal:money(paid?.finalAmount),taxAmount:money(paid?.taxAmount),paymentTotal:money(paid?.paymentTotal),addressSource:ship?'PAYPAL':'WESTTECH_PICKUP'})).run();
   await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'PRODUCTION_QUEUED',?)`).bind(orderId,JSON.stringify({reason:'PAYMENT_RECEIVED',paypalOrderId,captureId:cap||null})).run();
   const paidOrder=await getCoasterOrderDetail(env,orderId);
   if(paidOrder)await ensureManufacturingWorkOrder(env,'COASTER',paidOrder);
@@ -192,15 +208,16 @@ export async function captureCoasterPayPalOrderForCustomer(env,orderId,paypalOrd
 }
 async function captureCoasterPayPalOrderCore(env,orderId,paypalOrderId,{confirmTax=false}={}){
   const order=await getCoasterOrderDetail(env,orderId);if(!order)throw Object.assign(new Error('Coaster order not found.'),{status:404});
-  if(String(order.paymentStatus||'').toUpperCase()==='CAPTURING_VENMO')throw Object.assign(new Error('A Venmo payment is being verified. Please contact WestTech before retrying.'),{status:409});
+  if(['CAPTURING_VENMO','CAPTURING_PAYPAL','CREATING_PAYPAL_ORDER'].includes(String(order.paymentStatus||'').toUpperCase()))throw Object.assign(new Error('A payment operation is already underway. Please contact WestTech before retrying.'),{status:409});
   if(!order.paypalOrderId||order.paypalOrderId!==paypalOrderId)throw Object.assign(new Error('This PayPal checkout does not match the approved coaster order.'),{status:409});
   if(String(order.paymentStatus||'').toUpperCase()==='PAID'){await ensureManufacturingWorkOrder(env,'COASTER',order);return {order,capturedNow:false,taxConfirmationRequired:false};}
   let accessToken=await generateAccessToken(env);const detailResult=await paypalCall(env,`/v2/checkout/orders/${encodeURIComponent(paypalOrderId)}`,{accessToken});accessToken=detailResult.accessToken;
   const status=String(detailResult.data?.status||'').toUpperCase();
   if(!['APPROVED','COMPLETED'].includes(status))throw Object.assign(new Error(`PayPal checkout is not ready to capture (status: ${status||'UNKNOWN'}).`),{status:409});
-  if(status==='COMPLETED'){const paid=await markCaptured(env,orderId,paypalOrderId,detailResult.data,detailResult.data);return {order:paid,capturedNow:!!paid?._paymentCapturedNow,taxConfirmationRequired:false};}
+  if(status==='COMPLETED'){await reservePayPalCapture(env,orderId,paypalOrderId);const paid=await markCaptured(env,orderId,paypalOrderId,detailResult.data,detailResult.data);return {order:paid,capturedNow:!!paid?._paymentCapturedNow,taxConfirmationRequired:false};}
   const prepared=await preparePayPalTax(env,order,detailResult.data,accessToken,{confirmTax});
   if(prepared.quote.isColorado&&!prepared.confirmationAccepted)return {order:prepared.order,capturedNow:false,taxConfirmationRequired:true,taxReview:taxReview(prepared)};
+  await reservePayPalCapture(env,orderId,paypalOrderId);
   const captured=await paypalCall(env,`/v2/checkout/orders/${encodeURIComponent(paypalOrderId)}/capture`,{method:'POST',body:{},accessToken,requestId:requestId(order.orderId,order.proofVersion,'capture')});
   const paid=await markCaptured(env,orderId,paypalOrderId,detailResult.data,captured.data);
   return {order:paid,capturedNow:!!paid?._paymentCapturedNow,taxConfirmationRequired:false};
@@ -209,14 +226,16 @@ async function captureCoasterPayPalOrderCore(env,orderId,paypalOrderId,{confirmT
 export async function syncCoasterPayPalOrder(env,orderId){
   const db=requireOrdersDb(env);const order=await getCoasterOrderDetail(env,orderId);if(!order)return null;
   if(String(order.paymentStatus||'').toUpperCase()==='PAID'){await ensureManufacturingWorkOrder(env,'COASTER',order);return order;}
+  if(['CAPTURING_VENMO','CAPTURING_PAYPAL','CREATING_PAYPAL_ORDER'].includes(String(order.paymentStatus||'').toUpperCase()))throw Object.assign(new Error('Payment operation already underway. Do not retry without reconciliation.'),{status:409});
   if(!order.paypalOrderId)throw Object.assign(new Error('No PayPal checkout exists for this order yet.'),{status:404});
   let accessToken=await generateAccessToken(env);const got=await paypalCall(env,`/v2/checkout/orders/${encodeURIComponent(order.paypalOrderId)}`,{accessToken});accessToken=got.accessToken;
   const status=String(got.data?.status||'').toUpperCase();const url=approvalUrl(got.data);
-  await db.prepare(`UPDATE coaster_orders SET paypal_order_status=?,paypal_approval_url=CASE WHEN ?<>'' THEN ? ELSE paypal_approval_url END,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(status,url,url,orderId).run();
-  if(status==='COMPLETED')return markCaptured(env,orderId,order.paypalOrderId,got.data,got.data);
+  await db.prepare(`UPDATE coaster_orders SET paypal_order_status=?,paypal_approval_url=CASE WHEN ?<>'' THEN ? ELSE paypal_approval_url END,updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND payment_status NOT IN ('PAID','CAPTURING_PAYPAL','CAPTURING_VENMO','CREATING_PAYPAL_ORDER')`).bind(status,url,url,orderId).run();
+  if(status==='COMPLETED'){await reservePayPalCapture(env,orderId,order.paypalOrderId);return markCaptured(env,orderId,order.paypalOrderId,got.data,got.data);}
   if(status==='APPROVED'){
     const prepared=await preparePayPalTax(env,order,got.data,accessToken);
     if(prepared.quote.isColorado&&!prepared.confirmationAccepted)throw Object.assign(new Error('The customer must confirm the Colorado tax total on the approval page before this payment can be captured.'),{status:409});
+    await reservePayPalCapture(env,orderId,order.paypalOrderId);
     const captured=await paypalCall(env,`/v2/checkout/orders/${encodeURIComponent(order.paypalOrderId)}/capture`,{method:'POST',body:{},accessToken,requestId:requestId(order.orderId,order.proofVersion,'capture')});
     return markCaptured(env,orderId,order.paypalOrderId,got.data,captured.data);
   }

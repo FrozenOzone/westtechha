@@ -17,7 +17,7 @@ function requireOrder(order) {
   if (!order || !/^WTCC-\d{8}-\d{1,6}$/.test(String(order.orderId || ''))) throw fail('Order not found.', 404);
   if (order.paymentRequired !== true || order.proofStatus !== 'APPROVED' ||
     !['PROOF_APPROVED', 'AWAITING_PAYMENT'].includes(String(order.status || '').toUpperCase()) ||
-    ['PAID','CAPTURING_VENMO'].includes(String(order.paymentStatus || '').toUpperCase())) throw fail('Payment is not available for this order.');
+    ['PAID','CAPTURING_VENMO','CAPTURING_PAYPAL','CREATING_PAYPAL_ORDER'].includes(String(order.paymentStatus || '').toUpperCase())) throw fail('Payment is not available for this order.');
   if (order.fulfillmentMethod !== 'LOCAL_PICKUP') throw fail('Venmo testing currently supports local pickup only. Please use PayPal for shipped orders.');
   if (!String(order.productionWindow || '').trim()) throw fail('Production window is not set.');
   if (!(Number(order.finalAmount) > 0)) throw fail('Approved amount is invalid.');
@@ -104,7 +104,7 @@ export async function captureVenmoPickup(env, orderId, paypalOrderId) {
   // Legacy PayPal capture explicitly rejects CAPTURING_VENMO to avoid double charges.
   const reserved=await db.prepare("UPDATE coaster_payment_attempts SET status='CAPTURING',updated_at=CURRENT_TIMESTAMP WHERE attempt_id=? AND status='CREATED'").bind(attempt.attempt_id).run();
   if (Number(reserved?.meta?.changes||0)!==1) throw fail('Payment already processing.',409);
-  const orderLock=await db.prepare("UPDATE coaster_orders SET payment_status='CAPTURING_VENMO',updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND payment_status NOT IN ('PAID','CAPTURING_VENMO')").bind(orderId).run();
+  const orderLock=await db.prepare("UPDATE coaster_orders SET payment_status='CAPTURING_VENMO',updated_at=CURRENT_TIMESTAMP WHERE order_id=? AND payment_status IN ('AWAITING_PAYMENT','AWAITING_TAX_CONFIRMATION','PREVIEW_AWAITING_TEST_PAYMENT','PAYPAL_ERROR')").bind(orderId).run();
   if (Number(orderLock?.meta?.changes||0)!==1) {
     await db.prepare("UPDATE coaster_payment_attempts SET status='CANCELED',updated_at=CURRENT_TIMESTAMP WHERE attempt_id=? AND status='CAPTURING'").bind(attempt.attempt_id).run();
     throw fail('Another payment is already processing. Contact WestTech.',409);
@@ -122,14 +122,15 @@ export async function captureVenmoPickup(env, orderId, paypalOrderId) {
     throw fail('Capture response needs reconciliation. Do not pay again.',502);
   // Preserve existing order lifecycle; use shared markCaptured(), which records
   // events, creates manufacturing work order, and queues production only once.
-  await db.prepare(`UPDATE coaster_orders SET paypal_order_id=?,paypal_order_status='COMPLETED',
+  const venmoFinalize=await db.prepare(`UPDATE coaster_orders SET paypal_order_id=?,paypal_order_status='COMPLETED',
       tax_amount=?,tax_rate=?,taxable_amount=?,tax_jurisdiction_code=?,tax_source=?,
       tax_address_source='WESTTECH_PICKUP',tax_address_json=?,tax_quote_json=?,
       payment_total=?,tax_confirmed_at=CURRENT_TIMESTAMP
-      WHERE order_id=? AND payment_status<>'PAID'`)
+      WHERE order_id=? AND payment_status='CAPTURING_VENMO'`)
     .bind(paypalOrderId,Number(fresh.taxAmount),Number(fresh.taxRate),Number(fresh.taxableAmount),String(fresh.jurisdictionCode||''),String(fresh.source||''),
       JSON.stringify(fresh.address),JSON.stringify(fresh),Number(fresh.totalAmount),orderId).run();
-  const paid=await markCaptured(env,orderId,paypalOrderId,details,captured);
+  if(Number(venmoFinalize?.meta?.changes||0)!==1)throw fail('Venmo captured, but the order lock changed. Admin reconciliation required; do not pay again.',502);
+  const paid=await markCaptured(env,orderId,paypalOrderId,details,captured,{method:'VENMO'});
   if (!paid || String(paid.paymentStatus||'').toUpperCase()!=='PAID') throw fail('Payment captured, but order needs admin reconciliation. Do not pay again.',502);
   await db.prepare("UPDATE coaster_payment_attempts SET status='CAPTURED',updated_at=CURRENT_TIMESTAMP WHERE attempt_id=?").bind(attempt.attempt_id).run();
   return {order:paid,capturedNow:!!paid._paymentCapturedNow};
