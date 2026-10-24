@@ -41,7 +41,7 @@ export async function onRequestGet(context){
     {id:'venmo',label:'Venmo',enabled:f.venmo,reason:order.fulfillmentMethod==='SHIP'&&!f.venmo?'Venmo shipping Sandbox is not yet enabled.':null}];
   let quote=null;
   if(f.venmo&&order.fulfillmentMethod==='LOCAL_PICKUP'){const q=await getVenmoPickupQuote(context.env,order.orderId);
-   quote={taxableAmount:q.taxableAmount,taxAmount:q.taxAmount,totalAmount:q.totalAmount,taxRate:q.taxRate,shippingAmount:q.shippingAmount};}
+   quote={itemAmount:q.itemAmount,taxableAmount:q.taxableAmount,taxAmount:q.taxAmount,totalAmount:q.totalAmount,taxRate:q.taxRate,shippingAmount:q.shippingAmount};}
   return reply({ok:true,mode:f.mode,methods,fulfillmentMethod:order.fulfillmentMethod,clientId:f.venmo?sanitizeEnvValue(context.env.PAYPAL_CLIENT_ID):null,quote});
  }catch(e){return reply({ok:false,message:e.message||'Could not load payment methods.'},e.status||500);}
 }
