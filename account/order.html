@@ -277,10 +277,10 @@
           <div><span>Payment status</span><strong id="co-stage-payment-status">—</strong></div>
         </div>
         <p id="co-stage-guidance" class="customer-order-stage-guidance"></p>
-        <section id="co-paypal-sandbox" hidden aria-label="PayPal Sandbox checkout" style="margin-top:16px;border:1px solid #356187;border-radius:10px;padding:14px;">
-          <strong style="display:block;margin-bottom:8px;">PayPal Sandbox — Test Checkout</strong>
-          <p style="margin:0 0 12px;color:#aec7dd;">Sandbox test only. No real PayPal charge will be made. Review the final tax and shipping total before capture.</p>
-          <button id="co-paypal-start" type="button" class="customer-primary-btn" style="background:#1677c4;color:white;border:0;border-radius:6px;padding:10px 16px;cursor:pointer;">Continue to PayPal Sandbox</button>
+        <section id="co-paypal-sandbox" hidden aria-label="PayPal checkout" style="margin-top:16px;border:1px solid #356187;border-radius:10px;padding:14px;">
+          <strong id="co-paypal-heading" style="display:block;margin-bottom:8px;">PayPal Checkout</strong>
+          <p id="co-paypal-explainer" style="margin:0 0 12px;color:#aec7dd;">Review the final tax and shipping total before payment.</p>
+          <button id="co-paypal-start" type="button" class="customer-primary-btn" style="background:#1677c4;color:white;border:0;border-radius:6px;padding:10px 16px;cursor:pointer;">Continue to PayPal</button>
           <p id="co-paypal-feedback" role="status" aria-live="polite" hidden></p>
           <section id="co-payment-methods" hidden aria-label="Venmo Sandbox checkout" style="border-top:1px solid #356187;margin-top:16px;padding-top:14px;">
             <h3 style="margin:0 0 8px;">Or pay with Venmo</h3>
@@ -317,7 +317,7 @@
             <h3 style="margin:0 0 8px;">Confirm Colorado sales tax before payment</h3>
             <p id="co-paypal-tax-breakdown"></p>
             <label style="display:flex;gap:8px;align-items:start;"><input id="co-paypal-confirm-tax" type="checkbox"/>I have reviewed and approve the displayed tax and final total for this order.</label>
-            <button id="co-paypal-capture" type="button" disabled style="background:#1677c4;color:white;border:0;border-radius:6px;padding:10px 16px;margin-top:10px;cursor:pointer;">Confirm Total & Complete Sandbox Payment</button>
+            <button id="co-paypal-capture" type="button" disabled style="background:#1677c4;color:white;border:0;border-radius:6px;padding:10px 16px;margin-top:10px;cursor:pointer;">Confirm Total & Complete Payment</button>
           </div>
         </section>
       </aside>
@@ -325,5 +325,5 @@
   </main>
   <div id="site-footer"></div>
 </div>
-<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-pickup-details1"></script><script src="../js/customer-order.js?v=20261023-stage5i1"></script><script src="../js/customer-payment-methods.js?v=20261023-stage5h1"></script>
+<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-pickup-details1"></script><script src="../js/customer-order.js?v=20261024-stage5l1"></script><script src="../js/customer-payment-methods.js?v=20261023-stage5h1"></script>
 </body></html>

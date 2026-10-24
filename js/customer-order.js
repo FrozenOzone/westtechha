@@ -409,14 +409,14 @@
  async function paymentPost(action,rest={}){
   const response=await fetch(payRoute(),{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({action,...rest})});
   if(response.status===401){location.replace('login.html');throw new Error('Sign in again to continue payment.');}
-  const data=await response.json().catch(()=>({}));if(!response.ok||!data.ok)throw new Error(data.message||'Could not complete the Sandbox step.');return data;
+  const data=await response.json().catch(()=>({}));if(!response.ok||!data.ok)throw new Error(data.message||'Could not complete the payment step.');return data;
  }
  function clearPaypalReturn(){
   const u=new URL(location.href);u.searchParams.delete('payment');u.searchParams.delete('token');u.searchParams.delete('PayerID');
   history.replaceState(null,'',u.pathname+u.search+u.hash);
  }
  async function captureSandbox(confirmTax=false){
-  if(sandboxBusy)return;sandboxBusy=true;taxBtn.disabled=true;sandboxBtn.disabled=true;sandboxFeedback('Confirming Sandbox payment…');
+  if(sandboxBusy)return;sandboxBusy=true;taxBtn.disabled=true;sandboxBtn.disabled=true;sandboxFeedback(sandboxMode==='sandbox'?'Confirming Sandbox test payment…':'Confirming PayPal payment…');
   try{
    const token=String(params.get('token')||'');if(!token)throw new Error('PayPal return token is missing. Return to checkout or contact WestTech.');
    const data=await paymentPost('capture',{paypalOrderId:token,confirmTax});
@@ -424,9 +424,9 @@
     const quote=data.taxReview||{};
     taxPanel.hidden=false;taxCheckbox.checked=false;taxBtn.disabled=true;
     $text('#co-paypal-tax-breakdown',`Taxable items: ${money(quote.taxableAmount)} · Shipping: ${money(quote.shippingAmount)} · Colorado tax: ${money(quote.taxAmount)} · Final total: ${money(quote.totalAmount)}.`);
-    sandboxFeedback('Review and confirm the final Sandbox amount before completing payment.');
-   }else if(data.paid){taxPanel.hidden=true;clearPaypalReturn();sandboxFeedback('Sandbox payment captured. Your order is entering the production queue.');await load();}
-   else sandboxFeedback('Sandbox payment was not yet completed. Please contact WestTech.',true);
+    sandboxFeedback('Review and confirm the final amount before completing payment.');
+   }else if(data.paid){taxPanel.hidden=true;clearPaypalReturn();sandboxFeedback(sandboxMode==='sandbox'?'Sandbox test payment captured. Your order is entering the production queue.':'Payment confirmed. Your order is entering the production queue.');await load();}
+   else sandboxFeedback('Payment was not completed. Please contact WestTech before trying again.',true);
   }catch(e){sandboxFeedback(e.message||'Could not capture payment.',true);}
   finally{sandboxBusy=false;sandboxBtn.disabled=false;taxBtn.disabled=!taxCheckbox.checked;}
  }
@@ -439,22 +439,27 @@
    const data=await response.json().catch(()=>({}));if(!response.ok||!data.ok)return;
    if(sandboxOrder!==order)return;
    sandboxMode=data.mode||'';
-   if(sandboxMode==='configuration_error'){sandbox.hidden=false;sandboxBtn.hidden=true;sandboxFeedback('Sandbox checkout is not configured correctly. Contact WestTech.',true);return;}
-   if(data.mode!=='sandbox'||!data.canCheckout)return;
-   sandbox.hidden=false;sandboxBtn.hidden=false;
-   $text('#co-stage-guidance','Use PayPal Sandbox below to test checkout securely. No real funds will be charged. Your final tax and shipping total will be shown before capture.');
+   if(sandboxMode==='configuration_error'){sandbox.hidden=false;sandboxBtn.hidden=true;sandboxFeedback('Payment configuration needs attention. Contact WestTech.',true);return;}
+   if(!['sandbox','live'].includes(data.mode)||!data.canCheckout)return;
+   const testing=data.mode==='sandbox';sandbox.hidden=false;sandboxBtn.hidden=false;
+   sandbox.setAttribute('aria-label',testing?'PayPal Sandbox test checkout':'PayPal secure checkout');
+   $text('#co-paypal-heading',testing?'PayPal Sandbox — Test Checkout':'PayPal — Secure Checkout');
+   $text('#co-paypal-explainer',testing?'Sandbox test only. No real PayPal charge will be made. Review the final tax and shipping total before capture.':'Complete your payment securely using PayPal. Review the final tax, shipping, and total before confirming.');
+   sandboxBtn.textContent=testing?'Continue to PayPal Sandbox':'Continue to PayPal';
+   taxBtn.textContent=testing?'Confirm Total & Complete Sandbox Payment':'Confirm Total & Complete Payment';
+   $text('#co-stage-guidance',testing?'Use PayPal Sandbox below to test checkout securely. No real funds will be charged. Your final tax and shipping total will be shown before capture.':'Review your approved order and continue to PayPal. Your final tax and shipping total will be confirmed before payment.');
    sandboxFeedback('');
    if(params.get('payment')==='return'&&params.has('token')&&!payReturnAttempted){
     payReturnAttempted=true;captureSandbox(false);
    }else if(params.get('payment')==='cancel'){
-    sandboxFeedback('Your Sandbox checkout was canceled; you can try again. No payment was captured.');clearPaypalReturn();
+    sandboxFeedback('PayPal checkout was canceled. Check your payment status before trying again.');clearPaypalReturn();
    }
   }).catch(()=>{});
  }
  sandboxBtn.addEventListener('click',async()=>{
-  if(sandboxBusy||sandboxMode!=='sandbox')return;sandboxBusy=true;sandboxBtn.disabled=true;sandboxFeedback('Opening PayPal Sandbox checkout…');
-  try{const data=await paymentPost('startCheckout');const u=new URL(data.approvalUrl);if(u.protocol!=='https:'||!['sandbox.paypal.com','www.sandbox.paypal.com'].includes(u.hostname.toLowerCase()))throw new Error('Invalid Sandbox checkout destination.');location.assign(u.href);}
-  catch(e){sandboxBusy=false;sandboxBtn.disabled=false;sandboxFeedback(e.message||'Could not open PayPal Sandbox.',true);}
+  if(sandboxBusy||!['sandbox','live'].includes(sandboxMode))return;sandboxBusy=true;sandboxBtn.disabled=true;sandboxFeedback(sandboxMode==='sandbox'?'Opening PayPal Sandbox checkout…':'Opening secure PayPal checkout…');
+  try{const data=await paymentPost('startCheckout');const u=new URL(data.approvalUrl);const allowed=sandboxMode==='sandbox'?['sandbox.paypal.com','www.sandbox.paypal.com']:['paypal.com','www.paypal.com'];if(u.protocol!=='https:'||!allowed.includes(u.hostname.toLowerCase())||data.mode!==sandboxMode)throw new Error('Unexpected PayPal checkout destination; contact WestTech.');location.assign(u.href);}
+  catch(e){sandboxBusy=false;sandboxBtn.disabled=false;sandboxFeedback(e.message||'Could not open PayPal.',true);}
  });
  taxCheckbox.addEventListener('change',()=>{taxBtn.disabled=!taxCheckbox.checked||sandboxBusy;});
  taxBtn.addEventListener('click',()=>{if(taxCheckbox.checked)captureSandbox(true);});

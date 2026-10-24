@@ -72,6 +72,6 @@ test('payment, cancel, capture, address/tax verification and pickup scheduler re
 });
 test('checkout CSS and JS have their own cache versions, existing payment component does not',()=>{
  assert.match(html,/customer-order\.css\?v=20261023-stage5i1/);
- assert.match(html,/customer-order\.js\?v=20261023-stage5i1/);
+ assert.match(html,/customer-order\.js\?v=20261024-stage5l1/);
  assert.match(html,/customer-payment-methods\.js\?v=20261023-stage5h1/);
 });
