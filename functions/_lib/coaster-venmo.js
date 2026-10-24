@@ -129,7 +129,7 @@ async function reuseVenmoCheckout(env,db,orderId,quote,attempt) {
 }
 export async function startVenmoPickup(env, orderId, expectedTotal, shippingAddress=null) {
   if (!validMoney(expectedTotal)) throw fail('Confirm a valid final total.', 400);
-  if (sanitizeEnvValue(env.PAYPAL_ENV).toLowerCase() !== 'sandbox') throw fail('Venmo Sandbox checkout is not enabled.', 403);
+  if (!['sandbox','live'].includes(sanitizeEnvValue(env.PAYPAL_ENV).toLowerCase())) throw fail('Venmo checkout is not enabled.', 403);
   const order=await getCoasterOrderDetail(env,orderId);
   const quote=await quoteFor(env,order,shippingAddress);
   if(String(quote.totalAmount)!==expectedTotal)throw fail('Your tax quote changed. Review the total again.');
@@ -208,7 +208,7 @@ export async function startVenmoPickup(env, orderId, expectedTotal, shippingAddr
 // Record a buyer-abandoned Sandbox attempt without changing the coaster order.
 // A CAPTURING or CAPTURED attempt can never be downgraded to CANCELED.
 export async function cancelVenmoPickup(env, orderId, paypalOrderId) {
-  if (sanitizeEnvValue(env.PAYPAL_ENV).toLowerCase() !== 'sandbox') throw fail('Sandbox cancellation unavailable.',403);
+  if (!['sandbox','live'].includes(sanitizeEnvValue(env.PAYPAL_ENV).toLowerCase())) throw fail('Venmo cancellation unavailable.',403);
   const db=requireOrdersDb(env);
   const changed=await db.prepare("UPDATE coaster_payment_attempts SET status='CANCELED',updated_at=CURRENT_TIMESTAMP WHERE coaster_order_id=? AND method='VENMO' AND provider_order_id=? AND status='CREATED'")
     .bind(orderId,paypalOrderId).run();
@@ -220,7 +220,7 @@ export async function cancelVenmoPickup(env, orderId, paypalOrderId) {
   throw fail('Payment is processing or completed; cancellation is not allowed. Check your order before retrying.',409);
 }
 export async function captureVenmoPickup(env, orderId, paypalOrderId) {
-  if (sanitizeEnvValue(env.PAYPAL_ENV).toLowerCase() !== 'sandbox') throw fail('Venmo Sandbox checkout is not enabled.', 403);
+  if (!['sandbox','live'].includes(sanitizeEnvValue(env.PAYPAL_ENV).toLowerCase())) throw fail('Venmo checkout is not enabled.', 403);
   const db = requireOrdersDb(env);
   const attempt = await db.prepare("SELECT * FROM coaster_payment_attempts WHERE coaster_order_id=? AND method='VENMO' AND provider_order_id=? LIMIT 1")
     .bind(orderId,paypalOrderId).first();
