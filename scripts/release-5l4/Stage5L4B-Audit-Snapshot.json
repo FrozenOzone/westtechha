@@ -1,0 +1,30 @@
+{
+  "stage": "5L4B",
+  "audit_date": "2026-10-24",
+  "repository": "FrozenOzone/westtechha",
+  "preview_baseline": "a8ede1e522ed71eea9404044d2fa83da8d857b71",
+  "production_baseline": "67dd7dd1a9f4cafa7f76fb50bc51f983c6f49b48",
+  "production": {
+    "orders_db_id": "442f34a2-49bd-4a3b-8e58-75ba9c4d3eb0",
+    "resend_api_key_setting_present": true,
+    "webhook_signing_secret_setting_present": false,
+    "custom_email_sent_receipts": 1,
+    "webhook_event_count": 0,
+    "coaster_email_sent_events": 13
+  },
+  "preview": {
+    "orders_db_id": "d09b2358-dfcd-4cb2-9c46-57175732c45c",
+    "resend_api_key_setting_present": true,
+    "webhook_signing_secret_setting_present": true,
+    "webhook_event_count": 31,
+    "coaster_email_sent_events": 33
+  },
+  "webhook_route": "functions/api/webhooks/resend/index.js",
+  "webhook_route_git_blob": "b045743502ae1626f3409e96e4ca32ccde3efc06",
+  "custom_email_module_git_blob": "4aa406c4cb87f3dda8bc75da0c5e4cd37842a8e3",
+  "coaster_email_module_git_blob": "347b948188b9726ade56d4f571d0f5a8e5711254",
+  "resend_dashboard_endpoint_verified": false,
+  "provider_delivery_to_production_verified": false,
+  "release_decision": "HOLD",
+  "production_changes_authorized": false
+}
