@@ -75,10 +75,11 @@ test('live portal uses live PayPal URL allowlist, sandbox portal uses sandbox al
  assert.match(html,/id="co-paypal-explainer"/);
  assert.match(html,/customer-order\.js\?v=20261024-stage5l1/);
 });
-test('Venmo stays Sandbox and not activated on Production',()=>{
- assert.match(sdk,/if\(location\.hostname\.toLowerCase\(\)!==host\)return;/);
+test('Venmo selects the matching live or Sandbox SDK without replacing legacy PayPal',()=>{
+ assert.match(sdk,/allowedHosts\.has\(location\.hostname\.toLowerCase\(\)\)/);
+ assert.match(sdk,/www\.paypal\.com\/web-sdk\/v6\/core/);
  assert.match(sdk,/www\.sandbox\.paypal\.com\/web-sdk\/v6\/core/);
- assert.match(sdk,/data\.mode!=='sandbox'/);
+ assert.match(sdk,/\['sandbox','live'\]\.includes\(data.mode\)/);
  assert.doesNotMatch(backend,/startVenmo|captureVenmo/);
 });
 test('Stage 5L1 does not alter legacy proof-approval PayPal capture',()=>{
