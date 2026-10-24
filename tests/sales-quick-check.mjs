@@ -1,0 +1,35 @@
+import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {execFileSync} from 'node:child_process';
+const root=process.cwd(),read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const ledger=read('functions/_lib/sales-invoices.js'),payment=read('functions/_lib/sales-payment.js'),admin=read('js/sales-admin.js'),buyer=read('js/sales-pay.js');
+for(const f of ['js/sales-admin.js','js/sales-pay.js','functions/_lib/sales-invoices.js','functions/_lib/sales-payment.js','functions/api/admin/sales/index.js','functions/api/admin/sales/[id]/index.js','functions/api/sales/checkout/index.js'])execFileSync('node',['--check',f]);
+assert.match(ledger,/if\(String\(expectedTotal\)!==dollar\(sale.totalCents\)\)/,'recheck expected totals');
+assert.match(ledger,/buildTaxQuote\(env,address/,'server-side tax');
+assert.match(ledger,/price>original/,'price override cannot inflate regular');
+assert.match(ledger,/sales_invoice_events/,'history');
+assert.match(payment,/attempt\.method==='VENMO'&&!details\.payment_source\?\.venmo/,'must verify instrument');
+assert.match(payment,/UPDATE sales_invoices SET status='CAPTURING'/,'must lock before capture');
+assert.match(payment,/Do not pay again/,'capture errors safe');
+assert.match(payment,/getRandomValues|crypto\.randomUUID/,'non-predictable attempt IDs');
+assert.match(read('functions/api/admin/sales/index.js'),/requireWestTechAdmin/);
+assert.match(read('functions/api/admin/sales/\[id\]/index.js'),/requireWestTechAdmin/);
+assert.match(read('functions/api/sales/checkout/index.js'),/Invalid origin/);
+assert.match(buyer,/location\.hash\.slice\(1\)/,'token remains in location fragment');
+assert.doesNotMatch(buyer,/paypal\.clientSecret/,'must not ship secret');
+assert.match(admin,/check-cleared/);assert.match(admin,/Record Cash/);assert.match(admin,/Record Check/);
+assert.match(read('migrations/024_sales_invoices.sql'),/CREATE TABLE IF NOT EXISTS sales_invoice_events/);
+// Exercise the actual pricing function with a deterministic stub for external Colorado GIS.
+const moduleText=ledger.replace(/^import .*;\s*$/gm,'').replace(/\bexport (?=(?:const|function|async))/g,'');
+const factory=new Function('requireOrdersDb','buildTaxQuote','validateShippingAddress','generateAccessToken','paypalBaseUrl','readJsonSafe','sanitizeEnvValue',moduleText+'\nreturn {prepareSale,orderPayload};');
+const {prepareSale,orderPayload}=factory(()=>{throw Error('No DB in math checks');},async(_env,address,options)=>{
+ const tax=Number((options.taxableAmount*0.075).toFixed(2));return {taxRate:0.075,taxAmount:tax.toFixed(2),totalAmount:(options.itemAmount+options.shippingAmount+tax).toFixed(2),source:'stub-GIS',jurisdictionCode:'CO-TEST',salesTax:[]};
+},addr=>({fullName:addr.fullName,address1:addr.address1,city:addr.city,state:addr.state,postalCode:addr.postalCode,countryCode:'US'}),()=>{},()=>'',()=>{},v=>String(v||'').trim());
+const base={saleType:'INVOICE',customerName:'Test Neighbor',customerEmail:'neighbor@example.com',locationLabel:'Neighbor pickup',address:{fullName:'Test Neighbor',address1:'1 Test Ave',city:'Commerce City',state:'CO',postalCode:'80640'},items:[{description:'4 coaster set',quantity:'1',regularPrice:'29.99',unitPrice:'1.00'}],shipping:'0.00',discountReason:'Neighbor Venmo test'};
+const sale=await prepareSale({},base);assert.equal(sale.regularCents,2999);assert.equal(sale.subtotalCents,100);assert.equal(sale.discountCents,2899);assert.equal(sale.taxCents,7);assert.equal(sale.totalCents,107);
+await assert.rejects(prepareSale({}, {...base,discountReason:''}),/reason/);
+await assert.rejects(prepareSale({}, {...base,items:[{...base.items[0],unitPrice:'29.999'}]}),/Amounts/);
+await assert.rejects(prepareSale({}, {...base,items:[{...base.items[0],unitPrice:'30.00'}]}),/regular price/);
+await assert.rejects(prepareSale({}, {...base,address:{...base.address,state:'CA'}}),/outside Colorado/);
+const exempt=await prepareSale({}, {...base,taxExempt:true,exemptReason:'Verified certificate'});assert.equal(exempt.taxCents,0);
+const comp=await prepareSale({}, {...base,items:[{...base.items[0],unitPrice:'0.00'}]});assert.equal(comp.totalCents,0);
+const payload=orderPayload({invoice_number:'WTI-000001',subtotal_cents:100,shipping_cents:0,tax_cents:8,total_cents:108},'VENMO','abcd1234');assert.equal(payload.purchase_units[0].amount.value,'1.08');
+console.log('PASS: JS syntax, price override and reason, server tax math, exemptions and complimentary sales, payment locks, origin auth, PayPal amount consistency.');
