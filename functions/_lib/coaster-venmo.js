@@ -1,4 +1,4 @@
-/* Sandbox-only Venmo adapter: local pickup + gated shipping. Existing PayPal checkout unchanged. */
+/* Venmo adapter: Sandbox Preview and live PayPal; legacy PayPal checkout unchanged. Manual provider reconciliation remains Sandbox-only. */
 import { generateAccessToken, paypalBaseUrl } from './paypal.js';
 import { getCoasterOrderDetail } from './coaster-orders.js';
 import { buildTaxQuote, validateShippingAddress } from './tax.js';
