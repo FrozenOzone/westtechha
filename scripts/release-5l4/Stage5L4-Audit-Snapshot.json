@@ -1,0 +1,60 @@
+{
+  "stage": "5L4",
+  "audit_date": "2026-10-24",
+  "release_decision": "HOLD",
+  "production_baseline": "67dd7dd1a9f4cafa7f76fb50bc51f983c6f49b48",
+  "preview_baseline_before_kit": "69da270505f4be18d8c4fd8918c452988c957a46",
+  "branch_difference_before_kit": {
+    "ahead_commits": 64,
+    "changed_paths": 94,
+    "behind_commits": 0
+  },
+  "database_ids": {
+    "production": "442f34a2-49bd-4a3b-8e58-75ba9c4d3eb0",
+    "preview": "d09b2358-dfcd-4cb2-9c46-57175732c45c"
+  },
+  "migrations_pending": [
+    "022_coaster_pickup_scheduling.sql",
+    "023_coaster_payment_attempts.sql"
+  ],
+  "verified_read_only_counts": {
+    "production": {
+      "coaster_orders": 2,
+      "manufacturing_work_orders": 1,
+      "customer_accounts": 0
+    },
+    "preview": {
+      "coaster_orders": 7,
+      "manufacturing_work_orders": 6,
+      "customer_accounts": 1
+    }
+  },
+  "known_hold_gates": [
+    {
+      "id": "G1",
+      "reason": "Shipping-address data currently written to tax log output",
+      "action": "Redact and test tax logs before Production promotion"
+    },
+    {
+      "id": "G2",
+      "reason": "RESEND_WEBHOOK_SECRET not configured in Production Pages variables",
+      "action": "Verify webhook use, then configure Production-specific secret if needed"
+    },
+    {
+      "id": "G3",
+      "reason": "Production live PayPal identity and browser/email evidence not independently confirmed",
+      "action": "Owner and browser acceptance checks"
+    },
+    {
+      "id": "G4",
+      "reason": "64-commit, 94-path release difference needs complete review",
+      "action": "Exact diff review and release scope"
+    },
+    {
+      "id": "G5",
+      "reason": "Production backup/022/023/deployment separately gated",
+      "action": "Owner approvals, export/bookmark, migration checks and rollback"
+    }
+  ],
+  "write_authorized": false
+}

@@ -31,3 +31,27 @@
 .customer-profile-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.customer-profile-grid label small{font-size:.67rem;font-weight:500;line-height:1.45}.customer-sms-consent{grid-column:1/-1!important;display:flex!important;align-items:flex-start!important;gap:10px!important;border:1px solid var(--customer-border);border-radius:12px;padding:14px}.customer-sms-consent input{width:18px!important;min-height:18px!important;margin-top:2px}.customer-profile-actions{grid-column:1/-1;display:flex;justify-content:flex-end}
 @media(max-width:1050px){.customer-order-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.customer-profile-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.customer-login-main,.customer-account-main{width:calc(100% - 22px)}.customer-login-card form,.customer-profile-grid,.customer-order-grid{grid-template-columns:1fr}.customer-account-head{align-items:flex-start;flex-direction:column}.customer-account-head .customer-secondary{width:100%}.customer-login-card form button,.customer-profile-actions button{width:100%}.customer-sms-consent,.customer-profile-actions{grid-column:1}}
+
+/* Stage 3 / Step 1: every existing order has a safe details link. */
+.customer-order-actions{flex-wrap:wrap}
+.customer-order-actions .customer-view-order{background:var(--customer-accent);border-color:var(--customer-accent);color:#fff}
+.customer-order-actions .customer-view-order:focus-visible{outline:3px solid #ffcf70;outline-offset:3px}
+
+/* Stage 4B: scannable order history and private existing artwork. */
+.customer-order-tools{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:18px}
+.customer-order-tools label{width:min(460px,100%)}.customer-order-tools input{min-height:42px}
+.customer-order-tools>span{color:var(--customer-muted);font-size:.82rem;padding-bottom:10px}
+.customer-order .customer-order-primary{display:flex;align-items:center;gap:14px;min-width:0}
+.customer-order-identity{min-width:0;overflow-wrap:anywhere}
+.customer-order-art{width:104px;height:104px;flex:0 0 104px;display:flex;align-items:center;justify-content:center;background:var(--customer-field);border:1px solid var(--customer-border);border-radius:12px;overflow:hidden;text-decoration:none}
+.customer-order-art img{width:100%;height:100%;object-fit:contain;padding:5px;box-sizing:border-box}
+.customer-art-fallback{font-size:.7rem;text-align:center;color:var(--customer-muted);padding:8px}
+.customer-order-date{font-size:.75rem;color:var(--customer-muted);margin-top:6px}
+@media(max-width:700px){.customer-order-tools{align-items:stretch;flex-direction:column}.customer-order-tools>span{padding:0}.customer-order-art{width:88px;height:88px;flex-basis:88px}}
+
+/* Exact-repeat coaster reorder: quantity and delivery choice before creating a new order. */
+.wt-reorder-dialog{width:min(520px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;box-sizing:border-box;border:1px solid var(--customer-border);background:var(--customer-card);color:var(--customer-text);border-radius:18px;padding:25px;box-shadow:0 30px 90px #0009}
+.wt-reorder-dialog::backdrop{background:rgba(0,0,0,.68)}
+.wt-reorder-form{display:grid;gap:17px}.wt-reorder-form header small{color:#70b9ed;font-weight:900;letter-spacing:.12em}.wt-reorder-form h2{margin:8px 0;font-size:1.55rem}.wt-reorder-form p{color:var(--customer-muted);margin:0;line-height:1.5}
+.wt-reorder-price{display:grid;grid-template-columns:1fr auto;gap:9px;background:var(--customer-card-2);padding:15px;border:1px solid var(--customer-border);border-radius:12px}.wt-reorder-price span{color:var(--customer-muted)}
+.wt-reorder-form .wt-reorder-estimate{color:var(--customer-text);font-size:.9rem}.wt-reorder-form footer{display:flex;gap:10px;justify-content:flex-end}.wt-reorder-form footer button{min-height:43px}.wt-reorder-form label{display:grid;gap:7px}

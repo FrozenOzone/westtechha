@@ -5,15 +5,18 @@ import { sendCoasterCustomerEmail } from '../../../../../_lib/coaster-email.js';
 import { sendCoasterAdminProductionEmail } from '../../../../../_lib/coaster-admin-production-email.js';
 import { requireOrdersDb } from '../../../../../_lib/orders.js';
 import { ensureManufacturingWorkOrder } from '../../../../../_lib/manufacturing-work-orders.js';
+import { previewSandboxRequested } from '../../../../../_lib/coaster-preview-payment-mode.js';
 function previewHostAllowed(context){
   try{
     const host=new URL(context.request.url).hostname.toLowerCase();
-    const configured=String(context.env?.PUBLIC_SITE_URL||'').toLowerCase().replace(/\/+$/,'');
-    return host==='coasters-v30-preview.westtechha.pages.dev'&&configured==='https://coasters-v30-preview.westtechha.pages.dev';
+    const allowed=new Set(['pickup-stage1-preview.westtechha.pages.dev','coasters-v30-preview.westtechha.pages.dev']);
+    // The exact Pages Preview hostname is the security boundary: NEVER allow production domains.
+    return allowed.has(host);
   }catch(e){return false;}
 }
 async function markPreviewPaid(context,order){
-  if(!previewHostAllowed(context))throw Object.assign(new Error('Preview payment simulation is not available on this site.'),{status:403});
+  if(!previewHostAllowed(context)||previewSandboxRequested(context))throw Object.assign(new Error('Simulated payments are disabled when PayPal Sandbox testing is active.'),{status:403});
+  if(order.paypalOrderId||String(order.paymentStatus||'').toUpperCase()!=='PREVIEW_AWAITING_TEST_PAYMENT')throw Object.assign(new Error('This order is not a simulated-payment test order.'),{status:409});
   if(!order.paymentRequired)throw Object.assign(new Error('This order does not require payment.'),{status:409});
   if(String(order.proofStatus||'').toUpperCase()!=='APPROVED')throw Object.assign(new Error('Customer proof approval is required before preview payment can be simulated.'),{status:409});
   if(String(order.paymentStatus||'').toUpperCase()==='PAID')return order;
@@ -32,4 +35,4 @@ async function markPreviewPaid(context,order){
   return getCoasterOrderDetail(context.env,order.orderId);
 }
 export async function onRequestGet(context){try{requireCoasterAdmin(context);const order=await getCoasterOrderDetail(context.env,context.params.orderId);if(!order)return jsonResponse({ok:false,message:'Coaster order not found.'},404);return jsonResponse({ok:true,order});}catch(error){return jsonResponse({ok:false,message:error.message||'Could not load coaster order.'},error.status||500);}}
-export async function onRequestPost(context){try{requireCoasterAdmin(context);const before=await getCoasterOrderDetail(context.env,context.params.orderId);if(!before)return jsonResponse({ok:false,message:'Coaster order not found.'},404);const body=await context.request.json();const action=String(body?.action||'');if(action==='previewMarkPaid'){const order=await markPreviewPaid(context,before);return jsonResponse({ok:true,order,previewPaymentSimulated:true});}const order=await updateCoasterOrderAdmin(context.env,context.params.orderId,body);if(!['archive','restoreArchive'].includes(action)&&before.status!==order.status&&['IN_PRODUCTION','PREPARING_TO_SHIP','PREPARING_FOR_PICKUP','READY_FOR_PICKUP','SHIPPED','COMPLETED'].includes(order.status))await sendCoasterCustomerEmail(context.env,{type:order.status,order,requestUrl:context.request.url});return jsonResponse({ok:true,order});}catch(error){return jsonResponse({ok:false,message:error.message||'Could not update coaster order.'},error.status||500);}}
+export async function onRequestPost(context){try{requireCoasterAdmin(context);const before=await getCoasterOrderDetail(context.env,context.params.orderId);if(!before)return jsonResponse({ok:false,message:'Coaster order not found.'},404);const body=await context.request.json();const action=String(body?.action||'');if(action==='previewMarkPaid'){const order=await markPreviewPaid(context,before);return jsonResponse({ok:true,order,previewPaymentSimulated:true});}const order=await updateCoasterOrderAdmin(context.env,context.params.orderId,body);if(!['archive','restoreArchive'].includes(action)&&before.status!==order.status&&!order._pickupSchedulingOverrideUsed&&['IN_PRODUCTION','PREPARING_TO_SHIP','PREPARING_FOR_PICKUP','READY_FOR_PICKUP','SHIPPED','COMPLETED'].includes(order.status))await sendCoasterCustomerEmail(context.env,{type:order.status,order,requestUrl:context.request.url});return jsonResponse({ok:true,order});}catch(error){return jsonResponse({ok:false,message:error.message||'Could not update coaster order.'},error.status||500);}}

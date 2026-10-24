@@ -21,3 +21,20 @@ html[data-theme="light"] .custom-orders-page .xo-customer-row{background:#fff;co
 
 @media(max-width:900px){.xo-customer-controls{grid-template-columns:1fr 190px}.xo-customer-controls button{grid-column:1/-1}.xo-customer-row{grid-template-columns:1fr 1fr}.xo-customer-status{justify-self:start}}
 @media(max-width:620px){.xo-customer-controls,.xo-customer-row{grid-template-columns:1fr}.xo-customer-controls button{grid-column:auto}.xo-customer-status{justify-self:start}}
+
+/* Unified Orders: the parent owns order navigation in embedded pane mode.
+   Keep the standalone Custom Orders workspace unchanged. */
+.xo-pane .xo-actions,
+.xo-pane .xo-sidebar {
+  display: none !important;
+}
+.xo-pane .xo-shell {
+  display: block;
+  min-width: 0;
+}
+.xo-pane .xo-editor {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+}

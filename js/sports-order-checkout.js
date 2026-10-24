@@ -13,14 +13,14 @@
  $('#so-art').src=data.png;$('#so-title').textContent=title;$('#so-detail').textContent=`${details} · NFL · Choose your set size`;
  $('#so-back').href=data.returnUrl;
  $('#so-set-size').value=String(data.setSize)==='8'?'8':'4';
- try{const old=JSON.parse(localStorage.getItem(CONTACT)||'null');if(old){$('#so-name').value=old.name||'';$('#so-email').value=old.email||'';$('#so-phone').value=old.phone||'';$('#so-carrier').value=old.mobileCarrier||'';$('#so-communication').value=old.communicationPreference||'EMAIL';$('#so-sms-consent').checked=old.smsConsent===true;}}catch{}
+ try{const old=JSON.parse(localStorage.getItem(CONTACT)||'null');if(old){$('#so-name').value=old.name||'';$('#so-email').value=old.email||'';$('#so-phone').value=old.phone||'';$('#so-carrier').value='OTHER';$('#so-communication').value='EMAIL';$('#so-sms-consent').checked=false;}}catch{}
  const show=message=>{const feedback=$('#so-feedback');feedback.hidden=false;feedback.textContent=message;};
  $('#so-form').addEventListener('submit',async e=>{
    e.preventDefault();const button=$('#so-submit');
    const name=$('#so-name').value.trim(),email=$('#so-email').value.trim(),phone=$('#so-phone').value.trim(),carrier=$('#so-carrier').value,communication=$('#so-communication').value;
-   const consent=$('#so-sms-consent').checked;
-   if(name.length<2||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||phone.replace(/\D/g,'').length<10||!carrier){show('Please enter your name, valid email, mobile number, and carrier.');return;}
-   if(communication==='SMS'&&(!consent||!available.has(carrier))){show('Text notifications require your consent and a supported mobile carrier. Otherwise choose Email.');return;}
+   const consent=false;
+   if(name.length<2||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||phone.replace(/\D/g,'').length<10){show('Please enter your name, valid email, and mobile number.');return;}
+   /* Email-only gateway validation retired. */
    button.disabled=true;button.textContent='Sending request…';$('#so-feedback').hidden=true;
    try{
      const fields=new FormData();

@@ -1,0 +1,329 @@
+<!doctype html>
+<html class="wt-layout-template" lang="en" data-site-root="../" data-site-section="account">
+<head>
+  <meta charset="utf-8"/>
+  <script src="../js/theme-init.js?v=20260916-1"></script>
+  <title>Order Details – WestTech Home Automation</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="robots" content="noindex,nofollow,noarchive"/>
+  <link href="../icons/Westtech_Icon_BrainW_Blue_128.png" rel="icon" type="image/png"/>
+  <link href="../css/site.css" rel="stylesheet"/>
+  <link href="../css/customer-account.css?v=20261016-stage4c-layout1" rel="stylesheet"/>
+  <link href="../css/customer-order.css?v=20261023-stage5i1" rel="stylesheet"/>
+  <link href="../css/coaster-pickup-customer.css?v=20261016-roundtrip1" rel="stylesheet"/>
+  <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
+  <style>
+    /* Stage 5H: checkout review only; no styles outside the Venmo panel. */
+    #co-payment-methods .co-venmo-review {
+      margin: 18px 0 0;
+      padding: clamp(14px, 3vw, 20px);
+      color: #eaf5ff;
+      background: linear-gradient(155deg, #102d4e 0%, #091d33 100%);
+      border: 2px solid #3699dc;
+      border-radius: 12px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, .19);
+    }
+    #co-payment-methods .co-venmo-review[hidden] { display: none !important; }
+    #co-payment-methods .co-venmo-review-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 13px;
+      flex-wrap: wrap;
+    }
+    #co-payment-methods .co-venmo-review-head strong { font-size: 1.07rem; letter-spacing: .01em; }
+    #co-payment-methods .co-venmo-review-head span {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      color: #b9ddf8;
+      text-transform: uppercase;
+    }
+    #co-payment-methods .co-venmo-price-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 8px 2px;
+      border-bottom: 1px solid rgba(160, 204, 236, .19);
+      font-size: .95rem;
+    }
+    #co-payment-methods .co-venmo-price-row span { color: #c9e1f2; }
+    #co-payment-methods .co-venmo-price-row strong { white-space: nowrap; font-variant-numeric: tabular-nums; }
+    #co-payment-methods .co-venmo-price-row.co-venmo-due {
+      border: 0;
+      border-top: 2px solid rgba(102, 183, 240, .65);
+      margin: 10px 0 14px;
+      padding: 14px 2px 4px;
+      align-items: center;
+    }
+    #co-payment-methods .co-venmo-due span { color: #fff; font-size: 1.05rem; font-weight: 750; }
+    #co-payment-methods #co-venmo-total { font-size: clamp(1.4rem, 2.7vw, 1.75rem); color: #fff; }
+    #co-payment-methods .co-venmo-confirm-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+      margin: 0 0 14px;
+      padding: 13px;
+      background: rgba(49, 116, 170, .18);
+      border: 1px solid rgba(160, 204, 236, .43);
+      border-radius: 9px;
+      color: #eef7ff;
+      cursor: pointer;
+      font-size: .95rem;
+      line-height: 1.4;
+    }
+    #co-payment-methods .co-venmo-confirm-row:focus-within { outline: 2px solid #80c8f8; outline-offset: 2px; }
+    #co-payment-methods #co-venmo-tax-confirm {
+      appearance: auto !important;
+      -webkit-appearance: checkbox !important;
+      display: inline-block !important;
+      box-sizing: border-box !important;
+      width: 18px !important;
+      height: 18px !important;
+      min-width: 18px !important;
+      min-height: 18px !important;
+      max-width: 18px !important;
+      max-height: 18px !important;
+      flex: 0 0 18px !important;
+      margin: 2px 0 0 !important;
+      padding: 0 !important;
+      border-radius: 3px;
+      accent-color: #1677c4;
+    }
+    #co-payment-methods .co-venmo-action { display: flex; align-items: flex-start; flex-direction: column; gap: 8px; }
+    #co-payment-methods #co-venmo-feedback { margin: 6px 0 0; font-size: .91rem; line-height: 1.45; }
+    #co-payment-methods #co-venmo-explain { margin: 6px 0 0; font-size: .91rem; }
+    @media (max-width: 520px) {
+      #co-payment-methods .co-venmo-review { padding: 14px; }
+      #co-payment-methods .co-venmo-price-row { gap: 8px; }
+      #co-payment-methods .co-venmo-review-head { gap: 6px; }
+    }
+  </style>
+</head>
+<body class="wt-public-template customer-account-page">
+<div class="page"><div id="site-header"></div><script src="../js/site-shell.js"></script>
+  <main class="customer-account-main customer-order-main">
+    <nav class="customer-order-nav" aria-label="Customer account navigation"><a href="index.html">← Back to My Orders</a></nav>
+    <header class="customer-account-head customer-order-page-head">
+      <div><div class="customer-eyebrow" id="co-page-eyebrow">WESTTECH CUSTOMER DASHBOARD</div><h1 id="co-page-title">Order details.</h1><p id="co-intro">Loading your private order information…</p></div>
+    </header>
+    <div id="co-message" class="customer-message" role="alert" hidden></div>
+    <section id="co-content" hidden aria-label="Order details">
+      <article class="customer-account-card customer-order-overview">
+        <div class="customer-order-detail-heading">
+          <div><div class="customer-eyebrow" id="co-product-type">WESTTECH ORDER</div><h2 id="co-title">Your order</h2><p id="co-order-id" class="customer-order-detail-id"></p></div>
+          <span id="co-status" class="customer-order-detail-status"></span>
+        </div>
+        <div class="customer-order-detail-grid">
+          <section class="customer-order-next-step" aria-label="Latest order update" aria-live="polite">
+            <div class="customer-eyebrow">LATEST UPDATE</div>
+            <div class="customer-order-update-content">
+              <div class="customer-order-update-copy">
+                <strong id="co-next-title"></strong>
+                <p id="co-next-body"></p>
+              </div>
+              <div id="co-design" class="customer-order-design customer-order-top-artwork" hidden aria-label="Your coaster artwork">
+                <div id="co-design-frame" class="customer-order-design-frame">
+                  <img id="co-design-image" alt="Coaster artwork for this order" loading="lazy" decoding="async" hidden/>
+                  <div id="co-design-placeholder" class="customer-order-design-placeholder" role="status">Loading your coaster design…</div>
+                </div>
+                <p id="co-design-caption" class="customer-order-design-caption">Your current coaster design</p>
+              </div>
+            </div>
+          </section>
+          <aside class="customer-order-summary" aria-label="Order summary">
+            <div class="customer-eyebrow">ORDER SUMMARY</div><h2>At a glance</h2>
+            <dl class="customer-order-detail-facts">
+              <div><dt>Order date</dt><dd id="co-created">—</dd></div>
+              <div><dt>Last updated</dt><dd id="co-updated">—</dd></div>
+              <div><dt>Total</dt><dd id="co-total">—</dd></div>
+              <div><dt>Payment</dt><dd id="co-payment">—</dd></div>
+              <div><dt>Delivery method</dt><dd id="co-fulfillment">—</dd></div>
+              <div id="co-production-window" class="customer-order-production-summary-row" hidden>
+                <dt>Estimated production window<small>Estimate, not a guaranteed delivery date</small></dt>
+                <dd id="co-production-window-value">—</dd>
+              </div>
+            </dl>
+            <section id="co-shipping" class="customer-order-shipping" aria-label="Shipping and delivery" hidden>
+              <h3>Shipping &amp; delivery</h3>
+              <dl class="customer-order-shipping-facts">
+                <div><dt>Shipping charge</dt><dd id="co-shipping-charge"></dd></div>
+                <div><dt>Shipment status</dt><dd id="co-shipping-status"></dd></div>
+              </dl>
+              <div id="co-shipping-address-block" class="customer-order-shipping-address">
+                <strong id="co-shipping-address-title">Ship-to address</strong>
+                <p id="co-shipping-address"></p>
+              </div>
+              <p id="co-shipping-test-note" class="customer-order-test-note" hidden>PREVIEW TEST ADDRESS — DO NOT SHIP. No actual customer delivery is scheduled.</p>
+              <div id="co-shipping-tracking" class="customer-order-shipping-tracking" hidden>
+                <strong>Tracking</strong>
+                <p id="co-shipping-tracking-detail"></p>
+                <a id="co-shipping-tracking-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Track shipment ↗</a>
+              </div>
+            </section>
+            <div id="co-delivery" class="customer-order-delivery" hidden>
+              <h3 id="co-delivery-title">Delivery details</h3>
+              <p id="co-delivery-details"></p>
+            </div>
+          </aside>
+        </div>
+        <div class="customer-order-progress">
+          <h3 class="customer-order-section-label">Order progress</h3>
+          <ol id="co-timeline" class="customer-order-timeline" aria-label="Order progress"></ol>
+        </div>
+      </article>
+    </section>
+    <div class="customer-order-lower-grid" id="co-stage-workspace" hidden aria-label="Current order stage details">
+      <section id="co-approval" class="customer-order-approval customer-account-card" hidden aria-label="Proof approval">
+        <div class="customer-eyebrow">WESTTECH PROOF · CUSTOMER REVIEW</div>
+        <div class="customer-order-approval-head"><h2 id="co-proof-title">Review your coaster proof</h2><strong id="co-proof-version">—</strong></div>
+        <p id="co-proof-instructions" class="customer-order-approval-copy">Review the exact released design and order terms before deciding.</p>
+        <div class="customer-order-proof-layout">
+          <div class="customer-order-proof-visual">
+        <div id="co-proof-frame" class="customer-order-proof-frame"><p id="co-proof-loading" role="status">Loading WestTech proof…</p><img id="co-proof-image" alt="Final WestTech coaster proof" hidden/><embed id="co-proof-pdf" type="application/pdf" title="Final WestTech coaster proof PDF" hidden/></div>
+        <p><a id="co-proof-open" class="customer-order-proof-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Open full-size proof in a new tab ↗</a></p>
+          </div>
+          <div class="customer-order-proof-detail-column">
+        <details id="co-proof-terms-details" class="customer-order-proof-disclosure" open>
+          <summary id="co-proof-terms-label">Proof and order terms</summary>
+          <div class="customer-order-proof-terms" aria-label="Final proof terms">
+          <div><span>Coaster set</span><strong id="co-proof-set">—</strong></div>
+          <div><span>Number of sets</span><strong id="co-proof-count">—</strong></div>
+          <div><span>Delivery</span><strong id="co-proof-delivery">—</strong></div>
+          <div><span>Estimated production window</span><strong id="co-proof-window">—</strong></div>
+          <div id="co-proof-base-row"><span>Coaster sets</span><strong id="co-proof-base">—</strong></div>
+          <div id="co-proof-art-row" hidden><span>Artwork and design work</span><strong id="co-proof-art">—</strong></div>
+          <div id="co-proof-other-row" hidden><span>Other charge</span><strong id="co-proof-other">—</strong></div>
+          <div id="co-proof-shipping-row" hidden><span>Shipping</span><strong id="co-proof-shipping">—</strong></div>
+          <div id="co-proof-discount-row" hidden><span>Discount / special pricing</span><strong id="co-proof-discount">—</strong></div>
+          <div class="customer-order-proof-subtotal"><span>Approved subtotal (before applicable sales tax)</span><strong id="co-proof-total">—</strong></div>
+          <div><span>Payment</span><strong id="co-proof-payment">—</strong></div>
+          </div>
+        </details>
+        <div id="co-proof-review-note" class="customer-order-proof-note" hidden><strong>Note from WestTech</strong><p id="co-proof-review-text"></p></div>
+        <div id="co-proof-actions" class="customer-order-proof-actions" hidden>
+          <label class="customer-order-proof-confirm"><input id="co-proof-confirm" type="checkbox"/><span>I have reviewed and approve this proof, coaster quantity, approved subtotal, fulfillment method, and estimated production window. I understand that applicable sales tax will be shown before payment.</span></label>
+          <button id="co-proof-approve" class="customer-order-proof-primary" type="button" disabled>Approve Design &amp; Terms</button>
+          <div class="customer-order-proof-divider">or</div>
+          <label for="co-proof-change">Need something changed?</label>
+          <textarea id="co-proof-change" rows="4" maxlength="1200" placeholder="Tell WestTech exactly what you want changed."></textarea>
+          <button id="co-proof-request" class="customer-order-proof-secondary" type="button">Request Changes</button>
+        </div>
+        <p id="co-proof-result" class="customer-order-proof-result" role="status" hidden></p>
+        <p id="co-proof-feedback" class="customer-order-proof-feedback" role="alert" hidden></p>
+          </div>
+        </div>
+      </section>
+      <section id="co-pickup" class="customer-order-pickup" hidden aria-label="Pickup scheduling">
+        <div class="customer-eyebrow">LOCAL PICKUP · SCHEDULING</div>
+        <h2 id="co-pickup-heading">Arrange your pickup</h2>
+        <p class="customer-order-pickup-intro">Choose an available appointment, suggest different times, or review your confirmed booking. All times are Mountain Time.</p>
+ <section class="pc-card" id="pc-loading" role="status">Loading your pickup appointments…</section>
+ <section class="pc-card" id="pc-content" hidden>
+   <div class="pc-orderline"><strong id="pc-order">Your order</strong><span>Mountain Time · 15-minute pickup</span></div>
+   <div class="pc-message" id="pc-message" role="status" aria-live="polite" hidden></div>
+   <div id="pc-waiting" hidden><h2>Scheduling will open when your order is ready.</h2><p>WestTech will mark your coasters Ready for Pickup when manufacturing and inspection are complete. Please return to this private link then.</p></div>
+   <div id="pc-confirmed" hidden><h2><span aria-hidden="true">✓</span> Your pickup appointment is reserved</h2><p id="pc-confirmed-when"></p><p class="pc-note">Your appointment is confirmed. Pickup details and calendar options are available below.</p>
+     <div id="pc-confirmed-tools" class="pc-confirmed-tools" hidden>
+       <div id="pc-confirmed-location" class="pc-confirmed-location" hidden>
+         <strong>Private pickup location</strong>
+         <p id="pc-confirmed-address"></p>
+         <p id="pc-confirmed-instructions" class="pc-note" hidden></p>
+       </div>
+       <p id="pc-confirmed-location-pending" class="pc-note" hidden>WestTech has not published the pickup address for this appointment yet. The location and directions will appear here once WestTech confirms them.</p>
+       <div class="pc-confirmed-actions">
+         <a id="pc-maps" class="pc-action" target="_blank" rel="noopener noreferrer" hidden>Google Maps Directions</a>
+         <a id="pc-google-calendar" class="pc-action" target="_blank" rel="noopener noreferrer">Add to Google Calendar</a>
+         <a id="pc-ics" class="pc-action">Download Calendar (.ics)</a>
+         <a id="pc-email" class="pc-action">Open Email Draft</a>
+         <button id="pc-print" type="button" class="pc-action pc-action-print">Print Details</button>
+       </div>
+       <p class="pc-note">Calendar and email links open in your own apps. Nothing is sent automatically.</p>
+     </div></div>
+   <div id="pc-pending" hidden><h2>We received your alternate pickup request.</h2><p id="pc-pending-text"></p><p class="pc-note">This is a request, not a confirmed appointment. WestTech will review your preferred times. Return to your WestTech customer dashboard to see whether an appointment is confirmed or other times are offered.</p></div>
+   <div id="pc-chooser" hidden>
+    <h2>Available appointments</h2>
+    <p class="pc-muted">You may choose one of the times WestTech has offered for your order.</p>
+    <div id="pc-slot-list" class="pc-slot-list" role="radiogroup" aria-label="Offered pickup times"></div>
+    <label class="pc-other"><input type="radio" name="pc-choice" value="other" id="pc-other"/><span><strong>None of these times work for me</strong></span></label>
+    <div id="pc-alternatives" class="pc-alternatives" hidden>
+      <h3>Request a different pickup time</h3>
+      <p>What day and time would work better for you?</p>
+      <div class="pc-field-grid">
+        <label>Preferred date <input id="pc-first-date" type="date"/></label>
+        <label>Preferred time <select id="pc-first-time" aria-label="Preferred pickup time"><option value="">Choose a time</option></select></label>
+      </div>
+      <p>Have another time that would work? <span class="pc-muted">(Optional)</span></p>
+      <div class="pc-field-grid">
+        <label>Second-choice date <input id="pc-second-date" type="date"/></label>
+        <label>Second-choice time <select id="pc-second-time" aria-label="Second-choice pickup time"><option value="">Choose a time</option></select></label>
+      </div>
+      <p class="pc-note">Monday–Friday only; no weekend pickups. Alternative times are subject to WestTech approval.</p>
+    </div>
+    <button id="pc-submit" type="button" class="pc-primary" disabled>Choose a pickup appointment</button>
+    <p class="pc-note">Your private pickup location and calendar details will be available after your appointment is confirmed.</p>
+   </div>
+ </section>
+ <section class="pc-card pc-error" id="pc-error" role="alert" hidden><h2>Pickup scheduling unavailable</h2><p id="pc-error-text"></p><p>Please contact WestTech if you need assistance.</p></section>
+      </section>
+      <aside id="co-stage-panel" class="customer-order-stage-panel customer-account-card" hidden aria-label="Current stage and next steps" aria-live="polite">
+        <div class="customer-eyebrow" id="co-stage-label">CURRENT STAGE</div>
+        <h2 id="co-stage-title">Your order</h2>
+        <p id="co-stage-explanation" class="customer-order-stage-explanation"></p>
+        <div id="co-stage-payment" class="customer-order-stage-payment" hidden>
+          <div><span>Approved subtotal (before tax)</span><strong id="co-stage-amount">—</strong></div>
+          <div><span>Payment status</span><strong id="co-stage-payment-status">—</strong></div>
+        </div>
+        <p id="co-stage-guidance" class="customer-order-stage-guidance"></p>
+        <section id="co-paypal-sandbox" hidden aria-label="PayPal checkout" style="margin-top:16px;border:1px solid #356187;border-radius:10px;padding:14px;">
+          <strong id="co-paypal-heading" style="display:block;margin-bottom:8px;">PayPal Checkout</strong>
+          <p id="co-paypal-explainer" style="margin:0 0 12px;color:#aec7dd;">Review the final tax and shipping total before payment.</p>
+          <button id="co-paypal-start" type="button" class="customer-primary-btn" style="background:#1677c4;color:white;border:0;border-radius:6px;padding:10px 16px;cursor:pointer;">Continue to PayPal</button>
+          <p id="co-paypal-feedback" role="status" aria-live="polite" hidden></p>
+          <section id="co-payment-methods" hidden aria-label="Venmo Sandbox checkout" style="border-top:1px solid #356187;margin-top:16px;padding-top:14px;">
+            <h3 style="margin:0 0 8px;">Or pay with Venmo</h3>
+            <p style="margin:0 0 10px;color:#b5d1e6;">Sandbox only · No real funds will be charged. Shipped orders require a confirmed delivery address and final tax quote before checkout.</p>
+            <div id="co-venmo-shipping" hidden style="padding:12px;margin:12px 0;border:1px solid #356187;border-radius:9px;">
+              <strong style="display:block;margin-bottom:8px;">Shipping address for Venmo Sandbox</strong>
+              <p style="margin:0 0 9px;color:#b5d1e6;">Enter the delivery address. Shipping is already included in your approved subtotal. We'll calculate destination sales tax before payment. Your Venmo shipping address must match.</p>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:9px;">
+                <label>Recipient name<input id="co-venmo-ship-name" autocomplete="shipping name" maxlength="200"/></label>
+                <label>Street address<input id="co-venmo-ship-line1" autocomplete="shipping address-line1" maxlength="200"/></label>
+                <label>Apt / Suite (optional)<input id="co-venmo-ship-line2" autocomplete="shipping address-line2" maxlength="200"/></label>
+                <label>City<input id="co-venmo-ship-city" autocomplete="shipping address-level2" maxlength="120"/></label>
+                <label>State (2-letter code)<input id="co-venmo-ship-state" autocomplete="shipping address-level1" maxlength="2" placeholder="CO"/></label>
+                <label>ZIP code<input id="co-venmo-ship-zip" autocomplete="shipping postal-code" maxlength="15"/></label>
+              </div>
+              <button id="co-venmo-ship-quote" type="button" class="customer-primary-btn" style="margin-top:12px;background:#1677c4;color:#fff;border:0;border-radius:6px;padding:10px 14px;cursor:pointer;">Calculate Shipping & Tax Total</button>
+              <p id="co-venmo-ship-summary" style="color:#b5d1e6;" role="status" aria-live="polite"></p>
+            </div>
+            <section id="co-venmo-review" class="co-venmo-review" aria-label="Final Venmo payment summary" hidden>
+              <div class="co-venmo-review-head"><strong>Final payment summary</strong><span>Sandbox test · No real charge</span></div>
+              <div class="co-venmo-price-row"><span>Coaster items</span><strong id="co-venmo-items-amount">—</strong></div>
+              <div class="co-venmo-price-row"><span>Shipping</span><strong id="co-venmo-shipping-amount">—</strong></div>
+              <div class="co-venmo-price-row"><span>Sales tax</span><strong id="co-venmo-tax-amount">—</strong></div>
+              <div class="co-venmo-price-row co-venmo-due"><span>Total due now</span><strong id="co-venmo-total">—</strong></div>
+              <label class="co-venmo-confirm-row" for="co-venmo-tax-confirm"><input id="co-venmo-tax-confirm" type="checkbox"/><span>I confirm the delivery address, sales tax, and final total.</span></label>
+              <div class="co-venmo-action">
+                <venmo-button id="co-venmo-button" type="pay" hidden></venmo-button>
+                <p id="co-venmo-explain" hidden>Venmo isn't available for this buyer; PayPal is still available above.</p>
+                <p id="co-venmo-feedback" role="status" aria-live="polite" hidden></p>
+              </div>
+            </section>
+          </section>
+          <div id="co-paypal-tax-review" hidden style="border-top:1px solid #356187;margin-top:14px;padding-top:14px;">
+            <h3 style="margin:0 0 8px;">Confirm Colorado sales tax before payment</h3>
+            <p id="co-paypal-tax-breakdown"></p>
+            <label style="display:flex;gap:8px;align-items:start;"><input id="co-paypal-confirm-tax" type="checkbox"/>I have reviewed and approve the displayed tax and final total for this order.</label>
+            <button id="co-paypal-capture" type="button" disabled style="background:#1677c4;color:white;border:0;border-radius:6px;padding:10px 16px;margin-top:10px;cursor:pointer;">Confirm Total & Complete Payment</button>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+</div>
+<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-pickup-details1"></script><script src="../js/customer-order.js?v=20261024-stage5l1"></script><script src="../js/customer-payment-methods.js?v=20261023-stage5h1"></script>
+</body></html>

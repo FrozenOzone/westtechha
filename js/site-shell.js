@@ -14,7 +14,8 @@
     { href: 'services.html', label: 'Services' },
     { href: 'quote.html',    label: 'Quote' },
     { href: 'support.html',  label: 'Support' },
-    { href: 'contact.html',  label: 'Contact' }
+    { href: 'contact.html',  label: 'Contact' },
+    { href: 'account/index.html', label: 'My Orders', section: 'account' }
   ];
 
   const productLinks = [

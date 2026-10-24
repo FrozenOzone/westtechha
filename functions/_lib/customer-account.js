@@ -102,8 +102,9 @@ function brandedEmail({headline,intro,details,buttonLabel,buttonUrl,closing='Tha
 
 async function sendReorderNotifications(env,{account,sourceType,sourceOrderId,newOrderId,requestUrl}){
   const type=clean(sourceType,20).toUpperCase(),label=type==='COASTER'?'Coaster':type==='ENCLOSURE'?'Enclosure':'Custom',root=siteBase(env,requestUrl||'https://westtechha.com'),portalUrl=`${root}/account/`,adminPath=type==='COASTER'?'admin/coaster-orders':type==='ENCLOSURE'?'admin/enclosure-orders':'admin/custom-orders',adminUrl=`${root}/${adminPath}?order=${encodeURIComponent(newOrderId)}`;
-  const customerCopy=brandedEmail({headline:'We received your reorder request.',intro:`Hi ${account.displayName||'there'}, your new ${label.toLowerCase()} reorder request is ready for Ed to review. Nothing has been charged, and it has not entered production. WestTech will confirm current pricing, availability, and timing before sending anything for approval.`,details:[['New request',newOrderId],['Reordered from',sourceOrderId],['Current stage','Review draft — not in production']],buttonLabel:'View My Orders',buttonUrl:portalUrl,customerFacing:true});
-  const adminCopy=brandedEmail({headline:'A customer requested a reorder.',intro:`${account.displayName} created a new ${label.toLowerCase()} review draft from the customer portal. Review the request, confirm current pricing and timing, then send it through the normal approval process.`,details:[['Customer',account.displayName],['Customer email',account.email],['Customer phone',account.phone||'Not provided'],['New request',newOrderId],['Reordered from',sourceOrderId],['Current stage','Review draft — not in manufacturing']],buttonLabel:'Open Reorder Draft',buttonUrl:adminUrl,closing:'Customer portal notification\nWestTech Home Automation'});
+  const isCoaster=type==='COASTER';
+  const customerCopy=brandedEmail({headline:'We received your reorder request.',intro:isCoaster?`Hi ${account.displayName||'there'}, we're preparing another set of your previously approved coaster design. No new artwork approval is needed. WestTech will confirm current pricing and timing before payment. Nothing has been charged.`:`Hi ${account.displayName||'there'}, your new ${label.toLowerCase()} reorder request is ready for Ed to review. Nothing has been charged, and it has not entered production. WestTech will confirm current pricing, availability, and timing before sending anything for approval.`,details:[['New request',newOrderId],['Reordered from',sourceOrderId],['Current stage',isCoaster?'Reorder Verification — payment follows':'Review draft — not in production']],buttonLabel:'View My Orders',buttonUrl:portalUrl,customerFacing:true});
+  const adminCopy=brandedEmail({headline:'A customer requested a reorder.',intro:isCoaster?`${account.displayName} requested an exact repeat of previously approved coasters. Verify current price, quantity, fulfillment and production window. No repeat customer proof approval.`:`${account.displayName} created a new ${label.toLowerCase()} review draft from the customer portal. Review the request, confirm current pricing and timing, then send it through the normal approval process.`,details:[['Customer',account.displayName],['Customer email',account.email],['Customer phone',account.phone||'Not provided'],['New request',newOrderId],['Reordered from',sourceOrderId],['Current stage',isCoaster?'Reorder Verification':'Review draft — not in manufacturing']],buttonLabel:'Open Reorder',buttonUrl:adminUrl,closing:'Customer portal notification\nWestTech Home Automation'});
   const [customer,admin]=await Promise.all([
     deliverEmail(env,{to:account.email,subject:`We received your WestTech reorder request — ${newOrderId}`,html:customerCopy.html,text:customerCopy.text,replyToAddress:replyTo(env),idempotencyKey:`customer-reorder-${newOrderId}`}),
     deliverEmail(env,{to:adminAddress(env),subject:`Customer reorder request — ${newOrderId}`,html:adminCopy.html,text:adminCopy.text,replyToAddress:account.email,idempotencyKey:`admin-reorder-${newOrderId}`})
@@ -118,6 +119,45 @@ export async function requestCustomerLogin(env,emailAddress,requestUrl){
   if(recent)return {accepted:true};
   await linkOrdersForEmail(db,account.id,address);const raw=await issueToken(db,account.id,account.emailVerifiedAt?'LOGIN':'ACTIVATE'),delivery=await sendPortalEmail(env,{account,rawToken:raw,purpose:account.emailVerifiedAt?'LOGIN':'ACTIVATE',requestUrl});
   await log(db,account.id,'LOGIN_LINK_REQUESTED',{delivered:delivery.sent===true});return {accepted:true};
+}
+
+// Stage 4A: Include a private portal sign-in URL INSIDE the order receipt.
+// The token is hashed at rest, expires in 20 minutes, and is single-use.
+// Never expose it in a public API response or send a second login email.
+async function createCustomerCoasterAccessLink(env,{order,requestUrl,eventType}){
+  if(!order?.orderId||!EMAIL_RE.test(email(order?.customerEmail)))throw error('Valid order email is required.');
+  const db=requireOrdersDb(env);
+  const account=await ensureAccount(db,{
+    displayName:order.customerName,emailAddress:order.customerEmail,
+    phoneNumber:order.customerPhone,mobileCarrier:order.mobileCarrier,
+    communicationPreference:order.communicationPreference,smsConsent:order.smsConsent
+  });
+  await linkOrdersForEmail(db,account.id,account.email);
+  const linked=await db.prepare(`SELECT 1 AS allowed FROM customer_account_orders WHERE account_id=? AND source_type='COASTER' AND source_order_id=? LIMIT 1`).bind(account.id,order.orderId).first();
+  if(!linked)throw error('The order could not be linked to the customer portal.',500);
+  const raw=await issueToken(db,account.id,account.emailVerifiedAt?'LOGIN':'ACTIVATE');
+  // Use the ACTUAL deployment origin for Preview, not a production-only site URL.
+  const requestedSite=new URL(requestUrl);
+  if(requestedSite.protocol!=='https:')throw error('Customer portal links require HTTPS.',500);
+  const origin=requestedSite.origin;
+  const hostname=requestedSite.hostname.toLowerCase();
+  if(hostname!=='westtechha.com'&&hostname!=='www.westtechha.com'&&hostname!=='westtechha.pages.dev'&&!hostname.endsWith('.westtechha.pages.dev'))throw error('Unexpected customer portal host.',500);
+  const link=new URL('/api/customer/auth/verify',origin);
+  link.searchParams.set('token',raw);
+  link.searchParams.set('type','COASTER');
+  link.searchParams.set('order',order.orderId);
+  await log(db,account.id,eventType,{sourceType:'COASTER',orderId:order.orderId});
+  return link.toString();
+}
+
+export async function createCustomerOrderReceiptLink(env,{order,requestUrl}){
+  return createCustomerCoasterAccessLink(env,{order,requestUrl,eventType:'ORDER_RECEIPT_ACCESS_CREATED'});
+}
+
+// Stage 4C: the proof-ready notification opens the SAME authenticated order page.
+// The customer never needs a standalone proof approval token to review it.
+export async function createCustomerProofReadyLink(env,{order,requestUrl}){
+  return createCustomerCoasterAccessLink(env,{order,requestUrl,eventType:'PROOF_READY_ACCESS_CREATED'});
 }
 
 export async function inviteCustomerForOrder(env,{sourceType,order,requestUrl}){
@@ -145,7 +185,7 @@ export async function verifyCustomerToken(env,rawToken){
   }
   await db.prepare(`UPDATE customer_login_tokens SET used_at=? WHERE id=?`).bind(now(),row.id).run();
   const rawSession=token(),sessionHash=await sha256(rawSession);await db.prepare(`INSERT INTO customer_sessions (account_id,session_hash,expires_at) VALUES (?,?,?)`).bind(row.account_id,sessionHash,addDays(7)).run();
-  return {cookie:`${SESSION_COOKIE}=${encodeURIComponent(rawSession)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`,emailChanged:row.purpose==='EMAIL_CHANGE'};
+  return {cookie:`${SESSION_COOKIE}=${encodeURIComponent(rawSession)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`,emailChanged:row.purpose==='EMAIL_CHANGE',accountId:Number(row.account_id)};
 }
 
 export async function requireCustomerSession(context){
@@ -159,15 +199,30 @@ export async function endCustomerSession(context){const raw=readCookie(context.r
 export async function customerDashboard(env,account){
   const db=requireOrdersDb(env);await linkOrdersForEmail(db,account.id,account.email);
   const result=await db.prepare(`
-    SELECT l.source_type,l.source_order_id AS order_id,o.status,o.title,o.created_at,o.updated_at,o.fulfillment_method,o.payment_status,COALESCE(NULLIF(o.payment_total,0),o.final_amount,0) AS total,o.tracking_carrier,o.tracking_number,1 AS can_reorder FROM customer_account_orders l JOIN custom_orders o ON l.source_type='CUSTOM' AND o.order_id=l.source_order_id WHERE l.account_id=?
+    SELECT l.source_type,l.source_order_id AS order_id,o.status,o.title,o.created_at,o.updated_at,o.fulfillment_method,o.payment_status,o.payment_required,0 AS preview_test_payment,COALESCE(NULLIF(o.payment_total,0),o.final_amount,0) AS total,o.tracking_carrier,o.tracking_number,1 AS can_reorder FROM customer_account_orders l JOIN custom_orders o ON l.source_type='CUSTOM' AND o.order_id=l.source_order_id WHERE l.account_id=?
     UNION ALL
-    SELECT l.source_type,l.source_order_id,o.status,printf('%d-Coaster Set',o.total_coasters),o.created_at,o.updated_at,o.fulfillment_method,o.payment_status,COALESCE(NULLIF(o.payment_total,0),o.final_amount,0),o.tracking_carrier,o.tracking_number,1 FROM customer_account_orders l JOIN coaster_orders o ON l.source_type='COASTER' AND o.order_id=l.source_order_id WHERE l.account_id=?
+    SELECT l.source_type,l.source_order_id,CASE WHEN o.status='DESIGN_REVIEW' AND EXISTS(SELECT 1 FROM coaster_order_events e WHERE e.order_id=o.order_id AND e.event_type='CUSTOMER_REORDER_REQUESTED') THEN 'REORDER_VERIFICATION' ELSE o.status END,printf('%d-Coaster Set',o.total_coasters),o.created_at,o.updated_at,o.fulfillment_method,o.payment_status,o.payment_required,CASE WHEN o.paypal_order_status='PREVIEW_TEST_PAID' THEN 1 ELSE 0 END,COALESCE(NULLIF(o.payment_total,0),o.final_amount,0),o.tracking_carrier,o.tracking_number,CASE WHEN o.status IN ('COMPLETED','ARCHIVED') AND o.proof_status='APPROVED' AND o.proof_object_key IS NOT NULL THEN 1 ELSE 0 END FROM customer_account_orders l JOIN coaster_orders o ON l.source_type='COASTER' AND o.order_id=l.source_order_id WHERE l.account_id=?
     UNION ALL
-    SELECT l.source_type,l.source_order_id,o.status,trim(o.family||' '||o.model),o.created_at,o.updated_at,o.fulfillment_method,o.payment_status,COALESCE(NULLIF(o.payment_total,0),o.final_amount,o.starting_subtotal,0),o.tracking_carrier,o.tracking_number,1 FROM customer_account_orders l JOIN enclosure_orders o ON l.source_type='ENCLOSURE' AND o.order_id=l.source_order_id WHERE l.account_id=?
+    SELECT l.source_type,l.source_order_id,o.status,trim(o.family||' '||o.model),o.created_at,o.updated_at,o.fulfillment_method,o.payment_status,o.payment_required,0,COALESCE(NULLIF(o.payment_total,0),o.final_amount,o.starting_subtotal,0),o.tracking_carrier,o.tracking_number,1 FROM customer_account_orders l JOIN enclosure_orders o ON l.source_type='ENCLOSURE' AND o.order_id=l.source_order_id WHERE l.account_id=?
     UNION ALL
-    SELECT l.source_type,l.source_order_id,o.status,COALESCE((SELECT group_concat(product_name,', ') FROM store_order_items i WHERE i.invoice_id=o.invoice_id),'WestTech Store Order'),o.created_at,o.updated_at,'SHIP','PAID',o.total_amount,'','',EXISTS(SELECT 1 FROM store_order_items i WHERE i.invoice_id=o.invoice_id) FROM customer_account_orders l JOIN orders o ON l.source_type='STORE' AND o.invoice_id=l.source_order_id WHERE l.account_id=?
+    SELECT l.source_type,l.source_order_id,o.status,COALESCE((SELECT group_concat(product_name,', ') FROM store_order_items i WHERE i.invoice_id=o.invoice_id),'WestTech Store Order'),o.created_at,o.updated_at,'SHIP','PAID',0,0,o.total_amount,'','',EXISTS(SELECT 1 FROM store_order_items i WHERE i.invoice_id=o.invoice_id) FROM customer_account_orders l JOIN orders o ON l.source_type='STORE' AND o.invoice_id=l.source_order_id WHERE l.account_id=?
     ORDER BY created_at DESC`).bind(account.id,account.id,account.id,account.id).all();
-  return {profile:account,orders:(result?.results||[]).map(row=>({sourceType:row.source_type,orderId:row.order_id,status:row.status,title:row.title,createdAt:row.created_at,updatedAt:row.updated_at,fulfillmentMethod:row.fulfillment_method||'UNSET',paymentStatus:row.payment_status||'NOT_REQUESTED',total:Number(row.total||0),trackingCarrier:row.tracking_carrier||'',trackingNumber:row.tracking_number||'',canReorder:!!Number(row.can_reorder)}))};
+  // Account-scoped coaster details for the private order dashboard. Do not use the
+  // account profile address: shipment destination must come from this order only.
+  const coasterDetails=await db.prepare(`
+    SELECT o.order_id,o.production_window,o.shipping_amount,
+      o.shipping_name,o.shipping_address1,o.shipping_address2,o.shipping_city,
+      o.shipping_region,o.shipping_postal_code,o.shipping_country,
+       EXISTS(SELECT 1 FROM coaster_order_events e WHERE e.order_id=o.order_id AND e.event_type='CUSTOMER_REORDER_REQUESTED') AS is_reorder
+     FROM customer_account_orders l JOIN coaster_orders o
+      ON l.source_type='COASTER' AND l.source_order_id=o.order_id
+    WHERE l.account_id=?`).bind(account.id).all();
+  const coasterById=new Map((coasterDetails?.results||[]).map(row=>[row.order_id,row]));
+  return {profile:account,orders:(result?.results||[]).map(row=>{
+    const coaster=row.source_type==='COASTER'?coasterById.get(row.order_id):null;
+    return {sourceType:row.source_type,orderId:row.order_id,status:row.status,title:row.title,createdAt:row.created_at,updatedAt:row.updated_at,fulfillmentMethod:row.fulfillment_method||'UNSET',paymentStatus:row.payment_status||'NOT_REQUESTED',paymentRequired:!!Number(row.payment_required),paymentSimulated:!!Number(row.preview_test_payment),total:Number(row.total||0),trackingCarrier:row.tracking_carrier||'',trackingNumber:row.tracking_number||'',canReorder:!!Number(row.can_reorder),
+      ...(coaster?{isReorder:!!Number(coaster.is_reorder),productionWindow:coaster.production_window||'',shippingAmount:Number(coaster.shipping_amount||0),shippingDestination:{name:coaster.shipping_name||'',address1:coaster.shipping_address1||'',address2:coaster.shipping_address2||'',city:coaster.shipping_city||'',region:coaster.shipping_region||'',postalCode:coaster.shipping_postal_code||'',country:coaster.shipping_country||''}}:{})};
+  })};
 }
 
 export async function updateCustomerProfile(env,account,body,requestUrl){
@@ -180,13 +235,36 @@ export async function updateCustomerProfile(env,account,body,requestUrl){
 
 async function allocate(db,counter,prefix){const date=now().slice(0,10).replaceAll('-',''),row=await db.prepare(`INSERT INTO ${counter} (order_date,last_value) VALUES (?,1001) ON CONFLICT(order_date) DO UPDATE SET last_value=last_value+1 RETURNING last_value`).bind(date).first(),sequence=Number(row?.last_value||1001);return {orderId:`${prefix}-${date}-${sequence}`,orderDate:date,sequence};}
 
-export async function reorderCustomerOrder(env,account,sourceType,sourceOrderId,requestUrl=''){
+export async function quoteCustomerCoasterReorder(env,account,sourceOrderId){
+  const db=requireOrdersDb(env),id=clean(sourceOrderId,80);
+  const owned=await db.prepare("SELECT 1 AS ok FROM customer_account_orders WHERE account_id=? AND source_type='COASTER' AND source_order_id=? LIMIT 1").bind(account.id,id).first();
+  if(!owned)throw error('That coaster order is not connected to your account.',404);
+  const source=await db.prepare('SELECT * FROM coaster_orders WHERE order_id=?').bind(id).first();
+  if(!source)throw error('The original coaster order was not found.',404);
+  const approved=['COMPLETED','ARCHIVED'].includes(String(source.status||'').toUpperCase())&&String(source.proof_status||'').toUpperCase()==='APPROVED'&&!!source.proof_object_key;
+  if(!approved)throw error('An exact reorder requires a completed order with saved approved artwork. Please contact WestTech for this order.',409);
+  const setSize=Number(source.set_size),setCount=Math.max(1,Number(source.set_count||1)),fulfillment=FULFILLMENT.has(source.fulfillment_method)?source.fulfillment_method:'LOCAL_PICKUP';
+  const unitPrice=coasterSetDefaults(setSize,1).basePrice;
+  return {sourceOrderId:id,setSize,setCount,fulfillmentMethod:fulfillment,previousTotal:amount(source.final_amount),previousUnitPrice:amount(source.base_price),currentUnitPrice:unitPrice,shippingEstimate:fulfillment==='SHIP'?shippingAmountForQuantity(setCount):0,approvedDesign:true,priceNotice:'Current pricing may differ from your last purchase. WestTech verifies the final total before payment.'};
+}
+
+export async function reorderCustomerOrder(env,account,sourceType,sourceOrderId,requestUrl='',options={}){
   const db=requireOrdersDb(env),type=clean(sourceType,20).toUpperCase(),id=clean(sourceOrderId,80),owned=await db.prepare(`SELECT 1 AS ok FROM customer_account_orders WHERE account_id=? AND source_type=? AND source_order_id=? LIMIT 1`).bind(account.id,type,id).first();if(!owned)throw error('That order is not connected to your customer account.',404);
   let created;
   if(type==='COASTER'){
-    const source=await db.prepare(`SELECT * FROM coaster_orders WHERE order_id=?`).bind(id).first();if(!source)throw error('The original coaster order is no longer available.',404);const next=await allocate(db,'coaster_order_counters','WTCC');
-    const setCount=Math.max(1,Number(source.set_count||1)),defaults=coasterSetDefaults(source.set_size,setCount),fulfillment=FULFILLMENT.has(clean(source.fulfillment_method,30).toUpperCase())?clean(source.fulfillment_method,30).toUpperCase():'UNSET',basePrice=positiveAmount(source.base_price,defaults.basePrice),artworkCharge=amount(source.artwork_charge),otherCharge=amount(source.other_charge),discountAmount=amount(source.discount_amount),shippingFallback=fulfillment==='SHIP'?shippingAmountForQuantity(setCount):0,shippingAmount=fulfillment==='LOCAL_PICKUP'?0:positiveAmount(source.shipping_amount,shippingFallback),calculated=Math.max(0,basePrice*setCount+artworkCharge+otherCharge+shippingAmount-discountAmount),finalAmount=positiveAmount(source.final_amount,calculated),printerMinutes=Number(source.estimated_printer_minutes||0)>0?Number(source.estimated_printer_minutes):defaults.printerMinutes;
-    await db.prepare(`INSERT INTO coaster_orders (order_id,order_date,daily_sequence,status,customer_name,customer_email,customer_phone,mobile_carrier,communication_preference,sms_consent,set_size,set_count,total_coasters,top_text,bottom_text,field_color,accent_color,ring_color,text_color,customer_notes,rights_confirmed,artwork_filename,artwork_content_type,artwork_size_bytes,artwork_object_key,design_snapshot_object_key,fulfillment_method,payment_required,base_price,artwork_charge,other_charge,shipping_amount,discount_amount,final_amount,estimated_printer_minutes,admin_notes) VALUES (?,?,?,'DESIGN_REVIEW',?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(next.orderId,next.orderDate,next.sequence,account.displayName,account.email,account.phone,account.mobileCarrier,account.communicationPreference,account.smsConsent?1:0,source.set_size,setCount,source.total_coasters,source.top_text,source.bottom_text,source.field_color,source.accent_color,source.ring_color,source.text_color,`Reorder requested from ${id}. Prior-order pricing is an editable starting estimate and may change after WestTech review.`,source.rights_confirmed,source.artwork_filename,source.artwork_content_type,source.artwork_size_bytes,source.artwork_object_key,source.design_snapshot_object_key,fulfillment,source.payment_required===0?0:1,basePrice,artworkCharge,otherCharge,shippingAmount,discountAmount,finalAmount,printerMinutes,`Customer portal reorder from ${id}. Prior pricing and delivery terms copied as editable starting values; reconfirm current pricing and availability before sending.`).run();await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'CUSTOMER_REORDER_REQUESTED',?)`).bind(next.orderId,json({sourceOrderId:id,priorPricingCopied:true,startingAmount:finalAmount})).run();created=next.orderId;
+    const quote=await quoteCustomerCoasterReorder(env,account,id);
+    const source=await db.prepare(`SELECT * FROM coaster_orders WHERE order_id=?`).bind(id).first();
+    const count=Number(options?.setCount),requested=clean(options?.fulfillmentMethod,30).toUpperCase();
+    if(!Number.isSafeInteger(count)||count<1||count>125)throw error('Choose between 1 and 125 identical coaster sets.');
+    if(!['SHIP','LOCAL_PICKUP'].includes(requested))throw error('Choose Shipping or Local Pickup.');
+    if(requested==='SHIP'&&shippingAmountForQuantity(count)===null)throw error('Shipping for five or more sets requires a custom quote. Choose Local Pickup or contact WestTech.',409);
+    const next=await allocate(db,'coaster_order_counters','WTCC');
+    const setCount=count,defaults=coasterSetDefaults(source.set_size,setCount),fulfillment=requested,basePrice=defaults.basePrice,artworkCharge=0,otherCharge=0,discountAmount=0;
+    const shippingAmount=fulfillment==='LOCAL_PICKUP'?0:Number(shippingAmountForQuantity(setCount));
+    const finalAmount=Math.round(Math.max(0,basePrice*setCount+shippingAmount)*100)/100,printerMinutes=defaults.printerMinutes;
+    await db.prepare(`INSERT INTO coaster_orders (order_id,order_date,daily_sequence,status,customer_name,customer_email,customer_phone,mobile_carrier,communication_preference,sms_consent,set_size,set_count,total_coasters,top_text,bottom_text,field_color,accent_color,ring_color,text_color,customer_notes,rights_confirmed,artwork_filename,artwork_content_type,artwork_size_bytes,artwork_object_key,design_snapshot_object_key,fulfillment_method,payment_required,base_price,artwork_charge,other_charge,shipping_amount,discount_amount,final_amount,estimated_printer_minutes,admin_notes) VALUES (?,?,?,'REORDER_VERIFICATION',?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(next.orderId,next.orderDate,next.sequence,account.displayName,account.email,account.phone,account.mobileCarrier,account.communicationPreference,account.smsConsent?1:0,source.set_size,setCount,source.set_size*setCount,source.top_text,source.bottom_text,source.field_color,source.accent_color,source.ring_color,source.text_color,`Exact reorder of ${id}. Original approved artwork will be reused after WestTech confirms the current price and production timing.`,source.rights_confirmed,source.artwork_filename,source.artwork_content_type,source.artwork_size_bytes,source.artwork_object_key,source.design_snapshot_object_key,fulfillment,1,basePrice,artworkCharge,otherCharge,shippingAmount,discountAmount,finalAmount,printerMinutes,`REORDER from ${id}. Customer selected ${setCount} set(s), ${fulfillment}. Confirm current pricing, saved approved proof, and production window; release directly for payment without new customer proof approval.`).run();
+    await db.prepare(`UPDATE coaster_orders SET proof_version=?,proof_status='APPROVED',proof_source=?,proof_object_key=?,proof_filename=?,proof_content_type=?,proof_size_bytes=? WHERE order_id=?`).bind(source.proof_version,source.proof_source,source.proof_object_key,source.proof_filename,source.proof_content_type,source.proof_size_bytes,next.orderId).run();
+    await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,'CUSTOMER_REORDER_REQUESTED',?)`).bind(next.orderId,json({sourceOrderId:id,originalApprovalReused:true,previousTotal:quote.previousTotal,currentUnitPrice:basePrice,setCount,fulfillmentMethod:fulfillment,startingAmount:finalAmount})).run();created=next.orderId;
   }else if(type==='ENCLOSURE'){
     const source=await db.prepare(`SELECT * FROM enclosure_orders WHERE order_id=?`).bind(id).first();if(!source)throw error('The original enclosure order is no longer available.',404);const next=await allocate(db,'enclosure_order_counters','WTE');
     const quantity=Math.max(1,Number(source.quantity||1));let catalogUnitPrice=0;if(amount(source.starting_unit_price)<=0&&amount(source.starting_subtotal)<=0&&amount(source.product_amount)<=0){let selectedComponents=[];try{selectedComponents=JSON.parse(source.loaded_components_json||'[]').filter(component=>component?.selected&&!component?.required).map(component=>component.componentSku);catalogUnitPrice=amount(buildConfiguredProduct(source.sku,quantity,selectedComponents).unitAmount);}catch{}}const startingUnitPrice=positiveAmount(source.starting_unit_price,catalogUnitPrice),startingSubtotal=positiveAmount(source.starting_subtotal,positiveAmount(source.product_amount,startingUnitPrice*quantity)),productAmount=positiveAmount(source.product_amount,startingSubtotal),fulfillment=FULFILLMENT.has(clean(source.fulfillment_method,30).toUpperCase())?clean(source.fulfillment_method,30).toUpperCase():'UNSET',shippingFallback=fulfillment==='SHIP'?shippingAmountForQuantity(quantity):0,shippingAmount=fulfillment==='LOCAL_PICKUP'?0:positiveAmount(source.shipping_amount,shippingFallback),customCharge=amount(source.custom_charge),discountAmount=amount(source.discount_amount),calculated=Math.max(0,productAmount+customCharge+shippingAmount-discountAmount),finalAmount=positiveAmount(source.final_amount,calculated);
@@ -215,5 +293,5 @@ export async function reorderCustomerOrder(env,account,sourceType,sourceOrderId,
   }else if(type==='STORE'){
     const rows=await db.prepare(`SELECT product_sku,product_name,color,quantity FROM store_order_items WHERE invoice_id=? ORDER BY id`).bind(id).all(),items=(rows?.results||[]).map(row=>({sku:row.product_sku,name:row.product_name,color:row.color||'White',quantity:Number(row.quantity||1)}));if(!items.length)throw error('This older store order does not contain enough product detail for automatic Buy Again. Please open Enclosures and select the product again.',409);await log(db,account.id,'BUY_AGAIN_STARTED',{sourceType:type,sourceOrderId:id});return {cartItems:items};
   }else throw error('Choose a valid WestTech order type.');
-  await db.prepare(`INSERT INTO customer_account_orders (account_id,source_type,source_order_id) VALUES (?,?,?)`).bind(account.id,type,created).run();await log(db,account.id,'REORDER_REQUESTED',{sourceType:type,sourceOrderId:id,newOrderId:created});const notifications=await sendReorderNotifications(env,{account,sourceType:type,sourceOrderId:id,newOrderId:created,requestUrl});const eventTable=type==='COASTER'?'coaster_order_events':type==='ENCLOSURE'?'enclosure_order_events':'custom_order_events';await db.batch([db.prepare(`INSERT INTO ${eventTable} (order_id,event_type,detail) VALUES (?,?,?)`).bind(created,notifications.customer.sent?'EMAIL_SENT':'EMAIL_NOT_SENT',json({emailType:'CUSTOMER_REORDER_RECEIVED',to:account.email,providerId:notifications.customer.id||null,reason:notifications.customer.reason||null})),db.prepare(`INSERT INTO ${eventTable} (order_id,event_type,detail) VALUES (?,?,?)`).bind(created,notifications.admin.sent?'EMAIL_SENT':'EMAIL_NOT_SENT',json({emailType:'ADMIN_REORDER_REQUESTED',to:adminAddress(env),providerId:notifications.admin.id||null,reason:notifications.admin.reason||null}))]);await log(db,account.id,'REORDER_NOTIFICATIONS',{newOrderId:created,customerSent:notifications.customer.sent===true,adminSent:notifications.admin.sent===true,smsSent:notifications.sms.sent===true});return {orderId:created,stage:'REVIEW_DRAFT',inManufacturing:false,charged:false,notifications:{customerSent:notifications.customer.sent===true,adminSent:notifications.admin.sent===true,smsSent:notifications.sms.sent===true}};
+  await db.prepare(`INSERT INTO customer_account_orders (account_id,source_type,source_order_id) VALUES (?,?,?)`).bind(account.id,type,created).run();await log(db,account.id,'REORDER_REQUESTED',{sourceType:type,sourceOrderId:id,newOrderId:created});const notifications=await sendReorderNotifications(env,{account,sourceType:type,sourceOrderId:id,newOrderId:created,requestUrl});const eventTable=type==='COASTER'?'coaster_order_events':type==='ENCLOSURE'?'enclosure_order_events':'custom_order_events';await db.batch([db.prepare(`INSERT INTO ${eventTable} (order_id,event_type,detail) VALUES (?,?,?)`).bind(created,notifications.customer.sent?'EMAIL_SENT':'EMAIL_NOT_SENT',json({emailType:'CUSTOMER_REORDER_RECEIVED',to:account.email,providerId:notifications.customer.id||null,reason:notifications.customer.reason||null})),db.prepare(`INSERT INTO ${eventTable} (order_id,event_type,detail) VALUES (?,?,?)`).bind(created,notifications.admin.sent?'EMAIL_SENT':'EMAIL_NOT_SENT',json({emailType:'ADMIN_REORDER_REQUESTED',to:adminAddress(env),providerId:notifications.admin.id||null,reason:notifications.admin.reason||null}))]);await log(db,account.id,'REORDER_NOTIFICATIONS',{newOrderId:created,customerSent:notifications.customer.sent===true,adminSent:notifications.admin.sent===true,smsSent:notifications.sms.sent===true});return {orderId:created,stage:type==='COASTER'?'REORDER_VERIFICATION':'REVIEW_DRAFT',inManufacturing:false,charged:false,notifications:{customerSent:notifications.customer.sent===true,adminSent:notifications.admin.sent===true,smsSent:notifications.sms.sent===true}};
 }

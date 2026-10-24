@@ -12,11 +12,13 @@
   <link href="../css/coasters.css" rel="stylesheet"/>
   <link href="../css/coaster-admin.css?v=20260913-theme1" rel="stylesheet"/>
   <link href="../css/coaster-order-theme.css" rel="stylesheet"/>
+  <link href="../css/production-awareness.css?v=20261021-stageA1" rel="stylesheet"/>
   <link href="../css/work-orders.css" rel="stylesheet"/>
   <link href="../css/admin-pane.css" rel="stylesheet"/>
   <link href="../css/admin-production-fields.css?v=20260913-2" rel="stylesheet"/>
   <script src="../js/admin-access.js?v=20260913-prod1"></script>
   <link href="../css/layout-template.css?v=20260916-site1" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/coaster-pickup-admin.css?v=20261016-roundtrip1"/>
 </head>
 <body class="coaster-page custom-coasters-page wt-admin-template">
 <div class="page">
@@ -115,6 +117,11 @@
               <div class="ca-production-stat"><small>ORDER TOTAL</small><strong id="ca-prod-price">$0.00</strong><span id="ca-prod-price-detail">Customer terms frozen</span></div>
               <div class="ca-production-stat"><small>PAYMENT</small><strong id="ca-prod-payment">—</strong><span id="ca-prod-payment-detail">—</span></div>
             </div>
+            <div class="ca-production-reference" id="ca-prod-window-card" style="margin-top:10px" aria-label="Assigned production window">
+              <small>ASSIGNED PRODUCTION WINDOW</small>
+              <strong id="ca-prod-production-window">—</strong>
+              <span id="ca-prod-production-window-detail">Production dates are estimates, not guaranteed delivery dates.</span>
+            </div>
             <div class="ca-production-controls">
               <div class="ca-field">
                 <label for="ca-production-status">Production status</label>
@@ -128,9 +135,26 @@
                   <option value="COMPLETED">Completed</option>
                 </select>
               </div>
+              <label id="ca-completion-confirm-row" class="ca-completion-confirm" hidden>
+                <input type="checkbox" id="ca-completion-confirm"/>
+                <span class="ca-completion-confirm-copy">
+                  <span id="ca-completion-confirm-label">I confirm the customer received this order.</span>
+                  <small id="ca-completion-error" class="ca-completion-error" role="alert" hidden></small>
+                </span>
+              </label>
               <div class="ca-production-reference"><small>APPROVED PROOF</small><strong id="ca-prod-proof">—</strong><span>The approved design shown above is the production reference.</span></div>
-              <div class="ca-production-reference"><small>PAYPAL / PAYMENT</small><strong id="ca-prod-paypal">—</strong><span id="ca-prod-paypal-detail">—</span></div>
+              <div class="ca-production-reference"><small>PROCESSOR REFERENCE</small><strong id="ca-prod-paypal">—</strong><span id="ca-prod-paypal-detail">—</span></div>
             </div>
+            <style>
+              .ca-completion-confirm{box-sizing:border-box;display:flex;align-items:flex-start;gap:12px;padding:14px;border:1px solid #5898c8;border-radius:11px;background:rgba(22,119,196,.12);color:var(--ca-text,#f5f9ff);font-size:.88rem;font-weight:750;line-height:1.5}
+              .ca-completion-confirm[hidden]{display:none!important}
+              .ca-completion-confirm input{width:19px;height:19px;margin:2px 0 0;flex:none;accent-color:#1677c4}
+              .ca-completion-confirm-copy{display:flex;flex-direction:column;gap:7px;min-width:0}
+              .ca-completion-error{display:block;color:#ffd4c8;font-size:.82rem;font-weight:800;line-height:1.45}
+              .ca-completion-error[hidden]{display:none!important}
+              .ca-completion-confirm.ca-completion-confirm-error{border-color:#f5a18f;background:rgba(198,70,60,.16);box-shadow:0 0 0 2px rgba(245,161,143,.18)}
+              .ca-completion-confirm.ca-completion-confirm-error input{outline:2px solid #f5a18f;outline-offset:2px}
+            </style>
             <div class="ca-production-delivery" id="ca-production-delivery">
               <div><small id="ca-prod-delivery-label">DELIVERY DETAILS</small><strong id="ca-prod-delivery-primary">—</strong><span id="ca-prod-delivery-secondary">—</span></div>
             </div>
@@ -144,6 +168,66 @@
             </div>
             <p class="ca-production-rule"><strong>Production mode.</strong> Customer-approved design, price, set count, fulfillment terms, and payment are frozen. Work Log and internal production tracking remain available.</p>
           </section>
+
+          <section class="ca-card wt-pickup-panel" id="wt-pickup-panel" hidden>
+            <div class="ca-card-head"><div><span>LOCAL PICKUP • SCHEDULING</span><strong>Offer pickup times for this order</strong></div><small>ADMIN CONTROL</small></div>
+            <p class="wt-pickup-note">Pick the specific appointment times you want to offer. Monday–Friday, 9 AM–5 PM, Mountain Time. Each pickup lasts 15 minutes. No weekend pickups.</p>
+            <div class="wt-pickup-fields">
+              <div class="ca-field"><label for="wt-pickup-date">Pickup date</label><input id="wt-pickup-date" type="date"/></div>
+              <div class="ca-field"><label for="wt-pickup-time">Pickup time</label><select id="wt-pickup-time" aria-label="Pickup time"><option value="">Choose a time</option></select></div>
+              <button id="wt-pickup-add" class="ca-secondary" type="button">+ Add Offered Time</button>
+            </div>
+            <div id="wt-pickup-status" class="wt-pickup-status" role="status" aria-live="polite"></div>
+            <div id="wt-pickup-list" class="wt-pickup-list"></div>
+            <section class="wt-pickup-stage2" aria-label="Customer pickup scheduling">
+              <h3>Private customer scheduling</h3>
+              <p>Generate a private link for this order. Stage 2 does not send emails automatically. Generating a new link invalidates the previous one.</p>
+              <div class="wt-pickup-link-actions"><button class="ca-secondary" type="button" id="wt-pickup-create-link">Generate Private Link</button><small id="wt-pickup-link-state">No link created yet.</small></div>
+              <div id="wt-pickup-link-box" hidden><label for="wt-pickup-link-value">Private scheduling link — copy and share only with this customer</label><div class="wt-pickup-link-row"><input id="wt-pickup-link-value" type="text" readonly/><button class="ca-secondary" id="wt-pickup-copy-link" type="button">Copy Link</button></div></div>
+              <div id="wt-pickup-appointment" class="wt-pickup-booking" hidden></div>
+              <h3>Alternative pickup requests</h3>
+              <div id="wt-pickup-requests" class="wt-pickup-requests"><p>No requests yet.</p></div>
+              <p class="wt-pickup-stage2-note">For a counter-offer, add times above, then choose Offer Different Times and select exactly which times to offer. Confirmed appointments provide private location, directions, and calendar links in the customer portal. Use the available communication controls for notifications.</p>
+            </section>
+            <div class="wt-pickup-footer"><span>Private pickup offers, alternate requests, and confirmations are stored with the order. Customers can view confirmed pickup location and calendar options in their portal.</span><button id="wt-pickup-reload" class="ca-secondary" type="button">Refresh Scheduling</button></div>
+          </section>
+
+          <!-- WestTech-styled confirmation (replaces the browser's confirm() dialog). -->
+          <dialog id="wt-pickup-ready-dialog" aria-labelledby="wt-pickup-ready-title" aria-describedby="wt-pickup-ready-description">
+            <div class="wt-pickup-dialog-body">
+              <div class="wt-pickup-dialog-eyebrow">LOCAL PICKUP • READY FOR PICKUP</div>
+              <h2 id="wt-pickup-ready-title">No Pickup Times Selected</h2>
+              <p id="wt-pickup-ready-description">You have not offered a future pickup date and time for this order.</p>
+              <p class="wt-pickup-dialog-note">Add at least one time before notifying your customer, or override scheduling when arrangements were made privately (for example, family or friends).</p>
+              <p class="wt-pickup-dialog-note"><strong>Override:</strong> saves Ready for Pickup without sending the usual Ready for Pickup email. The override is recorded in Order History.</p>
+              <div class="wt-pickup-ready-actions">
+                <button id="wt-pickup-ready-add" type="button">Add Pickup Times</button>
+                <button id="wt-pickup-ready-override" type="button">Override — No Scheduling Email</button>
+                <button id="wt-pickup-ready-cancel" type="button">Cancel</button>
+              </div>
+            </div>
+          </dialog>
+          <dialog id="wt-pickup-decision-dialog" aria-labelledby="wt-pickup-decision-title" aria-describedby="wt-pickup-decision-description">
+            <div class="wt-pickup-dialog-body"><div class="wt-pickup-dialog-eyebrow">LOCAL PICKUP • SCHEDULING</div>
+              <h2 id="wt-pickup-decision-title">Review pickup request</h2><p id="wt-pickup-decision-description"></p>
+              <div id="wt-pickup-counter-choices" class="wt-pickup-counter-choices" hidden></div>
+              <p id="wt-pickup-counter-feedback" class="wt-pickup-counter-feedback" role="alert" hidden></p>
+              <p class="wt-pickup-dialog-note">The coaster order and payment status do not change. No automatic customer email is sent in Stage 2.</p>
+              <div class="wt-pickup-dialog-actions"><button type="button" id="wt-pickup-decision-cancel">Go Back</button><button type="button" id="wt-pickup-decision-confirm">Confirm</button></div>
+            </div>
+          </dialog>
+          <dialog id="wt-pickup-withdraw-dialog" aria-labelledby="wt-pickup-withdraw-title" aria-describedby="wt-pickup-withdraw-description">
+            <div class="wt-pickup-dialog-body">
+              <div class="wt-pickup-dialog-eyebrow">LOCAL PICKUP • SCHEDULING</div>
+              <h2 id="wt-pickup-withdraw-title">Withdraw offered pickup time?</h2>
+              <p id="wt-pickup-withdraw-description">This appointment will no longer be offered.</p>
+              <p class="wt-pickup-dialog-note">This affects only the offered time. The coaster order remains unchanged.</p>
+              <div class="wt-pickup-dialog-actions">
+                <button id="wt-pickup-withdraw-cancel" type="button">Keep Time</button>
+                <button id="wt-pickup-withdraw-confirm" type="button">Withdraw Time</button>
+              </div>
+            </div>
+          </dialog>
 
           <div class="ca-production-save-row" id="ca-production-save-row" hidden>
             <button class="ca-primary ca-production-save" id="ca-save-top" type="button">Save Production Update</button>
@@ -160,13 +244,24 @@
               <div class="ca-field"><label for="ca-discount">Discount / special pricing</label><div class="ca-money"><input id="ca-discount" type="number" min="0" step="0.01" value="0.00"/></div></div>
               <div class="ca-field"><label for="ca-set-count">Number of sets</label><input id="ca-set-count" type="number" min="1" max="125" step="1" value="1"/></div>
               <div class="ca-field"><label for="ca-total-coasters">Total coasters</label><input id="ca-total-coasters" type="number" value="4" readonly aria-readonly="true"/></div>
-              <div class="ca-field"><label for="ca-status">Order status</label><select id="ca-status"><option value="DESIGN_REVIEW">Design Review</option><option value="PROOF_READY">Proof Ready</option><option value="PROOF_SENT">Proof Sent</option><option value="CHANGES_REQUESTED">Changes Requested</option><option value="PROOF_APPROVED">Proof Approved</option><option value="AWAITING_PAYMENT">Awaiting Payment</option><option value="IN_PRODUCTION">In Production</option><option value="READY_FOR_PICKUP">Ready for Pickup</option><option value="SHIPPED">Shipped</option><option value="COMPLETED">Completed</option><option value="CANCELLED">Cancelled</option></select></div>
+              <div class="ca-field"><label for="ca-status">Order status</label><select id="ca-status"><option value="DESIGN_REVIEW">Design Review</option><option value="REORDER_VERIFICATION">Reorder Verification</option><option value="PROOF_READY">Proof Ready</option><option value="PROOF_SENT">Proof Sent</option><option value="CHANGES_REQUESTED">Changes Requested</option><option value="PROOF_APPROVED">Proof Approved</option><option value="AWAITING_PAYMENT">Awaiting Payment</option><option value="IN_PRODUCTION">In Production</option><option value="READY_FOR_PICKUP">Ready for Pickup</option><option value="SHIPPED">Shipped</option><option value="COMPLETED">Completed</option><option value="CANCELLED">Cancelled</option></select></div>
               <div class="ca-field"><label for="ca-printer-minutes">Estimated printer minutes</label><input id="ca-printer-minutes" type="number" min="0" max="1000000" step="1" value="0"/><small id="ca-printer-minutes-note">Standard total is filled automatically and remains editable.</small></div>
               <div class="ca-field"><label for="ca-printer-assignment">Printer assignment</label><select id="ca-printer-assignment"><option value="UNASSIGNED">Unassigned</option><option value="K2_1">K2 #1</option><option value="K2_2">K2 #2</option><option value="BOTH">Both K2s</option></select></div>
               <div class="ca-field full wt-date-window" data-window-target="#ca-production-window"><span class="wt-date-window-title">Estimated production / ship window</span><div class="wt-date-window-inputs"><label>Date<input id="ca-production-window-start" data-window-start type="date"/></label><label>End date (optional)<input id="ca-production-window-end" data-window-end type="date"/></label></div><input id="ca-production-window" type="hidden"/><small class="wt-date-window-note" data-window-note>Choose a date or calculate a suggested range from the shared queue.</small></div>
               <div class="ca-total ca-total-inline"><div><span>FINAL CUSTOMER PRICE</span></div><div><strong id="ca-final-total">$0.00</strong><small id="ca-total-detail">1 set • 4 coasters</small></div></div>
             </div>
             <div class="mw-estimate-panel" data-manufacturing-estimate data-minutes-target="#ca-printer-minutes" data-window-target="#ca-production-window"><p id="ca-window-estimate" data-estimate-result>Enter the expected printer minutes, then calculate a suggested customer window from the combined coaster + enclosure queue.</p><button class="ca-secondary" type="button" data-estimate-button>Calculate Shared Queue Window</button></div>
+            <section id="ca-production-awareness" class="pa-panel" aria-label="Production date awareness">
+              <div class="pa-header"><div><div class="pa-eyebrow">PRODUCTION DATE AWARENESS • STAGE A</div><h3>Suggested dates and schedule warnings</h3></div><button class="pa-button secondary" type="button" id="ca-pa-reload">Recalculate</button></div>
+              <p class="pa-text pa-metrics" id="ca-pa-summary" role="status">Checking saved production commitments…</p>
+              <p class="pa-note" id="ca-pa-note">Dates are suggestions only. You choose the dates and save them.</p>
+              <p class="pa-warning" id="ca-pa-risk"></p>
+              <div class="pa-actions"><button class="pa-button" type="button" id="ca-pa-apply">Use Suggested Dates</button><span class="pa-warning" id="ca-pa-warning" role="status"></span></div>
+            </section>
+            <div class="ca-action-buttons" style="margin-top:12px;flex-wrap:wrap;align-items:center">
+              <div class="ca-inline-message" id="ca-review-save-near-message" role="status" aria-live="polite" hidden></div>
+              <button class="ca-primary" id="ca-save-review-near-dates" type="button">Save Order Review</button>
+            </div>
           </section>
 
           <div class="ca-order-row" id="ca-review-terms-row">
@@ -204,7 +299,7 @@
                 <div><small>PROOF</small><strong id="ca-lock-proof">—</strong></div>
                 <div><small>PAYMENT</small><strong id="ca-lock-payment">—</strong></div>
                 <div><small>FINAL TOTAL</small><strong id="ca-lock-total">—</strong></div>
-                <div><small>PAYPAL</small><strong id="ca-lock-invoice">—</strong></div>
+                <div><small>PROCESSOR REFERENCE</small><strong id="ca-lock-invoice">—</strong></div>
               </div>
               <p class="ca-proof-intro">Choose what the customer should approve. If the submitted design is already production-ready, use it directly. If WestTech changed or rebuilt the artwork, upload the WestTech proof instead.</p>
               <div class="ca-proof-source">
@@ -242,6 +337,8 @@
   </main>
   <div id="site-footer"></div>
 </div>
-<script src="../js/theme.js"></script><script src="../js/admin-production-fields.js?v=20260913-2"></script><script src="../js/coaster-admin.js?v=20260920-carrier1"></script><script src="../js/manufacturing-estimate.js?v=20260913-1"></script><script src="../js/coaster-admin-auto-refresh.js?v=20260916-shippedlock1"></script><script src="../js/coaster-admin-archive.js?v=20260904-archive3"></script><script src="../js/admin-pane-sync.js?v=20260905-1"></script>
+<script src="../js/theme.js"></script><script src="../js/admin-production-fields.js?v=20260913-2"></script><script src="../js/coaster-admin.js?v=20261023-stage5e1"></script>
+<script src="../js/coaster-admin-preview-payment.js?v=20261019-preview-payment1"></script><script src="../js/coaster-admin-reorder.js?v=20261020-reorder-schedule-guard1"></script><script src="../js/manufacturing-estimate.js?v=20260913-1"></script><script src="../js/production-awareness.js?v=20261021-stageA1"></script><script src="../js/coaster-admin-auto-refresh.js?v=20261016-pickup-save-intercept1"></script><script src="../js/coaster-admin-archive.js?v=20260904-archive3"></script><script src="../js/admin-pane-sync.js?v=20260905-1"></script>
+<script src="../js/coaster-pickup-admin.js?v=20261016-roundtrip1"></script>
 </body>
 </html>

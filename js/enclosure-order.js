@@ -26,7 +26,7 @@
   let componentSelections={},componentProfileKey='',displayCombinationAcknowledged=false,pendingDisplaySku='',displayReturnFocus=null;
 
   function rememberContact(){try{localStorage.setItem(contactKey,JSON.stringify({name:$('#eo-name').value.trim(),email:$('#eo-email').value.trim(),phone:$('#eo-phone').value.trim(),mobileCarrier:$('#eo-mobile-carrier').value,communicationPreference:$('#eo-communication').value,smsConsent:$('#eo-sms-consent').checked}));}catch{}}
-  function restoreContact(){try{const saved=JSON.parse(localStorage.getItem(contactKey)||'null');if(!saved)return;$('#eo-name').value=saved.name||'';$('#eo-email').value=saved.email||'';$('#eo-phone').value=saved.phone||'';$('#eo-mobile-carrier').value=saved.mobileCarrier||'';$('#eo-communication').value=saved.communicationPreference||'EMAIL';$('#eo-sms-consent').checked=saved.smsConsent===true;}catch{}}
+  function restoreContact(){try{const saved=JSON.parse(localStorage.getItem(contactKey)||'null');if(!saved)return;$('#eo-name').value=saved.name||'';$('#eo-email').value=saved.email||'';$('#eo-phone').value=saved.phone||'';$('#eo-mobile-carrier').value='OTHER';$('#eo-communication').value='EMAIL';$('#eo-sms-consent').checked=false;}catch{}}
 
   function selected(name){return document.querySelector(`input[name="${name}"]:checked`)?.value||'';}
   function quantity(){return Math.min(50,Math.max(1,Math.round(Number($('#eo-quantity').value||1))));}
@@ -152,8 +152,8 @@
     const form=$('#eo-order-form');
     if(!form.reportValidity())return;
     if($('#eo-phone').value.replace(/\D/g,'').length<10){setMessage('Enter a valid mobile phone number.','error');$('#eo-phone').focus();return;}
-    if($('#eo-communication').value==='SMS'&&!gatewayCarriers.has($('#eo-mobile-carrier').value)){setMessage('Email-to-text is not available for that carrier. Choose Email as your preferred communication method.','error');$('#eo-communication').focus();return;}
-    if($('#eo-communication').value==='SMS'&&!$('#eo-sms-consent').checked){setMessage('Consent to receive text messages is required when Text message is selected.','error');$('#eo-sms-consent').focus();return;}
+    /* Email-only carrier check retired. */
+    /* Email-only consent check retired. */
     if(!$('#eo-confirm').checked){setMessage('Check the confirmation box before sending your enclosure request.','error');$('#eo-confirm').focus();return;}
     const model=$('#eo-model').value,board=selected('board'),offer=selected('offer');
     const payload={

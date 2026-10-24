@@ -38,6 +38,8 @@ function template(type,order,links={}){
   const approvalUrl=safeLink(links.approvalUrl);
   const paymentUrl=safeLink(links.paymentUrl||order?.paypalApprovalUrl);
   const siteUrl=safeLink(links.siteUrl)||'https://westtechha.com/coasters/';
+  const receiptUrl=safeLink(links.receiptUrl);
+  const receiptHasSecureLink=!!receiptUrl&&new URL(receiptUrl).pathname==='/api/customer/auth/verify';
   const tracking=clean(order?.trackingNumber,160);
   const carrier=clean(order?.trackingCarrier,80);
   const trackingUrl=safeLink(trackingLink(carrier,tracking));
@@ -45,20 +47,24 @@ function template(type,order,links={}){
   let subject='',headline='',intro='',process='',action='',details=[],buttonLabel='',buttonUrl='';
 
   if(type==='REQUEST_RECEIVED'){
-    subject=`${orderContext.customerSubject} — ${orderId}`;
-    headline=`Thanks, ${name} — your coaster request is in.`;
+    subject=`${orderContext.customerSubject.replace(/request$/,'order')} — ${orderId}`;
+    headline=`Thanks, ${name} — we've received your coaster order.`;
     intro=orderContext.kind==='custom'?'I’ve got your artwork and order details, and I’ll review everything before anything moves into production.':'I’ve got your selected WestTech Team Art and order details, and I’ll review everything before anything moves into production.';
     process='Next I’ll check the artwork, wording, colors, quantity, and whether anything needs to be adjusted for a clean manufactured result. When that review is finished, I’ll send you a proof with the final order terms.';
-    action='You don’t need to do anything right now. No payment has been collected.';
-    details=[`Order: ${orderId}`,...orderContext.details,summary];
+    action=receiptHasSecureLink?'No payment has been collected. Use Open My Order below to see your design and follow progress in your private WestTech customer portal. Your one-time access link expires in 20 minutes; afterward you can request another on the sign-in page.':'No payment has been collected. Your private customer portal shows your order and its progress. Use the sign-in page to request a secure access link.';
+    details=[`Order: ${orderId}`,'Status: Design Review — awaiting WestTech review',...orderContext.details,summary];
+    buttonLabel=receiptHasSecureLink?'Open My Order':'Sign In to My Orders';buttonUrl=receiptUrl||safeLink(links.portalLoginUrl);
   }else if(type==='PROOF_READY'){
     subject=`Your WestTech coaster proof is ready — ${orderId}`;
     headline=`Your proof is ready, ${name}.`;
     intro='I’ve reviewed your request and prepared the design that WestTech will use for your order.';
     process='Please check the artwork, wording, quantity, fulfillment method, and final total. Once you approve the proof, those customer-facing terms become the production reference. If something needs changing, use the change-request option instead of approving it.';
-    action='Your next step is to review the proof and either approve it or request changes.';
+    const directPortalLink=!!approvalUrl&&new URL(approvalUrl).pathname==='/api/customer/auth/verify';
+    action=directPortalLink
+      ? 'Select Open My Order below. Your private customer portal shows the released proof and lets you approve it or request changes. The single-use access link expires in 20 minutes; request a new sign-in link if it expires.'
+      : 'Sign in to your private customer portal, open this order, and approve the proof or request changes.';
     details=[`Order: ${orderId}`,summary,`Approved subtotal: ${finalTotal}`];if(productionWindow)details.push(`Estimated production / ship window: ${productionWindow}`);
-    buttonLabel='Review Proof & Terms';buttonUrl=approvalUrl;
+    buttonLabel=directPortalLink?'Open My Order':'Customer Portal Sign-In';buttonUrl=approvalUrl;
   }else if(type==='CHANGES_REQUESTED'){
     subject=`I received your coaster changes — ${orderId}`;
     headline=`Got it, ${name} — your changes are saved.`;
@@ -149,13 +155,13 @@ function idempotencyKey(type,order){const id=clean(order?.orderId,80).replace(/[
 async function hasSent(env,orderId,key){try{const db=requireOrdersDb(env);const needle=`\"idempotencyKey\":\"${key}\"`;const row=await db.prepare(`SELECT id FROM coaster_order_events WHERE order_id=? AND event_type='EMAIL_SENT' AND instr(detail,?)>0 LIMIT 1`).bind(orderId,needle).first();return !!row;}catch(e){return false;}}
 async function logEvent(env,orderId,eventType,detail){try{const db=requireOrdersDb(env);await db.prepare(`INSERT INTO coaster_order_events (order_id,event_type,detail) VALUES (?,?,?)`).bind(orderId,eventType,JSON.stringify(detail)).run();}catch(e){}}
 
-export async function sendCoasterCustomerEmail(env,{type,order,approvalUrl='',paymentUrl='',requestUrl=''}={}){
+export async function sendCoasterCustomerEmail(env,{type,order,approvalUrl='',paymentUrl='',receiptUrl='',requestUrl=''}={}){
   const normalized=String(type||'').toUpperCase();
   if(!EMAIL_TYPES.has(normalized)||!order?.orderId)return {sent:false,skipped:true,reason:'invalid-email-event'};
   const to=clean(order.customerEmail,254).toLowerCase();
   if(!to)return {sent:false,skipped:true,reason:'customer-email-missing'};
   const key=idempotencyKey(normalized,order);
-  const rendered=template(normalized,order,{approvalUrl,paymentUrl,siteUrl:`${siteBase(env,requestUrl)}/coasters/`});
+  const rendered=template(normalized,order,{approvalUrl,paymentUrl,receiptUrl,portalLoginUrl:`${new URL(requestUrl||'https://westtechha.com').origin}/account/login.html`,siteUrl:`${siteBase(env,requestUrl)}/coasters/`});
   let email;
   if(await hasSent(env,order.orderId,key))email={sent:true,duplicate:true,idempotencyKey:key};
   else{const apiKey=clean(env?.RESEND_API_KEY,400);if(!apiKey){await logEvent(env,order.orderId,'EMAIL_NOT_CONFIGURED',{emailType:normalized,to,subject:rendered.subject,idempotencyKey:key});email={sent:false,skipped:true,reason:'RESEND_API_KEY not configured',idempotencyKey:key};}else{const payload={from:fromAddress(env),to:[to],subject:rendered.subject,html:rendered.html,text:rendered.text,reply_to:replyTo(env)},bcc=bccList(env);if(bcc.length)payload.bcc=bcc;try{const response=await fetch('https://api.resend.com/emails',{method:'POST',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json','Idempotency-Key':key},body:JSON.stringify(payload)});let data={};try{data=await response.json();}catch(e){}if(!response.ok)throw new Error(data?.message||data?.name||`Email provider returned ${response.status}.`);await logEvent(env,order.orderId,'EMAIL_SENT',{emailType:normalized,to,subject:rendered.subject,provider:'RESEND',providerId:data?.id||null,idempotencyKey:key});email={sent:true,id:data?.id||null,idempotencyKey:key};}catch(error){await logEvent(env,order.orderId,'EMAIL_FAILED',{emailType:normalized,to,subject:rendered.subject,message:clean(error?.message,600),idempotencyKey:key});email={sent:false,error:clean(error?.message,600)||'Email send failed.',idempotencyKey:key};}}}

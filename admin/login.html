@@ -36,7 +36,7 @@
         <a class="ca-secondary" href="custom-orders.html">Custom Orders</a>
         <a class="ca-secondary" href="work-orders.html">Manufacturing Queue</a>
       </div>
-      <div class="admin-login-note" id="admin-login-note">Production uses Cloudflare Access. Preview keeps the admin token prompt for testing.</div>
+      <div class="admin-login-note" id="admin-login-note">WestTech Admin uses Cloudflare Access. Access is limited to approved WestTech administrators.</div>
     </section>
   </main>
   <div id="site-footer"></div>
@@ -44,7 +44,7 @@
 <script src="../js/theme.js"></script>
 <script>
 (function(){
-  const productionHosts=new Set(['westtechha.com','www.westtechha.com']);
+  const productionHosts=new Set(['westtechha.com','www.westtechha.com','dev.westtechha.com']);
   if(productionHosts.has(location.hostname.toLowerCase())){
     sessionStorage.setItem('westtechha-admin-token','cloudflare-access');
     document.getElementById('admin-login-note').textContent='Signed in through Cloudflare Access for this browser session.';

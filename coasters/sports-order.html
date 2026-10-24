@@ -21,11 +21,11 @@
         <label>Full name<input id="so-name" type="text" maxlength="120" autocomplete="name" required/></label>
         <label>Email<input id="so-email" type="email" maxlength="254" autocomplete="email" required/></label>
         <label>Mobile phone<input id="so-phone" type="tel" maxlength="40" autocomplete="tel" required/></label>
-        <label>Mobile carrier<select id="so-carrier" required><option value="">Choose carrier</option><option value="VERIZON">Verizon</option><option value="TMOBILE">T-Mobile</option><option value="METRO">Metro by T-Mobile</option><option value="MINT">Mint Mobile</option><option value="VISIBLE">Visible</option><option value="XFINITY">Xfinity Mobile</option><option value="BOOST">Boost Mobile</option><option value="CRICKET">Cricket Wireless</option><option value="US_CELLULAR">U.S. Cellular</option><option value="GOOGLE_FI">Google Fi</option><option value="ATT">AT&amp;T</option><option value="CONSUMER_CELLULAR">Consumer Cellular</option><option value="OTHER">Other / not listed</option></select></label>
-        <label>Preferred communication<select id="so-communication"><option value="EMAIL">Email</option><option value="SMS">Text message</option></select></label>
+        <input type="hidden" id="so-carrier" value="OTHER"/>
+        <input type="hidden" id="so-communication" value="EMAIL"/>
         <label>Coaster set<select id="so-set-size"><option value="4">4-coaster set — $29.99 starting price</option><option value="8">8-coaster set — $39.99 starting price</option></select></label>
       </div>
-      <label class="so-check"><input type="checkbox" id="so-sms-consent"/>I agree to receive transactional order notices through my carrier's email-to-text gateway. Complete order details and approvals are always emailed.</label>
+      <input type="hidden" id="so-sms-consent" value="0"/>
       <label class="so-notes">Order notes (optional)<textarea id="so-notes" maxlength="800" placeholder="Shipping or pickup preferences, deadlines, or special instructions"></textarea></label>
       <input class="so-honey" type="text" id="so-website" autocomplete="off" tabindex="-1" aria-hidden="true"/>
       <p class="so-note">The design uses WestTech's own Team Art; you do not need to claim ownership of it. WestTech confirms the final total, delivery terms, and proof before payment.</p>
@@ -34,5 +34,5 @@
     </form>
   </div>
 </main><div id="site-footer"></div></div>
-<script src="../js/theme.js"></script><script src="../js/site-shell.js"></script><script src="../js/sports-order-checkout.js?v=20261015-1"></script>
+<script src="../js/theme.js"></script><script src="../js/site-shell.js"></script><script src="../js/sports-order-checkout.js?v=email-only-20261022-2"></script>
 </body></html>

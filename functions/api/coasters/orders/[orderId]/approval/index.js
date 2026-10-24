@@ -8,10 +8,9 @@ function base(request){const u=new URL(request.url);return `${u.protocol}//${u.h
 function previewPaymentBypass(context){
   try{
     const host=new URL(context.request.url).hostname.toLowerCase();
-    const configured=String(context.env?.PUBLIC_SITE_URL||'').toLowerCase().replace(/\/+$/,'');
-    const preview='https://coasters-v30-preview.westtechha.pages.dev';
-    const paypalReady=!!(context.env?.PAYPAL_CLIENT_ID&&context.env?.PAYPAL_CLIENT_SECRET&&context.env?.PAYPAL_ENV);
-    return host==='coasters-v30-preview.westtechha.pages.dev'&&configured===preview&&!paypalReady;
+    const allowed=new Set(['pickup-stage1-preview.westtechha.pages.dev','coasters-v30-preview.westtechha.pages.dev']);
+    // Never create a real checkout on an approved Preview hostname, even if PayPal credentials are configured.
+    return allowed.has(host);
   }catch(e){return false;}
 }
 async function stagePreviewAwaitingPayment(context,order){

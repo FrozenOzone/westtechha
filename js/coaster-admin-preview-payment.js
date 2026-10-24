@@ -1,6 +1,7 @@
 (function(){
   'use strict';
-  if(location.hostname!=='coasters-v30-preview.westtechha.pages.dev')return;
+  const previewHosts=new Set(['pickup-stage1-preview.westtechha.pages.dev','coasters-v30-preview.westtechha.pages.dev']);
+  if(!previewHosts.has(location.hostname.toLowerCase()))return;
   const $=s=>document.querySelector(s);
   let busy=false;
   function token(){return sessionStorage.getItem('westtechha-admin-token')||'';}
@@ -18,16 +19,16 @@
       message('Preview test payment recorded. No PayPal call was made. Order moved to Production Queue.','success');
       setTimeout(()=>$('#ca-refresh')?.click(),350);
     }catch(err){message(err.message||'Could not simulate preview payment.','error');}
-    finally{busy=false;if(button){button.disabled=false;button.textContent='Preview: Mark Paid';}}
+    finally{busy=false;if(button){button.disabled=false;button.textContent='Preview: Mark Test Paid';}}
   }
   async function render(){
     const code=status();
     if(!['PROOF_APPROVED','AWAITING_PAYMENT'].includes(code)){removeButton();return;}
     const order=await fetchOrder();
-    if(!order||!order.paymentRequired||String(order.paymentStatus||'').toUpperCase()==='PAID'){removeButton();return;}
+    if(!order||!order.paymentRequired||String(order.paymentStatus||'').toUpperCase()!=='PREVIEW_AWAITING_TEST_PAYMENT'||order.paypalOrderId){removeButton();return;}
     const actions=document.querySelector('.ca-paypal-actions');if(!actions)return;
     let button=$('#ca-preview-mark-paid');
-    if(!button){button=document.createElement('button');button.id='ca-preview-mark-paid';button.type='button';button.className='ca-secondary';button.textContent='Preview: Mark Paid';button.addEventListener('click',markPaid);actions.appendChild(button);}
+    if(!button){button=document.createElement('button');button.id='ca-preview-mark-paid';button.type='button';button.className='ca-secondary';button.textContent='Preview: Mark Test Paid';button.addEventListener('click',markPaid);actions.appendChild(button);}
     let note=$('#ca-preview-pay-note');
     if(!note){note=document.createElement('small');note.id='ca-preview-pay-note';note.style.display='block';note.style.marginTop='8px';note.style.color='#8a5a00';const host=document.querySelector('.ca-proof-payment');host?.appendChild(note);}
     if(note)note.textContent=order.fulfillmentMethod==='SHIP'?'PREVIEW ONLY — no PayPal call. Marks this order paid and inserts a clearly labeled test shipping address so you can test the full shipping workflow.':'PREVIEW ONLY — no PayPal call. Marks this order paid so you can test the remaining workflow.';

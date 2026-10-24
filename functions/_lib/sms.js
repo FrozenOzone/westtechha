@@ -77,13 +77,15 @@ async function sendGatewayViaSmtp(env,{to,text,idempotencyKey}){
 async function log(env,sourceType,orderId,eventType,detail){const table=EVENT_TABLES[String(sourceType||'').toUpperCase()];if(!table||!orderId)return;try{await requireOrdersDb(env).prepare(`INSERT INTO ${table} (order_id,event_type,detail) VALUES (?,?,?)`).bind(orderId,eventType,JSON.stringify(detail)).run();}catch{}}
 async function alreadySent(env,sourceType,orderId,key){const table=EVENT_TABLES[String(sourceType||'').toUpperCase()];if(!table||!orderId)return false;try{const needle=`\"idempotencyKey\":\"${key}\"`,row=await requireOrdersDb(env).prepare(`SELECT id FROM ${table} WHERE order_id=? AND event_type='TEXT_GATEWAY_SENT' AND instr(detail,?)>0 LIMIT 1`).bind(orderId,needle).first();return !!row;}catch{return false;}}
 
-export function smsConfigured(env){return smtpConfigured(env);}
+export function smsConfigured(env){return false; /* email-only-notifications */}
 export function transactionalSmsText({subject='',orderId=''}={}){
   const title=clean(subject,120).replace(/\s+[—-]\s+[^—-]+$/,'').replace(/[.!]+$/,'');
   return [`WestTech: ${title||'Your order has an update'}.`,orderId?`Order ${clean(orderId,80)}.`:'','Full details were sent to your email.'].filter(Boolean).join(' ').slice(0,300);
 }
 
 export async function sendTransactionalSms(env,{sourceType,order,eventType,message,idempotencyKey}={}){
+  // Email-only notifications: retire carrier email-to-text, regardless of legacy preferences.
+  return {sent:false,skipped:true,reason:'email-only-notifications'};
   const type=String(sourceType||'').toUpperCase(),orderId=clean(order?.orderId,80),key=clean(idempotencyKey,240),carrier=normalizeMobileCarrier(order?.mobileCarrier),digits=normalizeUsMobile(order?.customerPhone||order?.phone),to=mobileGatewayAddress(order?.customerPhone||order?.phone,carrier);
   if(!EVENT_TABLES[type]||!orderId||!key)return {sent:false,skipped:true,reason:'invalid-text-gateway-event'};
   if(!consented(order))return {sent:false,skipped:true,reason:'text-not-preferred-or-consented'};

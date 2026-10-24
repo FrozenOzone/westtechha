@@ -55,13 +55,30 @@ export async function updateCoasterOrderAdmin(env,orderId,payload={}){
     if(status==='READY_FOR_PICKUP'&&order.fulfillmentMethod!=='LOCAL_PICKUP')throw makeError('Ready for Pickup is only valid for Local Pickup orders.');
     if(status==='PREPARING_TO_SHIP'&&order.fulfillmentMethod!=='SHIP')throw makeError('Preparing to Ship is only valid for shipped orders.');
     if(status==='SHIPPED'&&order.fulfillmentMethod!=='SHIP')throw makeError('Shipped is only valid for shipped orders.');
-    const currentStatus=String(order.status||'').toUpperCase(),shipmentLocked=['SHIPPED','COMPLETED'].includes(currentStatus),requestedCarrier=clean(payload.trackingCarrier,100),requestedTracking=clean(payload.trackingNumber,180);
+    const currentStatus=String(order.status||'').toUpperCase();
+    const completing=status==='COMPLETED'&&currentStatus!=='COMPLETED';
+    // Never treat a shipped or scheduled order as delivered by status alone.
+    // An authorized Admin must explicitly confirm physical handoff / delivery.
+    if(completing&&!bool(payload.fulfillmentConfirmed))throw makeError(order.fulfillmentMethod==='LOCAL_PICKUP'?'Confirm that the coasters were handed to the customer before completing this pickup order.':'Confirm that the customer received the shipment before completing this order.',409);
+    let pickupOverrideUsed=false;
+    if(status==='READY_FOR_PICKUP'&&currentStatus!=='READY_FOR_PICKUP'){
+      const parts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/Denver',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));
+      const localDate=`${parts.year}-${parts.month}-${parts.day}`,localTime=`${parts.hour}:${parts.minute}`;
+      const result=await db.prepare("SELECT COUNT(*) AS slotCount FROM coaster_pickup_slots WHERE order_id=? AND status='OFFERED' AND (local_date>? OR (local_date=? AND local_time>?))").bind(order.orderId,localDate,localDate,localTime).first();
+      if(Number(result?.slotCount||0)===0){
+        if(payload.pickupSchedulingOverride!==true)throw makeError('No future pickup times have been offered. Add a weekday pickup slot or explicitly override scheduling before saving Ready for Pickup.',409);
+        pickupOverrideUsed=true;
+      }
+    }
+    const shipmentLocked=['SHIPPED','COMPLETED'].includes(currentStatus),requestedCarrier=clean(payload.trackingCarrier,100),requestedTracking=clean(payload.trackingNumber,180);
     if(shipmentLocked&&(requestedCarrier!==clean(order.trackingCarrier,100)||requestedTracking!==clean(order.trackingNumber,180)))throw makeError('Carrier and tracking number are locked after the order is shipped.',409);
     const trackingCarrier=shipmentLocked?clean(order.trackingCarrier,100):requestedCarrier,trackingNumber=shipmentLocked?clean(order.trackingNumber,180):requestedTracking;
     const now=nowIso();
     await db.prepare(`UPDATE coaster_orders SET status=?,admin_notes=?,tracking_carrier=?,tracking_number=?,pickup_ready_at=CASE WHEN ?='READY_FOR_PICKUP' THEN COALESCE(pickup_ready_at,?) ELSE pickup_ready_at END,shipped_at=CASE WHEN ?='SHIPPED' THEN COALESCE(shipped_at,?) ELSE shipped_at END,completed_at=CASE WHEN ?='COMPLETED' THEN COALESCE(completed_at,?) ELSE completed_at END,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(status,clean(payload.adminNotes,4000),trackingCarrier,trackingNumber,status,now,status,now,status,now,order.orderId).run();
     await logEvent(db,order.orderId,'PRODUCTION_UPDATED',{status,trackingCarrier,trackingNumber,previousStatus:order.status});
-    const updated=await getCoasterOrderDetail(env,order.orderId);await syncManufacturingWorkOrder(env,'COASTER',updated);updated._statusChanged=order.status!==status;return updated;
+    if(completing)await logEvent(db,order.orderId,'FULFILLMENT_RECEIPT_CONFIRMED',{fulfillmentMethod:order.fulfillmentMethod,confirmedBy:'ADMIN',previousStatus:currentStatus});
+    if(pickupOverrideUsed)await logEvent(db,order.orderId,'PICKUP_SCHEDULING_OVERRIDDEN',{reason:'MANUAL_PICKUP_ARRANGEMENT',noOfferedTimes:true,readyEmailSuppressed:true});
+    const updated=await getCoasterOrderDetail(env,order.orderId);await syncManufacturingWorkOrder(env,'COASTER',updated);updated._statusChanged=order.status!==status;updated._pickupSchedulingOverrideUsed=pickupOverrideUsed;return updated;
   }
   if(frozen){
     await db.prepare(`UPDATE coaster_orders SET admin_notes=?,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(clean(payload.adminNotes,4000),order.orderId).run();
@@ -70,7 +87,7 @@ export async function updateCoasterOrderAdmin(env,orderId,payload={}){
   const setCount=integer(payload.setCount??order.setCount,1,125),totalCoasters=integer(payload.totalCoasters??setCount*order.setSize,1,500);if(totalCoasters!==setCount*order.setSize)throw makeError('Total coaster quantity does not match the selected set count.');
   const estimatedPrinterMinutes=integer(payload.estimatedPrinterMinutes??order.estimatedPrinterMinutes,0,1000000),printerAssignment=clean(payload.printerAssignment,30),productionWindow=clean(payload.productionWindow,160);
   const fulfillment=clean(payload.fulfillmentMethod,30)==='LOCAL_PICKUP'?'LOCAL_PICKUP':'SHIP',basePrice=number(payload.basePrice,0,100000),artworkCharge=number(payload.artworkCharge,0,100000),otherCharge=number(payload.otherCharge,0,100000),shipping=fulfillment==='LOCAL_PICKUP'?0:number(payload.shippingAmount,0,100000),discount=number(payload.discountAmount,0,100000),workTotal=await billableTotal(db,order.orderId),final=calcTotal({basePrice,setCount,artworkCharge,workTotal,otherCharge,shippingAmount:shipping,discountAmount:discount});
-  const allowed=new Set(['DESIGN_REVIEW','CHANGES_REQUESTED']),candidate=clean(payload.status,40),status=allowed.has(candidate)?candidate:'DESIGN_REVIEW';
+  const allowed=new Set(['DESIGN_REVIEW','CHANGES_REQUESTED','REORDER_VERIFICATION']),candidate=clean(payload.status,40),status=allowed.has(candidate)?candidate:'DESIGN_REVIEW';
   await db.prepare(`UPDATE coaster_orders SET base_price=?,artwork_charge=?,other_charge=?,shipping_amount=?,discount_amount=?,final_amount=?,set_count=?,total_coasters=?,fulfillment_method=?,payment_required=?,status=?,customer_review_note=?,admin_notes=?,estimated_printer_minutes=?,printer_assignment=?,production_window=?,review_saved_at=CURRENT_TIMESTAMP,updated_at=CURRENT_TIMESTAMP WHERE order_id=?`).bind(basePrice,artworkCharge,otherCharge,shipping,discount,final,setCount,totalCoasters,fulfillment,bool(payload.paymentRequired)?1:0,status,clean(payload.customerReviewNote,3000),clean(payload.adminNotes,4000),estimatedPrinterMinutes,printerAssignment,productionWindow,order.orderId).run();
   await logEvent(db,order.orderId,'REVIEW_SAVED',{status,fulfillmentMethod:fulfillment,totalCoasters,finalAmount:final,paymentRequired:bool(payload.paymentRequired),estimatedPrinterMinutes,productionWindow});return getCoasterOrderDetail(env,order.orderId);
 }
