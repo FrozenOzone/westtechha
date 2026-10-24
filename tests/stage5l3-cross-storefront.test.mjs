@@ -44,11 +44,15 @@ test('customer proof decision uses identity and proof-version guards',()=>{
  const p=read('functions/api/customer/orders/[sourceType]/[orderId]/approval/index.js');
  for(const term of ['requireCustomerCoasterProof(context)','proofVersion','Invalid request origin.','JSON request required.','recordCoasterApprovalForCustomer'])assert.ok(p.includes(term),term);
 });
-test('Production Venmo remains unavailable and preview Venmo requires Sandbox',()=>{
+test('Venmo uses isolated Preview Sandbox or the verified live Production domain',()=>{
  const p=read('functions/api/customer/orders/[sourceType]/[orderId]/payment-methods/index.js');
- assert.match(p,/if\(!isCoasterSandbox\(context\)\)/);
- assert.match(p,/methods:\[\]/);assert.match(p,/COASTER_VENMO_SANDBOX_ENABLED/);
- const js=read('js/customer-payment-methods.js');assert.match(js,/pickup-stage1-preview\.westtechha\.pages\.dev/);assert.match(js,/www\.sandbox\.paypal\.com\/web-sdk\/v6\/core/);
+ assert.match(p,/coasterCustomerPaymentMode\(context\)/);
+ assert.match(p,/if\(!f\.sandbox&&!f\.live\)/);
+ assert.match(p,/COASTER_VENMO_SANDBOX_ENABLED/);
+ const js=read('js/customer-payment-methods.js');
+ assert.match(js,/pickup-stage1-preview\.westtechha\.pages\.dev/);
+ assert.match(js,/www\.paypal\.com\/web-sdk\/v6\/core/);
+ assert.match(js,/www\.sandbox\.paypal\.com\/web-sdk\/v6\/core/);
 });
 test('production work order UPSERT remains conditional and idempotent',()=>{
  const s=read('functions/_lib/manufacturing-work-orders.js');

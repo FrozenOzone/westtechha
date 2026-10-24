@@ -282,11 +282,11 @@
           <p id="co-paypal-explainer" style="margin:0 0 12px;color:#aec7dd;">Review the final tax and shipping total before payment.</p>
           <button id="co-paypal-start" type="button" class="customer-primary-btn" style="background:#1677c4;color:white;border:0;border-radius:6px;padding:10px 16px;cursor:pointer;">Continue to PayPal</button>
           <p id="co-paypal-feedback" role="status" aria-live="polite" hidden></p>
-          <section id="co-payment-methods" hidden aria-label="Venmo Sandbox checkout" style="border-top:1px solid #356187;margin-top:16px;padding-top:14px;">
+          <section id="co-payment-methods" hidden aria-label="Venmo checkout" style="border-top:1px solid #356187;margin-top:16px;padding-top:14px;">
             <h3 style="margin:0 0 8px;">Or pay with Venmo</h3>
             <p style="margin:0 0 10px;color:#b5d1e6;">Sandbox only · No real funds will be charged. Shipped orders require a confirmed delivery address and final tax quote before checkout.</p>
             <div id="co-venmo-shipping" hidden style="padding:12px;margin:12px 0;border:1px solid #356187;border-radius:9px;">
-              <strong style="display:block;margin-bottom:8px;">Shipping address for Venmo Sandbox</strong>
+              <strong style="display:block;margin-bottom:8px;">Shipping address for Venmo</strong>
               <p style="margin:0 0 9px;color:#b5d1e6;">Enter the delivery address. Shipping is already included in your approved subtotal. We'll calculate destination sales tax before payment. Your Venmo shipping address must match.</p>
               <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:9px;">
                 <label>Recipient name<input id="co-venmo-ship-name" autocomplete="shipping name" maxlength="200"/></label>
@@ -300,7 +300,7 @@
               <p id="co-venmo-ship-summary" style="color:#b5d1e6;" role="status" aria-live="polite"></p>
             </div>
             <section id="co-venmo-review" class="co-venmo-review" aria-label="Final Venmo payment summary" hidden>
-              <div class="co-venmo-review-head"><strong>Final payment summary</strong><span>Sandbox test · No real charge</span></div>
+              <div class="co-venmo-review-head"><strong>Final payment summary</strong><span id="co-venmo-mode-note">Checking payment environment…</span></div>
               <div class="co-venmo-price-row"><span>Coaster items</span><strong id="co-venmo-items-amount">—</strong></div>
               <div class="co-venmo-price-row"><span>Shipping</span><strong id="co-venmo-shipping-amount">—</strong></div>
               <div class="co-venmo-price-row"><span>Sales tax</span><strong id="co-venmo-tax-amount">—</strong></div>
@@ -325,5 +325,5 @@
   </main>
   <div id="site-footer"></div>
 </div>
-<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-pickup-details1"></script><script src="../js/customer-order.js?v=20261024-stage5l1"></script><script src="../js/customer-payment-methods.js?v=20261023-stage5h1"></script>
+<script src="../js/theme.js"></script><script src="../js/coaster-pickup-customer.js?v=20261016-pickup-details1"></script><script src="../js/customer-order.js?v=20261024-stage5l1"></script><script src="../js/customer-payment-methods.js?v=20261024-stage5m-live"></script>
 </body></html>

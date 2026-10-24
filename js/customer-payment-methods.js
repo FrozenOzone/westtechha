@@ -1,10 +1,10 @@
-/* WestTech Payment Methods — Preview-only Venmo integration. Legacy PayPal remains unchanged. */
+/* WestTech Payment Methods — isolated Venmo checkout for Sandbox Preview and verified live Production. Legacy PayPal remains unchanged. */
 (()=>{'use strict';
  const params=new URLSearchParams(location.search);
  const orderId=String(params.get('id')||'');
  if(String(params.get('type')||'').toUpperCase()!=='COASTER'||!/^WTCC-\d{8}-\d{1,6}$/.test(orderId))return;
- const host='pickup-stage1-preview.westtechha.pages.dev';
- if(location.hostname.toLowerCase()!==host)return;
+ const allowedHosts=new Set(['pickup-stage1-preview.westtechha.pages.dev','westtechha.com','www.westtechha.com']);
+ if(!allowedHosts.has(location.hostname.toLowerCase()))return;
  const root=document.querySelector('#co-payment-methods');if(!root)return;
  const button=document.querySelector('#co-venmo-button'),explain=document.querySelector('#co-venmo-explain');
  const confirm=document.querySelector('#co-venmo-tax-confirm'),quoteEl=document.querySelector('#co-venmo-total');
@@ -17,7 +17,7 @@
  const shippingFields=['name','line1','line2','city','state','zip'].map(x=>document.querySelector('#co-venmo-ship-'+x));
  let shippingMode=false,confirmedAddress=null;
  const route='/api/customer/orders/COASTER/'+encodeURIComponent(orderId)+'/payment-methods';
- let quote=null,session=null,busy=false,initialized=false,activeCreate=null,activeOrderId=null;
+ let quote=null,session=null,busy=false,initialized=false,activeCreate=null,activeOrderId=null,checkoutMode=null;
  function status(message,error=false){feedback.hidden=!message;feedback.textContent=message;feedback.style.color=error?'#ffb3b3':'#c6dcec';}
  async function json(url,options={}){
   const res=await fetch(url,{credentials:'same-origin',headers:{Accept:'application/json',...(options.body?{'Content-Type':'application/json'}:{})},...options});
@@ -26,7 +26,7 @@
  }
  const post=(action,extra={})=>json(route,{method:'POST',body:JSON.stringify({action,...extra})});
  async function loadSdk(){
-  const src='https://www.sandbox.paypal.com/web-sdk/v6/core';
+  const src=checkoutMode==='live'?'https://www.paypal.com/web-sdk/v6/core':'https://www.sandbox.paypal.com/web-sdk/v6/core';
   if(window.paypal?.createInstance)return;
   await new Promise((resolve,reject)=>{
    const script=document.createElement('script');script.src=src;script.async=true;
@@ -52,13 +52,13 @@
    await loadSdk();
    const sdk=await window.paypal.createInstance({clientId,components:['venmo-payments'],pageType:'checkout'});
    const eligible=await sdk.findEligibleMethods({currencyCode:'USD',countryCode:'US',amount:String(quote.totalAmount)});
-   if(!eligible.isEligible('venmo')){setEnabled(false);explain.textContent='Venmo is unavailable for this Sandbox buyer. PayPal remains available.';return;}
+   if(!eligible.isEligible('venmo')){setEnabled(false);explain.textContent='Venmo is unavailable for this buyer. PayPal remains available.';return;}
    session=sdk.createVenmoOneTimePaymentSession({
     onApprove:async ({orderId:paypalOrderId})=>{
      activeCreate=null;activeOrderId=null; // Authorization began; never cancel this attempt automatically.
      status('Checking Venmo authorization and recording your payment…');
      const r=await post('captureVenmo',{paypalOrderId});
-     if(r.paid){status('Venmo Sandbox payment recorded. Reloading your order…');location.reload();}
+     if(r.paid){status('Venmo payment recorded. Reloading your order…');location.reload();}
      else throw new Error('Payment requires verification. Contact WestTech before retrying.');
     },
     onCancel:async()=>{
@@ -66,7 +66,7 @@
      const creating=activeCreate;let id=activeOrderId;activeCreate=null;activeOrderId=null;
      if(!id&&creating){try{id=(await creating).orderId;}catch{}}
      if(!id){status('Venmo was canceled before a payment attempt was created.');return;}
-     try{await post('cancelVenmo',{paypalOrderId:id});status('Venmo was canceled. No payment captured; the test attempt is recorded as canceled.');}
+     try{await post('cancelVenmo',{paypalOrderId:id});status('Venmo was canceled. No payment captured; the attempt is recorded as canceled.');}
      catch(e){status('Checkout closed, but the cancellation could not be verified. Please check your order before retrying.',true);}
     },
     onError:()=>{busy=false;status('Venmo could not complete the payment. Please review your order before trying again.',true);}
@@ -79,7 +79,9 @@
    try{
      const data=await json(route);
      const venmo=data.methods?.find(m=>m.id==='venmo');
-     if(data.mode!=='sandbox'||!venmo?.enabled||!data.clientId||(data.fulfillmentMethod!=='SHIP'&&!data.quote)){root.hidden=true;return;}
+     if(!['sandbox','live'].includes(data.mode)||!venmo?.enabled||!data.clientId||(data.fulfillmentMethod!=='SHIP'&&!data.quote)){root.hidden=true;return;}
+     checkoutMode=data.mode;
+     const modeNote=document.querySelector('#co-venmo-mode-note');if(modeNote)modeNote.textContent=checkoutMode==='live'?'Secure payment · Actual charge':'Sandbox test · No real charge';
      shippingMode=data.fulfillmentMethod==='SHIP';root.hidden=false;shippingPanel.hidden=!shippingMode;
      if(shippingMode){
        setEnabled(false);explain.textContent='Calculate and confirm the delivery address and tax total first.';
@@ -102,7 +104,7 @@
  button.addEventListener('click',async()=>{
   if(!session||busy)return;
   if(!confirm.checked){status('Please approve the tax and total before starting Venmo.',true);return;}
-  busy=true;status('Opening secure Venmo Sandbox checkout…');
+  busy=true;status('Opening secure Venmo checkout…');
   try{
    // Create a separate PayPal Orders API attempt without disturbing existing PayPal approval links.
    const promise=post('startVenmo',{confirmedTotal:true,expectedTotal:String(quote.totalAmount),...(shippingMode?{shippingAddress:confirmedAddress}:{})})

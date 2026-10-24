@@ -2,7 +2,7 @@ import { requireCustomerSession } from '../../../../../../_lib/customer-account.
 import { requireOrdersDb } from '../../../../../../_lib/orders.js';
 import { getCoasterOrderDetail } from '../../../../../../_lib/coaster-orders.js';
 import { jsonResponse, sanitizeEnvValue } from '../../../../../../_lib/shared.js';
-import { isCoasterSandbox } from '../../../../../../_lib/coaster-preview-payment-mode.js';
+import { isCoasterSandbox, coasterCustomerPaymentMode } from '../../../../../../_lib/coaster-preview-payment-mode.js';
 import { getVenmoPickupQuote, getVenmoShippingQuote, startVenmoPickup, captureVenmoPickup, cancelVenmoPickup } from '../../../../../../_lib/coaster-venmo.js';
 import { sendCoasterAdminProductionEmail } from '../../../../../../_lib/coaster-admin-production-email.js';
 import { inviteCustomerForOrder } from '../../../../../../_lib/customer-account.js';
@@ -20,31 +20,34 @@ async function owned(context){
  return order;
 }
 function flags(context,order){
- const sandbox=isCoasterSandbox(context);
+ const mode=coasterCustomerPaymentMode(context);
+ const sandbox=isCoasterSandbox(context),live=mode==='live';
  const pending=order.paymentRequired===true && order.proofStatus==='APPROVED' &&
    ['PROOF_APPROVED','AWAITING_PAYMENT'].includes(String(order.status||'').toUpperCase()) &&
    String(order.paymentStatus||'').toUpperCase()!=='PAID';
- return {sandbox,pending,
-   venmo:sandbox && pending && (order.fulfillmentMethod==='LOCAL_PICKUP'||(order.fulfillmentMethod==='SHIP'&&sanitizeEnvValue(context.env.COASTER_VENMO_SHIPPING_SANDBOX_ENABLED)==='1')) &&
-     sanitizeEnvValue(context.env.COASTER_VENMO_SANDBOX_ENABLED)==='1' &&
-     sanitizeEnvValue(context.env.PAYPAL_CURRENCY)==='USD' &&
+ const fulfillmentAllowed=order.fulfillmentMethod==='LOCAL_PICKUP'||
+   (order.fulfillmentMethod==='SHIP'&&(live||sanitizeEnvValue(context.env.COASTER_VENMO_SHIPPING_SANDBOX_ENABLED)==='1'));
+ const venmoEnabled=live||(sandbox&&sanitizeEnvValue(context.env.COASTER_VENMO_SANDBOX_ENABLED)==='1');
+ return {mode,sandbox,live,pending,
+   venmo:(sandbox||live)&&pending&&fulfillmentAllowed&&venmoEnabled&&
+     sanitizeEnvValue(context.env.PAYPAL_CURRENCY)==='USD'&&
      !!sanitizeEnvValue(context.env.PAYPAL_CLIENT_ID)};
 }
 export async function onRequestGet(context){
  try{
   const order=await owned(context);const f=flags(context,order);
-  if(!f.sandbox)return reply({ok:true,mode:'unavailable',methods:[]});
+  if(!f.sandbox&&!f.live)return reply({ok:true,mode:'unavailable',methods:[]});
   const methods=[{id:'paypal',label:'PayPal',enabled:f.pending},
     {id:'venmo',label:'Venmo',enabled:f.venmo,reason:order.fulfillmentMethod==='SHIP'&&!f.venmo?'Venmo shipping Sandbox is not yet enabled.':null}];
   let quote=null;
   if(f.venmo&&order.fulfillmentMethod==='LOCAL_PICKUP'){const q=await getVenmoPickupQuote(context.env,order.orderId);
-   quote={taxableAmount:q.taxableAmount,taxAmount:q.taxAmount,totalAmount:q.totalAmount,taxRate:q.taxRate,shippingAmount:q.shippingAmount};}
-  return reply({ok:true,mode:'sandbox',methods,fulfillmentMethod:order.fulfillmentMethod,clientId:f.venmo?sanitizeEnvValue(context.env.PAYPAL_CLIENT_ID):null,quote});
+   quote={itemAmount:q.itemAmount,taxableAmount:q.taxableAmount,taxAmount:q.taxAmount,totalAmount:q.totalAmount,taxRate:q.taxRate,shippingAmount:q.shippingAmount};}
+  return reply({ok:true,mode:f.mode,methods,fulfillmentMethod:order.fulfillmentMethod,clientId:f.venmo?sanitizeEnvValue(context.env.PAYPAL_CLIENT_ID):null,quote});
  }catch(e){return reply({ok:false,message:e.message||'Could not load payment methods.'},e.status||500);}
 }
 export async function onRequestPost(context){
  try{
-  if(!isCoasterSandbox(context))throw fail('Venmo is available only in Sandbox Preview.',403);
+  if(!isCoasterSandbox(context)&&coasterCustomerPaymentMode(context)!=='live')throw fail('Venmo checkout is unavailable in this environment.',403);
   const origin=context.request.headers.get('Origin');if(origin&&origin!==new URL(context.request.url).origin)throw fail('Invalid origin.',403);
   if(!/^application\/json(?:;|$)/i.test(context.request.headers.get('Content-Type')||''))throw fail('JSON required.',415);
   const order=await owned(context);const f=flags(context,order);if(!f.venmo)throw fail('Venmo is not enabled for this order.',403);
