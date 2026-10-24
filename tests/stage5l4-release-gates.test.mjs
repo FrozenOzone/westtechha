@@ -23,9 +23,9 @@ test('complete verified baseline is pinned, and Production and Preview D1 IDs di
  assert.equal(audit.branch_difference_before_kit.ahead_commits,64);
  assert.equal(audit.branch_difference_before_kit.changed_paths,94);
 });
-test('current tax address exposure is explicitly detected and remains a release blocker',()=>{
- assert.match(tax,/console\.log\("\[tax\.buildTaxQuote\] start"/);
- assert.match(tax,/\binputAddress\b/);
+test('tax address logging fixed on Preview while historical G1 remains documented',()=>{
+ assert.doesNotMatch(tax,/\bconsole\s*\./);
+ assert.match(tax,/address: buildColoradoAddressString\(address\)/);
  assert.match(report,/G1 - Sensitive tax request\/response logging/);
  assert.match(audit.known_hold_gates[0].action,/Redact/);
 });

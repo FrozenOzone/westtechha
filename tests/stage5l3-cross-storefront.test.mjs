@@ -18,7 +18,7 @@ function blobSha(p){
 const critical={
  'functions/_lib/enclosure-paypal.js':'e93ec8f70c9263c918996ce826db7f03581b1efd',
  'functions/_lib/custom-paypal.js':'3f9e214cb46efd4c7f5b3f1985950fc6f5f5966e',
- 'functions/_lib/tax.js':'79faae48cfa81a1e3dc6dffb2e6268bfb5d50609',
+ 'functions/_lib/tax.js':'f6dc6652f35b7659dd53ddc6a0c1c14548923ccb',
  'functions/api/coasters/orders/[orderId]/payment/capture/index.js':'fc7dd0bfe24f99b8f93d6d380a8ce67daa727274',
  'functions/api/paypal/config.js':'8b30382b00c701090d1e35766b7325b9f75fe8ec'
 };
