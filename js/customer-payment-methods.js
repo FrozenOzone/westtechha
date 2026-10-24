@@ -82,6 +82,7 @@
      if(!['sandbox','live'].includes(data.mode)||!venmo?.enabled||!data.clientId||(data.fulfillmentMethod!=='SHIP'&&!data.quote)){root.hidden=true;return;}
      checkoutMode=data.mode;
      const modeNote=document.querySelector('#co-venmo-mode-note');if(modeNote)modeNote.textContent=checkoutMode==='live'?'Secure payment · Actual charge':'Sandbox test · No real charge';
+     const intro=document.querySelector('#co-venmo-intro');if(intro)intro.textContent=checkoutMode==='live'?'Secure Venmo payment. Confirm your delivery address, sales tax, and final total before authorizing the charge.':'Sandbox test only · No real funds will be charged. Confirm the delivery address and final tax quote before checkout.';
      shippingMode=data.fulfillmentMethod==='SHIP';root.hidden=false;shippingPanel.hidden=!shippingMode;
      if(shippingMode){
        setEnabled(false);explain.textContent='Calculate and confirm the delivery address and tax total first.';
