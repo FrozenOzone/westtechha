@@ -33,3 +33,27 @@ const exempt=await prepareSale({}, {...base,taxExempt:true,exemptReason:'Verifie
 const comp=await prepareSale({}, {...base,items:[{...base.items[0],unitPrice:'0.00'}]});assert.equal(comp.totalCents,0);
 const payload=orderPayload({invoice_number:'WTI-000001',subtotal_cents:100,shipping_cents:0,tax_cents:8,total_cents:108},'VENMO','abcd1234');assert.equal(payload.purchase_units[0].amount.value,'1.08');
 console.log('PASS: JS syntax, price override and reason, server tax math, exemptions and complimentary sales, payment locks, origin auth, PayPal amount consistency.');
+
+// Sales v2: optional customer details, safe default tax-location and four requested UI changes.
+const blank={...base,saleType:'INVOICE',customerName:'',customerPhone:'',customerEmail:'',locationLabel:'',address:{}};
+const walkin=await prepareSale({},blank);
+assert.equal(walkin.customerName,'');assert.equal(walkin.customerEmail,'');assert.equal(walkin.customerPhone,'');
+assert.equal(walkin.locationLabel,'WestTech / Walk-in');
+assert.equal(walkin.addressSource,'WESTTECH_PICKUP');
+assert.equal(walkin.address.address1,'11300 Emporia St');
+assert.equal(walkin.address.postalCode,'80640');
+assert.equal(walkin.totalCents,107);
+const contact=await prepareSale({},{...blank,customerName:'Neighbor',customerPhone:'720-555-0100',customerEmail:'neighbor@example.com'});
+assert.equal(contact.customerPhone,'720-555-0100');
+await assert.rejects(prepareSale({},{...blank,address:{state:'CO',postalCode:'80640'}}),/complete Colorado event\/delivery address/);
+const html=read('admin/sales.html');
+for(const id of ['ws-open','ws-share','ws-email-me','ws-qr','ws-link'])assert.ok(html.includes('id="'+id+'"'),id);
+assert.ok(html.includes('name="customerPhone"'));
+assert.doesNotMatch(html,/name="(?:address1|city|postalCode)"[^>]*\srequired/);
+assert.match(admin,/ESP32 Enclosures/);assert.match(admin,/4-Coaster Set/);assert.match(admin,/8-Coaster Set/);
+assert.match(admin,/navigator\.share/);assert.match(admin,/action:'email-owner'/);
+assert.match(ledger,/customer_phone/);assert.match(ledger,/WESTTECH_PICKUP/);
+const protectedApi=read('functions/api/admin/sales/[id]/index.js');
+assert.match(protectedApi,/requireWestTechAdmin\(ctx\)/);assert.match(protectedApi,/emailSaleLinkToOwner\(ctx,id\)/);
+assert.match(read('migrations/025_sales_optional_contact.sql'),/ALTER TABLE sales_invoices ADD COLUMN customer_phone/);
+console.log('PASS v2: optional contacts, pickup default, precise event address rule, catalog selection, mobile link sharing, protected owner email, phone migration.');

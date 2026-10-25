@@ -9,6 +9,9 @@ const dollar=(c)=> (c/100).toFixed(2);
 function cents(value){const str=String(value??'');if(!/^(?:0|[1-9]\d{0,6})(?:\.\d{1,2})?$/.test(str))throw saleError('Amounts must be nonnegative dollars with at most two decimals.');const [a,b='']=str.split('.');return Number(a)*100+Number((b+'00').slice(0,2));}
 const money=(v)=>cents(v);
 const dbFor=(env)=>requireOrdersDb(env);
+// Shared WestTech pickup location used when a walk-in seller omits a tax address.
+// For special events and shipped sales, admins must enter the actual tax location.
+const PICKUP_TAX_ADDRESS={fullName:'WestTech Home Automation, LLC',address1:'11300 Emporia St',city:'Henderson',state:'CO',postalCode:'80640',countryCode:'US'};
 function randomToken(){const a=new Uint8Array(32);crypto.getRandomValues(a);return [...a].map(x=>x.toString(16).padStart(2,'0')).join('');}
 export function salesMode(context){const host=new URL(context.request.url).hostname.toLowerCase(),env=clean(context.env.PAYPAL_ENV).toLowerCase();if(['westtechha.com','www.westtechha.com'].includes(host))return env==='live'?'live':'blocked';if(host==='pickup-stage1-preview.westtechha.pages.dev'||host==='dev.westtechha.com')return env==='sandbox'?'sandbox':'blocked';return 'blocked';}
 export function invoicePublicLink(context,row){const host=new URL(context.request.url).hostname.toLowerCase();const origin=host==='dev.westtechha.com'||host==='pickup-stage1-preview.westtechha.pages.dev'?'https://pickup-stage1-preview.westtechha.pages.dev':'https://westtechha.com';return origin+'/pay/sale.html#'+row.public_token;}
@@ -19,13 +22,17 @@ export async function byToken(env,token){if(!/^[a-f0-9]{64}$/.test(String(token|
 export async function event(db,id,type,detail={}){await db.prepare('INSERT INTO sales_invoice_events (invoice_id,event_type,detail_json) VALUES (?,?,?)').bind(id,type,JSON.stringify(detail)).run();}
 export async function prepareSale(env,input){
  if(!input||!Array.isArray(input.items)||input.items.length<1||input.items.length>20)throw saleError('Enter 1-20 invoice items.');
- const saleType=input.saleType==='INVOICE'?'INVOICE':'QUICK_SALE',name=clean(input.customerName,140),email=clean(input.customerEmail,254).toLowerCase();
+ const saleType=input.saleType==='INVOICE'?'INVOICE':'QUICK_SALE',name=clean(input.customerName,140),email=clean(input.customerEmail,254).toLowerCase(),phone=clean(input.customerPhone,32);
  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))throw saleError('Enter a valid customer email.');
- if(saleType==='INVOICE'&&!email)throw saleError('An emailed invoice needs a customer email.');
- const address=validateShippingAddress({...input.address,fullName:name||'WestTech customer'});
+ // Missing email is fine: Admin can hand over or share the secure invoice link.
+ const supplied=input.address||{};const parts=['address1','city','state','postalCode'].map(k=>clean(supplied[k]));
+ const noAddress=parts.every(v=>!v);
+ // Blank address means walk-in/local pickup. A partially entered location must not silently get the wrong rate.
+ if(!noAddress&&parts.some(v=>!v))throw saleError('Enter the complete Colorado event/delivery address, or leave all address fields blank for WestTech pickup.');
+ const address=noAddress?{...PICKUP_TAX_ADDRESS}:validateShippingAddress({...supplied,fullName:name||'WestTech customer'});
  // No silent assumption of zero tax on out-of-state or special-event transactions.
  if(address.state!=='CO')throw saleError('Sales outside Colorado require separate tax-jurisdiction setup. Not available in Quick Sales yet.');
- const label=clean(input.locationLabel,120);if(!label)throw saleError('Enter a sale location or craft-fair name.');
+ const label=clean(input.locationLabel,120)||(noAddress?'WestTech / Walk-in':'Colorado sale');
  let subtotal=0,regular=0;
  const items=input.items.map((line,i)=>{
   const description=clean(line.description,160),qty=Number(line.quantity),original=money(line.regularPrice),price=money(line.unitPrice);
@@ -41,14 +48,14 @@ export async function prepareSale(env,input){
  const quote=await buildTaxQuote(env,address,{itemAmount:subtotal/100,taxableAmount:exempt?0:subtotal/100,shippingAmount:shipping/100});
  const tax=money(quote.taxAmount),total=subtotal+shipping+tax;
  if(total>100000000)throw saleError('Total exceeds supported limit.');
- return {saleType,customerName:name,customerEmail:email,locationLabel:label,address,items,notes:clean(input.notes,1000),discountReason,exemptReason:reason,
+ return {saleType,customerName:name,customerPhone:phone,customerEmail:email,locationLabel:label,address,addressSource:noAddress?'WESTTECH_PICKUP':'CUSTOM',items,notes:clean(input.notes,1000),discountReason,exemptReason:reason,
   subtotalCents:subtotal,regularCents:regular,discountCents:regular-subtotal,shippingCents:shipping,taxableCents:exempt?0:subtotal,taxCents:tax,totalCents:total,
   taxRate:Number(quote.taxRate),taxSource:exempt?'exempt:'+quote.source:quote.source,taxJurisdiction:clean(quote.jurisdictionCode,120),salesTax:quote.salesTax};
 }
 export async function createSale(env,input,expectedTotal){const sale=await prepareSale(env,input),db=dbFor(env),token=randomToken();
  if(String(expectedTotal)!==dollar(sale.totalCents))throw saleError('Sales tax or total has changed. Recalculate and approve before saving.',409);
- const result=await db.prepare(`INSERT INTO sales_invoices (public_token,customer_name,customer_email,sale_type,location_label,address_json,items_json,notes,discount_reason,exempt_reason,subtotal_cents,regular_cents,discount_cents,shipping_cents,taxable_cents,tax_cents,total_cents,tax_rate,tax_source,tax_jurisdiction) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
- .bind(token,sale.customerName,sale.customerEmail,sale.saleType,sale.locationLabel,JSON.stringify(sale.address),JSON.stringify(sale.items),sale.notes,sale.discountReason,sale.exemptReason,sale.subtotalCents,sale.regularCents,sale.discountCents,sale.shippingCents,sale.taxableCents,sale.taxCents,sale.totalCents,sale.taxRate,sale.taxSource,sale.taxJurisdiction).run();
+ const result=await db.prepare(`INSERT INTO sales_invoices (public_token,customer_name,customer_phone,customer_email,sale_type,location_label,address_json,items_json,notes,discount_reason,exempt_reason,subtotal_cents,regular_cents,discount_cents,shipping_cents,taxable_cents,tax_cents,total_cents,tax_rate,tax_source,tax_jurisdiction) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+ .bind(token,sale.customerName,sale.customerPhone,sale.customerEmail,sale.saleType,sale.locationLabel,JSON.stringify(sale.address),JSON.stringify(sale.items),sale.notes,sale.discountReason,sale.exemptReason,sale.subtotalCents,sale.regularCents,sale.discountCents,sale.shippingCents,sale.taxableCents,sale.taxCents,sale.totalCents,sale.taxRate,sale.taxSource,sale.taxJurisdiction).run();
  const id=Number(result.meta?.last_row_id);if(!id)throw saleError('Invoice was not saved.',500);
  const number='WTI-'+String(id).padStart(6,'0');await db.prepare('UPDATE sales_invoices SET invoice_number=? WHERE id=?').bind(number,id).run();await event(db,id,'CREATED',{total:dollar(sale.totalCents),saleType:sale.saleType,location:sale.locationLabel});return getInvoice(env,id);
 }
@@ -84,4 +91,19 @@ export async function sendSaleInvoice(context,id){const db=dbFor(context.env),r=
 export async function paypalRequest(env,path,{method='GET',payload=null,requestId=null}={}){const access=await generateAccessToken(env);const response=await fetch(paypalBaseUrl(env.PAYPAL_ENV)+path,{method,headers:{Authorization:'Bearer '+access,Accept:'application/json',...(payload?{'Content-Type':'application/json'}:{}),...(requestId?{'PayPal-Request-Id':requestId}:{})},body:payload?JSON.stringify(payload):undefined});const data=await readJsonSafe(response);if(!response.ok)throw saleError(clean(data.details?.[0]?.description||data.message||'Provider request failed',200),response.status>=500?502:409);return data;}
 export function orderPayload(row,method,attemptId){const amount=dollar(row.total_cents),subtotal=dollar(row.subtotal_cents),shipping=dollar(row.shipping_cents),tax=dollar(row.tax_cents);
  return {intent:'CAPTURE',purchase_units:[{custom_id:row.invoice_number,invoice_id:row.invoice_number+'-'+attemptId.slice(0,8),description:'WestTech direct sale '+row.invoice_number,amount:{currency_code:'USD',value:amount,breakdown:{item_total:{currency_code:'USD',value:subtotal},shipping:{currency_code:'USD',value:shipping},tax_total:{currency_code:'USD',value:tax}}},items:[{name:'WestTech merchandise',quantity:'1',category:'PHYSICAL_GOODS',unit_amount:{currency_code:'USD',value:subtotal}}]}]};
+}
+
+// Admin-only convenience: email the secure invoice link to the verified owner, not an arbitrary buyer.
+// This does not mark an invoice SENT or affect its payment lifecycle.
+export async function emailSaleLinkToOwner(context,id){
+ const invoice=await getInvoice(context.env,id);if(!invoice)throw saleError('Invoice not found.',404);
+ if(!['DRAFT','SENT','PAYMENT_PENDING'].includes(invoice.status)||invoice.total_cents===0)throw saleError('There is no open payment link to share.',409);
+ const key=clean(context.env.RESEND_API_KEY,500);if(!key)throw saleError('Invoice email service is not configured.',503);
+ const adminEmail='west.ed@gmail.com'; // Existing authorized WestTech admin identity.
+ const link=invoicePublicLink(context,invoice);
+ const html='<div style="font:16px/1.5 Arial,sans-serif"><h2>WestTechHA payment link</h2><p>Invoice <strong>'+esc(invoice.invoice_number)+'</strong> — $'+dollar(invoice.total_cents)+'</p><p><a href="'+esc(link)+'">Open the secure invoice payment page</a></p><p>Forward this link to your customer by email or text. It supports PayPal and eligible Venmo payments.</p></div>';
+ const response=await fetch('https://api.resend.com/emails',{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify({from:clean(context.env.COASTER_EMAIL_FROM,300)||'WestTech Home Automation <orders@westtechha.com>',to:[adminEmail],reply_to:clean(context.env.COASTER_EMAIL_REPLY_TO,254)||'orders@westtechha.com',subject:'WestTechHA payment link '+invoice.invoice_number,html})});
+ const result=await readJsonSafe(response);if(!response.ok)throw saleError(result?.message||'Email service rejected the link.',503);
+ await event(dbFor(context.env),id,'OWNER_LINK_EMAILED',{to:adminEmail});
+ return {sent:true,to:adminEmail};
 }
