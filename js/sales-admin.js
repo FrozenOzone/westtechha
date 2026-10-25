@@ -6,7 +6,7 @@
  async function api(url,opts={}){const res=await fetch(url,{credentials:'same-origin',headers:{...auth(),Accept:'application/json',...(opts.body?{'Content-Type':'application/json'}:{})},...opts});const data=await res.json().catch(()=>({}));if(!res.ok||!data.ok)throw Error(data.message||'Sales request failed.');return data;}
  // Catalog prices are known for coaster sets. Enclosure package prices vary: never invent one.
  const catalog=[
-  {family:'Coasters',choices:[['coaster4','4-Coaster Set','29.99'],['coaster8','8-Coaster Set','39.99']]},
+  {family:'Coasters',choices:[['coaster4','4-Coaster Set','19.99'],['coaster8','8-Coaster Set','29.99']]},
   {family:'ESP32 Enclosures',choices:[['scout','WestTech Scout ESP32 Enclosure',''],['ranger','WestTech Ranger ESP32 Enclosure',''],['command','WestTech Command ESP32 Enclosure','']]},
   {family:'Other',choices:[['custom','Custom Item','']]}
  ];
