@@ -3,8 +3,8 @@ const FROZEN_STATUSES = new Set(['PROOF_SENT','PROOF_APPROVED','AWAITING_PAYMENT
 export const ART_TYPES = new Set(['image/png','image/jpeg','image/webp','image/svg+xml']);
 export const PROOF_TYPES = new Set(['image/png','image/jpeg','image/webp','image/svg+xml','application/pdf']);
 export const COASTER_SET_DEFAULTS = Object.freeze({
-  4: Object.freeze({basePrice:29.99,printerMinutes:650}),
-  8: Object.freeze({basePrice:39.99,printerMinutes:992})
+  4: Object.freeze({basePrice:19.99,printerMinutes:650}),
+  8: Object.freeze({basePrice:29.99,printerMinutes:992})
 });
 
 export function clean(value,max=1000){return String(value??'').trim().slice(0,max);}
