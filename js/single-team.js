@@ -110,7 +110,7 @@
   function standardLogoUrl(team){if(activeSport!=='NFL')return'';return `../images/coasters/teams/nfl/custom/${team.id}.svg`;}
   function logoUrl(team){return team.kind==='custom' ? team.artworkUrl || '' : standardLogoUrl(team);}
   function setLabel(){return activeSetSize==='8'?'8-Coaster Set':'4-Coaster Set';}
-  function setPrice(){return activeSetSize==='8'?'$39.99':'$29.99';}
+  function setPrice(){return activeSetSize==='8'?'$29.99':'$19.99';}
   function mark(team){if(team.kind!=='custom')return team.id;return ((team.topText||'C')[0]+(team.bottomText||'T')[0]).toUpperCase();}
 
   function renderRingLetters(group,text,position){

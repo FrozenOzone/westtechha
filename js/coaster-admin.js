@@ -5,7 +5,7 @@
   const productionFields=window.WestTechProductionFields;
   const isLocal=location.protocol==='file:' || new URLSearchParams(location.search).get('mode')==='local';
   const paletteLabels={'white':'White','warm-white':'Warm White','light-gray':'Silver / Light Gray','gray':'Gray','black':'Black','red':'Cherry Red','dark-red':'Dark Red','orange':'Sunny Orange','yellow':'Yellow','green':'Green','dark-green':'Olive / Dark Green','royal-blue':'Klein / Royal Blue','light-blue':'Sky Blue','cyan':'Cyan','purple':'Purple','brown':'Coffee Brown'};
-  const COASTER_SET_DEFAULTS={4:{basePrice:29.99,printerMinutes:650},8:{basePrice:39.99,printerMinutes:992}};
+  const COASTER_SET_DEFAULTS={4:{basePrice:19.99,printerMinutes:650},8:{basePrice:29.99,printerMinutes:992}};
   let orders=[];let current=null;let adminToken='';let lastApprovalUrl='';let productionEditBaseline='';let printerMinutesUsesDefault=false;
   const mode=$('#ca-mode');const auth=$('#ca-auth');
   if(isLocal){mode.textContent='LOCAL TEST MODE';}else{mode.textContent='LIVE ADMIN';mode.classList.add('live');auth.hidden=false;adminToken=sessionStorage.getItem('westtechha-admin-token')||'';$('#ca-token').value=adminToken;}

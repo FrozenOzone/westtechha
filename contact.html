@@ -91,7 +91,7 @@
       const hasCustom = params.get('custom') === '1';
       const logoStyleLabel = hasCustom ? 'Custom uploaded artwork' : (sport === 'NHL' ? 'NHL Team Logo' : (logoStyle === 'official' ? 'NFL Team Logo' : 'WestTech Team Art'));
       const artworkStyleLabel = artworkStyle === 'blackout' ? 'Blackout' : 'Standard';
-      const setLabel = setSize === '8' ? '8-Coaster Set — $39.99' : '4-Coaster Set — $29.99';
+      const setLabel = setSize === '8' ? '8-Coaster Set — $29.99' : '4-Coaster Set — $19.99';
       topic.value = 'Order';
       if (product) product.value = `Coasters — Team Set (${sport})`;
       if (message && !message.value) {
