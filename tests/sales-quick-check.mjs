@@ -133,3 +133,68 @@ const missingClaimRace=await simulateMissingProvider('void','RESOURCE_NOT_FOUND'
 assert.match(missingClaimRace.error,/Checkout changed during review/);
 assert.equal(missingClaimRace.row.status,'PAYMENT_PENDING');
 console.log('PASS missing-order manual recovery: explicit 404, read-only review, no retry, typed attestation, audit, provider errors and claim race.');
+
+
+// Apple/Google Pay Dev staging: strict live gate, isolated SDK, and source verification.
+const walletClient=read('js/sales-wallets.js'),checkoutPage=read('pay/sale.html');
+execFileSync('node',['--check','js/sales-wallets.js']);
+assert.match(payment,/SALES_WALLETS_LIVE_ENABLED/);
+assert.match(payment,/mode==='sandbox'/);
+assert.match(payment,/method==='APPLE_PAY'&&!details\.payment_source\?\.apple_pay/);
+assert.match(payment,/method==='GOOGLE_PAY'&&!details\.payment_source\?\.google_pay/);
+assert.match(payment,/['"]APPLE_PAY['"],['"]GOOGLE_PAY['"]/);
+assert.match(payment,/walletsEnabled:salesWalletsEnabled\(context\)/);
+assert.match(ledger,/payment_source:\{google_pay:\{attributes:\{verification:\{method:'SCA_WHEN_REQUIRED'/);
+assert.match(read('js/sales-pay.js'),/configure\('PAYPAL',eligibility\.isEligible\('paypal'\)\);configure\('VENMO',eligibility\.isEligible\('venmo'\)\)/,'preserve live legacy buttons');
+assert.match(read('js/sales-pay.js'),/window\.WestTechSalesWallets\.init/);
+assert.match(walletClient,/googleSession\.confirmOrder/);
+assert.match(walletClient,/confirmed\?\.status!=='APPROVED'/,'no Google Pay capture before authorization');
+assert.match(walletClient,/apple\.validateMerchant/);
+assert.match(walletClient,/apple\.confirmOrder/);
+assert.match(walletClient,/window\.ApplePaySession/);
+assert.match(walletClient,/if\(!isConfirmed\(\)\)/,'both wallets require customer amount acknowledgment');
+assert.match(checkoutPage,/id="wp-wallets" hidden/);
+assert.match(checkoutPage,/js\/sales-wallets\.js/);
+assert.match(checkoutPage,/id="wp-apple-pay" hidden/);
+assert.match(checkoutPage,/id="wp-google-pay" hidden/);
+const walletSource=payment.replace(/^import .*;\s*$/gm,'').replace(/\bexport (?=(?:const|function|async))/g,'');
+const walletFactory=new Function('requireOrdersDb','byToken','getInvoice','saleError','salesMode','summary','event','paypalRequest','orderPayload',walletSource+'\nreturn {salesWalletsEnabled,beginPayment};');
+let testingMode='sandbox',dbTouched=false;
+const {salesWalletsEnabled,beginPayment:walletBegin}=walletFactory(
+ ()=>{dbTouched=true;throw Error('DB should not be reached for blocked wallet');},
+ ()=>{},()=>{},(message,status)=>Object.assign(new Error(message),{status}),
+ ()=>testingMode,()=>{},()=>{},()=>{},()=>{}
+);
+const walletContext=(flag)=>({env:{SALES_WALLETS_LIVE_ENABLED:flag}});
+testingMode='sandbox';assert.equal(salesWalletsEnabled(walletContext(undefined)),true);
+testingMode='live';assert.equal(salesWalletsEnabled(walletContext(undefined)),false);
+assert.equal(salesWalletsEnabled(walletContext('0')),false);
+assert.equal(salesWalletsEnabled(walletContext('1')),true);
+testingMode='blocked';assert.equal(salesWalletsEnabled(walletContext('1')),false);
+testingMode='live';dbTouched=false;
+await assert.rejects(walletBegin(walletContext('0'),'bogus','APPLE_PAY'),/Wallet payments are not enabled/);
+await assert.rejects(walletBegin(walletContext('0'),'bogus','GOOGLE_PAY'),/Wallet payments are not enabled/);
+assert.equal(dbTouched,false);
+const walletPayload=orderPayload({invoice_number:'WTI-000003',subtotal_cents:1499,shipping_cents:0,tax_cents:146,total_cents:1645},'GOOGLE_PAY','wallet-123');
+assert.equal(walletPayload.payment_source.google_pay.attributes.verification.method,'SCA_WHEN_REQUIRED');
+assert.equal(walletPayload.purchase_units[0].amount.value,'16.45');
+const paypalLegacyPayload=orderPayload({invoice_number:'WTI-000003',subtotal_cents:1499,shipping_cents:0,tax_cents:146,total_cents:1645},'PAYPAL','wallet-123');
+assert.equal(paypalLegacyPayload.payment_source,undefined,'legacy checkout order untouched');
+assert.match(walletClient,/then\(finish3DS\)/,'launch 3DS only after Google payment sheet closes');
+assert.match(walletClient,/initiatePayerAction\(\{orderId\}\)/,'PayPal 3DS payer action is used');
+assert.match(walletClient,/googleAwaiting3DS=orderId/,'store original PayPal order ID for 3DS');
+assert.match(walletClient,/\['NO','UNKNOWN'\]\.includes\(outcome\?\.liabilityShift\)/,'block unauthenticated bank outcomes');
+assert.match(checkoutPage,/sales-wallets\.js\?v=20261103-wallets-3ds-dev2/,'browser must fetch updated 3DS code');
+console.log('PASS wallet 3DS: Google sheet closes before bank authentication; only verified original order can be captured.');
+console.log('PASS wallet staging: syntax, SDK component isolation, eligibility guards, original price/locks, live enable flag, funding verification and Google SCA.');
+
+
+// Regression: customer payment QR/email/share links must use branded Dev, not raw pages.dev.
+const publicLinkSource=ledger.match(/export function invoicePublicLink\(context,row\)\{[^\n]+\}/)?.[0];
+assert.ok(publicLinkSource,'invoicePublicLink function exists');
+const makePublicLink=new Function(publicLinkSource.replace('export function','function')+'\nreturn invoicePublicLink;')();
+const exampleInvoice={public_token:'TEST_TOKEN_NOT_REAL'};
+for(const host of ['dev.westtechha.com','pickup-stage1-preview.westtechha.pages.dev'])
+ assert.equal(makePublicLink({request:{url:'https://'+host+'/api/admin/sales/test'}},exampleInvoice),'https://dev.westtechha.com/pay/sale.html#TEST_TOKEN_NOT_REAL');
+assert.equal(makePublicLink({request:{url:'https://westtechha.com/api/admin/sales/test'}},exampleInvoice),'https://westtechha.com/pay/sale.html#TEST_TOKEN_NOT_REAL');
+console.log('PASS invoice links: custom Dev domain for preview and production host unchanged.');

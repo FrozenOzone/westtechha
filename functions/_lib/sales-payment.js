@@ -2,10 +2,11 @@ import { requireOrdersDb } from './orders.js';
 import { byToken, getInvoice, saleError, salesMode, summary, event, paypalRequest, orderPayload } from './sales-invoices.js';
 const dbFor=env=>requireOrdersDb(env);
 const clean=v=>String(v??'').trim();
+export function salesWalletsEnabled(context){const mode=salesMode(context);return mode==='sandbox'||(mode==='live'&&clean(context.env.SALES_WALLETS_LIVE_ENABLED)==='1');}
 function publicInvoice(row){const x=summary(row);return {invoice_number:x.invoice_number,customer_name:x.customer_name,location_label:x.location_label,address:x.address,items:x.items,regular:x.regular,discount:x.discount,discount_reason:x.discount_reason,subtotal:x.subtotal,shipping:x.shipping,tax:x.tax,total:x.total,status:x.status,tax_rate:x.tax_rate,tax_source:x.tax_source};}
-export async function invoiceForBuyer(context,token){const row=await byToken(context.env,token);return {invoice:publicInvoice(row),mode:salesMode(context),clientId:['live','sandbox'].includes(salesMode(context))?clean(context.env.PAYPAL_CLIENT_ID):''};}
+export async function invoiceForBuyer(context,token){const row=await byToken(context.env,token);return {invoice:publicInvoice(row),mode:salesMode(context),clientId:['live','sandbox'].includes(salesMode(context))?clean(context.env.PAYPAL_CLIENT_ID):'',walletsEnabled:salesWalletsEnabled(context)};}
 export async function beginPayment(context,token,method){
- if(!['PAYPAL','VENMO'].includes(method))throw saleError('Select PayPal or Venmo.');const mode=salesMode(context);if(!['live','sandbox'].includes(mode))throw saleError('Electronic payment is not configured on this site.',403);
+ if(!['PAYPAL','VENMO','APPLE_PAY','GOOGLE_PAY'].includes(method))throw saleError('Unsupported payment method.');if(['APPLE_PAY','GOOGLE_PAY'].includes(method)&&!salesWalletsEnabled(context))throw saleError('Wallet payments are not enabled on this checkout.',403);const mode=salesMode(context);if(!['live','sandbox'].includes(mode))throw saleError('Electronic payment is not configured on this site.',403);
  const env=context.env,db=dbFor(env),row=await byToken(env,token);
  if(!['DRAFT','SENT','PAYMENT_PENDING'].includes(row.status)||row.total_cents<=0)throw saleError('This invoice is not available for payment.',409);
  if(row.status==='PAYMENT_PENDING'){
@@ -48,6 +49,8 @@ export async function capturePayment(context,token,providerOrderId){
  if(details.id!==providerOrderId||details.status!=='APPROVED'||!unit||details.purchase_units.length!==1||unit.custom_id!==row.invoice_number||unit.amount?.currency_code!=='USD'||unit.amount?.value!==(row.total_cents/100).toFixed(2))throw saleError('Provider payment verification failed. No payment captured.',409);
  if(attempt.method==='VENMO'&&!details.payment_source?.venmo)throw saleError('The provider did not verify Venmo as the funding source.',409);
  if(attempt.method==='PAYPAL'&&!details.payment_source?.paypal)throw saleError('The provider did not verify PayPal as the funding source.',409);
+ if(attempt.method==='APPLE_PAY'&&!details.payment_source?.apple_pay)throw saleError('The provider did not verify Apple Pay as the funding source.',409);
+ if(attempt.method==='GOOGLE_PAY'&&!details.payment_source?.google_pay)throw saleError('The provider did not verify Google Pay as the funding source.',409);
  const claim=await db.prepare("UPDATE sales_payment_attempts SET status='CAPTURING',updated_at=CURRENT_TIMESTAMP WHERE attempt_id=? AND status='CREATED'").bind(attempt.attempt_id).run();if(claim.meta?.changes!==1)throw saleError('Another capture is processing.',409);
  const orderLock=await db.prepare("UPDATE sales_invoices SET status='CAPTURING',updated_at=CURRENT_TIMESTAMP WHERE id=? AND status='PAYMENT_PENDING' AND paypal_capture_id IS NULL").bind(row.id).run();if(orderLock.meta?.changes!==1)throw saleError('Invoice capture lock changed. Contact WestTech; do not pay again.',409);
  let result;try{result=await paypalRequest(env,'/v2/checkout/orders/'+encodeURIComponent(providerOrderId)+'/capture',{method:'POST',payload:{},requestId:'WT-SALE-'+attempt.attempt_id+'-CAPTURE'});}catch{throw saleError('Provider capture outcome needs admin review. Do not pay again.',502);}
@@ -66,7 +69,7 @@ export function assessAbandonedSale(row,attempt,details,nowMs=Date.now()){
  const blocked=reason=>({canRelease:false,providerStatus,reason});
  if(row?.status!=='PAYMENT_PENDING'||row?.paypal_capture_id||row?.paypal_order_id||row?.paid_at)
   return blocked('Invoice is not an uncaptured pending sale. Do not change it.');
- if(!attempt||attempt.status!=='CREATED'||!['PAYPAL','VENMO'].includes(attempt.method))
+ if(!attempt||attempt.status!=='CREATED'||!['PAYPAL','VENMO','APPLE_PAY','GOOGLE_PAY'].includes(attempt.method))
   return blocked('No single safely reviewable checkout attempt exists.');
  if(!/^[A-Z0-9]{8,32}$/i.test(String(attempt.provider_order_id||'')))
   return blocked('Provider order reference is invalid.');
