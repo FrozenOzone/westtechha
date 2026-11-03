@@ -180,4 +180,10 @@ assert.equal(walletPayload.payment_source.google_pay.attributes.verification.met
 assert.equal(walletPayload.purchase_units[0].amount.value,'16.45');
 const paypalLegacyPayload=orderPayload({invoice_number:'WTI-000003',subtotal_cents:1499,shipping_cents:0,tax_cents:146,total_cents:1645},'PAYPAL','wallet-123');
 assert.equal(paypalLegacyPayload.payment_source,undefined,'legacy checkout order untouched');
+assert.match(walletClient,/then\(finish3DS\)/,'launch 3DS only after Google payment sheet closes');
+assert.match(walletClient,/initiatePayerAction\(\{orderId\}\)/,'PayPal 3DS payer action is used');
+assert.match(walletClient,/googleAwaiting3DS=orderId/,'store original PayPal order ID for 3DS');
+assert.match(walletClient,/\['NO','UNKNOWN'\]\.includes\(outcome\?\.liabilityShift\)/,'block unauthenticated bank outcomes');
+assert.match(checkoutPage,/sales-wallets\.js\?v=20261103-wallets-3ds-dev2/,'browser must fetch updated 3DS code');
+console.log('PASS wallet 3DS: Google sheet closes before bank authentication; only verified original order can be captured.');
 console.log('PASS wallet staging: syntax, SDK component isolation, eligibility guards, original price/locks, live enable flag, funding verification and Google SCA.');
