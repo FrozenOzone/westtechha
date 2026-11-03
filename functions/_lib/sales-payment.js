@@ -1,5 +1,5 @@
 import { requireOrdersDb } from './orders.js';
-import { byToken, saleError, salesMode, summary, event, paypalRequest, orderPayload } from './sales-invoices.js';
+import { byToken, getInvoice, saleError, salesMode, summary, event, paypalRequest, orderPayload } from './sales-invoices.js';
 const dbFor=env=>requireOrdersDb(env);
 const clean=v=>String(v??'').trim();
 function publicInvoice(row){const x=summary(row);return {invoice_number:x.invoice_number,customer_name:x.customer_name,location_label:x.location_label,address:x.address,items:x.items,regular:x.regular,discount:x.discount,discount_reason:x.discount_reason,subtotal:x.subtotal,shipping:x.shipping,tax:x.tax,total:x.total,status:x.status,tax_rate:x.tax_rate,tax_source:x.tax_source};}
@@ -56,4 +56,70 @@ export async function capturePayment(context,token,providerOrderId){
  const updated=await db.prepare("UPDATE sales_invoices SET status='PAID',payment_method=?,paypal_order_id=?,paypal_capture_id=?,paid_at=CURRENT_TIMESTAMP,updated_at=CURRENT_TIMESTAMP WHERE id=? AND status='CAPTURING' AND paypal_capture_id IS NULL").bind(attempt.method,providerOrderId,cap.id,row.id).run();
  if(updated.meta?.changes!==1)throw saleError('Captured payment needs invoice reconciliation. Do not pay again.',502);
  await db.prepare("UPDATE sales_payment_attempts SET status='CAPTURED',updated_at=CURRENT_TIMESTAMP WHERE attempt_id=? AND status='CAPTURING'").bind(attempt.attempt_id).run();await event(db,row.id,'PAID',{method:attempt.method,providerOrderId,captureId:cap.id});return {paid:true,invoice:publicInvoice(await byToken(env,token))};
+}
+
+
+// Admin-only review of an abandoned checkout. Fail closed on any ambiguous provider state.
+// Releasing a lock does not capture, refund, cancel or modify a PayPal order.
+export function assessAbandonedSale(row,attempt,details,nowMs=Date.now()){
+ const providerStatus=String(details?.status||'UNKNOWN');
+ const blocked=reason=>({canRelease:false,providerStatus,reason});
+ if(row?.status!=='PAYMENT_PENDING'||row?.paypal_capture_id||row?.paypal_order_id||row?.paid_at)
+  return blocked('Invoice is not an uncaptured pending sale. Do not change it.');
+ if(!attempt||attempt.status!=='CREATED'||!['PAYPAL','VENMO'].includes(attempt.method))
+  return blocked('No single safely reviewable checkout attempt exists.');
+ if(!/^[A-Z0-9]{8,32}$/i.test(String(attempt.provider_order_id||'')))
+  return blocked('Provider order reference is invalid.');
+ const stamp=Date.parse(String(attempt.created_at||'').replace(' ','T')+'Z');
+ if(!Number.isFinite(stamp)||nowMs-stamp<30*60*1000)
+  return blocked('This checkout is recent or its start time is uncertain. Allow 30 minutes before review.');
+ if(!details||details.id!==attempt.provider_order_id||details.intent!=='CAPTURE')
+  return blocked('PayPal could not verify the exact original order.');
+ const units=details.purchase_units;
+ if(!Array.isArray(units)||units.length!==1||units[0]?.custom_id!==row.invoice_number||
+   units[0]?.amount?.currency_code!=='USD'||units[0]?.amount?.value!==(row.total_cents/100).toFixed(2))
+  return blocked('PayPal order identity or amount does not match the invoice.');
+ const payments=units[0].payments||{};
+ if((payments.captures?.length||0)>0||(payments.authorizations?.length||0)>0||(payments.refunds?.length||0)>0)
+  return blocked('PayPal reports payment activity. Manual reconciliation required; do not release.');
+ if(!['CREATED','VOIDED'].includes(providerStatus))
+  return blocked('PayPal order is '+providerStatus+'. Do not release; review the order with PayPal.');
+ return {canRelease:true,providerStatus,reason:'PayPal confirms an uncaptured, unapproved abandoned order. You may release this local invoice lock.'};
+}
+export async function reviewAbandonedPayment(context,id,release=false){
+ const db=dbFor(context.env),row=await getInvoice(context.env,id);
+ if(!row)throw saleError('Invoice not found.',404);
+ if(row.status!=='PAYMENT_PENDING'){
+  if(release)throw saleError('Invoice is no longer pending. Refresh before proceeding.',409);
+  return {invoice:row,review:{canRelease:false,providerStatus:'N/A',reason:'Invoice is no longer awaiting a pending checkout.'}};
+ }
+ const query=await db.prepare("SELECT * FROM sales_payment_attempts WHERE invoice_id=? AND status IN ('CREATING','CREATED','CAPTURING') ORDER BY created_at DESC").bind(id).all();
+ const active=query.results||[];
+ if(active.length!==1||active[0].status!=='CREATED'){
+  const reason='Expected exactly one created checkout attempt; another attempt may be processing. Manual review required.';
+  if(release)throw saleError(reason,409);
+  return {invoice:row,review:{canRelease:false,providerStatus:'UNKNOWN',reason}};
+ }
+ const attempt=active[0];
+ if(!/^[A-Z0-9]{8,32}$/i.test(String(attempt.provider_order_id||''))){
+  const reason='The checkout has no valid provider reference. Manual review required.';
+  if(release)throw saleError(reason,409);
+  return {invoice:row,review:{canRelease:false,providerStatus:'UNKNOWN',reason}};
+ }
+ // Re-query PayPal for EACH review and EACH release; never trust browser-supplied status.
+ const details=await paypalRequest(context.env,'/v2/checkout/orders/'+encodeURIComponent(attempt.provider_order_id));
+ const review=assessAbandonedSale(row,attempt,details);
+ if(!release)return {invoice:row,review};
+ if(!review.canRelease)throw saleError(review.reason,409);
+ // Race with buyer approval/capture: only ONE actor may claim CREATED. If
+ // capture won first (CAPTURING), this update fails and no release occurs.
+ const changed=await db.prepare("UPDATE sales_payment_attempts SET status='CANCELED',updated_at=CURRENT_TIMESTAMP WHERE attempt_id=? AND invoice_id=? AND provider_order_id=? AND status='CREATED' AND EXISTS (SELECT 1 FROM sales_invoices WHERE id=? AND status='PAYMENT_PENDING' AND paypal_capture_id IS NULL AND paypal_order_id IS NULL)")
+  .bind(attempt.attempt_id,id,attempt.provider_order_id,id).run();
+ if(changed.meta?.changes!==1)throw saleError('Checkout changed during review. Refresh; do not retry blindly.',409);
+ const freed=await db.prepare("UPDATE sales_invoices SET status=CASE WHEN sent_at IS NULL THEN 'DRAFT' ELSE 'SENT' END,updated_at=CURRENT_TIMESTAMP WHERE id=? AND status='PAYMENT_PENDING' AND paypal_capture_id IS NULL AND paypal_order_id IS NULL AND NOT EXISTS (SELECT 1 FROM sales_payment_attempts WHERE invoice_id=? AND status IN ('CREATING','CREATED','CAPTURING'))")
+  .bind(id,id).run();
+ if(freed.meta?.changes!==1)throw saleError('Invoice state changed; manual reconciliation required before retrying.',409);
+ await event(db,id,'PAYMENT_ABANDONED_RELEASED',{method:attempt.method,providerStatus:review.providerStatus,source:'admin'});
+ return {invoice:await getInvoice(context.env,id),released:true,
+  review:{canRelease:false,providerStatus:review.providerStatus,reason:'Abandoned checkout released. The invoice is available for a fresh payment attempt.'}};
 }
