@@ -163,8 +163,13 @@
      callbackIntents:['PAYMENT_AUTHORIZATION']
     }).then(finish3DS).catch(error=>{
      googleAwaiting3DS=null;
-     if(error?.statusCode==='CANCELED')status('Google Pay was closed without completing checkout.');
-     else status('Google Pay is unavailable. Use PayPal or Venmo, or contact WestTech.',true);
+     // Sandbox-only, sanitized diagnostics. Never log wallet payloads, tokens,
+     // paymentData, or the full error object.
+     const errorCode=String(error?.statusCode||error?.name||'UNKNOWN').slice(0,64);
+     const errorDetail=String(error?.statusMessage||error?.message||'').slice(0,240);
+     if(mode==='sandbox')console.warn('[WestTechHA Google Pay Sandbox] loadPaymentData failure',{code:errorCode,detail:errorDetail});
+     if(errorCode==='CANCELED')status('Google Pay was closed without completing checkout.');
+     else status('Google Pay could not start ('+errorCode+'). Please use PayPal or Venmo.',true);
     }).finally(()=>{googleBusy=false;});
    }});
    host.append(button);host.hidden=false;host.parentElement.hidden=false;
