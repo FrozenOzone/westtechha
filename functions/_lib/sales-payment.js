@@ -86,7 +86,7 @@ export function assessAbandonedSale(row,attempt,details,nowMs=Date.now()){
   return blocked('PayPal order is '+providerStatus+'. Do not release; review the order with PayPal.');
  return {canRelease:true,providerStatus,reason:'PayPal confirms an uncaptured, unapproved abandoned order. You may release this local invoice lock.'};
 }
-export async function reviewAbandonedPayment(context,id,release=false){
+export async function reviewAbandonedPayment(context,id,release=false,voidInvoice=false){
  const db=dbFor(context.env),row=await getInvoice(context.env,id);
  if(!row)throw saleError('Invoice not found.',404);
  if(row.status!=='PAYMENT_PENDING'){
@@ -116,10 +116,11 @@ export async function reviewAbandonedPayment(context,id,release=false){
  const changed=await db.prepare("UPDATE sales_payment_attempts SET status='CANCELED',updated_at=CURRENT_TIMESTAMP WHERE attempt_id=? AND invoice_id=? AND provider_order_id=? AND status='CREATED' AND EXISTS (SELECT 1 FROM sales_invoices WHERE id=? AND status='PAYMENT_PENDING' AND paypal_capture_id IS NULL AND paypal_order_id IS NULL)")
   .bind(attempt.attempt_id,id,attempt.provider_order_id,id).run();
  if(changed.meta?.changes!==1)throw saleError('Checkout changed during review. Refresh; do not retry blindly.',409);
- const freed=await db.prepare("UPDATE sales_invoices SET status=CASE WHEN sent_at IS NULL THEN 'DRAFT' ELSE 'SENT' END,updated_at=CURRENT_TIMESTAMP WHERE id=? AND status='PAYMENT_PENDING' AND paypal_capture_id IS NULL AND paypal_order_id IS NULL AND NOT EXISTS (SELECT 1 FROM sales_payment_attempts WHERE invoice_id=? AND status IN ('CREATING','CREATED','CAPTURING'))")
+ const nextStatus=voidInvoice?"'VOID'":"CASE WHEN sent_at IS NULL THEN 'DRAFT' ELSE 'SENT' END";
+ const freed=await db.prepare("UPDATE sales_invoices SET status="+nextStatus+",updated_at=CURRENT_TIMESTAMP WHERE id=? AND status='PAYMENT_PENDING' AND paypal_capture_id IS NULL AND paypal_order_id IS NULL AND NOT EXISTS (SELECT 1 FROM sales_payment_attempts WHERE invoice_id=? AND status IN ('CREATING','CREATED','CAPTURING'))")
   .bind(id,id).run();
  if(freed.meta?.changes!==1)throw saleError('Invoice state changed; manual reconciliation required before retrying.',409);
- await event(db,id,'PAYMENT_ABANDONED_RELEASED',{method:attempt.method,providerStatus:review.providerStatus,source:'admin'});
- return {invoice:await getInvoice(context.env,id),released:true,
-  review:{canRelease:false,providerStatus:review.providerStatus,reason:'Abandoned checkout released. The invoice is available for a fresh payment attempt.'}};
+ await event(db,id,voidInvoice?'PAYMENT_ABANDONED_VOIDED':'PAYMENT_ABANDONED_RELEASED',{method:attempt.method,providerStatus:review.providerStatus,source:'admin'});
+ return {invoice:await getInvoice(context.env,id),released:true,voided:!!voidInvoice,
+  review:{canRelease:false,providerStatus:review.providerStatus,reason:voidInvoice?'Abandoned checkout verified and invoice voided. The old payment link is closed.':'Abandoned checkout released. The invoice is available for a fresh payment attempt.'}};
 }
