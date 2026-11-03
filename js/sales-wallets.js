@@ -95,6 +95,8 @@
     config=googleSession.formatConfigForPaymentRequest(details.config);
    }
    if(!config?.allowedPaymentMethods||!config?.apiVersion)return;
+   // Google must close its payment sheet before PayPal can open the bank's 3DS modal.
+   let googleAwaiting3DS=null,googleBusy=false;
    const client=new window.google.payments.api.PaymentsClient({
     environment:mode==='live'?'PRODUCTION':'TEST',
     paymentDataCallbacks:{
@@ -105,8 +107,17 @@
        const confirmed=await googleSession.confirmOrder({
         orderId,paymentMethodData:paymentData.paymentMethodData
        });
+       if(confirmed?.status==='PAYER_ACTION_REQUIRED'){
+        if(typeof googleSession.initiatePayerAction!=='function')
+         throw Error('Bank verification is unavailable. The invoice needs manual review.');
+        googleAwaiting3DS=orderId;
+        status('Additional bank verification is required. Complete it to finish payment.');
+        // Return from the Google callback FIRST, closing its sheet. The
+        // loadPaymentData() promise then launches PayPal 3DS out-of-band.
+        return {transactionState:'SUCCESS'};
+       }
        if(confirmed?.status!=='APPROVED')
-        throw Error('Google Pay requires additional authorization. Payment has NOT been captured.');
+        throw Error('Google Pay payment was not approved. No payment was captured.');
        await complete(orderId);
        return {transactionState:'SUCCESS'};
       }catch(error){
@@ -121,9 +132,27 @@
     apiVersion:config.apiVersion,apiVersionMinor:config.apiVersionMinor
    });
    if(!ready?.result)return;
+   const finish3DS=async()=>{
+    const orderId=googleAwaiting3DS;
+    if(!orderId)return;
+    googleAwaiting3DS=null;
+    status('Opening secure bank authentication for Google Pay…');
+    try{
+     const outcome=await googleSession.initiatePayerAction({orderId});
+     if(['NO','UNKNOWN'].includes(outcome?.liabilityShift))
+      throw Error('The bank could not verify authentication.');
+     // Existing server capture checks PayPal's APPROVED order, funding
+     // source, invoice amount, and claim lock before any actual capture.
+     await complete(orderId);
+    }catch(error){
+     status((error.message||'Google Pay authentication did not finish.')+
+      ' Payment needs review. Do not attempt another charge until WestTech verifies the invoice.',true);
+    }
+   };
    const host=document.querySelector('#wp-google-pay');
    const button=client.createButton({buttonType:'pay',onClick:()=>{
-    if(!check('Google Pay'))return;
+    if(googleBusy||!check('Google Pay'))return;
+    googleBusy=true;
     client.loadPaymentData({
      ...config,
      transactionInfo:{
@@ -132,10 +161,11 @@
       totalPrice:String(invoice.total)
      },
      callbackIntents:['PAYMENT_AUTHORIZATION']
-    }).catch(error=>{
+    }).then(finish3DS).catch(error=>{
+     googleAwaiting3DS=null;
      if(error?.statusCode==='CANCELED')status('Google Pay was closed without completing checkout.');
      else status('Google Pay is unavailable. Use PayPal or Venmo, or contact WestTech.',true);
-    });
+    }).finally(()=>{googleBusy=false;});
    }});
    host.append(button);host.hidden=false;host.parentElement.hidden=false;
   }
