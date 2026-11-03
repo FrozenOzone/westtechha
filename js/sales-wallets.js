@@ -54,13 +54,31 @@
     try{session=new window.ApplePaySession(version,request);}catch{
      status('Apple Pay is not available on this device. Choose PayPal or Venmo.',true);return;
     }
+    let appleStage='started',merchantValidationFailed=false;
+    if(mode==='sandbox')console.info('[WestTechHA Apple Pay Sandbox] sheet started; awaiting merchant validation');
     session.onvalidatemerchant=async event=>{
+     appleStage='validating-merchant';
+     if(mode==='sandbox')console.info('[WestTechHA Apple Pay Sandbox] merchant validation requested');
      try{
       const {merchantSession}=await apple.validateMerchant({validationUrl:event.validationURL});
       session.completeMerchantValidation(merchantSession);
-     }catch{session.abort();status('Apple Pay merchant validation failed. No payment was started.',true);}
+      appleStage='merchant-validated';
+      if(mode==='sandbox')console.info('[WestTechHA Apple Pay Sandbox] merchant validation completed');
+     }catch(error){
+      merchantValidationFailed=true;
+      appleStage='merchant-validation-failed';
+      // Never log validation URL, merchant session, payment tokens or full error object.
+      if(mode==='sandbox')console.warn('[WestTechHA Apple Pay Sandbox] merchant validation failed',{
+       code:String(error?.name||error?.code||'UNKNOWN').slice(0,60),
+       detail:String(error?.message||'').slice(0,200)
+      });
+      session.abort();
+      status('Apple Pay merchant validation failed. No payment was started. See Sandbox Console diagnostic.',true);
+     }
     };
     session.onpaymentauthorized=async event=>{
+     appleStage='payment-authorized';
+     if(mode==='sandbox')console.info('[WestTechHA Apple Pay Sandbox] payment authorization received');
      try{
       status('Confirming Apple Pay payment…');
       const {orderId}=await post('start',{method:'APPLE_PAY'});
@@ -76,7 +94,10 @@
       status((error.message||'Apple Pay could not complete.')+' Do not attempt another charge until WestTech verifies the invoice.',true);
      }
     };
-    session.oncancel=()=>status('Apple Pay was closed without completing checkout.');
+    session.oncancel=()=>{
+     if(mode==='sandbox')console.info('[WestTechHA Apple Pay Sandbox] sheet dismissed',{stage:appleStage});
+     if(!merchantValidationFailed)status('Apple Pay was closed before payment authorization. No charge was made.',true);
+    };
     session.begin();
    });
   }
