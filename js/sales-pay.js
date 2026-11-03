@@ -17,6 +17,11 @@
    sdk=await window.paypal.createInstance({clientId:data.clientId,components:['paypal-payments','venmo-payments'],pageType:'checkout'});
    const eligibility=await sdk.findEligibleMethods({currencyCode:'USD',countryCode:'US',amount:String(invoice.total)});
    configure('PAYPAL',eligibility.isEligible('paypal'));configure('VENMO',eligibility.isEligible('venmo'));
+   // Wallet integration runs in isolation. Missing merchant eligibility cannot affect working payment buttons.
+   if(data.walletsEnabled&&window.WestTechSalesWallets?.init){
+    window.WestTechSalesWallets.init({mode,clientId:data.clientId,invoice:data.invoice,post,status,show,
+     isConfirmed:()=>$('#wp-confirm').checked}).catch(()=>{});
+   }
    const notice=$('#wp-eligibility');notice.hidden=mode!=='sandbox';notice.textContent=mode==='sandbox'?'SANDBOX TEST — No real funds will be charged.':'';
   }catch(e){status(e.message||'Payment methods unavailable.',true);}}
  function configure(method,eligible){const el=method==='PAYPAL'?$('#wp-paypal'):$('#wp-venmo');el.hidden=!eligible;if(!eligible)return;
