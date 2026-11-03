@@ -37,7 +37,7 @@
    if(!Array.isArray(configuration?.supportedNetworks)||!Array.isArray(configuration?.merchantCapabilities))return;
    const host=document.querySelector('#wp-apple-pay'),button=document.createElement('apple-pay-button');
    button.setAttribute('buttonstyle','black');button.setAttribute('type','buy');button.setAttribute('locale','en-US');
-   host.append(button);host.hidden=false;
+   host.append(button);host.hidden=false;host.parentElement.hidden=false;
    button.addEventListener('click',()=>{
     if(!check('Apple Pay'))return;
     // Native user-gesture requirement: create/begin ApplePaySession synchronously in this click.
@@ -137,7 +137,7 @@
      else status('Google Pay is unavailable. Use PayPal or Venmo, or contact WestTech.',true);
     });
    }});
-   host.append(button);host.hidden=false;
+   host.append(button);host.hidden=false;host.parentElement.hidden=false;
   }
   await Promise.allSettled([addApple(),addGoogle()]);
  }
