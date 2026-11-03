@@ -44,6 +44,44 @@
  function filterRows(){const q=$('#ws-search').value.trim().toLowerCase(),list=$('#ws-history');list.replaceChildren();const rows=state.invoices.filter(x=>[x.invoice_number,x.customer_name,x.customer_phone,x.customer_email,x.status,x.location_label].join(' ').toLowerCase().includes(q));if(!rows.length){const p=document.createElement('p');p.className='ws-empty';p.textContent='No sales found.';list.append(p);return;}for(const row of rows){const btn=document.createElement('button');btn.type='button';btn.setAttribute('aria-current',String(state.selected===row.id));const a=document.createElement('span'),b=document.createElement('span');a.textContent=row.invoice_number+' • '+(row.customer_name||'Walk-in');const small=document.createElement('small');small.textContent=row.created_at+' · '+displayInvoiceStatus(row.status);a.append(small);b.textContent=money(row.total);btn.append(a,b);btn.onclick=()=>detail(row.id);list.append(btn);}}
  async function load(){try{const data=await api('/api/admin/sales');state.invoices=data.invoices;$('#ws-paid').textContent=money(data.totals.paidCents);$('#ws-tax').textContent=money(data.totals.taxCents);$('#ws-discount').textContent=money(data.totals.discountCents);$('#ws-checks').textContent=money(data.totals.checkPendingCents);filterRows();}catch(e){msg(e.message,true);}}
  function actionButton(label,act,confirmText=''){const b=document.createElement('button');b.type='button';b.textContent=label;b.onclick=async()=>{if(confirmText&&!confirm(confirmText))return;b.disabled=true;try{const data=await api('/api/admin/sales/'+state.selected,{method:'POST',body:JSON.stringify({action:act})});msg(label+' completed for '+data.invoice.invoice_number);await load();await detail(data.invoice.id);}catch(e){msg(e.message,true);}finally{b.disabled=false;}};$('#ws-detail-actions').append(b);}
+ // A read-only provider review must precede any local release of an abandoned payment.
+ function pendingRecoveryButton(invoiceId,invoiceNumber){
+  const actions=$('#ws-detail-actions'),reviewButton=document.createElement('button');
+  reviewButton.type='button';reviewButton.textContent='Review Pending Payment';
+  reviewButton.addEventListener('click',async()=>{
+   reviewButton.disabled=true;
+   actions.querySelector('[data-pending-review]')?.remove();
+   const area=document.createElement('div');area.dataset.pendingReview='yes';area.className='ws-help';area.setAttribute('role','status');area.textContent='Checking the original PayPal order without changing or capturing payment…';actions.append(area);
+   try{
+    const data=await api('/api/admin/sales/'+invoiceId,{method:'POST',body:JSON.stringify({action:'review-pending'})});
+    if(state.selected!==invoiceId)return;
+    const verdict=data.review;
+    area.textContent='PayPal order: '+verdict.providerStatus+'. '+verdict.reason;
+    if(!verdict.canRelease){msg('Payment has NOT been unlocked. Review the PayPal status before attempting another charge.',true);return;}
+    const options=[
+     {action:'void-abandoned',label:'Void Abandoned Invoice',confirm:'PayPal confirmed no approved or captured payment. VOID '+invoiceNumber+' and permanently close its old payment link? Choose this if the customer paid a replacement invoice.'},
+     {action:'release-pending',label:'Release for New Attempt',confirm:'PayPal confirmed no approved or captured payment. REOPEN '+invoiceNumber+' for a new attempt? Only do this if the customer has NOT already paid another invoice.'}
+    ];
+    const buttons=[];
+    for(const choice of options){
+     const button=document.createElement('button');button.type='button';button.textContent=choice.label;buttons.push(button);
+     button.addEventListener('click',async()=>{
+      if(!confirm(choice.confirm))return;
+      buttons.forEach(x=>x.disabled=true);
+      try{
+       // The server rechecks PayPal and the invoice state before either action.
+       const result=await api('/api/admin/sales/'+invoiceId,{method:'POST',body:JSON.stringify({action:choice.action})});
+       if(result.released){msg(result.voided?'Verified abandoned invoice '+invoiceNumber+' is now VOID; its old payment link is closed.':'Abandoned checkout released for '+invoiceNumber+'. Use its link only if the customer has not paid elsewhere.');await load();await detail(invoiceId);}
+       else{msg('Checkout was not released.',true);buttons.forEach(x=>x.disabled=false);}
+      }catch(e){msg(e.message+' Payment was not safely resolved. Review PayPal before retrying.',true);buttons.forEach(x=>x.disabled=false);}
+     });
+    }
+    area.append(document.createElement('br'),...buttons);
+   }catch(e){area.textContent='Provider review failed: '+e.message+'. No payment or invoice status was changed.';msg('Could not safely review pending payment.',true);}
+   finally{reviewButton.disabled=false;}
+  });
+  actions.append(reviewButton);
+ }
  async function detail(id){try{const data=await api('/api/admin/sales/'+id),r=data.invoice;state.selected=r.id;state.link=data.link;filterRows();$('#ws-detail').hidden=false;const info=$('#ws-detail-info');info.replaceChildren();
  const section=(title)=>{const el=document.createElement('section');el.className='ws-invoice-section';const head=document.createElement('h4');head.textContent=title;el.append(head);info.append(el);return el;};
  const line=(parent,label,value,strong=false)=>{const el=document.createElement('div');el.className='ws-invoice-row'+(strong?' ws-invoice-total':'');const key=document.createElement('span');key.textContent=label;const val=document.createElement('strong');val.textContent=value;el.append(key,val);parent.append(el);};
@@ -56,6 +94,7 @@
  if(r.status==='DRAFT'&&Number(r.total)===0)actionButton('Record Complimentary Sale','comp','Close this $0 sale as complimentary?');
  if(['DRAFT','SENT'].includes(r.status)&&Number(r.total)>0){actionButton('Record Cash','cash','Confirm actual cash received for '+r.invoice_number+'?');actionButton('Record Check','check','Record a check received, awaiting clearance?');}
  if(r.status==='CHECK_PENDING')actionButton('Mark Check Cleared','check-cleared','Confirm the check has cleared your bank?');
+ if(r.status==='PAYMENT_PENDING')pendingRecoveryButton(r.id,r.invoice_number);
  if(r.status==='DRAFT'&&r.customer_email&&Number(r.total)>0)actionButton('Email Invoice','send','Send this invoice once to '+r.customer_email+'?');
  if(['DRAFT','SENT'].includes(r.status))actionButton('Void Invoice','void','Void this unpaid invoice permanently?');
  }catch(e){msg(e.message,true);}}
