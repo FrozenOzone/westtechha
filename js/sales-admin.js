@@ -57,6 +57,29 @@
     if(state.selected!==invoiceId)return;
     const verdict=data.review;
     area.textContent='PayPal order: '+verdict.providerStatus+'. '+verdict.reason;
+    if(verdict.requiresManualReconciliation){
+     msg('Old PayPal order cannot be retrieved. No changes made. Check PayPal Activity before closing the invoice.',true);
+     const activity=document.createElement('a');activity.href='https://www.paypal.com/myaccount/activities';
+     activity.target='_blank';activity.rel='noopener noreferrer';activity.textContent='Open PayPal Activity to verify the transaction';
+     const manual=document.createElement('button');manual.type='button';manual.textContent='Void After Manual PayPal Check';
+     manual.addEventListener('click',async()=>{
+      if(!confirm('STOP: Did you check your LIVE PayPal Activity, including the original invoice number, the $ amount, and transaction date, and verify NO payment was collected for '+invoiceNumber+'? A missing PayPal order is NOT proof of no payment. Only continue after checking.'))return;
+      const typed=prompt('For the audit trail, type exactly '+invoiceNumber+' to confirm no payment was collected on this invoice:','');
+      if(typed!==invoiceNumber){msg('Confirmation does not match. Invoice remains pending.',true);return;}
+      manual.disabled=true;
+      try{
+       // The server must recheck PayPal and the original D1 attempt before accepting attestation.
+       const result=await api('/api/admin/sales/'+invoiceId,{method:'POST',body:JSON.stringify({
+        action:'void-provider-missing',invoiceNumber:typed,attestation:'I_VERIFIED_NO_PAYMENT_IN_PAYPAL_ACTIVITY'
+       })});
+       if(result.voided&&result.manual){msg('Manually reconciled '+invoiceNumber+' and closed the old payment link. This was an ADMIN confirmation, not a PayPal no-charge guarantee.');await load();await detail(invoiceId);}
+       else msg('Invoice was not safely closed.',true);
+      }catch(e){msg(e.message+' No invoice change confirmed. Check PayPal before taking further action.',true);}
+      finally{manual.disabled=false;}
+     });
+     area.append(document.createElement('br'),activity,document.createElement('br'),manual);
+     return;
+    }
     if(!verdict.canRelease){msg('Payment has NOT been unlocked. Review the PayPal status before attempting another charge.',true);return;}
     const options=[
      {action:'void-abandoned',label:'Void Abandoned Invoice',confirm:'PayPal confirmed no approved or captured payment. VOID '+invoiceNumber+' and permanently close its old payment link? Choose this if the customer paid a replacement invoice.'},
