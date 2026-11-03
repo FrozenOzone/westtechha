@@ -58,17 +58,25 @@
     const verdict=data.review;
     area.textContent='PayPal order: '+verdict.providerStatus+'. '+verdict.reason;
     if(!verdict.canRelease){msg('Payment has NOT been unlocked. Review the PayPal status before attempting another charge.',true);return;}
-    const release=document.createElement('button');release.type='button';release.textContent='Release Abandoned Checkout';
-    release.addEventListener('click',async()=>{
-     if(!confirm('PayPal review found no approved or captured payment for '+invoiceNumber+'. Release ONLY this abandoned checkout lock? This does not refund or capture money.'))return;
-     release.disabled=true;
-     try{
-      const result=await api('/api/admin/sales/'+invoiceId,{method:'POST',body:JSON.stringify({action:'release-pending'})});
-      if(result.released){msg('Abandoned checkout released for '+invoiceNumber+'. Verify the invoice and send a fresh payment link only if still needed.');await load();await detail(invoiceId);}
-      else msg('Checkout was not released.',true);
-     }catch(e){msg(e.message+' Do not retry payment until reconciled.',true);release.disabled=false;}
-    });
-    area.append(document.createElement('br'),release);
+    const options=[
+     {action:'void-abandoned',label:'Void Abandoned Invoice',confirm:'PayPal confirmed no approved or captured payment. VOID '+invoiceNumber+' and permanently close its old payment link? Choose this if the customer paid a replacement invoice.'},
+     {action:'release-pending',label:'Release for New Attempt',confirm:'PayPal confirmed no approved or captured payment. REOPEN '+invoiceNumber+' for a new attempt? Only do this if the customer has NOT already paid another invoice.'}
+    ];
+    const buttons=[];
+    for(const choice of options){
+     const button=document.createElement('button');button.type='button';button.textContent=choice.label;buttons.push(button);
+     button.addEventListener('click',async()=>{
+      if(!confirm(choice.confirm))return;
+      buttons.forEach(x=>x.disabled=true);
+      try{
+       // The server rechecks PayPal and the invoice state before either action.
+       const result=await api('/api/admin/sales/'+invoiceId,{method:'POST',body:JSON.stringify({action:choice.action})});
+       if(result.released){msg(result.voided?'Verified abandoned invoice '+invoiceNumber+' is now VOID; its old payment link is closed.':'Abandoned checkout released for '+invoiceNumber+'. Use its link only if the customer has not paid elsewhere.');await load();await detail(invoiceId);}
+       else{msg('Checkout was not released.',true);buttons.forEach(x=>x.disabled=false);}
+      }catch(e){msg(e.message+' Payment was not safely resolved. Review PayPal before retrying.',true);buttons.forEach(x=>x.disabled=false);}
+     });
+    }
+    area.append(document.createElement('br'),...buttons);
    }catch(e){area.textContent='Provider review failed: '+e.message+'. No payment or invoice status was changed.';msg('Could not safely review pending payment.',true);}
    finally{reviewButton.disabled=false;}
   });
