@@ -187,3 +187,14 @@ assert.match(walletClient,/\['NO','UNKNOWN'\]\.includes\(outcome\?\.liabilityShi
 assert.match(checkoutPage,/sales-wallets\.js\?v=20261103-wallets-3ds-dev2/,'browser must fetch updated 3DS code');
 console.log('PASS wallet 3DS: Google sheet closes before bank authentication; only verified original order can be captured.');
 console.log('PASS wallet staging: syntax, SDK component isolation, eligibility guards, original price/locks, live enable flag, funding verification and Google SCA.');
+
+
+// Regression: customer payment QR/email/share links must use branded Dev, not raw pages.dev.
+const publicLinkSource=ledger.match(/export function invoicePublicLink\(context,row\)\{[^\n]+\}/)?.[0];
+assert.ok(publicLinkSource,'invoicePublicLink function exists');
+const makePublicLink=new Function(publicLinkSource.replace('export function','function')+'\nreturn invoicePublicLink;')();
+const exampleInvoice={public_token:'TEST_TOKEN_NOT_REAL'};
+for(const host of ['dev.westtechha.com','pickup-stage1-preview.westtechha.pages.dev'])
+ assert.equal(makePublicLink({request:{url:'https://'+host+'/api/admin/sales/test'}},exampleInvoice),'https://dev.westtechha.com/pay/sale.html#TEST_TOKEN_NOT_REAL');
+assert.equal(makePublicLink({request:{url:'https://westtechha.com/api/admin/sales/test'}},exampleInvoice),'https://westtechha.com/pay/sale.html#TEST_TOKEN_NOT_REAL');
+console.log('PASS invoice links: custom Dev domain for preview and production host unchanged.');
