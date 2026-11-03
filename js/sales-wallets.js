@@ -95,6 +95,21 @@
     config=googleSession.formatConfigForPaymentRequest(details.config);
    }
    if(!config?.allowedPaymentMethods||!config?.apiVersion)return;
+   // Google can reject a gateway/merchant configuration before any PayPal order
+   // is created. Record only safe shape/presence checks in Sandbox, NEVER IDs,
+   // wallet tokens, card data, or the complete configuration object.
+   if(mode==='sandbox'){
+    const methods=config.allowedPaymentMethods.map(method=>({
+     type:String(method?.type||'').slice(0,32),
+     tokenizationType:String(method?.tokenizationSpecification?.type||'').slice(0,32),
+     gateway:String(method?.tokenizationSpecification?.parameters?.gateway||'').slice(0,40),
+     gatewayMerchantIdPresent:Boolean(method?.tokenizationSpecification?.parameters?.gatewayMerchantId)
+    }));
+    console.info('[WestTechHA Google Pay Sandbox] gateway configuration check',{
+     environment:'TEST',merchantInfoPresent:Boolean(config.merchantInfo),
+     methodCount:methods.length,methods
+    });
+   }
    // Google must close its payment sheet before PayPal can open the bank's 3DS modal.
    let googleAwaiting3DS=null,googleBusy=false;
    const client=new window.google.payments.api.PaymentsClient({
@@ -168,7 +183,7 @@
      const errorCode=String(error?.statusCode||error?.name||'UNKNOWN').slice(0,64);
      const errorDetail=String(error?.statusMessage||error?.message||'').slice(0,240);
      if(mode==='sandbox')console.warn('[WestTechHA Google Pay Sandbox] loadPaymentData failure',{code:errorCode,detail:errorDetail});
-     if(errorCode==='CANCELED')status('Google Pay was closed without completing checkout.');
+     if(errorCode==='CANCELED')status('Google Pay did not complete. If Google reported a merchant error, the checkout needs review before retrying.',true);
      else status('Google Pay could not start ('+errorCode+'). Please use PayPal or Venmo.',true);
     }).finally(()=>{googleBusy=false;});
    }});
