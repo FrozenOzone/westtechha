@@ -85,3 +85,51 @@ assert.match(admin,/Review Pending Payment/);assert.match(admin,/Release for New
 assert.match(payment,/paypalRequest\(context\.env,'\/v2\/checkout\/orders\/'/,'provider recheck');
 assert.match(payment,/status='CREATED' AND EXISTS/,'capture race claim protection');
 console.log('PASS recovery: provider identity and amount, no charge, stale age, race claim, admin access, review/void/retry controls.');
+
+
+// Missing/expired PayPal Order: 404 is NOT proof of no capture.
+// Review never writes; only a human-attested VOID is permitted, not a retry.
+assert.match(ledger,/error\.providerHttpStatus=response\.status/,'preserve provider error status');
+assert.match(ledger,/error\.providerErrorCode=/,'preserve provider error code');
+assert.match(payment,/providerHttpStatus===404&&e\.providerErrorCode==='RESOURCE_NOT_FOUND'/,'classify only explicit order not found');
+assert.match(admin,/Void After Manual PayPal Check/);
+assert.match(admin,/I_VERIFIED_NO_PAYMENT_IN_PAYPAL_ACTIVITY/);
+assert.match(recoveryRoute,/void-provider-missing/);
+async function simulateMissingProvider(action,providerErrorCode='RESOURCE_NOT_FOUND',manual=null,failClaim=false){
+ let row={...pendingInvoice,sent_at:null},attempt={...createdAttempt},writes=0,events=0,providerReads=0;
+ const db={prepare(sql){return {bind(...params){return {
+  async all(){assert.match(sql,/sales_payment_attempts/);return {results:[attempt]};},
+  async run(){writes++;if(sql.startsWith("UPDATE sales_payment_attempts")){if(failClaim)return {meta:{changes:0}};attempt.status='CANCELED';return {meta:{changes:1}};}
+   if(sql.startsWith("UPDATE sales_invoices")){row.status=sql.includes("status='VOID'")?'VOID':'DRAFT';return {meta:{changes:1}};}
+   throw Error('Unexpected D1 write: '+sql);}
+ };}};}};
+ const missing=Object.assign(new Error('Resource not found'),{
+  providerHttpStatus:404,providerErrorCode,providerIssue:'INVALID_RESOURCE_ID'
+ });
+ const {reviewAbandonedPayment}=recoveryFactory(
+  ()=>db,()=>{},async()=>row,(m,status)=>Object.assign(new Error(m),{status}),
+  ()=>{},x=>x,async()=>{events++;},async()=>{providerReads++;throw missing;},()=>{}
+ );
+ let result,error;try{result=await reviewAbandonedPayment({env:{}},3,action!=='review',action!=='retry',manual);}
+ catch(e){error=e.message;}
+ return {result,error,row,writes,events,providerReads};
+}
+const attested={invoiceNumber:'WTI-000003',attestation:'I_VERIFIED_NO_PAYMENT_IN_PAYPAL_ACTIVITY'};
+const missingReview=await simulateMissingProvider('review');
+assert.equal(missingReview.result.review.requiresManualReconciliation,true);
+assert.equal(missingReview.row.status,'PAYMENT_PENDING');assert.equal(missingReview.writes,0);
+const missingRetry=await simulateMissingProvider('retry','RESOURCE_NOT_FOUND',attested);
+assert.match(missingRetry.error,/Reopening is not allowed/);assert.equal(missingRetry.writes,0);
+const missingBlindVoid=await simulateMissingProvider('void');
+assert.match(missingBlindVoid.error,/Manual closeout requires/);assert.equal(missingBlindVoid.writes,0);
+const missingWrongInvoice=await simulateMissingProvider('void','RESOURCE_NOT_FOUND',{...attested,invoiceNumber:'WTI-000004'});
+assert.match(missingWrongInvoice.error,/Manual closeout requires/);assert.equal(missingWrongInvoice.writes,0);
+const missingManualVoid=await simulateMissingProvider('void','RESOURCE_NOT_FOUND',attested);
+assert.equal(missingManualVoid.row.status,'VOID');assert.equal(missingManualVoid.result.voided,true);
+assert.equal(missingManualVoid.writes,2);assert.equal(missingManualVoid.events,1);
+const missingWrongProviderError=await simulateMissingProvider('void','INTERNAL_SERVER_ERROR',attested);
+assert.match(missingWrongProviderError.error,/Resource not found/);assert.equal(missingWrongProviderError.writes,0);
+const missingClaimRace=await simulateMissingProvider('void','RESOURCE_NOT_FOUND',attested,true);
+assert.match(missingClaimRace.error,/Checkout changed during review/);
+assert.equal(missingClaimRace.row.status,'PAYMENT_PENDING');
+console.log('PASS missing-order manual recovery: explicit 404, read-only review, no retry, typed attestation, audit, provider errors and claim race.');

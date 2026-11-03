@@ -86,7 +86,7 @@ export function assessAbandonedSale(row,attempt,details,nowMs=Date.now()){
   return blocked('PayPal order is '+providerStatus+'. Do not release; review the order with PayPal.');
  return {canRelease:true,providerStatus,reason:'PayPal confirms an uncaptured, unapproved abandoned order. You may release this local invoice lock.'};
 }
-export async function reviewAbandonedPayment(context,id,release=false,voidInvoice=false){
+export async function reviewAbandonedPayment(context,id,release=false,voidInvoice=false,manualReview=null){
  const db=dbFor(context.env),row=await getInvoice(context.env,id);
  if(!row)throw saleError('Invoice not found.',404);
  if(row.status!=='PAYMENT_PENDING'){
@@ -106,11 +106,29 @@ export async function reviewAbandonedPayment(context,id,release=false,voidInvoic
   if(release)throw saleError(reason,409);
   return {invoice:row,review:{canRelease:false,providerStatus:'UNKNOWN',reason}};
  }
- // Re-query PayPal for EACH review and EACH release; never trust browser-supplied status.
- const details=await paypalRequest(context.env,'/v2/checkout/orders/'+encodeURIComponent(attempt.provider_order_id));
- const review=assessAbandonedSale(row,attempt,details);
+ // Re-query PayPal for EACH review and EACH resolution; never trust browser-supplied provider status.
+ // Orders can expire and return RESOURCE_NOT_FOUND. That is NEVER proof of no payment.
+ let details=null,providerMissing=false;
+ try{details=await paypalRequest(context.env,'/v2/checkout/orders/'+encodeURIComponent(attempt.provider_order_id));}
+ catch(e){
+  if(e.providerHttpStatus===404&&e.providerErrorCode==='RESOURCE_NOT_FOUND'&&e.providerIssue==='INVALID_RESOURCE_ID')providerMissing=true;
+  else throw e;
+ }
+ const review=providerMissing?{
+  canRelease:false,requiresManualReconciliation:true,providerStatus:'NOT_RETRIEVABLE',
+  reason:'PayPal no longer returns this order. It may have expired. This is NOT proof that no payment was captured. Check PayPal Activity by the invoice number, amount and date. Only an administrator who verified NO charge may close this invoice; a fresh payment attempt is blocked.'
+ }:assessAbandonedSale(row,attempt,details);
  if(!release)return {invoice:row,review};
- if(!review.canRelease)throw saleError(review.reason,409);
+ if(providerMissing){
+  const stamp=Date.parse(String(attempt.created_at||'').replace(' ','T')+'Z');
+  if(!Number.isFinite(stamp)||Date.now()-stamp<24*60*60*1000)
+   throw saleError('Provider order is unavailable, but this attempt is too recent for manual closeout. Contact PayPal.',409);
+  if(!voidInvoice||!manualReview||manualReview.invoiceNumber!==row.invoice_number||
+   manualReview.attestation!=='I_VERIFIED_NO_PAYMENT_IN_PAYPAL_ACTIVITY')
+   throw saleError('Manual closeout requires the exact invoice number and explicit confirmation of no charge in PayPal Activity. Reopening is not allowed.',409);
+  if(row.paypal_capture_id||row.paypal_order_id||row.paid_at)
+   throw saleError('This invoice has payment evidence and cannot be manually voided.',409);
+ }else if(!review.canRelease)throw saleError(review.reason,409);
  // Race with buyer approval/capture: only ONE actor may claim CREATED. If
  // capture won first (CAPTURING), this update fails and no release occurs.
  const changed=await db.prepare("UPDATE sales_payment_attempts SET status='CANCELED',updated_at=CURRENT_TIMESTAMP WHERE attempt_id=? AND invoice_id=? AND provider_order_id=? AND status='CREATED' AND EXISTS (SELECT 1 FROM sales_invoices WHERE id=? AND status='PAYMENT_PENDING' AND paypal_capture_id IS NULL AND paypal_order_id IS NULL)")
@@ -120,7 +138,13 @@ export async function reviewAbandonedPayment(context,id,release=false,voidInvoic
  const freed=await db.prepare("UPDATE sales_invoices SET status="+nextStatus+",updated_at=CURRENT_TIMESTAMP WHERE id=? AND status='PAYMENT_PENDING' AND paypal_capture_id IS NULL AND paypal_order_id IS NULL AND NOT EXISTS (SELECT 1 FROM sales_payment_attempts WHERE invoice_id=? AND status IN ('CREATING','CREATED','CAPTURING'))")
   .bind(id,id).run();
  if(freed.meta?.changes!==1)throw saleError('Invoice state changed; manual reconciliation required before retrying.',409);
- await event(db,id,voidInvoice?'PAYMENT_ABANDONED_VOIDED':'PAYMENT_ABANDONED_RELEASED',{method:attempt.method,providerStatus:review.providerStatus,source:'admin'});
- return {invoice:await getInvoice(context.env,id),released:true,voided:!!voidInvoice,
-  review:{canRelease:false,providerStatus:review.providerStatus,reason:voidInvoice?'Abandoned checkout verified and invoice voided. The old payment link is closed.':'Abandoned checkout released. The invoice is available for a fresh payment attempt.'}};
+ await event(db,id,providerMissing?'PAYMENT_MANUAL_PROVIDER_UNAVAILABLE_VOID':voidInvoice?'PAYMENT_ABANDONED_VOIDED':'PAYMENT_ABANDONED_RELEASED',{
+  method:attempt.method,providerStatus:review.providerStatus,source:'admin',manualReconciliation:providerMissing,
+  ...(providerMissing?{attestation:'I_VERIFIED_NO_PAYMENT_IN_PAYPAL_ACTIVITY',providerOrderId:attempt.provider_order_id}:{})
+ });
+ return {invoice:await getInvoice(context.env,id),released:true,voided:!!voidInvoice,manual:providerMissing,
+  review:{canRelease:false,providerStatus:review.providerStatus,reason:providerMissing?
+   'Invoice manually voided based on administrator PayPal Activity review. PayPal did NOT independently confirm no payment. Original payment link is closed.':
+   voidInvoice?'Abandoned checkout verified and invoice voided. The old payment link is closed.':
+   'Abandoned checkout released. The invoice is available for a fresh payment attempt.'}};
 }
