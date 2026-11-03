@@ -57,3 +57,31 @@ const protectedApi=read('functions/api/admin/sales/[id]/index.js');
 assert.match(protectedApi,/requireWestTechAdmin\(ctx\)/);assert.match(protectedApi,/emailSaleLinkToOwner\(ctx,id\)/);
 assert.match(read('migrations/025_sales_optional_contact.sql'),/ALTER TABLE sales_invoices ADD COLUMN customer_phone/);
 console.log('PASS v2: optional contacts, pickup default, precise event address rule, catalog selection, mobile link sharing, protected owner email, phone migration.');
+
+
+// Recovery regression: only a stale, unapproved and uncaptured provider order
+// can be released or voided; capture-stage and mismatched orders remain blocked.
+const recoverySource=payment.replace(/^import .*;\s*$/gm,'').replace(/\bexport (?=(?:const|function|async))/g,'');
+const recoveryFactory=new Function('requireOrdersDb','byToken','getInvoice','saleError','salesMode','summary','event','paypalRequest','orderPayload',recoverySource+'\nreturn {assessAbandonedSale,reviewAbandonedPayment};');
+const {assessAbandonedSale}=recoveryFactory(()=>{},()=>{},()=>{},()=>{},()=>{},()=>{},()=>{},()=>{},()=>{});
+const pendingInvoice={id:3,invoice_number:'WTI-000003',status:'PAYMENT_PENDING',total_cents:1645,paypal_capture_id:null,paypal_order_id:null,paid_at:null};
+const createdAttempt={attempt_id:'uuid',method:'VENMO',status:'CREATED',provider_order_id:'12345ABCDE678901',created_at:'2026-11-01 22:06:06'};
+const providerOrder={id:createdAttempt.provider_order_id,intent:'CAPTURE',status:'CREATED',purchase_units:[{custom_id:'WTI-000003',amount:{currency_code:'USD',value:'16.45'}}]};
+const checkTime=Date.parse('2026-11-03T16:00:00Z');
+const assessment=(r=pendingInvoice,a=createdAttempt,p=providerOrder)=>assessAbandonedSale(r,a,p,checkTime);
+assert.equal(assessment().canRelease,true,'stale, matched unapproved order is releaseable');
+for(const st of ['APPROVED','COMPLETED','PAYER_ACTION_REQUIRED','SAVED'])
+ assert.equal(assessment(pendingInvoice,createdAttempt,{...providerOrder,status:st}).canRelease,false,'block provider '+st);
+assert.equal(assessment(pendingInvoice,createdAttempt,{...providerOrder,purchase_units:[{...providerOrder.purchase_units[0],payments:{captures:[{id:'CAPTURE'}]}}]}).canRelease,false);
+assert.equal(assessment(pendingInvoice,createdAttempt,{...providerOrder,purchase_units:[{...providerOrder.purchase_units[0],payments:{authorizations:[{id:'AUTH'}]}}]}).canRelease,false);
+assert.equal(assessment(pendingInvoice,createdAttempt,{...providerOrder,purchase_units:[{...providerOrder.purchase_units[0],amount:{currency_code:'USD',value:'16.46'}}]}).canRelease,false);
+assert.equal(assessment({...pendingInvoice,paypal_capture_id:'PAYMENT'},createdAttempt,providerOrder).canRelease,false);
+assert.equal(assessment(pendingInvoice,{...createdAttempt,status:'CAPTURING'},providerOrder).canRelease,false);
+assert.equal(assessment(pendingInvoice,{...createdAttempt,created_at:'2026-11-03 15:55:00'},providerOrder).canRelease,false);
+const recoveryRoute=read('functions/api/admin/sales/[id]/index.js');
+assert.match(recoveryRoute,/requireWestTechAdmin\(ctx\)/);
+assert.match(recoveryRoute,/review-pending/);assert.match(recoveryRoute,/void-abandoned/);
+assert.match(admin,/Review Pending Payment/);assert.match(admin,/Release for New Attempt/);assert.match(admin,/Void Abandoned Invoice/);
+assert.match(payment,/paypalRequest\(context\.env,'\/v2\/checkout\/orders\/'/,'provider recheck');
+assert.match(payment,/status='CREATED' AND EXISTS/,'capture race claim protection');
+console.log('PASS recovery: provider identity and amount, no charge, stale age, race claim, admin access, review/void/retry controls.');
